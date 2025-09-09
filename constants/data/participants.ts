@@ -27,5 +27,14 @@ export const PARTICIPANT_DATA: ParticipantSchema[] = [
     avatar_path: 'participants/placeholder-avatar.svg',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'part_004',
+    name: 'Anastasiya Loyko',
+    slug: 'anastasiya-loyko',
+    bio: 'Interaktiv mediakonstnär och VR-specialist från Ukraina/Sverige. Skapar immersiva upplevelser som utforskar identitet, migration och teknologi.',
+    avatar_path: 'participants/placeholder-avatar.svg',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
   }
 ];

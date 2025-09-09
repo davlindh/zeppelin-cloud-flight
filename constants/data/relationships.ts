@@ -32,6 +32,30 @@ export const PROJECT_PARTICIPANTS: ProjectParticipantSchema[] = [
     participant_id: 'part_003',
     role: 'Experimental Band',
     created_at: '2024-01-01T00:00:00Z'
+  },
+  // Anastasiya's VR project
+  {
+    id: 'pp_004',
+    project_id: 'anastasiya-1',
+    participant_id: 'part_004',
+    role: 'Lead Artist & Technical Director',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  // Anastasiya's NFT project
+  {
+    id: 'pp_005',
+    project_id: 'anastasiya-2',
+    participant_id: 'part_004',
+    role: 'Artist & Blockchain Curator',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  // Anastasiya's media wall project
+  {
+    id: 'pp_006',
+    project_id: 'anastasiya-3',
+    participant_id: 'part_004',
+    role: 'Interaction Designer & Visual Artist',
+    created_at: '2024-01-01T00:00:00Z'
   }
 ];
 
