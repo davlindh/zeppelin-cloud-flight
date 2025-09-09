@@ -10,16 +10,16 @@ interface ShowcaseSectionProps {
 
 export const ShowcaseSection: React.FC<ShowcaseSectionProps> = ({ cards, addCard }) => {
     return (
-        <section id="showcase" className="py-20 md:py-32 bg-white">
-            <div className="container mx-auto px-6">
-                <div className="text-center mb-12 md:mb-20">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
+        <section id="showcase" className="py-12 sm:py-20 md:py-32 bg-white">
+            <div className="container mx-auto px-4 sm:px-6">
+                <div className="text-center mb-8 sm:mb-12 md:mb-20">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 font-serif">
                         Levande Konstnärskap i Rörelse
                     </h1>
-                    <h2 className="text-2xl md:text-3xl font-light mb-6 text-gray-700">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-light mb-6 text-gray-700">
                         Visa värdens arbete – delta i berättelsen
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4 leading-relaxed">
+                    <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mt-4 leading-relaxed px-4">
                         Här ser du Zeppel Inn-communityns verkliga ansikte genom projekt som bygger framtiden.
                         För varje verk finns en människa, en historia och möjlighet att engagera sig.
                         Utforska, inspireras och bidra.
@@ -27,11 +27,11 @@ export const ShowcaseSection: React.FC<ShowcaseSectionProps> = ({ cards, addCard
                 </div>
 
                 {/* Engagement Stats */}
-                <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-8 mb-12">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-4 sm:p-8 mb-8 sm:mb-12">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
                         <div>
-                            <div className="text-3xl font-bold text-blue-600">{cards.length}</div>
-                            <div className="text-sm text-gray-600">Aktiva Projekt</div>
+                            <div className="text-2xl sm:text-3xl font-bold text-blue-600">{cards.length}</div>
+                            <div className="text-xs sm:text-sm text-gray-600">Aktiva Projekt</div>
                         </div>
                         <div>
                             <div className="text-3xl font-bold text-green-600">{cards.reduce((acc, card) => acc + (card.participants?.length || 0), 0)}</div>
@@ -52,7 +52,7 @@ export const ShowcaseSection: React.FC<ShowcaseSectionProps> = ({ cards, addCard
                         </p>
                     </div>
                 </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     {cards.map(card => (
                         <ProjectCard key={card.id} card={card} />
                     ))}
