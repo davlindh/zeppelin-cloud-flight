@@ -1,5 +1,6 @@
 import type { ShowcaseCard } from '../types/index';
 import { ANASTASIYA_EXTRA_PROJECTS } from './anastasiyaProjects';
+import { ASSET_PATHS } from './assets';
 
 export const NAV_LINKS = [
     { href: '#vision', label: 'Vision' },
@@ -111,6 +112,7 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
                 name: 'Irina Novokrescionova',
                 role: 'Visual Artist & Performance',
                 bio: 'Karlskronakonstnär från Litauen/Sverige. Målar stadsmotiv, blommor och hav i akvarell. Håller målarworkshops och utför restaurering.',
+                avatar: ASSET_PATHS.participants['irina-novokrescionova'],
             },
         ],
         links: [
@@ -124,7 +126,7 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
         id: '6',
         title: 'LIVEMUSIK: COOKING POTATO & JONATAN HANER',
         description: 'Ambient/experimentellt band från södra Sverige presenterar filmisk ljudexperiment med egna instrument och elektroniska ljudlandskap.',
-        imageUrl: '/images/projects/placeholder-project.jpg',
+        imageUrl: ASSET_PATHS.projects['cooking-potato'],
         fullDescription: 'COOKING POTATO är ett ambient/experimentellt band från södra Sverige som bildades i början av Rysslands invasion av Ukraina på IFÖ CENTER i Bromölla. Bandet experimenterar ständigt med ljud och instrument och skapar sina egna. Under festivalen kommer vi höra deras unika ljudvärld som är tydligt filmisk i naturen, skräddarsydd för konstnärliga upplevelser och potentiella soundtracks.',
         tags: ['Ambient Musik', 'Experimentellt', 'Elektronika', 'Filmisk Ljud'],
         participants: [

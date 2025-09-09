@@ -14,7 +14,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   src,
   alt,
   className = '',
-  fallbackSrc = '/images/ui/placeholder-project.jpg',
+  fallbackSrc = '/images/ui/placeholder-project.svg',
   loading = 'lazy',
   sizes,
   srcSet

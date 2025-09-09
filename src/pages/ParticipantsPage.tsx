@@ -90,7 +90,7 @@ export const ParticipantsPage: React.FC = () => {
                     src={participant.avatar || ''}
                     alt={participant.name}
                     className="w-16 h-16 rounded-full object-cover"
-                    fallbackSrc="/images/ui/placeholder-project.jpg"
+                    fallbackSrc={'/images/ui/placeholder-avatar.svg'}
                   />
                 </div>
                 
