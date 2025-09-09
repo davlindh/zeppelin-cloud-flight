@@ -4,6 +4,7 @@ export const NAV_LINKS = [
     { href: '#vision', label: 'Vision' },
     { href: '#systematik', label: 'Systematik' },
     { href: '/showcase', label: 'Showcase' },
+    { href: '/participants', label: 'Deltagare' },
     { href: '#partner', label: 'Partners' },
 ];
 

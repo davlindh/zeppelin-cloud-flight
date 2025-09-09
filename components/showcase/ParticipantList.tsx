@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { slugify } from '../../src/utils/participantHelpers';
 
 interface Participant {
   name: string;
@@ -45,9 +47,12 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({ participants }
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-lg text-gray-800 mb-1">
+                <Link 
+                  to={`/participants/${slugify(participant.name)}`}
+                  className="font-semibold text-lg text-gray-800 mb-1 hover:text-amber-600 transition-colors duration-200 inline-block"
+                >
                   {participant.name}
-                </h3>
+                </Link>
 
                 <p className="text-amber-600 font-medium text-sm mb-3">
                   {participant.role}
