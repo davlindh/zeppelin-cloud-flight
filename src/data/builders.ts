@@ -17,6 +17,29 @@ import { getFullAssetUrl } from '../../constants/storage';
 import { ANASTASIYA_EXTRA_PROJECTS } from '../../constants/anastasiyaProjects';
 
 /**
+ * Normalize asset paths to prevent duplication
+ */
+const normalizeAssetPath = (bucket: keyof typeof import('../../constants/storage').STORAGE_BUCKETS, rawPath: string | undefined): string => {
+  if (!rawPath) return getFullAssetUrl(bucket, 'placeholder.svg');
+  
+  // Handle external URLs
+  if (rawPath.startsWith('http')) return rawPath;
+  
+  // Handle already full paths
+  if (rawPath.startsWith('/images/')) return rawPath;
+  
+  // Handle bucket-prefixed paths (e.g., "projects/image.jpg")
+  const bucketPrefix = `${bucket}/`;
+  if (rawPath.startsWith(bucketPrefix)) {
+    const filename = rawPath.substring(bucketPrefix.length);
+    return getFullAssetUrl(bucket, filename);
+  }
+  
+  // Handle direct filenames
+  return getFullAssetUrl(bucket, rawPath);
+};
+
+/**
  * Build ShowcaseCard objects from normalized data
  */
 export function buildShowcaseCards(): ShowcaseCard[] {
@@ -32,7 +55,7 @@ export function buildShowcaseCards(): ShowcaseCard[] {
           name: participant.name,
           role: pp.role,
           bio: participant.bio,
-          avatar: participant.avatar_path ? getFullAssetUrl('participants', participant.avatar_path) : undefined
+          avatar: normalizeAssetPath('participants', participant.avatar_path)
         };
       })
       .filter(Boolean) as ShowcaseCard['participants'];
@@ -47,7 +70,7 @@ export function buildShowcaseCards(): ShowcaseCard[] {
         return {
           name: sponsor.name,
           type: sponsor.type,
-          logo: sponsor.logo_path ? getFullAssetUrl('partners', sponsor.logo_path) : undefined,
+          logo: normalizeAssetPath('partners', sponsor.logo_path),
           website: sponsor.website
         };
       })
@@ -93,7 +116,7 @@ export function buildShowcaseCards(): ShowcaseCard[] {
       id: project.id,
       title: project.title,
       description: project.description,
-      imageUrl: getFullAssetUrl('projects', project.image_path || 'placeholder-project.svg'),
+      imageUrl: normalizeAssetPath('projects', project.image_path),
       fullDescription: project.full_description,
       purpose: project.purpose,
       expected_impact: project.expected_impact,
