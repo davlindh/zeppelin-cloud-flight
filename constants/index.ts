@@ -178,7 +178,7 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
             registration_required: false,
             requirements: ['Medhavd filt eller stol rekommenderas', 'Observera väderförhållanden']
         },
-        associations: ['Kollektiv intelligens', 'Biomimikry', 'Ljuskonst', 'Skärgårdsmiljö']
+        associations: ['Kollektiv intelligens', 'Biomimikry', 'Ljuskonst', 'Skärgårdsmiljö'],
         participants: [
             {
                 name: 'David Svensson',
