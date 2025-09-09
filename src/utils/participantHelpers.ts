@@ -10,6 +10,18 @@ export interface ParticipantEntity {
     id: string;
     title: string;
   }>;
+  featuredMedia: Array<{
+    type: 'video' | 'audio' | 'image' | 'document';
+    url: string;
+    title: string;
+    description?: string;
+    projectTitle: string;
+  }>;
+  personalLinks: Array<{
+    type: 'github' | 'website' | 'demo' | 'other';
+    url: string;
+    projectTitle: string;
+  }>;
 }
 
 export function slugify(text: string): string {
@@ -67,9 +79,39 @@ export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[
             title: card.title
           });
         }
+        
+        // Add media from this project
+        if (card.media) {
+          card.media.forEach(mediaItem => {
+            const existingMedia = existingParticipant.featuredMedia.find(m => 
+              m.url === mediaItem.url && m.projectTitle === card.title
+            );
+            if (!existingMedia) {
+              existingParticipant.featuredMedia.push({
+                ...mediaItem,
+                projectTitle: card.title
+              });
+            }
+          });
+        }
+        
+        // Add personal/professional links from this project
+        if (card.links) {
+          card.links.forEach(link => {
+            const existingLink = existingParticipant.personalLinks.find(l => 
+              l.url === link.url && l.projectTitle === card.title
+            );
+            if (!existingLink) {
+              existingParticipant.personalLinks.push({
+                ...link,
+                projectTitle: card.title
+              });
+            }
+          });
+        }
       } else {
         // Create new participant
-        participantMap.set(participant.name, {
+        const newParticipant: ParticipantEntity = {
           slug: finalSlug,
           name: participant.name,
           roles: [participant.role],
@@ -78,8 +120,32 @@ export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[
           projects: [{
             id: card.id,
             title: card.title
-          }]
-        });
+          }],
+          featuredMedia: [],
+          personalLinks: []
+        };
+        
+        // Add media from this project
+        if (card.media) {
+          card.media.forEach(mediaItem => {
+            newParticipant.featuredMedia.push({
+              ...mediaItem,
+              projectTitle: card.title
+            });
+          });
+        }
+        
+        // Add personal/professional links from this project
+        if (card.links) {
+          card.links.forEach(link => {
+            newParticipant.personalLinks.push({
+              ...link,
+              projectTitle: card.title
+            });
+          });
+        }
+        
+        participantMap.set(participant.name, newParticipant);
       }
     });
   });

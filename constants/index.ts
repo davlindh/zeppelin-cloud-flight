@@ -94,6 +94,12 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
         imageUrl: '/images/projects/placeholder-project.jpg',
         fullDescription: 'Hon ber alla som vill, och även de som inte vill, att filma ön med korta, 10-15 sekunder långa klipp. Det kan vara natur, hus, skuggor, rörelser – ögonblick som får dig att säga "Wow!". Videoprojektion på Vita Huset, drönare från ovan och robotgräsklippare skapar en multisensorisk upplevelse. Publiken blir samtidigt både objekt och skapare av filmen, vilket helt realiserar begreppet "Fånga din Fantasi" genom att kombinera film, teknologi och öns unika atmosfär.',
         tags: ['Video Art', 'Drönare', 'Robotik', 'Publikdeltagande'],
+        media: [
+            { type: 'video', url: 'https://vimeo.com/anastasiya/fantasy-capture', title: 'Bakom kulisserna: Fånga din fantasi', description: 'Exklusiv dokumentär om skapandeprocessen' },
+            { type: 'audio', url: 'https://soundcloud.com/anastasiya/artist-interview', title: 'Konstnärsintervju med Anastasiya', description: 'Djup diskussion om teknik, konst och identitet' },
+            { type: 'image', url: '/images/projects/anastasiya-portfolio.jpg', title: 'Portfolio gallerí', description: 'Urval av tidigare verk och inspirationer' },
+            { type: 'document', url: 'https://example.com/anastasiya-artist-statement.pdf', title: 'Konstnärlig vision', description: 'Anastasiyas konstnärliga statement och filosofi' }
+        ],
         participants: [
             {
                 name: 'Anastasiya Loyko',
@@ -108,8 +114,10 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
             },
         ],
         links: [
-            { type: 'demo' as const, url: 'https://example.com/fangla-din-fantasi' },
-            { type: 'website' as const, url: 'https://example.com/anastasiya-loyko' }
+            { type: 'demo' as const, url: 'https://example.com/fantasy-capture-demo' },
+            { type: 'website' as const, url: 'https://anastasiya-loyko.com' },
+            { type: 'github' as const, url: 'https://github.com/anastasiya-loyko' },
+            { type: 'other' as const, url: 'https://instagram.com/anastasiya.loyko.art' }
         ],
     },
     {

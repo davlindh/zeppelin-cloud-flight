@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ImageWithFallback } from '../../components/showcase/ImageWithFallback';
+import { ProjectMedia, ProjectLinks } from '../../components/showcase';
 import { aggregateParticipants } from '../utils/participantHelpers';
 import { INITIAL_CARDS } from '../../constants/index';
 import type { ParticipantEntity } from '../utils/participantHelpers';
@@ -89,6 +90,44 @@ export const ParticipantDetailPage: React.FC = () => {
                 <p className="text-muted-foreground leading-relaxed">
                   {participant.bio}
                 </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Featured Media Section */}
+          {participant.featuredMedia && participant.featuredMedia.length > 0 && (
+            <Card>
+              <CardContent className="p-6">
+                <ProjectMedia media={participant.featuredMedia} />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Personal Links Section */}
+          {participant.personalLinks && participant.personalLinks.length > 0 && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold text-foreground mb-6">
+                  Profillänkar
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {Array.from(new Map(participant.personalLinks.map(link => [link.url, link])).values()).map((link, index) => (
+                    <Button key={index} variant="outline" asChild>
+                      <a 
+                        href={link.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        {link.type === 'github' && 'GitHub'}
+                        {link.type === 'website' && 'Website'}
+                        {link.type === 'demo' && 'Demo'}
+                        {link.type === 'other' && 'Social'}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </Button>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
