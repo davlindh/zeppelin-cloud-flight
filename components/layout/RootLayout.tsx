@@ -11,7 +11,7 @@ export const RootLayout: React.FC = () => {
                 Skip to main content
             </a>
             <Header />
-            <main id="main-content" role="main" className="pt-20">
+            <main id="main-content" role="main" className="pt-16 sm:pt-20">
                 <Breadcrumbs />
                 <Outlet />
             </main>

@@ -6,6 +6,8 @@ interface ImageWithFallbackProps {
   className?: string;
   fallbackSrc?: string;
   loading?: 'lazy' | 'eager';
+  sizes?: string;
+  srcSet?: string;
 }
 
 export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
@@ -13,7 +15,9 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   alt,
   className = '',
   fallbackSrc = '/images/ui/placeholder-project.jpg',
-  loading = 'lazy'
+  loading = 'lazy',
+  sizes,
+  srcSet
 }) => {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
@@ -31,6 +35,8 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
       alt={alt}
       className={className}
       loading={loading}
+      sizes={sizes}
+      srcSet={srcSet}
       onError={handleError}
     />
   );

@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { NAV_LINKS } from '../../constants/index';
 import { useSmoothScroll } from '../../hooks/useSmoothScroll';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
     
     const closeMenu = () => setIsMenuOpen(false);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+    // Auto-close menu on route change
+    useEffect(() => {
+        closeMenu();
+    }, [location.pathname]);
+
+    // Prevent background scroll when mobile menu is open
+    useEffect(() => {
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMenuOpen]);
 
     const handleNavClick = useSmoothScroll(closeMenu);
     
@@ -18,10 +37,10 @@ export const Header: React.FC = () => {
         `block py-3 px-6 text-sm hover:bg-gray-50 ${isActive ? 'text-amber-500 font-semibold' : 'text-gray-700'}`;
 
     return (
-        <header className="bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm">
-            <div className="container mx-auto px-6 py-4">
+        <header className="bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm safe-area-inset-top">
+            <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
                 <div className="flex justify-between items-center">
-                    <Link to="/home" onClick={closeMenu} className="text-3xl font-bold font-serif">Zeppel <span className="text-amber-500">Inn</span></Link>
+                    <Link to="/home" onClick={closeMenu} className="text-2xl sm:text-3xl font-bold font-serif">Zeppel <span className="text-amber-500">Inn</span></Link>
 <nav aria-label="Primary navigation" className="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wider uppercase">
                         {NAV_LINKS.map(link => (
                             link.href.startsWith('/') ?
