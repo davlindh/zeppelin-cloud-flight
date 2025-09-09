@@ -47,7 +47,7 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
             requirements: ['Grundläggande erfarenhet av hantverk eller digital design', 'Fysisk förmåga att hantera verktyg']
         },
         associations: ['Digital fabrication', 'Parametrisk design', 'Hållbar teknologi', 'Konst & vetenskap'],
-        expected_impact: 'Skapa en ny generation av tekno-konstnärer som kan använda automatisering för hållbara och innovativa konstnärliga uttryck, samt etablera Zeppel Inn som ett ledande centrum för teknikkonst i Skandinavien.'
+        expected_impact: 'Skapa en ny generation av tekno-konstnärer som kan använda automatisering för hållbara och innovativa konstnärliga uttryck, samt etablera Zeppel Inn som ett ledande centrum för teknikkonst i Skandinavien.',
         participants: [
             {
                 name: 'Anna Karlsson',
