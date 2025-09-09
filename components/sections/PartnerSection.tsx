@@ -1,13 +1,26 @@
 import React from 'react';
 import { Button } from '../ui';
 
-const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: string }> = ({ alt, src, href, tagline }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-white/5 rounded-xl hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 backdrop-blur-sm hover:scale-105">
+const PartnerLogo: React.FC<{ alt: string, src: string, srcPng?: string, href: string, tagline?: string, invertOnDark?: boolean }> = ({ alt, src, srcPng, href, tagline, invertOnDark = false }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" 
+       className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-white/5 rounded-xl hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 backdrop-blur-sm hover:scale-105"
+       aria-label={`Besök ${alt}`}>
         <div className="h-16 sm:h-20 flex items-center justify-center mb-2 sm:mb-3">
-            <img src={src} alt={alt} className="max-h-full w-auto group-hover:scale-110 transition-transform duration-300 filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0" />
+            <picture>
+                <source srcSet={src} type="image/svg+xml" />
+                {srcPng && <img src={srcPng} alt={alt} />}
+                <img 
+                    src={srcPng || src} 
+                    alt={alt} 
+                    className={`max-h-full w-auto object-contain group-hover:scale-110 transition-transform duration-300 ${invertOnDark ? 'dark:invert' : ''}`}
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 640px) 120px, 160px"
+                />
+            </picture>
         </div>
         {tagline && (
-            <p className="text-xs text-center text-gray-300 group-hover:text-white transition-colors duration-300 leading-tight font-medium">
+            <p className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors duration-300 leading-tight font-medium">
                 {tagline}
             </p>
         )}
@@ -17,26 +30,28 @@ const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: 
 export const PartnerSection: React.FC = () => {
     const partners = [
         {
-            alt: "Stenbräcka Kursgård logo",
+            alt: "Stenbräcka Kursgård",
             src: "/images/partners/stenbracka-logo.png",
             href: "https://stenbracka.se/",
             tagline: "Konstnärliga och tekniska miljöer i skärgården"
         },
         {
-            alt: "Maskin & Fritid logo",
+            alt: "Maskin & Fritid",
             src: "/images/partners/maskin-fritid-logo.png",
             href: "https://www.maskfri.se/",
             tagline: "Lokala resurser för bygg och teknik"
         },
         {
-            alt: "Karlskrona Kommun logo",
-            src: "/images/partners/karlskrona-kommun-logo.png",
+            alt: "Karlskrona Kommun",
+            src: "/images/partners/karlskrona-kommun-logo.svg",
+            srcPng: "/images/partners/karlskrona-kommun-logo.png",
             href: "https://www.karlskrona.se/",
             tagline: "Regional utveckling och stöd"
         },
         {
-            alt: "Visit Blekinge logo",
-            src: "/images/partners/visit-blekinge-logo.png",
+            alt: "Visit Blekinge",
+            src: "/images/partners/visit-blekinge-logo.svg",
+            srcPng: "/images/partners/visit-blekinge-logo.png",
             href: "https://www.visitblekinge.se/",
             tagline: "Regional turism och kultur"
         },
@@ -60,8 +75,10 @@ export const PartnerSection: React.FC = () => {
                             key={p.alt}
                             alt={p.alt}
                             src={p.src}
+                            srcPng={p.srcPng}
                             href={p.href}
                             tagline={p.tagline}
+                            invertOnDark={p.invertOnDark}
                         />
                     ))}
                 </div>
