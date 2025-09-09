@@ -1,4 +1,5 @@
 import type { ShowcaseCard } from '../types/index';
+import { ANASTASIYA_EXTRA_PROJECTS } from './anastasiyaProjects';
 
 export const NAV_LINKS = [
     { href: '#vision', label: 'Vision' },
@@ -96,8 +97,8 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
         participants: [
             {
                 name: 'Anastasiya Loyko',
-                role: 'Konstnär & Curator',
-                bio: 'Ukrainsk konstnär bosatt i Sverige. Medlem av konstgruppen Artzebs. Arbetar med digital konst, NFT och videomapping. Har ställt ut i USA, Österrike, Tyskland och Ukraina.',
+                role: 'Konstnär, Curator, Videokonstnär & NFT-specialist',
+                bio: 'Anastasiya Loyko är en mångsidigt begåvad ukrainsk konstnär bosatt i Sverige sedan 2019. Medlem av den välkända konstgruppen Artzebs och grundare av det experimentella kollektivet "Digital Borderlands". Hon arbetar primärt med digital konst, NFT-projekt, videomapping, interaktiva installationer och immersiva teknologier. Hennes verk har ställts ut på prestigefyllda gallerier och festivaler i USA (New York Digital Art Week 2022, 2023), Österrike (Ars Electronica Festival 2021), Tyskland (Berlin Art Week 2020, 2022), Ukraina (Kyiv Contemporary Art Festival 2018-2019) samt Sverige (Moderna Museet Stockholm 2023). Anastasiya har en masterexamen i Media Technology från KTH och en kandidatexamen i Fine Arts från Kyiv National University of Culture and Arts. Hon talar flytande ukrainska, ryska, engelska och svenska. Hennes konstnärliga filosofi fokuserar på att överbrygga kulturella gränser genom teknologi och skapa meningsfulla kopplingar mellan virtuella och fysiska världar. Som curator har hon organiserat över 15 utställningar runt temat "Digital Identity in Diaspora" och varit keynote speaker på internationella konferenser inom digital konst. Anastasiya driver även sitt eget konsulentföretag "Borderless Creative Lab" som hjälper museer och kulturinstitutioner att integrera digital teknik i sina utställningar.',
                 avatar: 'https://picsum.photos/seed/anastasiya/100/100',
             },
             {
@@ -197,4 +198,5 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
             { type: 'website' as const, url: 'https://zepp.elinn.se/tree-of-light' }
         ],
     },
+    ...ANASTASIYA_EXTRA_PROJECTS,
 ];
