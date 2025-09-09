@@ -54,7 +54,7 @@ export const ParticipantDetailPage: React.FC = () => {
                 src={participant.avatar || ''}
                 alt={participant.name}
                 className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white/20"
-                fallbackSrc="/images/ui/placeholder-avatar.svg"
+                fallbackSrc="/images/participants/placeholder-avatar.svg"
               />
             </div>
             
