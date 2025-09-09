@@ -16,6 +16,38 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
         imageUrl: '/images/projects/placeholder-project.jpg',
         fullDescription: 'I detta intensiva tvåveckorsprogram utforskar vi samspelet mellan teknik och konst genom praktisk användning av automatiserade Kress-robotar. Genom att kombinera parametrisk design, realtids-simulering och storskaliga materialtransformationer, skapar deltagarna unika konstverk som utmanar gränserna mellan digital konceptualisering och fysiskt hantverk.',
         tags: ['Automation', 'Konst', 'Teknik', 'Robotics'],
+        purpose: 'Att demokratisera avancerad automatiseringsteknologi för konstnärlig användning och utforska hur robotik kan förstärka mänsklig kreativitet snarare än ersätta den.',
+        budget: {
+            amount: 125000,
+            currency: 'SEK',
+            breakdown: [
+                { item: 'Robotutrustning & underhåll', cost: 45000 },
+                { item: 'Material & verktyg', cost: 35000 },
+                { item: 'Expertledning & workshops', cost: 25000 },
+                { item: 'Lokaler & transport', cost: 20000 }
+            ]
+        },
+        timeline: {
+            startDate: '2024-09-15',
+            endDate: '2024-09-29',
+            milestones: [
+                { date: '2024-09-16', title: 'Introduktion & säkerhet', description: 'Grundläggande robothantering' },
+                { date: '2024-09-20', title: 'Första prototyper', description: 'Deltagarna skapar sina första automatiserade skulpturer' },
+                { date: '2024-09-27', title: 'Offentlig presentation', description: 'Visning av färdiga verk för allmänheten' }
+            ]
+        },
+        sponsors: [
+            { name: 'Karlskrona Kommun', type: 'main' as const, logo: '/images/partners/karlskrona-kommun-logo.png' },
+            { name: 'BTH Innovation', type: 'partner' as const, website: 'https://bth.se' }
+        ],
+        access: {
+            target_audience: 'Konstnärer, designers och teknikintresserade från 18 år',
+            capacity: 12,
+            registration_required: true,
+            requirements: ['Grundläggande erfarenhet av hantverk eller digital design', 'Fysisk förmåga att hantera verktyg']
+        },
+        associations: ['Digital fabrication', 'Parametrisk design', 'Hållbar teknologi', 'Konst & vetenskap'],
+        expected_impact: 'Skapa en ny generation av tekno-konstnärer som kan använda automatisering för hållbara och innovativa konstnärliga uttryck, samt etablera Zeppel Inn som ett ledande centrum för teknikkonst i Skandinavien.'
         participants: [
             {
                 name: 'Anna Karlsson',
@@ -129,6 +161,24 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
         imageUrl: '/images/projects/placeholder-project.jpg',
         fullDescription: 'Sammansmältningen av alla Zeppel Inn-program i en poetisk ljusmanifestation över Blekinges skärgård. Med över 50 programmerbara drönare skapar vi ett levande konstverk som förändras i realtid baserat på deltagarnas gemensamma resa. Showen undersöker teman om tillväxt, nätverk och kollektiv intelligens genom ljus, rörelse och ljud.',
         tags: ['Drone', 'Ljus', 'Performance', 'Skärgård'],
+        purpose: 'Att skapa en minnesvärd kollektiv upplevelse som syntetiserar alla workshops genom en poetisk manifestation av ljus, teknologi och naturens skönhet.',
+        media: [
+            { type: 'video' as const, url: 'https://example.com/tree-preview', title: 'Förhandsvisning: Tree of Light', description: 'Tidigare drönarprojekt och teknisk demonstration' },
+            { type: 'audio' as const, url: 'https://example.com/soundscape', title: 'Ljudlandskap', description: 'Ambient musik komponerad för ljusshowen' }
+        ],
+        timeline: {
+            startDate: '2024-09-27',
+            endDate: '2024-09-27',
+            milestones: [
+                { date: '2024-09-27', title: 'Ljusshow premiär', description: 'Kl. 20:30 - Huvudevent över skärgården' }
+            ]
+        },
+        access: {
+            target_audience: 'Öppen för allmänheten',
+            registration_required: false,
+            requirements: ['Medhavd filt eller stol rekommenderas', 'Observera väderförhållanden']
+        },
+        associations: ['Kollektiv intelligens', 'Biomimikry', 'Ljuskonst', 'Skärgårdsmiljö']
         participants: [
             {
                 name: 'David Svensson',

@@ -4,7 +4,13 @@ import {
   ProjectHero,
   ProjectDescription,
   ParticipantList,
-  ProjectLinks
+  ProjectLinks,
+  ProjectPurpose,
+  ProjectBudget,
+  ProjectTimeline,
+  ProjectSponsors,
+  ProjectMedia,
+  ProjectAccess
 } from '../components/showcase';
 import { INITIAL_CARDS } from '../constants/index';
 import type { ShowcaseCard } from '../types/index';
@@ -45,6 +51,23 @@ export const ProjectDetailPage: React.FC = () => {
             content={card.fullDescription || card.description}
             highlights={[]} // Kan utökas senare med highlights från data
           />
+
+          <ProjectPurpose 
+            purpose={card.purpose}
+            expectedImpact={card.expected_impact}
+            associations={card.associations}
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <ProjectBudget budget={card.budget} />
+            <ProjectTimeline timeline={card.timeline} />
+          </div>
+
+          <ProjectAccess access={card.access} />
+
+          <ProjectSponsors sponsors={card.sponsors} />
+
+          <ProjectMedia media={card.media} />
 
           {card.participants && card.participants.length > 0 && (
             <ParticipantList participants={card.participants} />
