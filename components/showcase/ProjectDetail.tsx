@@ -95,22 +95,22 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ card, onClose }) =
         )}
 
         {/* Links */}
-        {card.links && (
+        {card.links && card.links.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold text-gray-800">Länkar</h2>
             <div className="flex flex-wrap gap-3">
-              {card.links.website && (
-                <Button variant="secondary" href={card.links.website}>
+              {card.links.find(link => link.type === 'website') && (
+                <Button variant="secondary" href={card.links.find(link => link.type === 'website')?.url}>
                   Besök hemsida
                 </Button>
               )}
-              {card.links.github && (
-                <Button variant="secondary" href={card.links.github}>
+              {card.links.find(link => link.type === 'github') && (
+                <Button variant="secondary" href={card.links.find(link => link.type === 'github')?.url}>
                   GitHub
                 </Button>
               )}
-              {card.links.demo && (
-                <Button variant="primary" href={card.links.demo}>
+              {card.links.find(link => link.type === 'demo') && (
+                <Button variant="primary" href={card.links.find(link => link.type === 'demo')?.url}>
                   Se demo
                 </Button>
               )}
