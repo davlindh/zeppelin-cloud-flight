@@ -1,12 +1,13 @@
 // Additional projects for Anastasiya Loyko to test UI limits
 import type { ShowcaseCard } from '../types/index';
+import { getFullAssetUrl } from './storage';
 
 export const ANASTASIYA_EXTRA_PROJECTS: ShowcaseCard[] = [
     {
         id: 'anastasiya-1',
         title: 'DIGITAL BORDERLANDS: VR EXHIBITION',
         description: 'En virtuell utställning som utforskar diaspora-identitet genom immersiva teknologier.',
-        imageUrl: '/images/projects/placeholder-project.jpg',
+        imageUrl: getFullAssetUrl('projects', 'placeholder-project.jpg'),
         fullDescription: 'Digital Borderlands är en banbrytande VR-utställning som kombinerar fotogrammetri, AI-genererad konst och interaktiva berättelser för att utforska teman kring migration, identitet och tillhörighet.',
         tags: ['VR', 'AI Art', 'Diaspora', 'Interaktiv'],
         media: [
@@ -30,7 +31,7 @@ export const ANASTASIYA_EXTRA_PROJECTS: ShowcaseCard[] = [
         id: 'anastasiya-2', 
         title: 'NFT COLLECTION: FRAGMENTS OF HOME',
         description: 'En emotionell NFT-samling som dokumenterar förlorade platser och minnen från Ukraina.',
-        imageUrl: '/images/projects/placeholder-project.jpg',
+        imageUrl: getFullAssetUrl('projects', 'placeholder-project.jpg'),
         fullDescription: 'Fragments of Home är en känslosam NFT-kollektion på 100 verk som dokumenterar förlorade platser, byggnader och landskap från Ukraina genom digital konst och fotomanipulation.',
         tags: ['NFT', 'Blockchain', 'Memory', 'Ukraine'],
         media: [
@@ -54,7 +55,7 @@ export const ANASTASIYA_EXTRA_PROJECTS: ShowcaseCard[] = [
         id: 'anastasiya-3',
         title: 'INTERACTIVE MEDIA WALL: STOCKHOLM CITY',
         description: 'Permanent installation på Arlanda Airport som reagerar på passagerarnas rörelser.',
-        imageUrl: '/images/projects/placeholder-project.jpg', 
+        imageUrl: getFullAssetUrl('projects', 'placeholder-project.jpg'), 
         fullDescription: 'En 15 meter bred interaktiv medievägg installerad på Arlanda Airport som använder motion tracking och AI för att skapa dynamiska visuella berättelser baserade på resenärernas rörelser.',
         tags: ['Interactive', 'Public Art', 'AI', 'Motion Tracking'],
         media: [
