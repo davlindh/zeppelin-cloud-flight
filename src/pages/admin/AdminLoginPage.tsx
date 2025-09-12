@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,11 +9,20 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export const AdminLoginPage = () => {
   const { isAdmin, login, signup, loading } = useAdminAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSignupMode, setIsSignupMode] = useState(false);
+
+  // Handle redirect when admin status changes
+  useEffect(() => {
+    if (isAdmin && !loading) {
+      console.log('AdminLoginPage: Redirecting to /admin');
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, loading, navigate]);
 
   if (isAdmin) {
     return <Navigate to="/admin" replace />;
