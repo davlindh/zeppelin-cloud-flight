@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HeroSection, VisionSection, EngagementSection, SystematicsSection, PartnerSection } from '../components/sections';
-import { PublicSubmissionForm } from '@/components/public';
+import { EnhancedSubmissionForm } from '@/components/public';
 import { Button } from '@/components/ui/button';
 import { Modal } from '../components/ui/Modal';
 
@@ -41,7 +41,7 @@ export const HomePage: React.FC = () => {
             {/* Submission Form Modal */}
             {showSubmissionForm && (
                 <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-                    <PublicSubmissionForm onClose={() => setShowSubmissionForm(false)} />
+                    <EnhancedSubmissionForm onClose={() => setShowSubmissionForm(false)} />
                 </Modal>
             )}
         </>

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ShowcaseSection } from '../components/showcase';
 import { Button } from '../components/ui';
-import { PublicSubmissionForm } from '@/components/public';
+import { EnhancedSubmissionForm } from '@/components/public';
 import { Modal } from '../components/ui/Modal';
 import type { ShowcaseCard } from '../types/index';
 import { INITIAL_CARDS } from '../constants/index';
@@ -95,6 +95,7 @@ export const ShowcasePage: React.FC = () => {
                             </Button>
 
                             <Button
+                                variant="secondary"
                                 onClick={() => setShowSubmissionForm(true)}
                                 className="whitespace-nowrap bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600"
                             >
@@ -172,7 +173,7 @@ export const ShowcasePage: React.FC = () => {
             {/* Submission Form Modal */}
             {showSubmissionForm && (
                 <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-                    <PublicSubmissionForm onClose={() => setShowSubmissionForm(false)} />
+                    <EnhancedSubmissionForm onClose={() => setShowSubmissionForm(false)} />
                 </Modal>
             )}
         </div>
