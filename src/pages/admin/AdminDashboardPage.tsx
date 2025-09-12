@@ -3,10 +3,10 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EnhancedProjectForm } from '@/components/admin/EnhancedProjectForm';
+import { EnhancedShowcaseForm } from '@/components/admin/EnhancedShowcaseForm';
 import { ParticipantForm } from '@/components/admin/ParticipantForm';
 import { EnhancedSponsorForm } from '@/components/admin/EnhancedSponsorForm';
-import { ProjectManagementList } from '@/components/admin/ProjectManagementList';
+import { ShowcaseManagementList } from '@/components/admin/ShowcaseManagementList';
 import { ParticipantManagementList } from '@/components/admin/ParticipantManagementList';
 import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
 import { EnhancedSubmissionInbox } from '@/components/admin/EnhancedSubmissionInbox';
@@ -50,7 +50,7 @@ export const AdminDashboardPage = () => {
             </TabsTrigger>
             <TabsTrigger value="projects">
               <FolderOpen className="h-4 w-4 mr-2" />
-              Projects
+              Showcase
             </TabsTrigger>
             <TabsTrigger value="participants">
               <Users className="h-4 w-4 mr-2" />
@@ -81,11 +81,11 @@ export const AdminDashboardPage = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button 
-                    onClick={() => setActiveForm('project')} 
+                    onClick={() => setActiveForm('showcase')} 
                     className="w-full justify-start"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add New Project
+                    Add New Showcase Item
                   </Button>
                   <Button 
                     onClick={() => setActiveForm('participant')} 
@@ -113,7 +113,7 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="projects">
-            <ProjectManagementList onAddProject={() => setActiveForm('project')} />
+            <ShowcaseManagementList onAddShowcase={() => setActiveForm('showcase')} />
           </TabsContent>
 
           <TabsContent value="participants">
@@ -144,8 +144,8 @@ export const AdminDashboardPage = () => {
         </Tabs>
 
         {/* Form Modals */}
-        {activeForm === 'project' && (
-          <EnhancedProjectForm onClose={handleFormClose} />
+        {activeForm === 'showcase' && (
+          <EnhancedShowcaseForm onClose={handleFormClose} />
         )}
         {activeForm === 'participant' && (
           <ParticipantForm onClose={handleFormClose} />

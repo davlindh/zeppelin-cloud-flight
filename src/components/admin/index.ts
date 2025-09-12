@@ -5,3 +5,5 @@ export { FileUpload } from './FileUpload';
 export { SponsorForm } from './SponsorForm';
 export { EnhancedSubmissionInbox } from './EnhancedSubmissionInbox';
 export { RecentActivity } from './RecentActivity';
+export { ShowcaseManagementList } from './ShowcaseManagementList';
+export { EnhancedShowcaseForm } from './EnhancedShowcaseForm';

@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { FolderOpen, Users, Building, Inbox, TrendingUp } from 'lucide-react';
 
 interface Stats {
-  projects: number;
+  showcases: number;
   participants: number;
   sponsors: number;
   pendingSubmissions: number;
@@ -12,7 +12,7 @@ interface Stats {
 
 export const AdminStats = () => {
   const [stats, setStats] = useState<Stats>({
-    projects: 0,
+    showcases: 0,
     participants: 0,
     sponsors: 0,
     pendingSubmissions: 0,
@@ -42,7 +42,7 @@ export const AdminStats = () => {
       
       // Fetch all stats in parallel
       const [
-        { count: projectsCount },
+        { count: showcasesCount },
         { count: participantsCount },
         { count: sponsorsCount },
         { count: pendingCount }
@@ -54,7 +54,7 @@ export const AdminStats = () => {
       ]);
 
       setStats({
-        projects: projectsCount || 0,
+        showcases: showcasesCount || 0,
         participants: participantsCount || 0,
         sponsors: sponsorsCount || 0,
         pendingSubmissions: pendingCount || 0,
@@ -106,11 +106,11 @@ export const AdminStats = () => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        title="Total Projects"
-        value={stats.projects}
+        title="Total Showcase Items"
+        value={stats.showcases}
         icon={FolderOpen}
-        description="Projects in showcase"
-        trend={stats.projects > 0 ? "+12% from last month" : undefined}
+        description="Items in showcase"
+        trend={stats.showcases > 0 ? "+12% from last month" : undefined}
       />
       
       <StatCard
