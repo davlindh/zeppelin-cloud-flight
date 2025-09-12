@@ -62,6 +62,39 @@ export type Database = {
         }
         Relationships: []
       }
+      draft_submissions: {
+        Row: {
+          created_at: string
+          current_step: number
+          device_fingerprint: string | null
+          form_data: Json
+          id: string
+          session_id: string
+          updated_at: string
+          uploaded_files: Json
+        }
+        Insert: {
+          created_at?: string
+          current_step?: number
+          device_fingerprint?: string | null
+          form_data?: Json
+          id?: string
+          session_id: string
+          updated_at?: string
+          uploaded_files?: Json
+        }
+        Update: {
+          created_at?: string
+          current_step?: number
+          device_fingerprint?: string | null
+          form_data?: Json
+          id?: string
+          session_id?: string
+          updated_at?: string
+          uploaded_files?: Json
+        }
+        Relationships: []
+      }
       participant_media: {
         Row: {
           category: string
@@ -599,6 +632,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_drafts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_session_id: {
         Args: Record<PropertyKey, never>
         Returns: string

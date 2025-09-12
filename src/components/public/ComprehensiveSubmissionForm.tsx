@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,10 +9,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Upload, X, FileIcon, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import { Upload, X, FileIcon, ChevronLeft, ChevronRight, CheckCircle, Save, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getSubmissionMetadata } from '@/utils/sessionTracking';
 import { useToast } from '@/hooks/use-toast';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { debounce } from '@/utils/debounce';
 
 interface UploadedFile {
   name: string;
@@ -62,6 +64,7 @@ interface ComprehensiveSubmissionFormProps {
 
 export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participant' }: ComprehensiveSubmissionFormProps) => {
   const { toast } = useToast();
+  const { saveDraft, loadDraft, clearDraft, lastSaved, isSaving, hasDraft } = useAutoSave();
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
   
@@ -90,6 +93,7 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
 
   // Role options from Google Forms
   const roleOptions = [
@@ -152,8 +156,53 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
     { value: 'no', label: 'Nej, men jag är väldigt sugen på att prova 🌱' }
   ];
 
+  // Load draft on mount
+  useEffect(() => {
+    const loadExistingDraft = async () => {
+      const draft = await loadDraft();
+      if (draft) {
+        setShowDraftPrompt(true);
+      }
+    };
+    loadExistingDraft();
+  }, [loadDraft]);
+
+  // Auto-save functionality
+  const debouncedSave = useCallback(
+    debounce((formData: FormData, uploadedFiles: UploadedFile[], currentStep: number) => {
+      saveDraft(formData, uploadedFiles, currentStep);
+    }, 2000),
+    [saveDraft]
+  );
+
+  useEffect(() => {
+    if (formData.title || formData.description || formData.fullName || formData.email) {
+      debouncedSave(formData, uploadedFiles, currentStep);
+    }
+  }, [formData, uploadedFiles, currentStep, debouncedSave]);
+
   const updateFormData = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const restoreDraft = async () => {
+    const draft = await loadDraft();
+    if (draft) {
+      if (draft.formData) setFormData(draft.formData);
+      if (draft.uploadedFiles) setUploadedFiles(draft.uploadedFiles);
+      if (draft.currentStep) setCurrentStep(draft.currentStep);
+      
+      toast({
+        title: "Utkast återställt",
+        description: "Dina tidigare ändringar har återställts.",
+      });
+    }
+    setShowDraftPrompt(false);
+  };
+
+  const discardDraft = () => {
+    clearDraft();
+    setShowDraftPrompt(false);
   };
 
   const handleRoleChange = (roleId: string, checked: boolean) => {
@@ -187,37 +236,20 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
     const files = event.target.files;
     if (!files) return;
 
+    // Only upload files temporarily, they'll be moved on final submission
     for (const file of Array.from(files)) {
       if (file.size > 10 * 1024 * 1024) {
         setError('Filer får inte vara större än 10MB');
         continue;
       }
 
-      try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `submissions/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('media-files')
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('media-files')
-          .getPublicUrl(filePath);
-
-        setUploadedFiles(prev => [...prev, {
-          name: file.name,
-          url: publicUrl,
-          type: file.type,
-          size: file.size
-        }]);
-      } catch (err) {
-        console.error('Upload error:', err);
-        setError('Kunde inte ladda upp fil. Försök igen.');
-      }
+      // Create a temporary file object without uploading
+      setUploadedFiles(prev => [...prev, {
+        name: file.name,
+        url: URL.createObjectURL(file), // Temporary local URL
+        type: file.type,
+        size: file.size
+      }]);
     }
   };
 
@@ -262,6 +294,45 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
     try {
       const metadata = getSubmissionMetadata();
       
+      // Upload files properly now
+      const finalUploadedFiles = [];
+      for (const file of uploadedFiles) {
+        if (file.url.startsWith('blob:')) {
+          // This is a temporary file that needs to be uploaded
+          try {
+            const response = await fetch(file.url);
+            const blob = await response.blob();
+            
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `submissions/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('media-files')
+              .upload(filePath, blob);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+              .from('media-files')
+              .getPublicUrl(filePath);
+
+            finalUploadedFiles.push({
+              name: file.name,
+              url: publicUrl,
+              type: file.type,
+              size: file.size
+            });
+          } catch (uploadErr) {
+            console.error('File upload error:', uploadErr);
+            setError('Kunde inte ladda upp alla filer. Försök igen.');
+            return;
+          }
+        } else {
+          finalUploadedFiles.push(file);
+        }
+      }
+      
       const content = {
         // Clean, non-duplicated structured fields
         description: formData.description,
@@ -299,7 +370,7 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
           language_preference: formData.languagePreference,
           how_found_us: formData.howFoundUs,
           publication_permission: formData.publicationPermission,
-          files: uploadedFiles as any,
+          files: finalUploadedFiles as any,
           session_id: metadata.sessionId,
           device_fingerprint: metadata.deviceFingerprint
         });
@@ -310,6 +381,9 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
         return;
       }
 
+      // Clear draft after successful submission
+      clearDraft();
+      
       setSubmitted(true);
       toast({
         title: "Tack för ditt bidrag!",
@@ -341,11 +415,47 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Progress bar */}
+      {/* Draft restore prompt */}
+      {showDraftPrompt && (
+        <Alert className="mb-6">
+          <RotateCcw className="h-4 w-4" />
+          <div className="flex justify-between items-center w-full">
+            <div>
+              <h4 className="font-medium">Tidigare utkast hittades</h4>
+              <p className="text-sm text-muted-foreground">
+                Vill du fortsätta från där du slutade?
+              </p>
+            </div>
+            <div className="flex gap-2 ml-4">
+              <Button size="sm" onClick={restoreDraft}>
+                Återställ
+              </Button>
+              <Button size="sm" variant="outline" onClick={discardDraft}>
+                Ignorera
+              </Button>
+            </div>
+          </div>
+        </Alert>
+      )}
+
+      {/* Progress bar and auto-save indicator */}
       <div className="mb-6">
         <div className="flex justify-between text-sm text-muted-foreground mb-2">
           <span>Steg {currentStep} av {totalSteps}</span>
-          <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+          <div className="flex items-center gap-2">
+            <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
+            {isSaving && (
+              <div className="flex items-center gap-1">
+                <Save className="h-3 w-3 animate-pulse" />
+                <span className="text-xs">Sparar...</span>
+              </div>
+            )}
+            {lastSaved && !isSaving && (
+              <span className="text-xs">
+                Senast sparad: {lastSaved.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
         </div>
         <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
       </div>

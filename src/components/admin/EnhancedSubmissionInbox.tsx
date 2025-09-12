@@ -22,8 +22,13 @@ import {
   Mail,
   MapPin,
   Calendar,
-  Tag
+  Tag,
+  Edit,
+  UserPlus,
+  Briefcase
 } from 'lucide-react';
+import { SubmissionEditModal } from './SubmissionEditModal';
+import { ConversionModal } from './ConversionModal';
 
 interface EnhancedSubmission {
   id: string;
@@ -51,6 +56,8 @@ export const EnhancedSubmissionInbox = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedSubmission, setSelectedSubmission] = useState<EnhancedSubmission | null>(null);
+  const [editingSubmission, setEditingSubmission] = useState<EnhancedSubmission | null>(null);
+  const [convertingSubmission, setConvertingSubmission] = useState<EnhancedSubmission | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterExperience, setFilterExperience] = useState<string>('all');
@@ -129,6 +136,20 @@ export const EnhancedSubmissionInbox = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  const handleSubmissionUpdate = (updatedSubmission: EnhancedSubmission) => {
+    setSubmissions(prev => 
+      prev.map(sub => 
+        sub.id === updatedSubmission.id ? updatedSubmission : sub
+      )
+    );
+    setEditingSubmission(null);
+  };
+
+  const handleConversionSuccess = () => {
+    setConvertingSubmission(null);
+    fetchSubmissions(); // Refresh the list
   };
 
   const deleteSubmission = async (id: string) => {
@@ -580,6 +601,27 @@ export const EnhancedSubmissionInbox = () => {
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={() => setEditingSubmission(submission)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setConvertingSubmission(submission)}
+                  disabled={submission.status === 'approved'}
+                >
+                  {submission.type === 'participant' ? (
+                    <UserPlus className="h-4 w-4" />
+                  ) : (
+                    <Briefcase className="h-4 w-4" />
+                  )}
+                </Button>
+                
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={() => exportSubmission(submission)}
                 >
                   <Download className="h-4 w-4" />
@@ -978,6 +1020,26 @@ export const EnhancedSubmissionInbox = () => {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Edit Modal */}
+      {editingSubmission && (
+        <SubmissionEditModal
+          submission={editingSubmission}
+          isOpen={!!editingSubmission}
+          onClose={() => setEditingSubmission(null)}
+          onUpdate={handleSubmissionUpdate}
+        />
+      )}
+
+      {/* Conversion Modal */}
+      {convertingSubmission && (
+        <ConversionModal
+          submission={convertingSubmission}
+          isOpen={!!convertingSubmission}
+          onClose={() => setConvertingSubmission(null)}
+          onSuccess={handleConversionSuccess}
+        />
       )}
     </div>
   );
