@@ -181,9 +181,25 @@ export const EnhancedSubmissionForm = ({ onClose, initialType }: EnhancedSubmiss
             proposal: formData.proposal
           };
           break;
+        case 'partnership':
+          content = {
+            ...content,
+            organization: formData.organization,
+            partnership_type: formData.partnershipType,
+            proposal: formData.proposal,
+            website: formData.website
+          };
+          break;
       }
 
-      const { error } = await supabase
+      console.log('Submitting data:', {
+        type: formData.type,
+        title: formData.title,
+        content,
+        files: uploadedFiles,
+      });
+
+      const { data, error: insertError } = await supabase
         .from('submissions')
         .insert({
           type: formData.type,
@@ -201,15 +217,44 @@ export const EnhancedSubmissionForm = ({ onClose, initialType }: EnhancedSubmiss
           device_fingerprint: metadata.deviceFingerprint
         });
 
-      if (error) throw error;
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        
+        // Provide more specific error messages based on error type
+        if (insertError.code === '23514') {
+          setError('Felaktigt format på indata. Kontrollera att alla fält är korrekt ifyllda.');
+        } else if (insertError.code === '42501') {
+          setError('Behörighet saknas. Försök igen eller kontakta support.');
+        } else if (insertError.message.includes('validation')) {
+          setError('Vissa obligatoriska fält saknas. Kontrollera formuläret.');
+        } else if (insertError.message.includes('case not found')) {
+          setError('Systemfel: Okänd submission-typ. Kontakta support.');
+        } else {
+          setError(`Fel vid inlämning: ${insertError.message}`);
+        }
+        return;
+      }
 
+      console.log('Submission successful:', data);
       setSubmitted(true);
       setTimeout(() => {
         onClose?.();
       }, 3000);
     } catch (err) {
       console.error('Submission error:', err);
-      setError('Kunde inte skicka in. Försök igen.');
+      
+      // Handle different types of errors with specific messages
+      if (err instanceof Error) {
+        if (err.message.includes('fetch')) {
+          setError('Nätverksfel. Kontrollera din internetanslutning och försök igen.');
+        } else if (err.message.includes('JSON')) {
+          setError('Fel i dataformat. Försök igen eller kontakta support.');
+        } else {
+          setError(`Ett fel uppstod: ${err.message}`);
+        }
+      } else {
+        setError('Kunde inte skicka in. Försök igen.');
+      }
     } finally {
       setIsSubmitting(false);
     }
