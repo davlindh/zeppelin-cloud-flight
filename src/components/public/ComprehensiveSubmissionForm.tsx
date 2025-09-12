@@ -15,6 +15,7 @@ import { getSubmissionMetadata } from '@/utils/sessionTracking';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { debounce } from '@/utils/debounce';
+import { FileUpload, UploadedFileItem } from '@/components/admin/FileUpload';
 
 interface UploadedFile {
   name: string;
@@ -89,7 +90,7 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
     publicationPermission: false
   });
   
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFileItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -169,7 +170,7 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
 
   // Auto-save functionality
   const debouncedSave = useCallback(
-    debounce((formData: FormData, uploadedFiles: UploadedFile[], currentStep: number) => {
+    debounce((formData: FormData, uploadedFiles: UploadedFileItem[], currentStep: number) => {
       saveDraft(formData, uploadedFiles, currentStep);
     }, 2000),
     [saveDraft]
@@ -232,29 +233,12 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
     }));
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    // Only upload files temporarily, they'll be moved on final submission
-    for (const file of Array.from(files)) {
-      if (file.size > 10 * 1024 * 1024) {
-        setError('Filer får inte vara större än 10MB');
-        continue;
-      }
-
-      // Create a temporary file object without uploading
-      setUploadedFiles(prev => [...prev, {
-        name: file.name,
-        url: URL.createObjectURL(file), // Temporary local URL
-        type: file.type,
-        size: file.size
-      }]);
-    }
+  const handleFilesSelect = (files: UploadedFileItem[]) => {
+    setUploadedFiles(files);
   };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  const handleFileRemove = (index: number) => {
+    // FileUpload component handles this internally
   };
 
   const validateStep = (step: number): boolean => {
@@ -736,46 +720,15 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
               {/* File upload */}
               <div className="space-y-2">
                 <Label>Bifoga filer (valfritt)</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4">
-                  <Input
-                    type="file"
-                    multiple
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
-                  />
-                  <Label
-                    htmlFor="file-upload"
-                    className="flex flex-col items-center cursor-pointer"
-                  >
-                    <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground">
-                      Klicka för att ladda upp filer (max 10MB per fil)
-                    </span>
-                  </Label>
-                </div>
-                
-                {uploadedFiles.length > 0 && (
-                  <div className="space-y-2">
-                    {uploadedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <div className="flex items-center gap-2">
-                          <FileIcon className="h-4 w-4" />
-                          <span className="text-sm">{file.name}</span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeFile(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <FileUpload
+                  multiple
+                  variant="public"
+                  acceptedTypes="image/*,video/*,audio/*,.pdf,.doc,.docx"
+                  maxSizeMB={10}
+                  onFilesSelect={handleFilesSelect}
+                  onFileRemove={handleFileRemove}
+                  initialFiles={uploadedFiles}
+                />
               </div>
 
               <div className="flex items-center space-x-2">

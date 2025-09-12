@@ -1,7 +1,7 @@
 export { AdminRoute } from './AdminRoute';
 export { AdminSettings } from './AdminSettings';
 export { AdminStats } from './AdminStats';
-export { FileUpload } from './FileUpload';
+export { FileUpload, type UploadedFileItem } from './FileUpload';
 export { SponsorForm } from './SponsorForm';
 export { EnhancedSubmissionInbox } from './EnhancedSubmissionInbox';
 export { RecentActivity } from './RecentActivity';
