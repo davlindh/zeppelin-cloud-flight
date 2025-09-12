@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Filter, ArrowUpDown, Plus, Eye } from 'lucide-react';
+import { Search, Filter, ArrowUpDown, Plus, Eye, Play, Image, FileText, Volume2 } from 'lucide-react';
 
 interface Project {
   id: string;
@@ -33,6 +33,13 @@ interface Project {
     name: string;
     type: string;
     logo_path?: string;
+  }>;
+  media?: Array<{
+    id: string;
+    type: 'video' | 'audio' | 'image' | 'document';
+    url: string;
+    title: string;
+    description?: string;
   }>;
 }
 
@@ -70,7 +77,8 @@ export const ShowcasePage: React.FC = () => {
             ),
             project_sponsors (
               sponsors (id, name, type, logo_path)
-            )
+            ),
+            project_media (id, type, url, title, description)
           `)
           .order('created_at', { ascending: false });
 
@@ -86,7 +94,11 @@ export const ShowcasePage: React.FC = () => {
             role: pp.role,
             avatar_path: pp.participants.avatar_path
           })) || [],
-          sponsors: project.project_sponsors?.map((ps: any) => ps.sponsors) || []
+          sponsors: project.project_sponsors?.map((ps: any) => ps.sponsors) || [],
+          media: project.project_media?.map((m: any) => ({
+            ...m,
+            type: m.type as 'video' | 'audio' | 'image' | 'document'
+          })) || []
         }));
 
         setProjects(transformedProjects);
@@ -190,6 +202,40 @@ export const ShowcasePage: React.FC = () => {
       .getPublicUrl(imagePath);
     
     return data.publicUrl;
+  };
+
+  const getMediaIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Play className="h-3 w-3" />;
+      case 'audio': return <Volume2 className="h-3 w-3" />;
+      case 'image': return <Image className="h-3 w-3" />;
+      case 'document': return <FileText className="h-3 w-3" />;
+      default: return <FileText className="h-3 w-3" />;
+    }
+  };
+
+  const getMediaPreview = (project: Project) => {
+    if (!project.media || project.media.length === 0) return null;
+    
+    // Try to find an image first for preview
+    const imageMedia = project.media.find(m => m.type === 'image');
+    if (imageMedia) {
+      return (
+        <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+          {getMediaIcon('image')}
+          {project.media.length}
+        </div>
+      );
+    }
+    
+    // Otherwise show the first media type
+    const firstMedia = project.media[0];
+    return (
+      <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+        {getMediaIcon(firstMedia.type)}
+        {project.media.length}
+      </div>
+    );
   };
 
   if (loading) {
@@ -356,6 +402,7 @@ export const ShowcasePage: React.FC = () => {
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <Eye className="h-8 w-8 text-white" />
                   </div>
+                  {getMediaPreview(project)}
                 </div>
                 
                 <CardHeader>
