@@ -275,7 +275,7 @@ export const EnhancedSubmissionInbox = () => {
       <div className="space-y-4">
         <div>
           <h4 className="font-medium text-sm text-muted-foreground mb-1">Beskrivning:</h4>
-          <p className="text-sm">{content.description}</p>
+          <p className="text-sm">{content.description || content.bio}</p>
         </div>
 
         {/* Type-specific content */}
@@ -303,17 +303,115 @@ export const EnhancedSubmissionInbox = () => {
         )}
 
         {submission.type === 'participant' && (
-          <div className="space-y-3">
-            {content.bio && (
+          <div className="space-y-4">
+            {/* Legacy bio field */}
+            {content.bio && content.bio !== content.description && (
               <div>
                 <h4 className="font-medium text-sm text-muted-foreground mb-1">Biografi:</h4>
                 <p className="text-sm">{content.bio}</p>
               </div>
             )}
+
+            {/* Roles */}
+            {(content.roles && Array.isArray(content.roles) && content.roles.length > 0) && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Roller:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {content.roles.map((role: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {role}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Skills (legacy field, show if different from roles) */}
             {content.skills && (
               <div>
                 <h4 className="font-medium text-sm text-muted-foreground mb-1">Färdigheter:</h4>
-                <p className="text-sm">{content.skills}</p>
+                <p className="text-sm">
+                  {Array.isArray(content.skills) ? content.skills.join(', ') : content.skills}
+                </p>
+              </div>
+            )}
+
+            {/* Experience Level */}
+            {content.experienceLevel && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Erfarenhetsnivå:</h4>
+                <Badge variant="outline" className="text-xs capitalize">
+                  {content.experienceLevel}
+                </Badge>
+              </div>
+            )}
+
+            {/* Interests */}
+            {(content.interests && Array.isArray(content.interests) && content.interests.length > 0) && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Intressen:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {content.interests.map((interest: string, index: number) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {interest}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Contributions */}
+            {(content.contributions && Array.isArray(content.contributions) && content.contributions.length > 0) && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Bidrag:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {content.contributions.map((contribution: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {contribution}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Time Commitment */}
+            {content.timeCommitment && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Tidsåtagande:</h4>
+                <Badge variant="outline" className="text-xs capitalize">
+                  {content.timeCommitment}
+                </Badge>
+              </div>
+            )}
+
+            {/* Previous Experience */}
+            {content.previousExperience && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Tidigare erfarenhet:</h4>
+                <p className="text-sm">{content.previousExperience}</p>
+              </div>
+            )}
+
+            {/* Portfolio Links */}
+            {content.portfolioLinks && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Portfolio/Länkar:</h4>
+                <a 
+                  href={content.portfolioLinks.startsWith('http') ? content.portfolioLinks : `https://${content.portfolioLinks}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline"
+                >
+                  {content.portfolioLinks}
+                </a>
+              </div>
+            )}
+
+            {/* Comments */}
+            {content.comments && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Kommentarer:</h4>
+                <p className="text-sm italic">{content.comments}</p>
               </div>
             )}
           </div>
@@ -636,23 +734,69 @@ export const EnhancedSubmissionInbox = () => {
               {selectedSubmission.files && selectedSubmission.files.length > 0 && (
                 <div>
                   <h3 className="font-medium mb-3">Bifogade filer</h3>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {selectedSubmission.files.map((file, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                        <FileIcon className="h-5 w-5 text-muted-foreground" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {(file.size / 1024 / 1024).toFixed(1)} MB • {file.type}
-                          </p>
+                      <div key={index} className="space-y-2">
+                        {/* Image Preview */}
+                        {file.type?.startsWith('image/') && (
+                          <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                            <img
+                              src={file.url}
+                              alt={file.name}
+                              className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                              onClick={() => window.open(file.url, '_blank')}
+                              onError={(e) => {
+                                // Fallback to file icon if image fails to load
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>';
+                                }
+                              }}
+                            />
+                          </div>
+                        )}
+                        
+                        {/* File Info */}
+                        <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                          {!file.type?.startsWith('image/') && (
+                            <FileIcon className="h-5 w-5 text-muted-foreground mt-0.5" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate" title={file.name}>
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {(file.size / 1024 / 1024).toFixed(1)} MB • {file.type}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => window.open(file.url, '_blank')}
+                              title="Öppna fil"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                const a = document.createElement('a');
+                                a.href = file.url;
+                                a.download = file.name;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                              }}
+                              title="Ladda ner fil"
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(file.url, '_blank')}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
                       </div>
                     ))}
                   </div>
