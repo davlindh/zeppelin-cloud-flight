@@ -608,6 +608,10 @@ export type Database = {
         Args: { user_email: string } | { user_email?: string; user_id?: string }
         Returns: boolean
       }
+      is_admin_email: {
+        Args: { email_to_check: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

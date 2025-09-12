@@ -77,13 +77,10 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     try {
       if (!email) return false;
       
-      const { data, error } = await supabase
-        .from('admin_users')
-        .select('email')
-        .eq('email', email)
-        .single();
+      const { data: isAuthorized, error } = await supabase
+        .rpc('is_admin_email', { email_to_check: email });
 
-      return !error && data !== null;
+      return !error && isAuthorized === true;
     } catch (error) {
       console.error('Error verifying admin:', error);
       return false;
@@ -94,14 +91,11 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     try {
       setLoading(true);
       
-      // First check if email is in admin_users table
-      const { data: adminData, error: adminError } = await supabase
-        .from('admin_users')
-        .select('email')
-        .eq('email', email)
-        .single();
+      // Check if email is authorized using secure function
+      const { data: isAuthorized, error: authError } = await supabase
+        .rpc('is_admin_email', { email_to_check: email });
 
-      if (adminError || !adminData) {
+      if (authError || !isAuthorized) {
         return { success: false, error: 'Email not authorized for admin access' };
       }
 
@@ -128,14 +122,11 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     try {
       setLoading(true);
       
-      // First check if email is in admin_users table
-      const { data: adminData, error: adminError } = await supabase
-        .from('admin_users')
-        .select('email')
-        .eq('email', email)
-        .single();
+      // Check if email is authorized using secure function
+      const { data: isAuthorized, error: authError } = await supabase
+        .rpc('is_admin_email', { email_to_check: email });
 
-      if (adminError || !adminData) {
+      if (authError || !isAuthorized) {
         return { success: false, error: 'Email not authorized for admin access' };
       }
 
