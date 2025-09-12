@@ -42,7 +42,18 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
         slug: generateSlug(submission.submitted_by || submission.title),
         bio: submission.content?.description || submission.content?.bio || '',
         social_links: submission.content?.portfolioLinks ? 
-          [{ platform: 'website', url: submission.content.portfolioLinks }] : []
+          [{ platform: 'website', url: submission.content.portfolioLinks }] : [],
+        // Enhanced participant fields
+        skills: submission.content?.skills || [],
+        experience_level: submission.content?.experienceLevel || null,
+        interests: submission.content?.interests || [],
+        time_commitment: submission.content?.timeCommitment || null,
+        contributions: submission.content?.contributions || [],
+        location: submission.location || null,
+        contact_email: submission.contact_email || null,
+        contact_phone: submission.contact_phone || null,
+        how_found_us: submission.how_found_us || null,
+        availability: submission.content?.availability || null
       };
 
       const { error: participantError } = await supabase
@@ -157,12 +168,37 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
           <div>
             <strong>Bio:</strong> {submission.content?.description || submission.content?.bio || 'Ingen beskrivning'}
           </div>
-          {submission.content?.roles && (
+          {submission.content?.skills && submission.content.skills.length > 0 && (
             <div>
-              <strong>Roller:</strong>{' '}
-              {submission.content.roles.map((role: string, index: number) => (
+              <strong>Färdigheter:</strong>{' '}
+              {submission.content.skills.map((skill: string, index: number) => (
                 <Badge key={index} variant="secondary" className="text-xs mr-1">
-                  {role}
+                  {skill}
+                </Badge>
+              ))}
+            </div>
+          )}
+          {submission.content?.experienceLevel && (
+            <div>
+              <strong>Erfarenhetsnivå:</strong> {submission.content.experienceLevel}
+            </div>
+          )}
+          {submission.content?.contributions && submission.content.contributions.length > 0 && (
+            <div>
+              <strong>Bidragstyper:</strong>{' '}
+              {submission.content.contributions.map((contribution: string, index: number) => (
+                <Badge key={index} variant="outline" className="text-xs mr-1">
+                  {contribution}
+                </Badge>
+              ))}
+            </div>
+          )}
+          {submission.content?.interests && submission.content.interests.length > 0 && (
+            <div>
+              <strong>Intressen:</strong>{' '}
+              {submission.content.interests.map((interest: string, index: number) => (
+                <Badge key={index} variant="outline" className="text-xs mr-1">
+                  {interest}
                 </Badge>
               ))}
             </div>

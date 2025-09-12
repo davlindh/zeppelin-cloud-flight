@@ -141,35 +141,65 @@ export type Database = {
       }
       participants: {
         Row: {
+          availability: string | null
           avatar_path: string | null
           bio: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contributions: string[] | null
           created_at: string
+          experience_level: string | null
+          how_found_us: string | null
           id: string
+          interests: string[] | null
+          location: string | null
           name: string
+          skills: string[] | null
           slug: string
           social_links: Json | null
+          time_commitment: string | null
           updated_at: string
           website: string | null
         }
         Insert: {
+          availability?: string | null
           avatar_path?: string | null
           bio?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contributions?: string[] | null
           created_at?: string
+          experience_level?: string | null
+          how_found_us?: string | null
           id?: string
+          interests?: string[] | null
+          location?: string | null
           name: string
+          skills?: string[] | null
           slug: string
           social_links?: Json | null
+          time_commitment?: string | null
           updated_at?: string
           website?: string | null
         }
         Update: {
+          availability?: string | null
           avatar_path?: string | null
           bio?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contributions?: string[] | null
           created_at?: string
+          experience_level?: string | null
+          how_found_us?: string | null
           id?: string
+          interests?: string[] | null
+          location?: string | null
           name?: string
+          skills?: string[] | null
           slug?: string
           social_links?: Json | null
+          time_commitment?: string | null
           updated_at?: string
           website?: string | null
         }

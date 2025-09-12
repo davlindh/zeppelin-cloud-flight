@@ -90,6 +90,18 @@ export interface Participant {
   }>;
   createdAt?: string;
   updatedAt?: string;
+  
+  // Enhanced participant fields from database
+  skills?: string[];
+  experienceLevel?: string;
+  interests?: string[];
+  timeCommitment?: string;
+  contributions?: string[];
+  location?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  howFoundUs?: string;
+  availability?: string;
 }
 
 /**
