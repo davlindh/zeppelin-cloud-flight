@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, FileText, Image, Headphones, Video, File, User, Palette, Settings, Star, FileArchive, Code, Box, Presentation } from 'lucide-react';
+import { Play, FileText, Image, Headphones, Video, File, User, Palette, Settings, Star, Archive, Code, Box, Monitor } from 'lucide-react';
 import type { MediaType, MediaCategory } from '@/types/media';
 
 export const getMediaIcon = (type: MediaType, size: string = 'w-5 h-5') => {
@@ -11,8 +11,8 @@ export const getMediaIcon = (type: MediaType, size: string = 'w-5 h-5') => {
     case 'portfolio': return React.createElement(Image, props);
     case 'document': return React.createElement(FileText, props);
     case 'pdf': return React.createElement(FileText, props);
-    case 'presentation': return React.createElement(Presentation, props);
-    case 'archive': return React.createElement(FileArchive, props);
+    case 'presentation': return React.createElement(Monitor, props);
+    case 'archive': return React.createElement(Archive, props);
     case 'code': return React.createElement(Code, props);
     case '3d': return React.createElement(Box, props);
     default: return React.createElement(File, props);
