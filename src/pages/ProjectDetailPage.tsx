@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PublicVoting } from '@/components/public';
+import { EnhancedProjectMedia } from '../../components/showcase/EnhancedProjectMedia';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -422,28 +423,15 @@ export const ProjectDetailPage: React.FC = () => {
             {/* Media */}
             {project.media && project.media.length > 0 && (
               <Card>
-                <CardHeader>
-                  <CardTitle>Media</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.media.map((item, index) => (
-                      <div key={index} className="border border-border rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          {getMediaIcon(item.type)}
-                          <h4 className="font-semibold text-sm">{item.title}</h4>
-                        </div>
-                        {item.description && (
-                          <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
-                        )}
-                        <Button variant="outline" size="sm" className="w-full" asChild>
-                          <a href={item.url} target="_blank" rel="noopener noreferrer">
-                            Öppna {item.type === 'document' ? 'dokument' : item.type}
-                          </a>
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+                <CardContent className="p-6">
+                  <EnhancedProjectMedia 
+                    media={project.media.map(item => ({
+                      ...item,
+                      type: item.type as 'video' | 'audio' | 'image' | 'document'
+                    }))}
+                    showPreview={true}
+                    allowCategorization={true}
+                  />
                 </CardContent>
               </Card>
             )}
