@@ -530,12 +530,19 @@ export type Database = {
       }
       submissions: {
         Row: {
+          contact_email: string | null
+          contact_phone: string | null
           content: Json
           created_at: string
           device_fingerprint: string | null
+          files: Json | null
+          how_found_us: string | null
           id: string
           ip_address: unknown | null
+          language_preference: string | null
+          location: string | null
           processed_at: string | null
+          publication_permission: boolean | null
           session_id: string | null
           status: string
           submitted_by: string | null
@@ -543,12 +550,19 @@ export type Database = {
           type: string
         }
         Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
           content: Json
           created_at?: string
           device_fingerprint?: string | null
+          files?: Json | null
+          how_found_us?: string | null
           id?: string
           ip_address?: unknown | null
+          language_preference?: string | null
+          location?: string | null
           processed_at?: string | null
+          publication_permission?: boolean | null
           session_id?: string | null
           status?: string
           submitted_by?: string | null
@@ -556,12 +570,19 @@ export type Database = {
           type: string
         }
         Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
           content?: Json
           created_at?: string
           device_fingerprint?: string | null
+          files?: Json | null
+          how_found_us?: string | null
           id?: string
           ip_address?: unknown | null
+          language_preference?: string | null
+          location?: string | null
           processed_at?: string | null
+          publication_permission?: boolean | null
           session_id?: string | null
           status?: string
           submitted_by?: string | null
