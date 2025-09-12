@@ -10,6 +10,9 @@ import type {
   ProjectVotingSchema
 } from '../../types/schema';
 
+// Import participant media data
+export { PARTICIPANT_MEDIA } from './participantMedia';
+
 // Project-Participant relationships
 export const PROJECT_PARTICIPANTS: ProjectParticipantSchema[] = [
   {
@@ -137,8 +140,233 @@ export const PROJECT_TAGS: ProjectTagSchema[] = [
   { id: 'pt_024', project_id: '6', tag: 'Filmisk Ljud', created_at: '2024-01-01T00:00:00Z' }
 ];
 
-// Project Media
-export const PROJECT_MEDIA: ProjectMediaSchema[] = [];
+// Project Media - Rich multimedia examples for all projects
+export const PROJECT_MEDIA: ProjectMediaSchema[] = [
+  // Project 1 - Robotics & Automation
+  {
+    id: 'pm_001',
+    project_id: '1',
+    type: 'video',
+    url: '/media/videos/robotics-demo.mp4',
+    title: 'Robotisk Landskapsformning - Demo',
+    description: 'Timelapse-video som visar robotarnas precision i naturmiljö',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_002', 
+    project_id: '1',
+    type: 'document',
+    url: '/media/documents/tech-specifications.pdf',
+    title: 'Tekniska Specifikationer',
+    description: 'Detaljerad teknisk dokumentation för robotsystemet',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_003',
+    project_id: '1', 
+    type: 'image',
+    url: '/media/images/process-shots.jpg',
+    title: 'Process Documentation',
+    description: 'Behind-the-scenes bilder från utvecklingsprocessen',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Project 2 - Traditional Crafts
+  {
+    id: 'pm_004',
+    project_id: '2',
+    type: 'video',
+    url: '/media/videos/crafts-workshop.mp4', 
+    title: 'Mästarklass i Stenhuggeri',
+    description: 'Dokumentation av traditionella tekniker och moderna tillämpningar',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_005',
+    project_id: '2',
+    type: 'audio',
+    url: '/media/audio/hammer-sounds.mp3',
+    title: 'Ljuden av Hantverk',
+    description: 'Inspelningar från verkstaden - hammare, mejslar och eld',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_006',
+    project_id: '2',
+    type: 'image',
+    url: '/media/images/craft-portfolio.jpg',
+    title: 'Hantverksportfölj',
+    description: 'Utvalda verk från stenhuggare och smeder',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Project 3 - Drone Light Show  
+  {
+    id: 'pm_007',
+    project_id: '3',
+    type: 'video',
+    url: '/media/videos/drone-spectacle.mp4',
+    title: 'Skärgårdsspektakel - Fullständig Show',
+    description: '15-minuters drönareshow över Karlskronas skärgård',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_008',
+    project_id: '3',
+    type: 'image',
+    url: '/media/images/aerial-formations.jpg',
+    title: 'Luftformationer',
+    description: 'Spektakulära formationer av 200 synkroniserade drönare',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_009',
+    project_id: '3',
+    type: 'document',
+    url: '/media/documents/technical-rider.pdf',
+    title: 'Technical Rider',
+    description: 'Tekniska krav och säkerhetsprotokoll för showen',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Project 4 - Irina's Digital Art
+  {
+    id: 'pm_010',
+    project_id: '4',
+    type: 'image',
+    url: '/media/images/digital-paintings.jpg',
+    title: 'Digital Akvarellsamling',
+    description: 'Portfolio av Irinas digitala akvarellmålningar',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_011',
+    project_id: '4',
+    type: 'video',
+    url: '/media/videos/painting-process.mp4',
+    title: 'Målarprocess - Timelapse',
+    description: 'Timelapse som visar skapandet av en digital akvarell',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_012',
+    project_id: '4',
+    type: 'audio',
+    url: '/media/audio/workshop-session.mp3',
+    title: 'Workshop-session',
+    description: 'Ljudinspelning från en målarklass med Irina',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Project 5 - Interactive Performance
+  {
+    id: 'pm_013', 
+    project_id: '5',
+    type: 'video',
+    url: '/media/videos/interactive-performance.mp4',
+    title: 'Interaktiv Videoperformance',
+    description: 'Fullständig dokumentation av den interaktiva installationen',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_014',
+    project_id: '5',
+    type: 'image',
+    url: '/media/images/audience-interaction.jpg',
+    title: 'Publikinteraktion',
+    description: 'Publikens reaktioner och deltagande i performancen',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Project 6 - Experimental Music
+  {
+    id: 'pm_015',
+    project_id: '6',
+    type: 'audio',
+    url: '/media/audio/ambient-composition.mp3',
+    title: 'Ambient Komposition #1',
+    description: 'Experimentell ljudkomposition med handgjorda instrument',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_016',
+    project_id: '6',
+    type: 'video',
+    url: '/media/videos/instrument-building.mp4',
+    title: 'Instrumentbyggande',
+    description: 'Dokumentation av processen att skapa egna instrument',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_017',
+    project_id: '6',
+    type: 'image',
+    url: '/media/images/experimental-setup.jpg',
+    title: 'Experimentuppställning',
+    description: 'Studio setup med handgjorda elektroniska instrument',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Anastasiya's VR Project additional media
+  {
+    id: 'pm_018',
+    project_id: 'anastasiya-1',
+    type: 'video',
+    url: '/media/videos/vr-walkthrough.mp4',
+    title: 'VR Experience Walkthrough',
+    description: 'Complete walkthrough of the Digital Borderlands VR experience',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_019',
+    project_id: 'anastasiya-1',
+    type: 'document',
+    url: '/media/documents/vr-technical-specs.pdf',
+    title: 'VR Technical Specifications',
+    description: 'Hardware requirements and setup documentation',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Anastasiya's NFT Project additional media
+  {
+    id: 'pm_020',
+    project_id: 'anastasiya-2',
+    type: 'image',
+    url: '/media/images/nft-gallery.jpg',
+    title: 'NFT Collection Gallery',
+    description: 'Visual overview of the complete Fragments of Home collection',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_021',
+    project_id: 'anastasiya-2',
+    type: 'video',
+    url: '/media/videos/artist-interview.mp4',
+    title: 'Artist Interview',
+    description: 'In-depth interview about the inspiration behind the collection',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+
+  // Anastasiya's Media Wall additional media
+  {
+    id: 'pm_022',
+    project_id: 'anastasiya-3',
+    type: 'video',
+    url: '/media/videos/installation-timelapse.mp4',
+    title: 'Installation Timelapse',
+    description: 'Time-lapse of the 15-meter media wall installation at Arlanda',
+    created_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 'pm_023',
+    project_id: 'anastasiya-3',
+    type: 'image',
+    url: '/media/images/visitor-interactions.jpg',
+    title: 'Visitor Interactions',
+    description: 'Passengers interacting with the responsive media wall',
+    created_at: '2024-01-01T00:00:00Z'
+  }
+];
 
 // Project Budgets
 export const PROJECT_BUDGETS: ProjectBudgetSchema[] = [];

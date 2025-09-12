@@ -29,17 +29,17 @@ export const ProjectMedia: React.FC<ProjectMediaProps> = ({ media = [] }) => {
 
   const getMediaTypeColor = (type: string) => {
     switch (type) {
-      case 'video': return 'text-red-600 bg-red-50';
-      case 'audio': return 'text-purple-600 bg-purple-50';
-      case 'image': return 'text-blue-600 bg-blue-50';
-      case 'document': return 'text-gray-600 bg-gray-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'video': return 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800';
+      case 'audio': return 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950 dark:text-purple-400 dark:border-purple-800';
+      case 'image': return 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800';
+      case 'document': return 'bg-muted text-muted-foreground border-border';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800">Media & Material</h3>
+      <h3 className="text-lg font-semibold text-foreground">Media & Material</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {media.map((item, index) => (
@@ -48,19 +48,19 @@ export const ProjectMedia: React.FC<ProjectMediaProps> = ({ media = [] }) => {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow group"
+            className="flex items-start gap-3 p-4 border border-border rounded-lg hover:shadow-md hover:border-primary/20 transition-all group"
           >
-            <div className={`flex-shrink-0 p-2 rounded ${getMediaTypeColor(item.type)}`}>
+            <div className={`flex-shrink-0 p-2 rounded border ${getMediaTypeColor(item.type)}`}>
               {getMediaIcon(item.type)}
             </div>
             <div className="flex-grow min-w-0">
-              <h4 className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">
+              <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
                 {item.title}
               </h4>
               {item.description && (
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{item.description}</p>
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
               )}
-              <p className="text-xs text-gray-500 mt-2 capitalize">{item.type}</p>
+              <p className="text-xs text-muted-foreground mt-2 capitalize">{item.type}</p>
             </div>
           </a>
         ))}

@@ -32,7 +32,29 @@ export const STORAGE_BUCKETS = {
     maxSize: '1MB'
   },
   
-  // Media bucket for rich content
+  // Rich multimedia buckets
+  videos: {
+    name: 'videos',
+    basePath: '/media/videos/',
+    allowedTypes: ['mp4', 'webm', 'mov', 'avi'],
+    maxSize: '100MB'
+  },
+  
+  audio: {
+    name: 'audio',
+    basePath: '/media/audio/',
+    allowedTypes: ['mp3', 'wav', 'flac', 'ogg'],
+    maxSize: '25MB'
+  },
+  
+  documents: {
+    name: 'documents',
+    basePath: '/media/documents/',
+    allowedTypes: ['pdf', 'doc', 'docx', 'txt', 'rtf'],
+    maxSize: '10MB'
+  },
+  
+  // Legacy media bucket for backward compatibility
   media: {
     name: 'media',
     basePath: '/media/',

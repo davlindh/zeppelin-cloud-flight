@@ -6,8 +6,22 @@ export interface ParticipantSchema {
   slug: string;
   bio?: string;
   avatar_path?: string;
+  website?: string;
+  social_links?: Array<{ platform: string; url: string; }>;
   created_at: string;
   updated_at: string;
+}
+
+export interface ParticipantMediaSchema {
+  id: string;
+  participant_id: string;
+  type: 'portfolio' | 'video' | 'audio' | 'document' | 'image';
+  category: 'featured' | 'process' | 'archive' | 'collaboration';
+  url: string;
+  title: string;
+  description?: string;
+  year?: string;
+  created_at: string;
 }
 
 export interface ProjectSchema {

@@ -14,3 +14,6 @@ export { ProjectTimeline } from './ProjectTimeline';
 export { ProjectSponsors } from './ProjectSponsors';
 export { ProjectMedia } from './ProjectMedia';
 export { ProjectAccess } from './ProjectAccess';
+export { ParticipantMedia } from './ParticipantMedia';
+export { EnhancedProjectMedia } from './EnhancedProjectMedia';
+export { PartnerShowcase } from './PartnerShowcase';
