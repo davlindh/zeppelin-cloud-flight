@@ -86,7 +86,7 @@ export const AdminLoginPage = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="lindhdavid2@gmail.com"
+                placeholder="Enter your admin email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

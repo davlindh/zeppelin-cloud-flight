@@ -612,6 +612,10 @@ export type Database = {
         Args: { email_to_check: string }
         Returns: boolean
       }
+      set_session_context: {
+        Args: { device_fingerprint: string; session_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
