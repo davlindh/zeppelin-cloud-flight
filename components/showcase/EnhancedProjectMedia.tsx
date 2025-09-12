@@ -1,13 +1,13 @@
 import React from 'react';
-import { MediaGrid } from '../multimedia/MediaGrid';
-import { MediaFilters } from '../multimedia/MediaFilters';
+import { MediaFilters, MediaGrid, MediaGallery } from '../multimedia';
+import { Button } from '@/components/ui/button';
 import type { ProjectMediaItem } from '@/types/media';
 import { generateMediaId } from '@/utils/mediaHelpers';
 import { useMediaFiltering } from '@/hooks/useMediaFiltering';
 
 interface EnhancedProjectMediaProps {
   media?: Array<{
-    type: 'video' | 'audio' | 'image' | 'document';
+    type: 'video' | 'audio' | 'image' | 'document' | 'pdf' | 'presentation' | 'archive' | 'code' | '3d' | 'portfolio';
     url: string;
     title: string;
     description?: string;
@@ -46,40 +46,48 @@ export const EnhancedProjectMedia: React.FC<EnhancedProjectMediaProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <h3 className="text-lg font-semibold text-foreground">Media & Material</h3>
-      
-      {/* Filters */}
-      {allowCategorization && hasFilters && (
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Media ({totalCount})</h3>
+      </div>
+
+      {(allowCategorization && hasFilters) && (
         <MediaFilters
           availableTypes={availableTypes}
           activeTypeFilter={typeFilter}
           viewMode={viewMode}
           totalCount={totalCount}
-          filteredCount={filteredCount}
+          filteredCount={filteredMedia.length}
           onTypeFilterChange={setTypeFilter}
           onViewModeChange={setViewMode}
         />
       )}
-      
-      {/* Media Grid */}
-      <MediaGrid
-        media={filteredMedia}
-        viewMode={viewMode}
-        showPreview={showPreview}
-        showPlayButton={true}
-        showAddToQueue={true}
-      />
-      
-      {filteredCount === 0 && typeFilter !== 'all' && (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>Inga mediafiler av vald typ hittades.</p>
-          <button 
-            onClick={resetFilters}
-            className="text-primary hover:underline mt-1"
-          >
-            Visa alla mediafiler
-          </button>
+
+      {filteredMedia.length > 0 ? (
+        viewMode === 'gallery' ? (
+          <MediaGallery
+            media={filteredMedia}
+            viewMode="gallery"
+            showPreview={showPreview}
+          />
+        ) : (
+          <MediaGrid
+            media={filteredMedia}
+            viewMode={viewMode}
+            showPreview={showPreview}
+            showPlayButton={true}
+            showAddToQueue={true}
+          />
+        )
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground mb-4">
+            Inga mediafiler hittades{typeFilter !== 'all' ? ' för vald typ' : ''}.
+          </p>
+          {typeFilter !== 'all' && (
+            <Button variant="outline" onClick={resetFilters}>
+              Återställ filter
+            </Button>
+          )}
         </div>
       )}
     </div>

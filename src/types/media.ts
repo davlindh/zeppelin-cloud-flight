@@ -1,4 +1,4 @@
-export type MediaType = 'video' | 'audio' | 'image' | 'document' | 'portfolio';
+export type MediaType = 'video' | 'audio' | 'image' | 'document' | 'portfolio' | 'pdf' | 'presentation' | 'archive' | 'code' | '3d';
 
 export type MediaCategory = 'featured' | 'process' | 'archive' | 'collaboration' | 'promotional' | 'technical' | 'artistic';
 

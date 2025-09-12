@@ -6,7 +6,7 @@ interface UseMediaFilteringProps {
 }
 
 export const useMediaFiltering = ({ media }: UseMediaFilteringProps) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'gallery'>('gallery');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
   // Get available types for filter

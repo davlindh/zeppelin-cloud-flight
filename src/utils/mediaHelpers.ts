@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, FileText, Image, Headphones, Video, File, User, Palette, Settings, Star } from 'lucide-react';
+import { Play, FileText, Image, Headphones, Video, File, User, Palette, Settings, Star, FileArchive, Code, Box, Presentation } from 'lucide-react';
 import type { MediaType, MediaCategory } from '@/types/media';
 
 export const getMediaIcon = (type: MediaType, size: string = 'w-5 h-5') => {
@@ -10,6 +10,11 @@ export const getMediaIcon = (type: MediaType, size: string = 'w-5 h-5') => {
     case 'image': 
     case 'portfolio': return React.createElement(Image, props);
     case 'document': return React.createElement(FileText, props);
+    case 'pdf': return React.createElement(FileText, props);
+    case 'presentation': return React.createElement(Presentation, props);
+    case 'archive': return React.createElement(FileArchive, props);
+    case 'code': return React.createElement(Code, props);
+    case '3d': return React.createElement(Box, props);
     default: return React.createElement(File, props);
   }
 };
@@ -21,6 +26,11 @@ export const getMediaTypeColor = (type: MediaType) => {
     case 'image': 
     case 'portfolio': return 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800';
     case 'document': return 'bg-muted text-muted-foreground border-border';
+    case 'pdf': return 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800';
+    case 'presentation': return 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950 dark:text-indigo-400 dark:border-indigo-800';
+    case 'archive': return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800';
+    case 'code': return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800';
+    case '3d': return 'bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950 dark:text-cyan-400 dark:border-cyan-800';
     default: return 'bg-muted text-muted-foreground border-border';
   }
 };
@@ -32,6 +42,11 @@ export const getMediaTypeName = (type: MediaType): string => {
     case 'image': return 'Bild';
     case 'portfolio': return 'Portfolio';
     case 'document': return 'Dokument';
+    case 'pdf': return 'PDF';
+    case 'presentation': return 'Presentation';
+    case 'archive': return 'Arkiv';
+    case 'code': return 'Kod';
+    case '3d': return '3D-modell';
     default: return type;
   }
 };

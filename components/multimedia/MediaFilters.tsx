@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Grid, List } from 'lucide-react';
+import { Filter, Grid, List, Images } from 'lucide-react';
 import { getMediaTypeName, getCategoryLabel } from '@/utils/mediaHelpers';
 import type { MediaType, MediaCategory } from '@/types/media';
 import { cn } from '@/lib/utils';
@@ -9,12 +9,12 @@ interface MediaFiltersProps {
   availableCategories?: MediaCategory[];
   activeTypeFilter: string;
   activeCategoryFilter?: string;
-  viewMode: 'grid' | 'list';
+  viewMode: 'grid' | 'list' | 'gallery';
   totalCount: number;
   filteredCount: number;
   onTypeFilterChange: (filter: string) => void;
   onCategoryFilterChange?: (filter: string) => void;
-  onViewModeChange: (mode: 'grid' | 'list') => void;
+  onViewModeChange: (mode: 'grid' | 'list' | 'gallery') => void;
   showCategoryFilter?: boolean;
 }
 
@@ -80,9 +80,21 @@ export const MediaFilters: React.FC<MediaFiltersProps> = ({
       {/* View mode toggle */}
       <div className="flex border border-border rounded-md">
         <button
-          onClick={() => onViewModeChange('grid')}
+          onClick={() => onViewModeChange('gallery')}
           className={cn(
             "p-1.5 rounded-l-md transition-colors",
+            viewMode === 'gallery' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'bg-background text-muted-foreground hover:text-foreground'
+          )}
+          title="Gallerivisning"
+        >
+          <Images className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onViewModeChange('grid')}
+          className={cn(
+            "p-1.5 transition-colors",
             viewMode === 'grid' 
               ? 'bg-primary text-primary-foreground' 
               : 'bg-background text-muted-foreground hover:text-foreground'
