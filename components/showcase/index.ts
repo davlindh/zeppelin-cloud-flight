@@ -7,7 +7,6 @@ export { ProjectLinks } from './ProjectLinks';
 export { TagList } from './TagList';
 export { ImageWithFallback } from './ImageWithFallback';
 export { ShowcaseSection } from './ShowcaseSection';
-export { SubmissionForm } from './SubmissionForm';
 export { ProjectPurpose } from './ProjectPurpose';
 export { ProjectBudget } from './ProjectBudget';
 export { ProjectTimeline } from './ProjectTimeline';

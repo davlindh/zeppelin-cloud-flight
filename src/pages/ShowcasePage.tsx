@@ -1,0 +1,441 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { EnhancedSubmissionForm } from '@/components/public/EnhancedSubmissionForm';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { Search, Filter, ArrowUpDown, Plus, Eye } from 'lucide-react';
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  full_description?: string;
+  image_path?: string;
+  purpose?: string;
+  expected_impact?: string;
+  associations?: string[];
+  created_at: string;
+  tags?: string[];
+  participants?: Array<{
+    id: string;
+    name: string;
+    role: string;
+    avatar_path?: string;
+  }>;
+  sponsors?: Array<{
+    id: string;
+    name: string;
+    type: string;
+    logo_path?: string;
+  }>;
+}
+
+type SortOption = 'newest' | 'oldest' | 'az' | 'za';
+type FilterOption = 'all' | string;
+
+export const ShowcasePage: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+  
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Fetch projects from Supabase
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch projects with related data
+        const { data: projectsData, error: projectsError } = await supabase
+          .from('projects')
+          .select(`
+            *,
+            project_tags (tag),
+            project_participants (
+              role,
+              participants (id, name, avatar_path)
+            ),
+            project_sponsors (
+              sponsors (id, name, type, logo_path)
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (projectsError) throw projectsError;
+
+        // Transform data to match our interface
+        const transformedProjects: Project[] = (projectsData || []).map(project => ({
+          ...project,
+          tags: project.project_tags?.map((t: any) => t.tag) || [],
+          participants: project.project_participants?.map((pp: any) => ({
+            id: pp.participants.id,
+            name: pp.participants.name,
+            role: pp.role,
+            avatar_path: pp.participants.avatar_path
+          })) || [],
+          sponsors: project.project_sponsors?.map((ps: any) => ps.sponsors) || []
+        }));
+
+        setProjects(transformedProjects);
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+        setError('Kunde inte ladda projekt. Försök igen senare.');
+        toast({
+          title: "Fel",
+          description: "Kunde inte ladda projekt från databasen.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+
+    // Set up real-time subscription
+    const subscription = supabase
+      .channel('projects-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'projects' },
+        () => {
+          fetchProjects();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast]);
+
+  // Get all unique tags for filtering
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    projects.forEach(project => {
+      project.tags?.forEach(tag => tags.add(tag));
+      project.associations?.forEach(assoc => tags.add(assoc));
+    });
+    return Array.from(tags);
+  }, [projects]);
+
+  // Process projects: search, filter, sort
+  const processedProjects = useMemo(() => {
+    let filtered = projects.filter(project => {
+      // Search filter
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        return (
+          project.title.toLowerCase().includes(searchLower) ||
+          project.description.toLowerCase().includes(searchLower) ||
+          project.purpose?.toLowerCase().includes(searchLower) ||
+          project.participants?.some(p => p.name.toLowerCase().includes(searchLower))
+        );
+      }
+      return true;
+    });
+
+    // Tag filter
+    if (filterBy !== 'all') {
+      filtered = filtered.filter(project =>
+        project.tags?.includes(filterBy) || 
+        project.associations?.includes(filterBy)
+      );
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'az':
+          return a.title.localeCompare(b.title, 'sv');
+        case 'za':
+          return b.title.localeCompare(a.title, 'sv');
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [projects, searchQuery, sortBy, filterBy]);
+
+  const handleProjectClick = (projectId: string) => {
+    navigate(`/showcase/${projectId}`);
+  };
+
+  const getImageUrl = (imagePath?: string) => {
+    if (!imagePath) return '/public/images/ui/placeholder-project.jpg';
+    
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    const { data } = supabase.storage
+      .from('project-images')
+      .getPublicUrl(imagePath);
+    
+    return data.publicUrl;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
+        <div className="container mx-auto px-6 py-16 text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Laddar projekt...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
+        <div className="container mx-auto px-6 py-16 text-center">
+          <p className="text-destructive">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Försök igen
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
+      {/* Header */}
+      <div className="bg-card shadow-sm border-b border-border">
+        <div className="container mx-auto px-6 py-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-foreground mb-4">Showcase</h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Upptäck innovativa projekt från vår community av konstnärer, tekniker och visionärer.
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Sök projekt, deltagare..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-wrap gap-3">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="px-3 py-2 border border-border rounded-md text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="newest">Nyaste först</option>
+                <option value="oldest">Äldsta först</option>
+                <option value="az">A till Ö</option>
+                <option value="za">Ö till A</option>
+              </select>
+
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="whitespace-nowrap"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {showFilters ? 'Dölj' : 'Visa'} filter
+              </Button>
+
+              <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
+                <DialogTrigger asChild>
+                  <Button className="whitespace-nowrap">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Dela ditt projekt
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Dela ditt projekt</DialogTitle>
+                  </DialogHeader>
+                  <EnhancedSubmissionForm 
+                    onClose={() => setShowSubmissionForm(false)}
+                    initialType="project"
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          {/* Tag Filters */}
+          {showFilters && allTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button
+                variant={filterBy === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterBy('all')}
+              >
+                Alla kategorier
+              </Button>
+              {allTags.map(tag => (
+                <Button
+                  key={tag}
+                  variant={filterBy === tag ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterBy(filterBy === tag ? 'all' : tag)}
+                >
+                  {tag}
+                </Button>
+              ))}
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="text-sm text-muted-foreground">
+            Visar <span className="font-medium">{processedProjects.length}</span> av <span className="font-medium">{projects.length}</span> projekt
+            {filterBy !== 'all' && (
+              <> • Filtrerar på "<span className="font-medium">{filterBy}</span>"</>
+            )}
+            {searchQuery && (
+              <> • Sökning: "<span className="font-medium">{searchQuery}</span>"</>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Projects Grid */}
+      <div className="container mx-auto px-6 py-12">
+        {processedProjects.length === 0 ? (
+          <div className="text-center py-16">
+            <h3 className="text-xl font-semibold text-foreground mb-4">Inga projekt hittades</h3>
+            <p className="text-muted-foreground mb-8">
+              {searchQuery || filterBy !== 'all' 
+                ? 'Prova att ändra dina sökkriterier eller filter.' 
+                : 'Det finns inga projekt att visa just nu.'}
+            </p>
+            <Button onClick={() => {
+              setSearchQuery('');
+              setFilterBy('all');
+            }}>
+              Rensa filter
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {processedProjects.map((project) => (
+              <Card 
+                key={project.id}
+                className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-border"
+                onClick={() => handleProjectClick(project.id)}
+              >
+                <div className="relative overflow-hidden rounded-t-lg">
+                  <img
+                    src={getImageUrl(project.image_path)}
+                    alt={project.title}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.currentTarget.src = '/public/images/ui/placeholder-project.jpg';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <Eye className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                
+                <CardHeader>
+                  <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+                    {project.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-3">
+                    {project.description}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  {/* Participants */}
+                  {project.participants && project.participants.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-xs text-muted-foreground mb-1">Deltagare:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {project.participants.slice(0, 3).map((participant, index) => (
+                          <Badge key={participant.id} variant="secondary" className="text-xs">
+                            {participant.name}
+                          </Badge>
+                        ))}
+                        {project.participants.length > 3 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{project.participants.length - 3} till
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  {(project.tags || project.associations) && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {project.tags?.slice(0, 3).map((tag, index) => (
+                        <Badge key={`tag-${index}`} variant="outline" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {project.associations?.slice(0, 2).map((assoc, index) => (
+                        <Badge key={`assoc-${index}`} variant="outline" className="text-xs">
+                          {assoc}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Creation date */}
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Skapad {new Date(project.created_at).toLocaleDateString('sv-SE')}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Community Message */}
+      <div className="bg-muted py-16">
+        <div className="container mx-auto px-6 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h3 className="text-2xl font-bold text-foreground mb-4">
+              Gemenskapsdriven innovation
+            </h3>
+            <p className="text-muted-foreground mb-8">
+              Varje projekt här är ett bevis på vad som händer när passionerade människor förenas 
+              kring konst, teknologi och samhällsförändring. Här kan du hitta inspiration, 
+              kollaborationspartners och verkliga möjligheter att göra skillnad.
+            </p>
+            <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
+              <DialogTrigger asChild>
+                <Button size="lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Bidra med ditt projekt
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,14 +1,12 @@
 import React from 'react';
 import type { ShowcaseCard as ShowcaseCardType } from '../../types/index';
 import { ProjectCard } from './ProjectCard';
-import { SubmissionForm } from './SubmissionForm';
 
 interface ShowcaseSectionProps {
     cards: ShowcaseCardType[];
-    addCard: (card: ShowcaseCardType) => void;
 }
 
-export const ShowcaseSection: React.FC<ShowcaseSectionProps> = ({ cards, addCard }) => {
+export const ShowcaseSection: React.FC<ShowcaseSectionProps> = ({ cards }) => {
     return (
         <section id="showcase" className="py-12 sm:py-20 md:py-32 bg-white">
             <div className="container mx-auto px-4 sm:px-6">
@@ -57,7 +55,6 @@ export const ShowcaseSection: React.FC<ShowcaseSectionProps> = ({ cards, addCard
                         <ProjectCard key={card.id} card={card} />
                     ))}
                 </div>
-                <SubmissionForm addCard={addCard} />
             </div>
         </section>
     );
