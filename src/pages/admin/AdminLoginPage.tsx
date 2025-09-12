@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export const AdminLoginPage = () => {
   const { isAdmin, login, loading } = useAdminAuth();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -22,7 +23,7 @@ export const AdminLoginPage = () => {
     setError('');
     setIsSubmitting(true);
 
-    const result = await login(email);
+    const result = await login(email, password);
     
     if (!result.success) {
       setError(result.error || 'Login failed');
@@ -68,14 +69,26 @@ export const AdminLoginPage = () => {
                 disabled={isSubmitting}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
           </CardContent>
           <CardFooter>
             <Button 
               type="submit" 
               className="w-full"
-              disabled={isSubmitting || !email.trim()}
+              disabled={isSubmitting || !email.trim() || !password.trim()}
             >
-              {isSubmitting ? 'Verifying...' : 'Access Admin Dashboard'}
+              {isSubmitting ? 'Signing In...' : 'Sign In to Admin Dashboard'}
             </Button>
           </CardFooter>
         </form>

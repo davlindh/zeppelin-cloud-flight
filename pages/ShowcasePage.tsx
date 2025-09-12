@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { ShowcaseSection } from '../components/showcase';
 import { Button } from '../components/ui';
+import { PublicSubmissionForm } from '@/components/public';
+import { Modal } from '@/components/ui/Modal';
 import type { ShowcaseCard } from '../types/index';
 import { INITIAL_CARDS } from '../constants/index';
 
@@ -12,6 +14,7 @@ export const ShowcasePage: React.FC = () => {
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [filterBy, setFilterBy] = useState<FilterOption>('all');
     const [showFilters, setShowFilters] = useState(false);
+    const [showSubmissionForm, setShowSubmissionForm] = useState(false);
 
     const addShowcaseCard = (card: ShowcaseCard) => {
         setShowcaseCards(prevCards => [card, ...prevCards]);
@@ -91,7 +94,12 @@ export const ShowcasePage: React.FC = () => {
                                 {showFilters ? 'Dölj' : 'Visa'} filter
                             </Button>
 
-
+                            <Button
+                                onClick={() => setShowSubmissionForm(true)}
+                                className="whitespace-nowrap bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600"
+                            >
+                                Submit Project
+                            </Button>
                         </div>
                     </div>
 
@@ -160,6 +168,13 @@ export const ShowcasePage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Submission Form Modal */}
+            {showSubmissionForm && (
+                <Modal onClose={() => setShowSubmissionForm(false)}>
+                    <PublicSubmissionForm onClose={() => setShowSubmissionForm(false)} />
+                </Modal>
+            )}
         </div>
     );
 };

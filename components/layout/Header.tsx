@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { NAV_LINKS } from '../../constants/index';
 import { useSmoothScroll } from '../../hooks/useSmoothScroll';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { Button } from '@/components/ui/button';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
+    const { isAdmin, logout } = useAdminAuth();
     
     const closeMenu = () => setIsMenuOpen(false);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -41,14 +44,31 @@ export const Header: React.FC = () => {
             <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
                 <div className="flex justify-between items-center">
                     <Link to="/home" onClick={closeMenu} className="text-2xl sm:text-3xl font-bold font-serif">Zeppel <span className="text-amber-500">Inn</span></Link>
-<nav aria-label="Primary navigation" className="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wider uppercase">
+                    <nav aria-label="Primary navigation" className="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wider uppercase">
                         {NAV_LINKS.map(link => (
                             link.href.startsWith('/') ?
                             <NavLink key={link.href} to={link.href} className={navLinkClasses}>{link.label}</NavLink> :
                             <a key={link.href} href={link.href} onClick={(e) => handleNavClick(e, link.href)} className="text-gray-600 hover:text-amber-500 transition">{link.label}</a>
                         ))}
                     </nav>
-                    <a href="#kontakt" onClick={(e) => handleNavClick(e, '#kontakt')} className="hidden md:inline-block bg-gray-800 text-white font-bold px-5 py-2 rounded-lg hover:bg-gray-900 transition text-sm">Kontakta Oss</a>
+                    <div className="hidden md:flex items-center space-x-4">
+                        <a href="#kontakt" onClick={(e) => handleNavClick(e, '#kontakt')} className="bg-gray-800 text-white font-bold px-5 py-2 rounded-lg hover:bg-gray-900 transition text-sm">Kontakta Oss</a>
+                        {isAdmin && (
+                            <div className="flex items-center space-x-2">
+                                <Link to="/admin" className="text-sm text-amber-600 hover:text-amber-700 font-medium">
+                                    Admin
+                                </Link>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={logout}
+                                    className="text-xs"
+                                >
+                                    Logout
+                                </Button>
+                            </div>
+                        )}
+                    </div>
 <button onClick={toggleMenu} id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded={isMenuOpen} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100" aria-label="Toggle menu">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </button>

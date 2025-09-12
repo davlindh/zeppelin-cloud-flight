@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AdminAuthContextType {
   isAdmin: boolean;
   adminEmail: string | null;
-  login: (email: string) => Promise<{ success: boolean; error?: string }>;
+  user: User | null;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
 }
@@ -26,65 +29,98 @@ interface AdminAuthProviderProps {
 export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if already logged in
-    const storedEmail = localStorage.getItem('zeppel_admin_email');
-    if (storedEmail) {
-      verifyAdmin(storedEmail);
-    } else {
-      setLoading(false);
-    }
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Check if authenticated user is admin
+          const isUserAdmin = await verifyAdmin(session.user.id, session.user.email);
+          setIsAdmin(isUserAdmin);
+          setAdminEmail(isUserAdmin ? session.user.email : null);
+        } else {
+          setIsAdmin(false);
+          setAdminEmail(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        verifyAdmin(session.user.id, session.user.email).then((isUserAdmin) => {
+          setIsAdmin(isUserAdmin);
+          setAdminEmail(isUserAdmin ? session.user.email : null);
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const verifyAdmin = async (email: string) => {
+  const verifyAdmin = async (userId: string, email?: string | null): Promise<boolean> => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('admin_users')
-        .select('email')
-        .eq('email', email)
+        .select('email, auth_user_id')
+        .or(`auth_user_id.eq.${userId},email.eq.${email}`)
         .single();
 
-      if (data && !error) {
-        setIsAdmin(true);
-        setAdminEmail(email);
-        localStorage.setItem('zeppel_admin_email', email);
-      } else {
-        setIsAdmin(false);
-        setAdminEmail(null);
-        localStorage.removeItem('zeppel_admin_email');
-      }
+      return !error && data !== null;
     } catch (error) {
       console.error('Error verifying admin:', error);
-      setIsAdmin(false);
-      setAdminEmail(null);
-      localStorage.removeItem('zeppel_admin_email');
-    } finally {
-      setLoading(false);
+      return false;
     }
   };
 
-  const login = async (email: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
       
-      // Check if email exists in admin_users table
-      const { data, error } = await supabase
+      // First check if email is in admin_users table
+      const { data: adminData, error: adminError } = await supabase
         .from('admin_users')
         .select('email')
         .eq('email', email)
         .single();
 
-      if (error || !data) {
+      if (adminError || !adminData) {
         return { success: false, error: 'Email not authorized for admin access' };
       }
 
-      setIsAdmin(true);
-      setAdminEmail(email);
-      localStorage.setItem('zeppel_admin_email', email);
-      
+      // Sign in with Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      // Update admin_users with auth_user_id if not already set
+      if (data.user) {
+        await supabase
+          .from('admin_users')
+          .update({ auth_user_id: data.user.id })
+          .eq('email', email)
+          .is('auth_user_id', null);
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
@@ -94,16 +130,20 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setIsAdmin(false);
     setAdminEmail(null);
-    localStorage.removeItem('zeppel_admin_email');
+    setUser(null);
+    setSession(null);
   };
 
   return (
     <AdminAuthContext.Provider value={{
       isAdmin,
       adminEmail,
+      user,
+      session,
       login,
       logout,
       loading

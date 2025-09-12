@@ -12,6 +12,7 @@ import {
   ProjectMedia,
   ProjectAccess
 } from '../components/showcase';
+import { PublicVoting } from '@/components/public';
 import { INITIAL_CARDS } from '../constants/index';
 import type { ShowcaseCard } from '../types/index';
 
@@ -76,6 +77,12 @@ export const ProjectDetailPage: React.FC = () => {
           {card.links && card.links.length > 0 && (
             <ProjectLinks links={card.links} />
           )}
+
+          {/* Public Voting Section */}
+          <div className="border-t pt-8">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900">Vote for this Project</h2>
+            <PublicVoting projectId={card.id} />
+          </div>
         </div>
       </div>
     </div>
