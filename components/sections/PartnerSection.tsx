@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button } from '../ui';
 import { ImageWithFallback } from '../showcase/ImageWithFallback';
+import { usePartnerData } from '../../src/hooks/usePartnerData';
+import { Loader2 } from 'lucide-react';
 
 const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: string }> = ({ alt, src, href, tagline }) => (
     <a href={href} target="_blank" rel="noopener noreferrer" 
@@ -25,32 +27,20 @@ const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: 
 );
 
 export const PartnerSection: React.FC = () => {
-    const partners = [
-        {
-            alt: "Stenbräcka Kursgård",
-            src: "/images/partners/stenbracka-logo.png",
-            href: "https://stenbracka.se/",
-            tagline: "Konstnärliga och tekniska miljöer i skärgården"
-        },
-        {
-            alt: "Maskin & Fritid",
-            src: "/images/partners/maskin-fritid-logo.png",
-            href: "https://www.maskfri.se/",
-            tagline: "Lokala resurser för bygg och teknik"
-        },
-        {
-            alt: "Karlskrona Kommun",
-            src: "/images/partners/karlskrona-kommun-logo.png",
-            href: "https://www.karlskrona.se/",
-            tagline: "Regional utveckling och stöd"
-        },
-        {
-            alt: "Visit Blekinge",
-            src: "/images/partners/visit-blekinge-logo.png",
-            href: "https://www.visitblekinge.se/",
-            tagline: "Regional turism och kultur"
-        },
-    ];
+    const { partners, loading, usingDatabase } = usePartnerData();
+
+    if (loading) {
+        return (
+            <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+                <div className="container mx-auto px-4 sm:px-6">
+                    <div className="flex items-center justify-center py-16">
+                        <Loader2 className="h-8 w-8 animate-spin text-white" />
+                        <span className="ml-2 text-white">Loading partners...</span>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -63,15 +53,20 @@ export const PartnerSection: React.FC = () => {
                         Zeppel Inn bygger på samarbete med regionala organisationer som delar vår vision att skapa nya möjligheter genom konst och teknologi.
                         Varje partner bidrar med unik kompetens som tar vårt arbete till nästa nivå.
                     </p>
+                    {usingDatabase && (
+                        <p className="text-sm text-white/60 mt-2">
+                            • Partners loaded from database
+                        </p>
+                    )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-center max-w-5xl mx-auto">
-                    {partners.map(p => (
+                    {partners.map(partner => (
                         <PartnerLogo
-                            key={p.alt}
-                            alt={p.alt}
-                            src={p.src}
-                            href={p.href}
-                            tagline={p.tagline}
+                            key={partner.alt}
+                            alt={partner.alt}
+                            src={partner.src}
+                            href={partner.href}
+                            tagline={partner.tagline}
                         />
                     ))}
                 </div>

@@ -8,7 +8,8 @@ import { ParticipantForm } from '@/components/admin/ParticipantForm';
 import { SponsorForm } from '@/components/admin/SponsorForm';
 import { SubmissionInbox } from '@/components/admin/SubmissionInbox';
 import { AdminStats } from '@/components/admin/AdminStats';
-import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen } from 'lucide-react';
+import { AdminSettings } from '@/components/admin/AdminSettings';
+import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings } from 'lucide-react';
 
 export const AdminDashboardPage = () => {
   const { adminEmail, logout } = useAdminAuth();
@@ -38,7 +39,7 @@ export const AdminDashboardPage = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
@@ -58,6 +59,10 @@ export const AdminDashboardPage = () => {
             <TabsTrigger value="submissions">
               <Inbox className="h-4 w-4 mr-2" />
               Submissions
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
             </TabsTrigger>
           </TabsList>
 
@@ -155,6 +160,20 @@ export const AdminDashboardPage = () => {
 
           <TabsContent value="submissions">
             <SubmissionInbox />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Admin Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AdminSettings />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
