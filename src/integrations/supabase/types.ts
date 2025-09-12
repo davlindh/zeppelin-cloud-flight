@@ -469,6 +469,7 @@ export type Database = {
           id: string
           image_path: string | null
           purpose: string | null
+          slug: string
           title: string
           updated_at: string
         }
@@ -481,6 +482,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           purpose?: string | null
+          slug: string
           title: string
           updated_at?: string
         }
@@ -493,6 +495,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           purpose?: string | null
+          slug?: string
           title?: string
           updated_at?: string
         }
@@ -598,6 +601,10 @@ export type Database = {
     Functions: {
       generate_session_id: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_slug: {
+        Args: { title: string }
         Returns: string
       }
       hash_device_fingerprint: {
