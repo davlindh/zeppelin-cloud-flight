@@ -27,13 +27,8 @@ export const PersistentPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
-  // Don't show player if no current media or media is not playable
-  if (!currentMedia || !isPlayableMedia(currentMedia.type)) {
-    return null;
-  }
-  
-  const isAudio = currentMedia.type === 'audio';
-  const isVideo = currentMedia.type === 'video';
+  const isAudio = currentMedia?.type === 'audio';
+  const isVideo = currentMedia?.type === 'video';
   const mediaRef = isAudio ? audioRef : videoRef;
   
   // Handle media element updates
@@ -57,6 +52,11 @@ export const PersistentPlayer: React.FC = () => {
     mediaElement.volume = isMuted ? 0 : volume / 100;
     
   }, [currentMedia, isPlaying, volume, isMuted, mediaRef]);
+  
+  // Don't show player if no current media or media is not playable
+  if (!currentMedia || !isPlayableMedia(currentMedia.type)) {
+    return null;
+  }
   
   // Handle seek
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
