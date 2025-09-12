@@ -81,20 +81,39 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
 
   const loadShowcaseData = async (id: string) => {
     try {
-      // Fetch showcase data with relationships
+      setIsSubmitting(true);
+      
+      // Fetch showcase data with optional relationships using left joins
       const { data: showcase, error } = await supabase
         .from('projects')
         .select(`
           *,
-          project_participants!inner(participant_id, role, participants(name)),
-          project_sponsors!inner(sponsor_id, sponsors(name, type)),
+          project_participants(participant_id, role, participants(name)),
+          project_sponsors(sponsor_id, sponsors(name, type)),
           project_links(type, url),
           project_tags(tag)
         `)
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Failed to load showcase:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load showcase data',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (!showcase) {
+        toast({
+          title: 'Error',
+          description: 'Showcase not found',
+          variant: 'destructive'
+        });
+        return;
+      }
 
       // Populate form fields
       setValue('title', showcase.title || '');
@@ -104,7 +123,7 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
       setValue('expected_impact', showcase.expected_impact || '');
       setValue('associations', Array.isArray(showcase.associations) ? showcase.associations.join(', ') : '');
 
-      // Set relationships
+      // Set relationships - handle empty arrays gracefully
       setSelectedParticipants(showcase.project_participants?.map((pp: any) => ({
         participant_id: pp.participant_id,
         role: pp.role
@@ -116,13 +135,20 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
       
       setShowcaseTags(showcase.project_tags?.map((pt: any) => pt.tag) || []);
 
-    } catch (error) {
-      logError('loadShowcaseData', error);
       toast({
-        title: 'Error loading showcase data',
-        description: 'Failed to load existing showcase data for editing.',
-        variant: 'destructive',
+        title: 'Success',
+        description: 'Showcase data loaded successfully'
       });
+
+    } catch (error) {
+      console.error('Failed to load showcase data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load showcase data. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -282,9 +308,27 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="participants">Participants</TabsTrigger>
-                <TabsTrigger value="sponsors">Sponsors</TabsTrigger>
-                <TabsTrigger value="links">Links & Tags</TabsTrigger>
+                <TabsTrigger value="participants">
+                  Participants {selectedParticipants.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      {selectedParticipants.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="sponsors">
+                  Sponsors {selectedSponsors.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      {selectedSponsors.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="links">
+                  Links & Tags {(showcaseLinks.length > 0 || showcaseTags.length > 0) && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      {showcaseLinks.length + showcaseTags.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-4">
