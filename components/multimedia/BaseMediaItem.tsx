@@ -43,11 +43,13 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
   };
   
   const containerClass = cn(
-    "group card-enhanced hover:shadow-medium hover:border-primary/30 transition-all duration-300",
-    viewMode === 'grid' ? 'flex flex-col overflow-hidden' : 'flex items-start gap-4 p-4',
-    isCurrentlyPlaying && "ring-2 ring-primary/50 shadow-glow",
-    "hover:scale-[1.02] hover:-translate-y-1",
+    "transition-all duration-300 rounded-lg overflow-hidden",
+    viewMode === 'grid' 
+      ? "border border-border hover:border-border/80 shadow-soft hover:shadow-medium" 
+      : "border-l-4 border-l-primary/20 hover:border-l-primary/50 bg-card/30 hover:bg-card/60 pl-4 shadow-soft hover:shadow-medium",
+    isCurrentlyPlaying && "ring-2 ring-primary shadow-glow border-primary/50",
     className
+  );
   );
   
   if (viewMode === 'grid') {

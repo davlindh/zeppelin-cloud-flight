@@ -289,49 +289,49 @@ export const ProjectDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen gradient-hero">
       {/* Enhanced Hero Section */}
-      <div className="relative h-[32rem] overflow-hidden">
+      <div className="relative h-[28rem] md:h-[32rem] lg:h-[36rem] overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={getImageUrl(project.image_path)}
             alt={project.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
             onError={(e) => {
               e.currentTarget.src = '/public/images/ui/placeholder-project.jpg';
             }}
           />
           <div className="absolute inset-0 gradient-hero opacity-90" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent" />
         </div>
         
-        <div className="relative container mx-auto px-6 py-16 h-full flex items-end">
-          <div className="max-w-4xl reveal-up">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 h-full flex items-end">
+          <div className="w-full max-w-5xl reveal-up">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/showcase')}
-              className="mb-6 text-muted-foreground hover:text-foreground btn-glow backdrop-blur-sm bg-background/20 border border-border/30"
+              className="mb-4 md:mb-6 text-muted-foreground hover:text-foreground btn-glow backdrop-blur-sm bg-background/20 border border-border/30"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Tillbaka till showcase
             </Button>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 md:mb-6 leading-tight tracking-tight">
               {project.title}
             </h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-6 md:mb-8 max-w-4xl leading-relaxed">
               {project.description}
             </p>
 
             {/* Enhanced Tags */}
             {(project.tags || project.associations) && (
-              <div className="flex flex-wrap gap-3 reveal-scale stagger-1">
+              <div className="flex flex-wrap gap-2 md:gap-3 reveal-scale stagger-1">
                 {project.tags?.map((tag, index) => (
-                  <Badge key={`tag-${index}`} variant="secondary" className="px-4 py-2 text-sm font-medium shadow-soft hover:shadow-medium transition-all duration-300">
+                  <Badge key={`tag-${index}`} variant="secondary" className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium shadow-soft hover:shadow-medium transition-all duration-300">
                     {tag}
                   </Badge>
                 ))}
                 {project.associations?.map((assoc, index) => (
-                  <Badge key={`assoc-${index}`} variant="outline" className="px-4 py-2 text-sm font-medium bg-background/20 backdrop-blur-sm border-border/30 hover:bg-background/40 transition-all duration-300">
+                  <Badge key={`assoc-${index}`} variant="outline" className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium bg-background/20 backdrop-blur-sm border-border/30 hover:bg-background/40 transition-all duration-300">
                     {assoc}
                   </Badge>
                 ))}
@@ -342,11 +342,11 @@ export const ProjectDetailPage: React.FC = () => {
       </div>
 
       {/* Enhanced Content */}
-      <div className="container mx-auto px-6 py-16 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 items-start">
           
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-10">
+          <div className="lg:col-span-2 space-y-8 md:space-y-10">
             
             {/* Full Description */}
             {project.full_description && (
@@ -362,35 +362,35 @@ export const ProjectDetailPage: React.FC = () => {
 
             {/* Purpose & Impact */}
             {(project.purpose || project.expected_impact) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 reveal-up stagger-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 reveal-up stagger-2">
                 {project.purpose && (
-                  <Card className="card-glow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-3 text-xl">
-                        <div className="p-2 rounded-lg gradient-primary">
-                          <Target className="h-5 w-5 text-primary-foreground" />
+                  <Card className="card-glow h-full">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-start gap-3 text-lg md:text-xl">
+                        <div className="p-2 rounded-lg gradient-primary flex-shrink-0 mt-0.5">
+                          <Target className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
                         </div>
-                        Syfte
+                        <span className="leading-tight">Syfte</span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground leading-relaxed">{project.purpose}</p>
+                    <CardContent className="pt-0">
+                      <p className="text-muted-foreground leading-relaxed text-sm md:text-base">{project.purpose}</p>
                     </CardContent>
                   </Card>
                 )}
 
                 {project.expected_impact && (
-                  <Card className="card-glow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-3 text-xl">
-                        <div className="p-2 rounded-lg gradient-secondary">
-                          <Target className="h-5 w-5 text-secondary-foreground" />
+                  <Card className="card-glow h-full">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-start gap-3 text-lg md:text-xl">
+                        <div className="p-2 rounded-lg gradient-secondary flex-shrink-0 mt-0.5">
+                          <Target className="h-4 w-4 md:h-5 md:w-5 text-secondary-foreground" />
                         </div>
-                        Förväntad påverkan
+                        <span className="leading-tight">Förväntad påverkan</span>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground leading-relaxed">{project.expected_impact}</p>
+                    <CardContent className="pt-0">
+                      <p className="text-muted-foreground leading-relaxed text-sm md:text-base">{project.expected_impact}</p>
                     </CardContent>
                   </Card>
                 )}

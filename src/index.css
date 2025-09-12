@@ -131,16 +131,28 @@
 @layer components {
   /* Enhanced card variants */
   .card-enhanced {
-    @apply bg-card text-card-foreground rounded-lg border shadow-sm hover:shadow-md transition-all duration-300;
+    @apply bg-card/50 backdrop-blur-sm border border-border/50 shadow-soft hover:shadow-medium transition-all duration-300;
   }
   
   .card-interactive {
-    @apply card-enhanced hover:scale-[1.02] hover:border-primary/20 cursor-pointer;
+    @apply card-enhanced hover:bg-card/80 hover:border-border/80 hover:shadow-glow cursor-pointer;
   }
   
   .card-glow {
-    @apply card-enhanced;
-    box-shadow: var(--shadow-soft);
+    @apply card-enhanced shadow-glow hover:shadow-large;
+  }
+  
+  /* Content alignment utilities */
+  .content-center {
+    @apply flex items-center justify-center;
+  }
+  
+  .content-start {
+    @apply flex items-start justify-start;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
   }
   
   .card-glow:hover {
