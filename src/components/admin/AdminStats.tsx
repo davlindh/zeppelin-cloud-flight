@@ -21,6 +21,19 @@ export const AdminStats = () => {
 
   useEffect(() => {
     fetchStats();
+    
+    // Set up real-time subscriptions for stats updates
+    const channel = supabase
+      .channel('admin_stats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, fetchStats)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'participants' }, fetchStats)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sponsors' }, fetchStats)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'submissions' }, fetchStats)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchStats = async () => {

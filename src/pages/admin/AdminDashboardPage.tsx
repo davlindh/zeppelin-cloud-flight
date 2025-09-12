@@ -9,7 +9,8 @@ import { EnhancedSponsorForm } from '@/components/admin/EnhancedSponsorForm';
 import { ProjectManagementList } from '@/components/admin/ProjectManagementList';
 import { ParticipantManagementList } from '@/components/admin/ParticipantManagementList';
 import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
-import { SubmissionInbox } from '@/components/admin/SubmissionInbox';
+import { EnhancedSubmissionInbox } from '@/components/admin/EnhancedSubmissionInbox';
+import { RecentActivity } from '@/components/admin/RecentActivity';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { AdminSettings } from '@/components/admin/AdminSettings';
 import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings } from 'lucide-react';
@@ -105,14 +106,9 @@ export const AdminDashboardPage = () => {
                 </CardContent>
               </Card>
               
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Recent submissions and changes will appear here...</p>
-                </CardContent>
-              </Card>
+              <div className="md:col-span-2">
+                <RecentActivity />
+              </div>
             </div>
           </TabsContent>
 
@@ -129,7 +125,7 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="submissions">
-            <SubmissionInbox />
+            <EnhancedSubmissionInbox />
           </TabsContent>
 
           <TabsContent value="settings">
