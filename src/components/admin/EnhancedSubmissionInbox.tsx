@@ -53,6 +53,8 @@ export const EnhancedSubmissionInbox = () => {
   const [selectedSubmission, setSelectedSubmission] = useState<EnhancedSubmission | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterExperience, setFilterExperience] = useState<string>('all');
+  const [filterLocation, setFilterLocation] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'created_at' | 'title' | 'type'>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -158,14 +160,68 @@ export const EnhancedSubmissionInbox = () => {
 
   const exportSubmission = (submission: EnhancedSubmission) => {
     const data = {
-      ...submission,
-      content: JSON.stringify(submission.content, null, 2)
+      id: submission.id,
+      type: submission.type,
+      title: submission.title,
+      content: submission.content,
+      contact: {
+        name: submission.submitted_by,
+        email: submission.contact_email,
+        phone: submission.contact_phone,
+        location: submission.location
+      },
+      metadata: {
+        created_at: submission.created_at,
+        status: submission.status,
+        language_preference: submission.language_preference,
+        how_found_us: submission.how_found_us,
+        publication_permission: submission.publication_permission
+      },
+      files: submission.files
     };
+
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `submission-${submission.id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAllSubmissions = (submissions: EnhancedSubmission[]) => {
+    const csvHeaders = [
+      'ID', 'Type', 'Title', 'Name', 'Email', 'Phone', 'Location', 
+      'Roles', 'Experience', 'Interests', 'Status', 'Created', 'How Found Us'
+    ];
+    
+    const csvRows = submissions.map(sub => [
+      sub.id,
+      sub.type,
+      sub.title,
+      sub.submitted_by || '',
+      sub.contact_email || '',
+      sub.contact_phone || '',
+      sub.location || '',
+      Array.isArray((sub.content as any)?.roles) ? (sub.content as any).roles.join('; ') : '',
+      (sub.content as any)?.experienceLevel || '',
+      Array.isArray((sub.content as any)?.interests) ? (sub.content as any).interests.join('; ') : '',
+      sub.status,
+      new Date(sub.created_at).toLocaleDateString('sv-SE'),
+      sub.how_found_us || ''
+    ]);
+
+    const csvContent = [csvHeaders.join(','), ...csvRows.map(row => 
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    )].join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `submissions-export-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -227,6 +283,7 @@ export const EnhancedSubmissionInbox = () => {
         sub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sub.submitted_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sub.contact_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sub.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         JSON.stringify(sub.content).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -234,6 +291,20 @@ export const EnhancedSubmissionInbox = () => {
     // Filter by type
     if (filterType !== 'all') {
       filtered = filtered.filter(sub => sub.type === filterType);
+    }
+
+    // Filter by experience level
+    if (filterExperience !== 'all') {
+      filtered = filtered.filter(sub => 
+        (sub.content as any)?.experienceLevel === filterExperience
+      );
+    }
+
+    // Filter by location
+    if (filterLocation !== 'all') {
+      filtered = filtered.filter(sub => 
+        sub.location?.toLowerCase().includes(filterLocation.toLowerCase())
+      );
     }
 
     // Sort
@@ -601,7 +672,7 @@ export const EnhancedSubmissionInbox = () => {
               </div>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
@@ -615,6 +686,38 @@ export const EnhancedSubmissionInbox = () => {
                 <option value="feedback">Feedback</option>
                 <option value="suggestion">Förslag</option>
               </select>
+
+              <select
+                value={filterExperience}
+                onChange={(e) => setFilterExperience(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm"
+              >
+                <option value="all">Alla erfarenhetsnivåer</option>
+                <option value="beginner">Nybörjare</option>
+                <option value="intermediate">Medel</option>
+                <option value="experienced">Erfaren</option>
+                <option value="expert">Expert</option>
+              </select>
+
+              <select
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm"
+              >
+                <option value="all">Alla platser</option>
+                {Array.from(new Set(submissions.map(s => s.location).filter(Boolean))).map(location => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportAllSubmissions(filteredAndSortedSubmissions())}
+                title="Exportera alla synliga inlämningar som CSV"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
               
               <Button
                 variant="outline"

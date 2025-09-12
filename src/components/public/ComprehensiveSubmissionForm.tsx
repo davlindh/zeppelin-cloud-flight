@@ -263,7 +263,7 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
       const metadata = getSubmissionMetadata();
       
       const content = {
-        // New structured fields
+        // Clean, non-duplicated structured fields
         description: formData.description,
         roles: formData.roles,
         experienceLevel: formData.experienceLevel,
@@ -274,15 +274,9 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
         portfolioLinks: formData.portfolioLinks,
         comments: formData.comments,
         
-        // Legacy field mappings for database validation
+        // Required legacy fields for database validation (minimal duplication)
         bio: formData.description,
-        skills: formData.roles?.length > 0 
-          ? formData.roles 
-          : formData.contributions?.length > 0 
-            ? formData.contributions 
-            : formData.experienceLevel 
-              ? [formData.experienceLevel] 
-              : [],
+        skills: formData.roles?.length > 0 ? formData.roles : [formData.experienceLevel].filter(Boolean),
               
         ...(formData.type === 'project' && {
           purpose: formData.purpose,

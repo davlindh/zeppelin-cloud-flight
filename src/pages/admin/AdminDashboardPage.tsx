@@ -12,6 +12,7 @@ import { SponsorManagementList } from '@/components/admin/SponsorManagementList'
 import { EnhancedSubmissionInbox } from '@/components/admin/EnhancedSubmissionInbox';
 import { RecentActivity } from '@/components/admin/RecentActivity';
 import { AdminStats } from '@/components/admin/AdminStats';
+import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminSettings } from '@/components/admin/AdminSettings';
 import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings } from 'lucide-react';
 
@@ -43,10 +44,14 @@ export const AdminDashboardPage = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="projects">
               <FolderOpen className="h-4 w-4 mr-2" />
@@ -110,6 +115,10 @@ export const AdminDashboardPage = () => {
                 <RecentActivity />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <AdminAnalytics />
           </TabsContent>
 
           <TabsContent value="projects">
