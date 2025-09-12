@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ShowcaseSection } from '../components/showcase';
 import { Button } from '../components/ui';
 import { PublicSubmissionForm } from '@/components/public';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '../components/ui/Modal';
 import type { ShowcaseCard } from '../types/index';
 import { INITIAL_CARDS } from '../constants/index';
 
@@ -171,7 +171,7 @@ export const ShowcasePage: React.FC = () => {
 
             {/* Submission Form Modal */}
             {showSubmissionForm && (
-                <Modal onClose={() => setShowSubmissionForm(false)}>
+                <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
                     <PublicSubmissionForm onClose={() => setShowSubmissionForm(false)} />
                 </Modal>
             )}

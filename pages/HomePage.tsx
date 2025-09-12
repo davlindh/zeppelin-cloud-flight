@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { HeroSection, VisionSection, EngagementSection, SystematicsSection, PartnerSection } from '../components/sections';
 import { PublicSubmissionForm } from '@/components/public';
 import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '../components/ui/Modal';
 
 export const HomePage: React.FC = () => {
     const location = useLocation();
@@ -40,7 +40,7 @@ export const HomePage: React.FC = () => {
 
             {/* Submission Form Modal */}
             {showSubmissionForm && (
-                <Modal onClose={() => setShowSubmissionForm(false)}>
+                <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
                     <PublicSubmissionForm onClose={() => setShowSubmissionForm(false)} />
                 </Modal>
             )}
