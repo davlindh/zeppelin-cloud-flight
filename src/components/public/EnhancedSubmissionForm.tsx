@@ -39,11 +39,12 @@ interface FormData {
 
 interface EnhancedSubmissionFormProps {
   onClose?: () => void;
+  initialType?: 'project' | 'participant' | 'media' | 'partnership';
 }
 
-export const EnhancedSubmissionForm = ({ onClose }: EnhancedSubmissionFormProps) => {
+export const EnhancedSubmissionForm = ({ onClose, initialType }: EnhancedSubmissionFormProps) => {
   const [formData, setFormData] = useState<FormData>({
-    type: '',
+    type: initialType || 'project',
     title: '',
     description: '',
     submitterName: '',
@@ -65,6 +66,7 @@ export const EnhancedSubmissionForm = ({ onClose }: EnhancedSubmissionFormProps)
     { value: 'project', label: 'Projektförslag' },
     { value: 'participant', label: 'Deltagare/Konstnär' },
     { value: 'media', label: 'Media/Innehåll' },
+    { value: 'partnership', label: 'Partnerskap' },
     { value: 'collaboration', label: 'Samarbete' },
     { value: 'feedback', label: 'Feedback' },
     { value: 'suggestion', label: 'Förslag' }
@@ -406,6 +408,62 @@ export const EnhancedSubmissionForm = ({ onClose }: EnhancedSubmissionFormProps)
           </div>
         );
 
+      case 'partnership':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="organization">Organisation *</Label>
+              <Input
+                id="organization"
+                placeholder="Namn på din organisation"
+                value={formData.organization || ''}
+                onChange={(e) => updateFormData('organization', e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="partnershipType">Typ av partnerskap *</Label>
+              <Select 
+                value={formData.partnershipType || ''} 
+                onValueChange={(value) => updateFormData('partnershipType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Välj partnerskapstyp" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sponsor">Sponsor</SelectItem>
+                  <SelectItem value="venue">Lokal/Plats</SelectItem>
+                  <SelectItem value="technical">Teknisk partner</SelectItem>
+                  <SelectItem value="media">Media partner</SelectItem>
+                  <SelectItem value="community">Samhällspartner</SelectItem>
+                  <SelectItem value="other">Annat</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="proposal">Partnerskapsförslag *</Label>
+              <Textarea
+                id="proposal"
+                placeholder="Beskriv vad din organisation kan bidra med och vad ni vill få ut av partnerskapet..."
+                value={formData.proposal || ''}
+                onChange={(e) => updateFormData('proposal', e.target.value)}
+                rows={4}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="website">Organisationens webbsida (valfritt)</Label>
+              <Input
+                id="website"
+                type="url"
+                placeholder="https://er-webbsida.se"
+                value={formData.website || ''}
+                onChange={(e) => updateFormData('website', e.target.value)}
+              />
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -425,6 +483,9 @@ export const EnhancedSubmissionForm = ({ onClose }: EnhancedSubmissionFormProps)
         }
         if (formData.type === 'media') {
           return formData.mediaType && formData.mediaCategory;
+        }
+        if (formData.type === 'partnership') {
+          return formData.organization && formData.partnershipType && formData.proposal;
         }
         return true;
       case 3:

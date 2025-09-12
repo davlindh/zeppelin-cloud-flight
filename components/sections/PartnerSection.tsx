@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui';
+import { Modal } from '../ui';
 import { ImageWithFallback } from '../showcase/ImageWithFallback';
 import { usePartnerData } from '../../src/hooks/usePartnerData';
 import { Loader2 } from 'lucide-react';
+import { EnhancedSubmissionForm } from '../../src/components/public/EnhancedSubmissionForm';
 
 const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: string }> = ({ alt, src, href, tagline }) => (
     <a href={href} target="_blank" rel="noopener noreferrer" 
@@ -28,6 +30,11 @@ const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: 
 
 export const PartnerSection: React.FC = () => {
     const { partners, loading, usingDatabase } = usePartnerData();
+    const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+
+    const handlePartnershipClick = () => {
+        setShowSubmissionForm(true);
+    };
 
     if (loading) {
         return (
@@ -43,6 +50,7 @@ export const PartnerSection: React.FC = () => {
     }
 
     return (
+        <>
         <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
             <div className="container mx-auto px-4 sm:px-6">
                 <div className="text-center mb-8 sm:mb-12">
@@ -73,7 +81,7 @@ export const PartnerSection: React.FC = () => {
                 <div className="text-center mt-12 sm:mt-16">
                     <Button
                         variant="primary"
-                        href="#engagement"
+                        onClick={handlePartnershipClick}
                         className="hover:scale-105 transition-transform duration-300"
                     >
                         Ansök om partnerskap
@@ -81,5 +89,16 @@ export const PartnerSection: React.FC = () => {
                 </div>
             </div>
         </section>
+
+        {/* Enhanced Submission Form Modal */}
+        {showSubmissionForm && (
+            <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
+                <EnhancedSubmissionForm 
+                    onClose={() => setShowSubmissionForm(false)}
+                    initialType="partnership"
+                />
+            </Modal>
+        )}
+        </>
     );
 };

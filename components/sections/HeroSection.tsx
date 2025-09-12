@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../ui';
 import { Modal } from '../ui';
 import { motion } from 'framer-motion';
+import { EnhancedSubmissionForm } from '../../src/components/public/EnhancedSubmissionForm';
 
 
 
 export const HeroSection: React.FC = () => {
-    const [showInterestModal, setShowInterestModal] = useState(false);
+    const [showSubmissionForm, setShowSubmissionForm] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -14,8 +15,8 @@ export const HeroSection: React.FC = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleInterestClick = () => {
-        setShowInterestModal(true);
+    const handleParticipantClick = () => {
+        setShowSubmissionForm(true);
     };
 
     return (
@@ -65,7 +66,7 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="primary"
-                                onClick={handleInterestClick}
+                                onClick={handleParticipantClick}
                                 className="hover:scale-105 transition-transform duration-300"
                             >
                                 Delta i Residenset
@@ -122,65 +123,15 @@ export const HeroSection: React.FC = () => {
                 </div>
             </section>
 
-            {/* Interest Signup Modal */}
-            <Modal
-                isOpen={showInterestModal}
-                onClose={() => setShowInterestModal(false)}
-            >
-                <div className="space-y-6">
-                    <h2 className="text-3xl font-bold font-serif text-gray-800">
-                        Anmäl intresse för Zeppel Inn Residenset
-                    </h2>
-
-                    <p className="text-gray-600">
-                        Tack för ditt intresse att delta i Zeppel Innl Vi är glada över att du vill bli en del av denna unika konstnärliga reserfaring i Karlskronas skärgård.
-                    </p>
-
-                    <div className="bg-amber-50 p-6 rounded-lg">
-                        <h3 className="font-semibold text-gray-800 mb-2">Vad händer nu?</h3>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                            <li>• Vi skickar information om kommande ansökningsperioder</li>
-                            <li>• Du får uppdateringar om projekt och partners</li>
-                            <li>• Möjlighet att delta i öppna evenemang och workshops</li>
-                        </ul>
-                    </div>
-
-                    <form className="space-y-4">
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Namn</label>
-                                <input
-                                    type="text"
-                                    placeholder="Ditt namn"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input
-                                    type="email"
-                                    placeholder="din@email.com"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Förhållande till projektet</label>
-                            <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                <option value="">Välj intresseområde...</option>
-                                <option value="artist">Konstnär/Deltagare</option>
-                                <option value="facilitator">Workshop-facilitator</option>
-                                <option value="partner">Partner/Affärsutvecklare</option>
-                                <option value="visitor">Besökare/friskrivning</option>
-                                <option value="other">Annat</option>
-                            </select>
-                        </div>
-                        <Button variant="primary" className="w-full">
-                            Skicka intresseanmälan
-                        </Button>
-                    </form>
-                </div>
-            </Modal>
+            {/* Enhanced Submission Form Modal */}
+            {showSubmissionForm && (
+                <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
+                    <EnhancedSubmissionForm 
+                        onClose={() => setShowSubmissionForm(false)}
+                        initialType="participant"
+                    />
+                </Modal>
+            )}
         </>
     );
 };
