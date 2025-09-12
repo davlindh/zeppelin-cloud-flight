@@ -105,6 +105,25 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
+                                to="/partners"
+                                className="hover:scale-105 transition-transform duration-300"
+                            >
+                                Våra Partners
+                            </Button>
+                        </motion.div>
+                        
+                        {/* Bli Partner CTA */}
+                        <motion.div
+                            initial={{ y: 30, opacity: 0, x: 30 }}
+                            animate={{ y: 0, opacity: 1, x: 0 }}
+                            transition={{
+                                delay: 1.5,
+                                duration: 0.7,
+                                ease: "easeOut"
+                            }}
+                        >
+                            <Button
+                                variant="secondary"
                                 href="#partner"
                                 className="hover:scale-105 transition-transform duration-300"
                             >

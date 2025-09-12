@@ -7,7 +7,8 @@ export const NAV_LINKS = [
     { href: '#systematik', label: 'Systematik' },
     { href: '/showcase', label: 'Showcase' },
     { href: '/participants', label: 'Deltagare' },
-    { href: '#partner', label: 'Partners' },
+    { href: '/partners', label: 'Partners' },
+    { href: '#partner', label: 'Bli Partner' },
 ];
 
 // Build showcase cards from normalized data
