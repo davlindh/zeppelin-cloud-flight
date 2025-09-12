@@ -26,6 +26,28 @@ export const FileUpload = ({
   
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const validateFileType = (file: File): boolean => {
+    if (acceptedTypes === "*/*") return true;
+    
+    const acceptedList = acceptedTypes.split(',').map(type => type.trim());
+    const fileMimeType = file.type.toLowerCase();
+    const fileName = file.name.toLowerCase();
+    
+    return acceptedList.some(acceptedType => {
+      if (acceptedType.startsWith('.')) {
+        // Handle file extensions
+        return fileName.endsWith(acceptedType.toLowerCase());
+      } else if (acceptedType.includes('/*')) {
+        // Handle wildcard MIME types (e.g., "image/*", "video/*")
+        const baseType = acceptedType.split('/')[0];
+        return fileMimeType.startsWith(baseType + '/');
+      } else {
+        // Handle exact MIME types
+        return fileMimeType === acceptedType.toLowerCase();
+      }
+    });
+  };
+
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
     
@@ -38,8 +60,8 @@ export const FileUpload = ({
     }
 
     // Validate file type if specified
-    if (acceptedTypes !== "*/*" && !file.type.match(acceptedTypes)) {
-      setError(`File type not supported. Expected: ${acceptedTypes}`);
+    if (!validateFileType(file)) {
+      setError(`File type not supported. Expected: ${acceptedTypes.split(',').join(', ')}`);
       return;
     }
 
