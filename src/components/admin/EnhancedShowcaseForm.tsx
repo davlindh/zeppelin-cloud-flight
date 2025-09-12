@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,6 @@ import { FileUpload } from './FileUpload';
 import { useToast } from '@/hooks/use-toast';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { withTimeout, logError, createProjectWithRelationships, fetchParticipantsWithMedia, fetchSponsors } from '@/utils/adminApi';
-import { useEffect } from 'react';
 
 interface ShowcaseFormData {
   title: string;
@@ -30,7 +29,7 @@ interface ShowcaseFormProps {
   showcaseId?: string;
 }
 
-export const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
+const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -281,6 +280,7 @@ export const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps)
                   <FileUpload
                     onFileSelect={handleImageUpload}
                     bucketName="project-images"
+                    acceptedTypes="image/*"
                   />
                 </div>
 
@@ -519,3 +519,5 @@ export const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps)
     </div>
   );
 };
+
+export { EnhancedShowcaseForm };
