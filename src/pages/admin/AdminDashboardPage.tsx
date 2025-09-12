@@ -3,9 +3,12 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ProjectForm } from '@/components/admin/ProjectForm';
+import { EnhancedProjectForm } from '@/components/admin/EnhancedProjectForm';
 import { ParticipantForm } from '@/components/admin/ParticipantForm';
-import { SponsorForm } from '@/components/admin/SponsorForm';
+import { EnhancedSponsorForm } from '@/components/admin/EnhancedSponsorForm';
+import { ProjectManagementList } from '@/components/admin/ProjectManagementList';
+import { ParticipantManagementList } from '@/components/admin/ParticipantManagementList';
+import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
 import { SubmissionInbox } from '@/components/admin/SubmissionInbox';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { AdminSettings } from '@/components/admin/AdminSettings';
@@ -114,48 +117,15 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="projects">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Project Management</CardTitle>
-                <Button onClick={() => setActiveForm('project')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Project
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Project list and management tools will appear here...</p>
-              </CardContent>
-            </Card>
+            <ProjectManagementList onAddProject={() => setActiveForm('project')} />
           </TabsContent>
 
           <TabsContent value="participants">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Participant Management</CardTitle>
-                <Button onClick={() => setActiveForm('participant')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Participant
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Participant list and management tools will appear here...</p>
-              </CardContent>
-            </Card>
+            <ParticipantManagementList onAddParticipant={() => setActiveForm('participant')} />
           </TabsContent>
 
           <TabsContent value="sponsors">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Sponsor Management</CardTitle>
-                <Button onClick={() => setActiveForm('sponsor')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Sponsor
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Sponsor list and management tools will appear here...</p>
-              </CardContent>
-            </Card>
+            <SponsorManagementList onAddSponsor={() => setActiveForm('sponsor')} />
           </TabsContent>
 
           <TabsContent value="submissions">
@@ -179,13 +149,13 @@ export const AdminDashboardPage = () => {
 
         {/* Form Modals */}
         {activeForm === 'project' && (
-          <ProjectForm onClose={handleFormClose} />
+          <EnhancedProjectForm onClose={handleFormClose} />
         )}
         {activeForm === 'participant' && (
           <ParticipantForm onClose={handleFormClose} />
         )}
         {activeForm === 'sponsor' && (
-          <SponsorForm onClose={handleFormClose} />
+          <EnhancedSponsorForm onClose={handleFormClose} />
         )}
       </div>
     </div>
