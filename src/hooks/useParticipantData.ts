@@ -40,13 +40,16 @@ const transformParticipant = (dbParticipant: DatabaseParticipant): Participant =
   name: dbParticipant.name,
   slug: dbParticipant.slug,
   bio: dbParticipant.bio || undefined,
-  avatar: dbParticipant.avatar_path ? `/images/${dbParticipant.avatar_path}` : undefined,
+  avatar: dbParticipant.avatar_path || undefined,
   website: dbParticipant.website || undefined,
   socialLinks: (dbParticipant.social_links as Array<{ platform: string; url: string; }>) || [],
   roles: [], // Will be populated from project relationships
   projects: [], // Will be populated from project relationships
   media: [], // Will be populated from participant_media
-  personalLinks: [], // Will be populated from social_links
+  personalLinks: (dbParticipant.social_links as Array<{ platform: string; url: string; }>)?.map((link: any) => ({
+    type: link.platform.toLowerCase(),
+    url: link.url
+  })) || [],
   createdAt: dbParticipant.created_at,
   updatedAt: dbParticipant.updated_at,
   // Enhanced fields

@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, MapPin, Clock, Star, Phone, Mail, Calendar, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { ImageWithFallback } from '../../components/showcase/ImageWithFallback';
 import { MediaGrid } from '../../components/multimedia';
 import { useParticipantData } from '../hooks/useParticipantData';
@@ -82,11 +83,28 @@ export const ParticipantDetailPage: React.FC = () => {
                     {role}
                   </Badge>
                 ))}
+                {participant.experienceLevel && (
+                  <Badge variant="outline" className="bg-white/10 text-primary-foreground border-white/30">
+                    {participant.experienceLevel}
+                  </Badge>
+                )}
               </div>
               
-              <p className="text-primary-foreground/90">
-                Medverkar i {participant.projects?.length || 0} projekt
-              </p>
+              <div className="space-y-2 text-primary-foreground/90">
+                <p>Medverkar i {participant.projects?.length || 0} projekt</p>
+                {participant.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{participant.location}</span>
+                  </div>
+                )}
+                {participant.availability && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{participant.availability}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -107,6 +125,110 @@ export const ParticipantDetailPage: React.FC = () => {
             </Card>
           )}
 
+          {/* Skills & Experience Section */}
+          {(participant.skills?.length || participant.interests?.length || participant.contributions?.length) && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold text-foreground mb-6">Kompetens & Intressen</h2>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {participant.skills?.length && (
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <Star className="h-4 w-4" />
+                        Färdigheter
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {participant.skills.map((skill, index) => (
+                          <Badge key={index} variant="secondary">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {participant.interests?.length && (
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-3">Intressen</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {participant.interests.map((interest, index) => (
+                          <Badge key={index} variant="outline">
+                            {interest}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {participant.contributions?.length && (
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-3">Bidrag</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {participant.contributions.map((contribution, index) => (
+                          <Badge key={index} variant="default">
+                            {contribution}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Contact & Availability Section */}
+          {(participant.contactEmail || participant.contactPhone || participant.website || participant.timeCommitment) && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold text-foreground mb-6">Kontakt & Tillgänglighet</h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-3">
+                    {participant.contactEmail && (
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-muted-foreground" />
+                        <a href={`mailto:${participant.contactEmail}`} className="text-primary hover:underline">
+                          {participant.contactEmail}
+                        </a>
+                      </div>
+                    )}
+                    {participant.contactPhone && (
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-muted-foreground" />
+                        <a href={`tel:${participant.contactPhone}`} className="text-primary hover:underline">
+                          {participant.contactPhone}
+                        </a>
+                      </div>
+                    )}
+                    {participant.website && (
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-5 w-5 text-muted-foreground" />
+                        <a href={participant.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                          Webbsida
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {participant.timeCommitment && (
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          <span className="font-medium">Tidsåtagande:</span> {participant.timeCommitment}
+                        </span>
+                      </div>
+                    )}
+                    {participant.howFoundUs && (
+                      <div className="text-sm text-muted-foreground">
+                        <span className="font-medium">Hur de hittade oss:</span> {participant.howFoundUs}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Featured Media Section */}
           {participant.media && participant.media.length > 0 && (
             <Card>
@@ -120,16 +242,16 @@ export const ParticipantDetailPage: React.FC = () => {
             </Card>
           )}
 
-          {/* Personal Links Section */}
-          {participant.personalLinks && participant.personalLinks.length > 0 && (
+          {/* Social Links Section */}
+          {((participant.personalLinks && participant.personalLinks.length > 0) || (participant.socialLinks && participant.socialLinks.length > 0)) && (
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-foreground mb-6">
-                  Profillänkar
+                  Sociala länkar & Profiler
                 </h2>
                 <div className="flex flex-wrap gap-3">
-                  {Array.from(new Map(participant.personalLinks.map(link => [link.url, link])).values()).map((link, index) => (
-                    <Button key={index} variant="outline" asChild>
+                  {participant.personalLinks && Array.from(new Map(participant.personalLinks.map(link => [link.url, link])).values()).map((link, index) => (
+                    <Button key={`personal-${index}`} variant="outline" asChild>
                       <a 
                         href={link.url} 
                         target="_blank" 
@@ -137,9 +259,22 @@ export const ParticipantDetailPage: React.FC = () => {
                         className="flex items-center gap-2"
                       >
                         {link.type === 'github' && 'GitHub'}
-                        {link.type === 'website' && 'Website'}
+                        {link.type === 'website' && 'Webbsida'}
                         {link.type === 'demo' && 'Demo'}
-                        {link.type === 'other' && 'Social'}
+                        {!['github', 'website', 'demo'].includes(link.type) && link.type.charAt(0).toUpperCase() + link.type.slice(1)}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </Button>
+                  ))}
+                  {participant.socialLinks && participant.socialLinks.map((link, index) => (
+                    <Button key={`social-${index}`} variant="outline" asChild>
+                      <a 
+                        href={link.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        {link.platform.charAt(0).toUpperCase() + link.platform.slice(1)}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </Button>
