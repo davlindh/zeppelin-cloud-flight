@@ -1,11 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fileCacheService, type CacheEntry, type CacheSettings } from '@/services/FileCacheService';
 
+// Check for user consent
+const getCacheConsent = (): boolean => {
+  try {
+    const consent = localStorage.getItem('file-cache-consent');
+    return consent === 'granted';
+  } catch {
+    return false;
+  }
+};
+
+const setCacheConsent = (granted: boolean): void => {
+  try {
+    localStorage.setItem('file-cache-consent', granted ? 'granted' : 'denied');
+  } catch {
+    console.warn('Could not save cache consent to localStorage');
+  }
+};
+
 export interface UseCachedFileResult {
   cachedUrl: string | null;
   isLoading: boolean;
   isCached: boolean;
   error: string | null;
+  needsPermission: boolean;
   cacheFile: () => Promise<void>;
   removeCachedFile: () => Promise<void>;
 }
@@ -15,9 +34,12 @@ export const useCachedFile = (url: string, metadata?: CacheEntry['metadata']): U
   const [isLoading, setIsLoading] = useState(false);
   const [isCached, setIsCached] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsPermission, setNeedsPermission] = useState(false);
+
+  const hasConsent = getCacheConsent();
 
   const checkCache = useCallback(async () => {
-    if (!url) return;
+    if (!url || !hasConsent) return;
 
     try {
       const cached = await fileCacheService.getCachedFile(url);
@@ -33,10 +55,16 @@ export const useCachedFile = (url: string, metadata?: CacheEntry['metadata']): U
       console.warn('Error checking cache:', err);
       setError(err instanceof Error ? err.message : 'Cache check failed');
     }
-  }, [url]);
+  }, [url, hasConsent]);
 
   const cacheFile = useCallback(async () => {
     if (!url || isLoading) return;
+
+    // Check for consent first
+    if (!hasConsent) {
+      setNeedsPermission(true);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -54,7 +82,7 @@ export const useCachedFile = (url: string, metadata?: CacheEntry['metadata']): U
     } finally {
       setIsLoading(false);
     }
-  }, [url, metadata, isLoading]);
+  }, [url, metadata, isLoading, hasConsent]);
 
   const removeCachedFile = useCallback(async () => {
     if (!url) return;
@@ -88,6 +116,7 @@ export const useCachedFile = (url: string, metadata?: CacheEntry['metadata']): U
     isLoading,
     isCached,
     error,
+    needsPermission,
     cacheFile,
     removeCachedFile
   };
@@ -106,6 +135,13 @@ export interface UseCacheManagerResult {
   updateSettings: (newSettings: Partial<CacheSettings>) => void;
   clearCache: () => Promise<void>;
   refreshStats: () => Promise<void>;
+  grantPermission: (settings: {
+    enableCache: boolean;
+    maxSize: number;
+    allowBackground: boolean;
+    allowCellular: boolean;
+  }) => void;
+  hasConsent: boolean;
 }
 
 export const useCacheManager = (): UseCacheManagerResult => {
@@ -119,6 +155,8 @@ export const useCacheManager = (): UseCacheManagerResult => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  const hasConsent = getCacheConsent();
+
   const refreshStats = useCallback(async () => {
     try {
       const newStats = await fileCacheService.getCacheStats();
@@ -131,10 +169,44 @@ export const useCacheManager = (): UseCacheManagerResult => {
   }, []);
 
   const updateSettings = useCallback((newSettings: Partial<CacheSettings>) => {
+    // Only update if user has given consent
+    if (!hasConsent && newSettings.enabled) {
+      console.warn('Cannot enable cache without user consent');
+      return;
+    }
+
     fileCacheService.updateSettings(newSettings);
     const updatedSettings = fileCacheService.getSettings();
     setSettings(updatedSettings);
-  }, []);
+  }, [hasConsent]);
+
+  const grantPermission = useCallback((permissionSettings: {
+    enableCache: boolean;
+    maxSize: number;
+    allowBackground: boolean;
+    allowCellular: boolean;
+  }) => {
+    // Save consent
+    setCacheConsent(permissionSettings.enableCache);
+    
+    // Update cache settings
+    if (permissionSettings.enableCache) {
+      fileCacheService.updateSettings({
+        enabled: true,
+        maxSize: permissionSettings.maxSize,
+        // Convert permission flags to settings
+        autoCleanup: permissionSettings.allowBackground
+      });
+    } else {
+      fileCacheService.updateSettings({
+        enabled: false
+      });
+    }
+    
+    const updatedSettings = fileCacheService.getSettings();
+    setSettings(updatedSettings);
+    refreshStats();
+  }, [refreshStats]);
 
   const clearCache = useCallback(async () => {
     setIsLoading(true);
@@ -158,6 +230,8 @@ export const useCacheManager = (): UseCacheManagerResult => {
     isLoading,
     updateSettings,
     clearCache,
-    refreshStats
+    refreshStats,
+    grantPermission,
+    hasConsent
   };
 };

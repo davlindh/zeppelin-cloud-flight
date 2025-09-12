@@ -54,7 +54,7 @@ export const PersistentPlayer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Use cached file for current media
-  const { cachedUrl, isCached, cacheFile } = useCachedFile(
+  const { cachedUrl, isCached, cacheFile, needsPermission } = useCachedFile(
     currentMedia?.url || '', 
     {
       title: currentMedia?.title,
@@ -64,6 +64,13 @@ export const PersistentPlayer: React.FC = () => {
 
   // Use cached URL if available, otherwise use original
   const mediaUrl = cachedUrl || currentMedia?.url;
+
+  // Auto-cache media when it starts playing, but check permissions first
+  useEffect(() => {
+    if (isPlaying && currentMedia && !isCached && !needsPermission) {
+      cacheFile();
+    }
+  }, [isPlaying, currentMedia, isCached, cacheFile, needsPermission]);
 
   // Format time helper
   const formatTime = (timeInSeconds: number): string => {
