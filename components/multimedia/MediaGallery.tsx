@@ -90,7 +90,7 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
               <div
                 key={item.id || `img-${index}`}
                 onClick={() => handleMediaClick(item)}
-                className="group relative aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer media-item reveal-scale stagger-1"
+                className="group media-item cursor-pointer reveal-scale stagger-1 aspect-square"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <img
@@ -127,7 +127,7 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
               <div
                 key={item.id || `video-${index}`}
                 onClick={() => handleMediaClick(item)}
-                className="group relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer media-item reveal-scale stagger-2"
+                className="group media-item cursor-pointer reveal-scale stagger-2 aspect-video"
                 style={{ animationDelay: `${index * 0.15}s` }}
               >
                 {item.thumbnail ? (
