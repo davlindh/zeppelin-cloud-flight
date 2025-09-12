@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../ui';
 import { Modal } from '../ui';
 import { motion } from 'framer-motion';
-import { EnhancedSubmissionForm } from '../../src/components/public/EnhancedSubmissionForm';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 
 
@@ -126,7 +126,7 @@ export const HeroSection: React.FC = () => {
             {/* Enhanced Submission Form Modal */}
             {showSubmissionForm && (
                 <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-                    <EnhancedSubmissionForm 
+                    <ComprehensiveSubmissionForm 
                         onClose={() => setShowSubmissionForm(false)}
                         initialType="participant"
                     />

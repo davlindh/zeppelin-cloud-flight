@@ -11,7 +11,6 @@ export { ProjectPurpose } from './ProjectPurpose';
 export { ProjectBudget } from './ProjectBudget';
 export { ProjectTimeline } from './ProjectTimeline';
 export { ProjectSponsors } from './ProjectSponsors';
-export { ProjectMedia } from './ProjectMedia';
 export { ProjectAccess } from './ProjectAccess';
 export { ParticipantMedia } from './ParticipantMedia';
 export { EnhancedProjectMedia } from './EnhancedProjectMedia';

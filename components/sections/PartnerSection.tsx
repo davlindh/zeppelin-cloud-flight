@@ -4,7 +4,7 @@ import { Modal } from '../ui';
 import { ImageWithFallback } from '../showcase/ImageWithFallback';
 import { usePartnerData } from '../../src/hooks/usePartnerData';
 import { Loader2 } from 'lucide-react';
-import { EnhancedSubmissionForm } from '../../src/components/public/EnhancedSubmissionForm';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: string }> = ({ alt, src, href, tagline }) => (
     <a href={href} target="_blank" rel="noopener noreferrer" 
@@ -93,7 +93,7 @@ export const PartnerSection: React.FC = () => {
         {/* Enhanced Submission Form Modal */}
         {showSubmissionForm && (
             <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-                <EnhancedSubmissionForm 
+                <ComprehensiveSubmissionForm 
                     onClose={() => setShowSubmissionForm(false)}
                     initialType="partnership"
                 />

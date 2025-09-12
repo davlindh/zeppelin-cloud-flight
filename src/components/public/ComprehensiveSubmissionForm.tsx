@@ -23,7 +23,7 @@ interface UploadedFile {
 
 interface FormData {
   // Basic info
-  type: 'project' | 'participant';
+  type: 'project' | 'participant' | 'partnership';
   title: string;
   description: string;
   
@@ -57,7 +57,7 @@ interface FormData {
 
 interface ComprehensiveSubmissionFormProps {
   onClose?: () => void;
-  initialType?: 'project' | 'participant';
+  initialType?: 'project' | 'participant' | 'partnership';
 }
 
 export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participant' }: ComprehensiveSubmissionFormProps) => {

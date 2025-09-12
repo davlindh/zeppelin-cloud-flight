@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../ui';
 import { Modal } from '../ui';
-import { EnhancedSubmissionForm } from '../../src/components/public/EnhancedSubmissionForm';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 const SystemStep: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
     <div className="text-center p-4 sm:p-6">
@@ -165,7 +165,7 @@ export const SystematicsSection: React.FC = () => {
         {/* Enhanced Submission Form Modal */}
         {showSubmissionForm && (
             <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-                <EnhancedSubmissionForm 
+                <ComprehensiveSubmissionForm 
                     onClose={() => setShowSubmissionForm(false)}
                     initialType={submissionType}
                 />

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MediaGrid } from '../multimedia/MediaGrid';
 import { MediaFilters } from '../multimedia/MediaFilters';
 import type { ProjectMediaItem } from '@/types/media';
 import { generateMediaId } from '@/utils/mediaHelpers';
+import { useMediaFiltering } from '@/hooks/useMediaFiltering';
 
 interface EnhancedProjectMediaProps {
   media?: Array<{
@@ -20,26 +21,28 @@ export const EnhancedProjectMedia: React.FC<EnhancedProjectMediaProps> = ({
   showPreview = true,
   allowCategorization = true 
 }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filter, setFilter] = useState<string>('all');
-
-  if (media.length === 0) {
-    return null;
-  }
-
   // Convert to ProjectMediaItem format
   const mediaItems: ProjectMediaItem[] = media.map((item, index) => ({
     id: generateMediaId(item),
     ...item,
   }));
 
-  // Filter media
-  const filteredMedia = filter === 'all' 
-    ? mediaItems 
-    : mediaItems.filter(item => item.type === filter);
+  const {
+    viewMode,
+    typeFilter,
+    availableTypes,
+    filteredMedia,
+    setViewMode,
+    setTypeFilter,
+    resetFilters,
+    totalCount,
+    filteredCount,
+    hasFilters
+  } = useMediaFiltering({ media: mediaItems });
 
-  // Get available types for filter
-  const availableTypes = [...new Set(mediaItems.map(item => item.type))];
+  if (media.length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -47,18 +50,18 @@ export const EnhancedProjectMedia: React.FC<EnhancedProjectMediaProps> = ({
       <h3 className="text-lg font-semibold text-foreground">Media & Material</h3>
       
       {/* Filters */}
-      {allowCategorization && availableTypes.length > 1 && (
+      {allowCategorization && hasFilters && (
         <MediaFilters
           availableTypes={availableTypes}
-          activeTypeFilter={filter}
+          activeTypeFilter={typeFilter}
           viewMode={viewMode}
-          totalCount={mediaItems.length}
-          filteredCount={filteredMedia.length}
-          onTypeFilterChange={setFilter}
+          totalCount={totalCount}
+          filteredCount={filteredCount}
+          onTypeFilterChange={setTypeFilter}
           onViewModeChange={setViewMode}
         />
       )}
-
+      
       {/* Media Grid */}
       <MediaGrid
         media={filteredMedia}
@@ -67,12 +70,12 @@ export const EnhancedProjectMedia: React.FC<EnhancedProjectMediaProps> = ({
         showPlayButton={true}
         showAddToQueue={true}
       />
-
-      {filteredMedia.length === 0 && filter !== 'all' && (
+      
+      {filteredCount === 0 && typeFilter !== 'all' && (
         <div className="text-center py-8 text-muted-foreground">
           <p>Inga mediafiler av vald typ hittades.</p>
           <button 
-            onClick={() => setFilter('all')}
+            onClick={resetFilters}
             className="text-primary hover:underline mt-1"
           >
             Visa alla mediafiler

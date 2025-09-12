@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../ui';
 import { Modal } from '../ui';
-import { EnhancedSubmissionForm } from '../../src/components/public/EnhancedSubmissionForm';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 export const EngagementSection: React.FC = () => {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
@@ -84,7 +84,7 @@ export const EngagementSection: React.FC = () => {
 
       {showSubmissionForm && (
         <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-          <EnhancedSubmissionForm 
+          <ComprehensiveSubmissionForm 
             onClose={() => setShowSubmissionForm(false)}
             initialType="participant"
           />
