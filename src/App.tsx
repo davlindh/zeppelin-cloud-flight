@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { MediaProvider } from "@/contexts/MediaContext";
+import { PersistentPlayer } from "../components/multimedia/PersistentPlayer";
 import { RootLayout } from "../components/layout";
 import { HomePage } from "../pages/HomePage";
 import { ShowcasePage } from "../pages/ShowcasePage";
@@ -16,21 +18,24 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<RootLayout />}>
-            <Route index element={<Navigate to="/home" replace />} />
-            <Route path="home" element={<HomePage />} />
-            <Route path="showcase" element={<ShowcasePage />} />
-            <Route path="showcase/:id" element={<ProjectDetailPage />} />
-            <Route path="participants" element={<ParticipantsPage />} />
-            <Route path="participants/:slug" element={<ParticipantDetailPage />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <MediaProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<RootLayout />}>
+              <Route index element={<Navigate to="/home" replace />} />
+              <Route path="home" element={<HomePage />} />
+              <Route path="showcase" element={<ShowcasePage />} />
+              <Route path="showcase/:id" element={<ProjectDetailPage />} />
+              <Route path="participants" element={<ParticipantsPage />} />
+              <Route path="participants/:slug" element={<ParticipantDetailPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+        <PersistentPlayer />
+      </MediaProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
