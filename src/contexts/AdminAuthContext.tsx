@@ -35,42 +35,76 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener
+    let timeoutId: NodeJS.Timeout;
+    
+    // Set loading timeout as fallback
+    const setLoadingTimeout = () => {
+      timeoutId = setTimeout(() => {
+        console.log('AdminAuth: Loading timeout reached, setting loading to false');
+        setLoading(false);
+      }, 10000); // 10 second timeout
+    };
+
+    // Set up auth state listener - CRITICAL: No async callback to prevent deadlocks
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('AdminAuth: Auth state changed', event, session?.user?.email);
+        
+        // Clear any existing timeout
+        if (timeoutId) clearTimeout(timeoutId);
+        
+        // Update session state immediately
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check if authenticated user is admin
-          const isUserAdmin = await verifyAdmin(session.user.id, session.user.email);
-          setIsAdmin(isUserAdmin);
-          setAdminEmail(isUserAdmin ? session.user.email : null);
+          // Defer admin verification to avoid callback deadlock
+          setTimeout(() => {
+            verifyAdmin(session.user.id, session.user.email).then((isUserAdmin) => {
+              console.log('AdminAuth: Admin verification result', isUserAdmin);
+              setIsAdmin(isUserAdmin);
+              setAdminEmail(isUserAdmin ? session.user.email : null);
+              setLoading(false);
+            }).catch((error) => {
+              console.error('AdminAuth: Admin verification failed', error);
+              setIsAdmin(false);
+              setAdminEmail(null);
+              setLoading(false);
+            });
+          }, 0);
         } else {
           setIsAdmin(false);
           setAdminEmail(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
     // Check for existing session
+    setLoadingTimeout();
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      console.log('AdminAuth: Initial session check', session?.user?.email);
       
-      if (session?.user) {
-        verifyAdmin(session.user.id, session.user.email).then((isUserAdmin) => {
-          setIsAdmin(isUserAdmin);
-          setAdminEmail(isUserAdmin ? session.user.email : null);
-          setLoading(false);
-        });
-      } else {
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      if (!session?.user) {
+        // No session, stop loading immediately
+        setSession(null);
+        setUser(null);
+        setIsAdmin(false);
+        setAdminEmail(null);
         setLoading(false);
       }
+      // If there is a session, let the auth state change handler deal with it
+    }).catch((error) => {
+      console.error('AdminAuth: Session check failed', error);
+      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const verifyAdmin = async (userId: string, email?: string | null): Promise<boolean> => {
