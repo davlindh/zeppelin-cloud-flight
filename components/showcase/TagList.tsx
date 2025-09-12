@@ -2,7 +2,7 @@ import React from 'react';
 
 interface TagListProps {
   tags: string[];
-  variant?: 'colored' | 'minimal';
+  variant?: 'colored' | 'minimal' | 'hero';
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -20,9 +20,14 @@ export const TagList: React.FC<TagListProps> = ({
   };
 
   const getVariantClasses = (variant: string) => {
-    return variant === 'minimal'
-      ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-      : 'bg-amber-100 text-amber-800 hover:bg-amber-200';
+    switch (variant) {
+      case 'minimal':
+        return 'bg-gray-100 text-gray-600 hover:bg-gray-200';
+      case 'hero':
+        return 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30';
+      default:
+        return 'bg-amber-100 text-amber-800 hover:bg-amber-200';
+    }
   };
 
   return (

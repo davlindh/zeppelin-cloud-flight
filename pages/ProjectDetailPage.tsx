@@ -1,10 +1,11 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ProjectHero,
   ProjectDescription,
   ParticipantList,
-  ProjectLinks
+  ProjectLinks,
+  MediaPlayer
 } from '../components/showcase';
 import { INITIAL_CARDS } from '../constants/index';
 import type { ShowcaseCard } from '../types/index';
@@ -37,8 +38,39 @@ export const ProjectDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      {/* Breadcrumbs */}
+      <div className="container mx-auto px-6 pt-8 pb-4">
+        <nav aria-label="breadcrumb" className="text-sm text-gray-500">
+          <ol className="flex items-center space-x-2">
+            <li>
+              <Link to="/" className="hover:text-amber-500 transition-colors">
+                Hem
+              </Link>
+            </li>
+            <li className="flex items-center space-x-2">
+              <span>/</span>
+              <Link to="/showcase" className="hover:text-amber-500 transition-colors">
+                Showcase
+              </Link>
+            </li>
+            <li className="flex items-center space-x-2">
+              <span>/</span>
+              <span className="text-gray-800 font-semibold" aria-current="page">
+                {card.title}
+              </span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
       <div className="pb-12">
         <ProjectHero card={card} />
+
+        {card.media && (
+          <div className="container mx-auto px-6 max-w-4xl">
+            <MediaPlayer media={card.media} />
+          </div>
+        )}
 
         <div className="container mx-auto px-6 max-w-4xl space-y-12 mt-12">
           <ProjectDescription

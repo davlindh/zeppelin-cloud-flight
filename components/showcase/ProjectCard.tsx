@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TagList } from './TagList';
+import { ImageWithFallback } from './ImageWithFallback';
 import type { ShowcaseCard as ShowcaseCardType } from '../../types/index';
 
 interface ProjectCardProps {
@@ -30,7 +32,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ card, isModal = false 
     return (
         <div onClick={handleClick} className={cardClassName.trim()}>
             <div className="relative overflow-hidden">
-                <img
+                <ImageWithFallback
                     src={card.imageUrl}
                     alt={card.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
@@ -46,18 +48,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ card, isModal = false 
                     {card.description}
                 </p>
                 {card.tags && card.tags.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1">
-                        {card.tags.slice(0, 2).map((tag, index) => (
-                            <span
-                                key={index}
-                                className="px-2 py-1 bg-gray-100 text-xs rounded-full text-gray-600"
-                            >
-                                {tag}
-                            </span>
-                        ))}
-                        {card.tags.length > 2 && (
-                            <span className="px-2 py-1 bg-gray-100 text-xs rounded-full text-gray-600">
-                                +{card.tags.length - 2} fler
+                    <div className="mt-3">
+                        <TagList
+                            tags={card.tags.slice(0, 3)}
+                            variant="minimal"
+                            size="sm"
+                        />
+                        {card.tags.length > 3 && (
+                            <span className="text-xs text-gray-500 mt-1 block">
+                                +{card.tags.length - 3} fler
                             </span>
                         )}
                     </div>

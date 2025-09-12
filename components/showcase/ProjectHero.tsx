@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TagList } from './TagList';
+import { ImageWithFallback } from './ImageWithFallback';
 import type { ShowcaseCard } from '../../types/index';
 
 interface ProjectHeroProps {
@@ -13,7 +15,7 @@ export const ProjectHero: React.FC<ProjectHeroProps> = ({ card }) => {
     <div className="relative">
       {/* Hero Image */}
       <div className="h-64 md:h-80 lg:h-96 overflow-hidden">
-        <img
+        <ImageWithFallback
           src={card.imageUrl}
           alt={card.title}
           className="w-full h-full object-cover"
@@ -42,15 +44,12 @@ export const ProjectHero: React.FC<ProjectHeroProps> = ({ card }) => {
 
           {/* Tags */}
           {card.tags && card.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {card.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-white/20 backdrop-blur-sm text-sm rounded-full font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="mb-4">
+              <TagList
+                tags={card.tags}
+                variant="hero"
+                size="md"
+              />
             </div>
           )}
 

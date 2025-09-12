@@ -15,4 +15,23 @@ export interface ShowcaseCard {
         url: string;
     }>;
     tags?: string[];
+    media?: {
+        primaryVideo?: {
+            type: 'youtube' | 'vimeo' | 'external';
+            url: string;
+            title?: string;
+            thumbnail?: string;
+        };
+        gallery?: Array<{
+            type: 'video' | 'image';
+            url: string;
+            title?: string;
+        }>;
+    };
+    schedule?: {
+        date?: string;
+        time?: string;
+        duration?: string;
+        status?: 'upcoming' | 'live' | 'past' | 'archived';
+    };
 }

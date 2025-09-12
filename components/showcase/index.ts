@@ -6,5 +6,6 @@ export { ParticipantList } from './ParticipantList';
 export { ProjectLinks } from './ProjectLinks';
 export { TagList } from './TagList';
 export { ImageWithFallback } from './ImageWithFallback';
+export { MediaPlayer } from './MediaPlayer';
 export { ShowcaseSection } from './ShowcaseSection';
 export { SubmissionForm } from './SubmissionForm';

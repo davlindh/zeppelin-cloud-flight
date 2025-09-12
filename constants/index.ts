@@ -33,6 +33,17 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
             { type: 'demo' as const, url: 'https://example.com/kress-demo' },
             { type: 'website' as const, url: 'https://kaggle.com/kress-workshop' }
         ],
+        media: {
+            primaryVideo: {
+                type: 'youtube',
+                url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                title: 'KRESS Robot Workshop Preview'
+            },
+            gallery: [
+                { type: 'image', url: '/images/projects/cooking-potato.jpg', title: 'Robot setup' },
+                { type: 'video', url: 'https://vimeo.com/76979871', title: 'Parametric design process' }
+            ]
+        }
     },
     {
         id: '4',
@@ -77,6 +88,17 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
             { type: 'demo' as const, url: 'https://example.com/fangla-din-fantasi' },
             { type: 'website' as const, url: 'https://example.com/anastasiya-loyko' }
         ],
+        media: {
+            primaryVideo: {
+                type: 'vimeo',
+                url: 'https://vimeo.com/76979871',
+                title: 'Fånga Din Fantasi Performance'
+            },
+            gallery: [
+                { type: 'image', url: '/images/projects/irina-novokrescionova.jpg', title: 'Performance setup' },
+                { type: 'video', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', title: 'Drone footage' }
+            ]
+        }
     },
     {
         id: '6',
