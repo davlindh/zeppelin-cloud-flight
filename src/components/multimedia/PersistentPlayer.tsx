@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMediaPlayer } from '@/contexts/MediaContext';
+import { useCachedFile } from '@/hooks/useFileCache';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
@@ -17,7 +18,9 @@ import {
   RotateCcw,
   Shuffle,
   Repeat,
-  Download
+  Download,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,6 +52,18 @@ export const PersistentPlayer: React.FC = () => {
   const [showPlaybackRate, setShowPlaybackRate] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Use cached file for current media
+  const { cachedUrl, isCached, cacheFile } = useCachedFile(
+    currentMedia?.url || '', 
+    {
+      title: currentMedia?.title,
+      type: currentMedia?.type
+    }
+  );
+
+  // Use cached URL if available, otherwise use original
+  const mediaUrl = cachedUrl || currentMedia?.url;
 
   // Format time helper
   const formatTime = (timeInSeconds: number): string => {
@@ -79,6 +94,11 @@ export const PersistentPlayer: React.FC = () => {
             <h4 className="font-medium text-sm text-foreground truncate">
               {currentMedia.title}
             </h4>
+            {isCached && (
+              <div className="flex-shrink-0" title="Cached offline">
+                <WifiOff className="h-3 w-3 text-green-600" />
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-1 flex-shrink-0">
@@ -110,7 +130,7 @@ export const PersistentPlayer: React.FC = () => {
                 <div className="relative bg-black rounded-lg overflow-hidden aspect-video">
                   <video
                     ref={videoRef}
-                    src={currentMedia.url}
+                    src={mediaUrl}
                     className="w-full h-full object-contain"
                     controls={false}
                   />
@@ -272,6 +292,7 @@ export const PersistentPlayer: React.FC = () => {
                   size="sm"
                   asChild
                   className="h-8 w-8 p-0"
+                  title={isCached ? "Downloaded (Cached)" : "Download"}
                 >
                   <a
                     href={currentMedia.url}
@@ -279,7 +300,7 @@ export const PersistentPlayer: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Download className="h-3 w-3" />
+                    {isCached ? <WifiOff className="h-3 w-3" /> : <Download className="h-3 w-3" />}
                   </a>
                 </Button>
               )}
@@ -296,8 +317,8 @@ export const PersistentPlayer: React.FC = () => {
       </Card>
 
       {/* Hidden media elements */}
-      <audio ref={audioRef} style={{ display: 'none' }} />
-      <video ref={videoRef} style={{ display: 'none' }} />
+      <audio ref={audioRef} src={mediaUrl} style={{ display: 'none' }} />
+      <video ref={videoRef} src={mediaUrl} style={{ display: 'none' }} />
     </div>
   );
 };

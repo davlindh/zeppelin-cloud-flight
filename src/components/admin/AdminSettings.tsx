@@ -5,7 +5,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Database, FileText } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CacheManager } from '@/components/ui/CacheManager';
+import { Loader2, Database, FileText, HardDrive } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AdminSetting {
@@ -105,64 +107,90 @@ export const AdminSettings = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Partner Data Source
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Alert>
-            <AlertDescription>
-              Toggle between static hardcoded partner data and dynamic database-driven partner content.
-              Current source: <strong>{partnerDataSource === 'database' ? 'Database' : 'Static Files'}</strong>
-            </AlertDescription>
-          </Alert>
-          
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label htmlFor="partner-toggle" className="text-base font-medium">
-                Use Database Partners
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                {partnerDataSource === 'database' 
-                  ? 'Partners are loaded from the database sponsors table' 
-                  : 'Partners are loaded from static constants file'}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {partnerDataSource === 'static' ? (
-                <FileText className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <Database className="h-4 w-4 text-primary" />
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Systeminställningar</h2>
+        <p className="text-muted-foreground">
+          Konfigurera systemets beteende och funktioner
+        </p>
+      </div>
+
+      <Tabs defaultValue="partners" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="partners" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Partner & Data
+          </TabsTrigger>
+          <TabsTrigger value="cache" className="flex items-center gap-2">
+            <HardDrive className="h-4 w-4" />
+            File Cache
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="partners" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Partner Data Source
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <AlertDescription>
+                  Toggle between static hardcoded partner data and dynamic database-driven partner content.
+                  Current source: <strong>{partnerDataSource === 'database' ? 'Database' : 'Static Files'}</strong>
+                </AlertDescription>
+              </Alert>
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label htmlFor="partner-toggle" className="text-base font-medium">
+                    Use Database Partners
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {partnerDataSource === 'database' 
+                      ? 'Partners are loaded from the database sponsors table' 
+                      : 'Partners are loaded from static constants file'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {partnerDataSource === 'static' ? (
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Database className="h-4 w-4 text-primary" />
+                  )}
+                  <Switch
+                    id="partner-toggle"
+                    checked={partnerDataSource === 'database'}
+                    onCheckedChange={togglePartnerDataSource}
+                    disabled={updating === 'use_database_partners'}
+                  />
+                </div>
+              </div>
+
+              {updating === 'use_database_partners' && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Updating partner data source...
+                </div>
               )}
-              <Switch
-                id="partner-toggle"
-                checked={partnerDataSource === 'database'}
-                onCheckedChange={togglePartnerDataSource}
-                disabled={updating === 'use_database_partners'}
-              />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {updating === 'use_database_partners' && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Updating partner data source...
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Other Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Additional admin settings will appear here as they are added.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Other Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Additional admin settings will appear here as they are added.</p>
-        </CardContent>
-      </Card>
+        <TabsContent value="cache" className="space-y-6">
+          <CacheManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
