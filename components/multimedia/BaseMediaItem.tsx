@@ -43,9 +43,10 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
   };
   
   const containerClass = cn(
-    "group border border-border rounded-lg hover:shadow-md hover:border-primary/20 transition-all duration-200",
-    viewMode === 'grid' ? 'flex flex-col' : 'flex items-start gap-4 p-4',
-    isCurrentlyPlaying && "ring-2 ring-primary/50",
+    "group card-enhanced hover:shadow-medium hover:border-primary/30 transition-all duration-300",
+    viewMode === 'grid' ? 'flex flex-col overflow-hidden' : 'flex items-start gap-4 p-4',
+    isCurrentlyPlaying && "ring-2 ring-primary/50 shadow-glow",
+    "hover:scale-[1.02] hover:-translate-y-1",
     className
   );
   
@@ -54,27 +55,29 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
       <div className={containerClass}>
         {/* Preview section for grid view */}
         {showPreview && (media.type === 'image' || media.type === 'portfolio') && (
-          <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative">
+          <div className="aspect-video bg-muted overflow-hidden relative">
             <img 
               src={media.url} 
               alt={media.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
               loading="lazy"
             />
             {isPlayable && showPlayButton && (
               <button
                 onClick={handlePlayClick}
-                className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
               >
-                {getMediaIcon(media.type, 'w-12 h-12 text-white')}
+                <div className="bg-white/95 dark:bg-black/95 backdrop-blur-sm rounded-full p-3 shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                  {getMediaIcon(media.type, 'w-6 h-6 text-primary')}
+                </div>
               </button>
             )}
           </div>
         )}
         
-        <div className="p-4 flex-grow">
-          <div className="flex items-start justify-between gap-2 mb-2">
-            <div className={`flex-shrink-0 p-2 rounded-md border ${getMediaTypeColor(media.type)}`}>
+        <div className="p-5 flex-grow">
+          <div className="flex items-start justify-between gap-2 mb-3">
+            <div className={`flex-shrink-0 p-2.5 rounded-lg border shadow-sm ${getMediaTypeColor(media.type)} group-hover:shadow-md transition-all duration-300`}>
               {getMediaIcon(media.type)}
             </div>
             
@@ -82,36 +85,37 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
               {showAddToQueue && isPlayable && (
                 <button
                   onClick={handleAddToQueue}
-                  className="p-1 rounded hover:bg-muted transition-colors opacity-0 group-hover:opacity-100"
+                  className="btn-glow p-2 rounded-lg hover:bg-primary/10 transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0"
                   title="Lägg till i kö"
                 >
-                  <Plus className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                  <Plus className="w-4 h-4 text-muted-foreground hover:text-primary" />
                 </button>
               )}
               <a 
                 href={media.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="p-1 rounded hover:bg-muted transition-colors"
+                className="btn-glow p-2 rounded-lg hover:bg-primary/10 transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0"
                 onClick={(e) => e.stopPropagation()}
+                style={{ transitionDelay: '0.05s' }}
               >
-                <ExternalLink className="w-4 h-4 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ExternalLink className="w-4 h-4 text-muted-foreground hover:text-primary" />
               </a>
             </div>
           </div>
           
-          <h4 className="font-medium text-foreground group-hover:text-primary transition-colors mb-1">
+          <h4 className="font-semibold text-foreground group-hover:text-primary transition-all duration-300 mb-2 line-clamp-2">
             {media.title}
           </h4>
           
           {media.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
               {media.description}
             </p>
           )}
           
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground capitalize">
+          <div className="flex items-center justify-between mt-auto">
+            <span className="text-xs font-medium text-muted-foreground capitalize bg-muted/50 px-2 py-1 rounded-full">
               {media.type}
             </span>
             
@@ -119,13 +123,13 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
               <button
                 onClick={handlePlayClick}
                 className={cn(
-                  "px-2 py-1 text-xs rounded-md border transition-colors",
+                  "btn-glow px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-300 transform hover:scale-105",
                   isCurrentlyPlaying 
-                    ? "bg-primary text-primary-foreground border-primary" 
-                    : "bg-muted hover:bg-primary/10 hover:border-primary/20 text-muted-foreground hover:text-primary"
+                    ? "gradient-primary text-primary-foreground border-primary shadow-soft animate-pulse-glow" 
+                    : "bg-muted hover:bg-primary/10 hover:border-primary/30 text-muted-foreground hover:text-primary hover:shadow-soft"
                 )}
               >
-                {isCurrentlyPlaying ? 'Spelar' : 'Spela'}
+                {isCurrentlyPlaying ? 'Spelar nu' : 'Spela'}
               </button>
             )}
           </div>

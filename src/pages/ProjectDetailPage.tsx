@@ -216,10 +216,53 @@ export const ProjectDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-        <div className="container mx-auto px-6 py-16 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Laddar projekt...</p>
+      <div className="min-h-screen gradient-hero">
+        <div className="container mx-auto px-6 py-16">
+          {/* Hero skeleton */}
+          <div className="relative h-96 gradient-subtle rounded-xl overflow-hidden mb-12">
+            <div className="absolute inset-0 animate-pulse">
+              <div className="h-full bg-muted/30 rounded-xl"></div>
+            </div>
+            <div className="relative p-16 h-full flex items-end">
+              <div className="space-y-4 max-w-4xl">
+                <div className="skeleton h-6 w-32 mb-4"></div>
+                <div className="skeleton h-12 w-96 mb-4"></div>
+                <div className="skeleton h-6 w-2/3 mb-6"></div>
+                <div className="flex gap-2">
+                  <div className="skeleton h-6 w-16 rounded-full"></div>
+                  <div className="skeleton h-6 w-20 rounded-full"></div>
+                  <div className="skeleton h-6 w-24 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Content skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl">
+            <div className="lg:col-span-2 space-y-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="card-enhanced p-6 space-y-4">
+                  <div className="skeleton h-6 w-48"></div>
+                  <div className="space-y-2">
+                    <div className="skeleton h-4 w-full"></div>
+                    <div className="skeleton h-4 w-5/6"></div>
+                    <div className="skeleton h-4 w-4/5"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="space-y-6">
+              <div className="card-enhanced p-6 space-y-4">
+                <div className="skeleton h-6 w-32"></div>
+                <div className="space-y-3">
+                  <div className="skeleton h-4 w-full"></div>
+                  <div className="skeleton h-4 w-3/4"></div>
+                  <div className="skeleton h-4 w-1/2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -227,65 +270,68 @@ export const ProjectDetailPage: React.FC = () => {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
+      <div className="min-h-screen gradient-hero">
         <div className="container mx-auto px-6 py-16 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
-            {error || 'Projekt hittades inte'}
-          </h1>
-          <Button onClick={() => navigate('/showcase')} className="mt-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Tillbaka till showcase
-          </Button>
+          <div className="card-glow p-12 inline-block">
+            <h1 className="text-3xl font-bold text-foreground mb-6">
+              {error || 'Projekt hittades inte'}
+            </h1>
+            <Button onClick={() => navigate('/showcase')} className="btn-glow">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Tillbaka till showcase
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-      {/* Hero Section */}
-      <div className="relative h-96 bg-gradient-to-r from-primary/20 to-primary/10">
+    <div className="min-h-screen gradient-hero">
+      {/* Enhanced Hero Section */}
+      <div className="relative h-[32rem] overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={getImageUrl(project.image_path)}
             alt={project.title}
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover"
             onError={(e) => {
               e.currentTarget.src = '/public/images/ui/placeholder-project.jpg';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
+          <div className="absolute inset-0 gradient-hero opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/30 to-transparent" />
         </div>
         
         <div className="relative container mx-auto px-6 py-16 h-full flex items-end">
-          <div className="max-w-4xl">
+          <div className="max-w-4xl reveal-up">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/showcase')}
-              className="mb-4 text-muted-foreground hover:text-foreground"
+              className="mb-6 text-muted-foreground hover:text-foreground btn-glow backdrop-blur-sm bg-background/20 border border-border/30"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Tillbaka till showcase
             </Button>
             
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
               {project.title}
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-6 max-w-3xl">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl leading-relaxed">
               {project.description}
             </p>
 
-            {/* Tags */}
+            {/* Enhanced Tags */}
             {(project.tags || project.associations) && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3 reveal-scale stagger-1">
                 {project.tags?.map((tag, index) => (
-                  <Badge key={`tag-${index}`} variant="secondary">
+                  <Badge key={`tag-${index}`} variant="secondary" className="px-4 py-2 text-sm font-medium shadow-soft hover:shadow-medium transition-all duration-300">
                     {tag}
                   </Badge>
                 ))}
                 {project.associations?.map((assoc, index) => (
-                  <Badge key={`assoc-${index}`} variant="outline">
+                  <Badge key={`assoc-${index}`} variant="outline" className="px-4 py-2 text-sm font-medium bg-background/20 backdrop-blur-sm border-border/30 hover:bg-background/40 transition-all duration-300">
                     {assoc}
                   </Badge>
                 ))}
@@ -295,54 +341,56 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="container mx-auto px-6 py-12 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Enhanced Content */}
+      <div className="container mx-auto px-6 py-16 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-10">
             
             {/* Full Description */}
             {project.full_description && (
-              <Card>
+              <Card className="card-glow reveal-up">
                 <CardHeader>
-                  <CardTitle>Om projektet</CardTitle>
+                  <CardTitle className="text-2xl font-bold">Om projektet</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="whitespace-pre-wrap">{project.full_description}</p>
-                  </div>
+                <CardContent className="prose prose-gray max-w-none">
+                  <p className="text-lg leading-relaxed whitespace-pre-wrap">{project.full_description}</p>
                 </CardContent>
               </Card>
             )}
 
             {/* Purpose & Impact */}
             {(project.purpose || project.expected_impact) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 reveal-up stagger-2">
                 {project.purpose && (
-                  <Card>
+                  <Card className="card-glow">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="h-5 w-5" />
+                      <CardTitle className="flex items-center gap-3 text-xl">
+                        <div className="p-2 rounded-lg gradient-primary">
+                          <Target className="h-5 w-5 text-primary-foreground" />
+                        </div>
                         Syfte
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">{project.purpose}</p>
+                      <p className="text-muted-foreground leading-relaxed">{project.purpose}</p>
                     </CardContent>
                   </Card>
                 )}
 
                 {project.expected_impact && (
-                  <Card>
+                  <Card className="card-glow">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="h-5 w-5" />
+                      <CardTitle className="flex items-center gap-3 text-xl">
+                        <div className="p-2 rounded-lg gradient-secondary">
+                          <Target className="h-5 w-5 text-secondary-foreground" />
+                        </div>
                         Förväntad påverkan
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">{project.expected_impact}</p>
+                      <p className="text-muted-foreground leading-relaxed">{project.expected_impact}</p>
                     </CardContent>
                   </Card>
                 )}
@@ -422,8 +470,8 @@ export const ProjectDetailPage: React.FC = () => {
 
             {/* Media */}
             {project.media && project.media.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
+              <Card className="card-glow reveal-up stagger-3">
+                <CardContent className="p-8">
                   <EnhancedProjectMedia 
                     media={project.media.map(item => ({
                       ...item,
@@ -436,21 +484,25 @@ export const ProjectDetailPage: React.FC = () => {
               </Card>
             )}
 
-            {/* Links */}
+            {/* Enhanced Links */}
             {project.links && project.links.length > 0 && (
-              <Card>
+              <Card className="card-glow reveal-up stagger-4">
                 <CardHeader>
-                  <CardTitle>Länkar</CardTitle>
+                  <CardTitle className="text-xl">Projektlänkar</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {project.links.map((link, index) => (
-                      <Button key={index} variant="outline" asChild>
-                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                          {getLinkIcon(link.type)}
-                          {link.type === 'github' ? 'GitHub' : 
-                           link.type === 'website' ? 'Webbsida' : 
-                           link.type === 'demo' ? 'Demo' : 'Länk'}
+                      <Button key={index} variant="outline" asChild className="btn-glow h-auto p-4 justify-start">
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                          <div className="p-2 rounded-md bg-primary/10">
+                            {getLinkIcon(link.type)}
+                          </div>
+                          <span className="font-medium">
+                            {link.type === 'github' ? 'GitHub Repository' : 
+                             link.type === 'website' ? 'Projektwebbsida' : 
+                             link.type === 'demo' ? 'Live Demo' : 'Extern länk'}
+                          </span>
                         </a>
                       </Button>
                     ))}
@@ -461,20 +513,23 @@ export const ProjectDetailPage: React.FC = () => {
 
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* Enhanced Sidebar */}
+          <div className="space-y-8">
             
             {/* Project Info */}
-            <Card>
+            <Card className="card-glow reveal-up">
               <CardHeader>
-                <CardTitle>Projektinfo</CardTitle>
+                <CardTitle className="text-xl">Projektdetaljer</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Skapad</p>
-                  <p className="text-sm font-medium">
-                    {new Date(project.created_at).toLocaleDateString('sv-SE')}
-                  </p>
+              <CardContent className="space-y-5">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Skapad</p>
+                    <p className="text-sm font-semibold">
+                      {new Date(project.created_at).toLocaleDateString('sv-SE')}
+                    </p>
+                  </div>
                 </div>
                 
                 {project.access && (
