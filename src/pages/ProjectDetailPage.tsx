@@ -82,7 +82,7 @@ interface ProjectDetail {
 }
 
 export const ProjectDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -92,8 +92,8 @@ export const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
-      if (!id) {
-        setError('Inget projekt-ID angivet');
+      if (!slug) {
+        setError('Ingen projektslug angiven');
         setLoading(false);
         return;
       }
@@ -121,7 +121,7 @@ export const ProjectDetailPage: React.FC = () => {
             project_access (requirements, target_audience, capacity, registration_required),
             project_voting (enabled, categories, results)
           `)
-          .eq('id', id)
+          .eq('slug', slug)
           .single();
 
         if (projectError) {
@@ -178,7 +178,7 @@ export const ProjectDetailPage: React.FC = () => {
     };
 
     fetchProject();
-  }, [id, toast]);
+  }, [slug, toast]);
 
   const getImageUrl = (imagePath?: string) => {
     if (!imagePath) return '/public/images/ui/placeholder-project.jpg';

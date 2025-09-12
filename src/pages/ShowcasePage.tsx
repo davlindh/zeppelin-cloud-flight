@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { EnhancedSubmissionForm } from '@/components/public/EnhancedSubmissionForm';
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Filter, ArrowUpDown, Plus, Eye } from 'lucide-react';
 
 interface Project {
   id: string;
+  slug: string;
   title: string;
   description: string;
   full_description?: string;
@@ -173,8 +174,8 @@ export const ShowcasePage: React.FC = () => {
     return filtered;
   }, [projects, searchQuery, sortBy, filterBy]);
 
-  const handleProjectClick = (projectId: string) => {
-    navigate(`/showcase/${projectId}`);
+  const handleProjectClick = (projectSlug: string) => {
+    navigate(`/showcase/${projectSlug}`);
   };
 
   const getImageUrl = (imagePath?: string) => {
@@ -273,9 +274,9 @@ export const ShowcasePage: React.FC = () => {
                   <DialogHeader>
                     <DialogTitle>Dela ditt projekt</DialogTitle>
                   </DialogHeader>
-                  <EnhancedSubmissionForm 
+                  <ComprehensiveSubmissionForm 
                     onClose={() => setShowSubmissionForm(false)}
-                    initialType="project"
+                    initialType="participant"
                   />
                 </DialogContent>
               </Dialog>
@@ -341,7 +342,7 @@ export const ShowcasePage: React.FC = () => {
               <Card 
                 key={project.id}
                 className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-border"
-                onClick={() => handleProjectClick(project.id)}
+                onClick={() => handleProjectClick(project.slug)}
               >
                 <div className="relative overflow-hidden rounded-t-lg">
                   <img
