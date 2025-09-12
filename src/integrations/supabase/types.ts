@@ -43,16 +43,19 @@ export type Database = {
       }
       admin_users: {
         Row: {
+          auth_user_id: string | null
           created_at: string
           email: string
           id: string
         }
         Insert: {
+          auth_user_id?: string | null
           created_at?: string
           email: string
           id?: string
         }
         Update: {
+          auth_user_id?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -529,8 +532,11 @@ export type Database = {
         Row: {
           content: Json
           created_at: string
+          device_fingerprint: string | null
           id: string
+          ip_address: unknown | null
           processed_at: string | null
+          session_id: string | null
           status: string
           submitted_by: string | null
           title: string
@@ -539,8 +545,11 @@ export type Database = {
         Insert: {
           content: Json
           created_at?: string
+          device_fingerprint?: string | null
           id?: string
+          ip_address?: unknown | null
           processed_at?: string | null
+          session_id?: string | null
           status?: string
           submitted_by?: string | null
           title: string
@@ -549,8 +558,11 @@ export type Database = {
         Update: {
           content?: Json
           created_at?: string
+          device_fingerprint?: string | null
           id?: string
+          ip_address?: unknown | null
           processed_at?: string | null
+          session_id?: string | null
           status?: string
           submitted_by?: string | null
           title?: string
@@ -563,8 +575,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_session_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      hash_device_fingerprint: {
+        Args: { fingerprint: string }
+        Returns: string
+      }
       is_admin: {
-        Args: { user_email: string }
+        Args: { user_email: string } | { user_email?: string; user_id?: string }
         Returns: boolean
       }
     }
