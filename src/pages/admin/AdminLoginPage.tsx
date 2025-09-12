@@ -8,11 +8,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export const AdminLoginPage = () => {
-  const { isAdmin, login, loading } = useAdminAuth();
+  const { isAdmin, login, signup, loading } = useAdminAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSignupMode, setIsSignupMode] = useState(false);
 
   if (isAdmin) {
     return <Navigate to="/admin" replace />;
@@ -23,10 +24,19 @@ export const AdminLoginPage = () => {
     setError('');
     setIsSubmitting(true);
 
-    const result = await login(email, password);
+    const result = isSignupMode 
+      ? await signup(email, password)
+      : await login(email, password);
     
     if (!result.success) {
-      setError(result.error || 'Login failed');
+      setError(result.error || (isSignupMode ? 'Signup failed' : 'Login failed'));
+    } else if (isSignupMode) {
+      setError('');
+      // Switch to login mode after successful signup
+      setIsSignupMode(false);
+      setPassword('');
+      // Show success message
+      setError('Registration successful! Please check your email and then log in.');
     }
     
     setIsSubmitting(false);
@@ -48,12 +58,17 @@ export const AdminLoginPage = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Zeppel Inn Admin</CardTitle>
-          <CardDescription>Enter your authorized email to access the admin dashboard</CardDescription>
+          <CardDescription>
+            {isSignupMode 
+              ? 'Register with your authorized email to create an admin account'
+              : 'Enter your authorized email to access the admin dashboard'
+            }
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant={error.includes('successful') ? 'default' : 'destructive'}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -74,7 +89,7 @@ export const AdminLoginPage = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={isSignupMode ? "Create a password" : "Enter your password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -82,13 +97,29 @@ export const AdminLoginPage = () => {
               />
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex-col space-y-3">
             <Button 
               type="submit" 
               className="w-full"
               disabled={isSubmitting || !email.trim() || !password.trim()}
             >
-              {isSubmitting ? 'Signing In...' : 'Sign In to Admin Dashboard'}
+              {isSubmitting 
+                ? (isSignupMode ? 'Registering...' : 'Signing In...') 
+                : (isSignupMode ? 'Register Admin Account' : 'Sign In to Admin Dashboard')
+              }
+            </Button>
+            <Button 
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setIsSignupMode(!isSignupMode);
+                setError('');
+                setPassword('');
+              }}
+              disabled={isSubmitting}
+            >
+              {isSignupMode ? 'Already have an account? Sign In' : 'Need to register? Create Account'}
             </Button>
           </CardFooter>
         </form>

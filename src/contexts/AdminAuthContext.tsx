@@ -8,6 +8,7 @@ interface AdminAuthContextType {
   user: User | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
 }
@@ -74,10 +75,12 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
 
   const verifyAdmin = async (userId: string, email?: string | null): Promise<boolean> => {
     try {
+      if (!email) return false;
+      
       const { data, error } = await supabase
         .from('admin_users')
-        .select('email, auth_user_id')
-        .or(`auth_user_id.eq.${userId},email.eq.${email}`)
+        .select('email')
+        .eq('email', email)
         .single();
 
       return !error && data !== null;
@@ -112,19 +115,47 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
         return { success: false, error: error.message };
       }
 
-      // Update admin_users with auth_user_id if not already set
-      if (data.user) {
-        await supabase
-          .from('admin_users')
-          .update({ auth_user_id: data.user.id })
-          .eq('email', email)
-          .is('auth_user_id', null);
-      }
-
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, error: 'Login failed. Please try again.' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signup = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      setLoading(true);
+      
+      // First check if email is in admin_users table
+      const { data: adminData, error: adminError } = await supabase
+        .from('admin_users')
+        .select('email')
+        .eq('email', email)
+        .single();
+
+      if (adminError || !adminData) {
+        return { success: false, error: 'Email not authorized for admin access' };
+      }
+
+      // Sign up with Supabase Auth
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin`
+        }
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Signup error:', error);
+      return { success: false, error: 'Signup failed. Please try again.' };
     } finally {
       setLoading(false);
     }
@@ -145,6 +176,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
       user,
       session,
       login,
+      signup,
       logout,
       loading
     }}>
