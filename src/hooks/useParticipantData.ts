@@ -13,6 +13,17 @@ interface DatabaseParticipant {
   social_links: Array<{ platform: string; url: string; }>;
   created_at: string;
   updated_at: string;
+  // Enhanced fields
+  skills: string[] | null;
+  experience_level: string | null;
+  interests: string[] | null;
+  time_commitment: string | null;
+  contributions: string[] | null;
+  location: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  how_found_us: string | null;
+  availability: string | null;
 }
 
 interface EnhancedFilters {
@@ -37,7 +48,18 @@ const transformParticipant = (dbParticipant: DatabaseParticipant): Participant =
   media: [], // Will be populated from participant_media
   personalLinks: [], // Will be populated from social_links
   createdAt: dbParticipant.created_at,
-  updatedAt: dbParticipant.updated_at
+  updatedAt: dbParticipant.updated_at,
+  // Enhanced fields
+  skills: dbParticipant.skills || [],
+  experienceLevel: dbParticipant.experience_level || undefined,
+  interests: dbParticipant.interests || [],
+  timeCommitment: dbParticipant.time_commitment || undefined,
+  contributions: dbParticipant.contributions || [],
+  location: dbParticipant.location || undefined,
+  contactEmail: dbParticipant.contact_email || undefined,
+  contactPhone: dbParticipant.contact_phone || undefined,
+  howFoundUs: dbParticipant.how_found_us || undefined,
+  availability: dbParticipant.availability || undefined
 });
 
 // Transform static data to frontend format for fallback
@@ -156,8 +178,11 @@ export const useParticipantData = () => {
 
           transformedParticipants.forEach(participant => {
             participant.roles?.forEach(role => roles.add(role));
-            // These would come from submission data or participant metadata
-            // For now, we'll generate some basic categories
+            participant.skills?.forEach(skill => skills.add(skill));
+            if (participant.experienceLevel) experienceLevel.add(participant.experienceLevel);
+            participant.contributions?.forEach(contribution => contributionTypes.add(contribution));
+            
+            // Legacy categories for backwards compatibility
             if (participant.media?.length) contributionTypes.add('Media Creator');
             if (participant.projects?.length) contributionTypes.add('Project Participant');
             if (participant.personalLinks?.length) contributionTypes.add('Professional');
@@ -210,7 +235,26 @@ export const useParticipantData = () => {
         }
       }
 
-      // Other filters can be added here as needed
+      // Skills filter
+      if (filters.skills?.length) {
+        if (!participant.skills?.some(skill => filters.skills!.includes(skill))) {
+          return false;
+        }
+      }
+
+      // Experience level filter
+      if (filters.experienceLevel?.length) {
+        if (!participant.experienceLevel || !filters.experienceLevel.includes(participant.experienceLevel)) {
+          return false;
+        }
+      }
+
+      // Contribution types filter
+      if (filters.contributionTypes?.length) {
+        if (!participant.contributions?.some(contribution => filters.contributionTypes!.includes(contribution))) {
+          return false;
+        }
+      }
       return true;
     });
   };
