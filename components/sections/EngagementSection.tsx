@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '../ui';
 import { Modal } from '../ui';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 export const EngagementSection: React.FC = () => {
-  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [showSubmissionForm, setShowSubmissionForm] = useState(false);
 
   const handleJoinClick = () => {
-    setShowInterestModal(true);
+    setShowSubmissionForm(true);
   };
 
   return (
@@ -81,82 +82,14 @@ export const EngagementSection: React.FC = () => {
         </div>
       </section>
 
-      <Modal
-        isOpen={showInterestModal}
-        onClose={() => setShowInterestModal(false)}
-      >
-        <div className="space-y-6">
-          <h2 className="text-3xl font-bold font-serif text-gray-800">
-            Bli en del av Zeppel Inn-residen
-          </h2>
-
-          <p className="text-gray-600">
-            Anmäl ditt intresse att delta i denna unika konstnärliga och teknologiska satsning i Karlskronas skärgård. Vi söker konstnärer, teknologer, samhällsbyggare och partners.
-          </p>
-
-          <div className="bg-amber-50 p-6 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">Vad vi erbjuder</h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Tvärvetenskapliga workshops och kollaborationer</li>
-              <li>• Tillgång till unika lokaliteter i skärgården</li>
-              <li>• Nätverksmöjligheter med internationella deltagare</li>
-              <li>• Presentation av ditt arbete för allmänheten</li>
-              <li>• Teknisk och konstnärlig laboratoriemoment</li>
-            </ul>
-          </div>
-
-          <form className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Namn</label>
-                <input
-                  type="text"
-                  placeholder="Ditt namn"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  placeholder="din@email.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Jag är...</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500">
-                <option value="">Välj din roll/start</option>
-                <option value="artist">Konstnär/Artistäg</option>
-                <option value="technologist">Teknolog/Forskare</option>
-                <option value="sociologist">Samhällsbyggare/Forskare</option>
-                <option value="partner">Partner/Organisation</option>
-                <option value="facilitator">Workshop-ledare</option>
-                <option value="other">Annat</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Berätta om din bakgrund och varför du vill delta</label>
-              <textarea
-                rows={4}
-                placeholder="Berätta kort om dina erfarenheter, intresseområden och hur du kan bidra till Zeppel Inn..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
-              ></textarea>
-            </div>
-
-            <Button variant="primary" className="w-full">
-              Skicka intresseanmälan
-            </Button>
-          </form>
-
-          <p className="text-xs text-gray-500 text-center">
-            Vi behandlar dina uppgifter konfidentiellt och kontaktar dig inom 2 veckor med mer information om kommande ansökningsperioder.
-          </p>
-        </div>
-      </Modal>
+      {showSubmissionForm && (
+        <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
+          <ComprehensiveSubmissionForm 
+            onClose={() => setShowSubmissionForm(false)}
+            initialType="participant"
+          />
+        </Modal>
+      )}
     </>
   );
 };

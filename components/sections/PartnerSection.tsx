@@ -1,63 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui';
-
-const PartnerLogo: React.FC<{ alt: string, src: string, srcPng?: string, href: string, tagline?: string, invertOnDark?: boolean }> = ({ alt, src, srcPng, href, tagline, invertOnDark = false }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" 
-       className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-white/5 rounded-xl hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 backdrop-blur-sm hover:scale-105"
-       aria-label={`Besök ${alt}`}>
-        <div className="h-16 sm:h-20 flex items-center justify-center mb-2 sm:mb-3">
-            <picture>
-                <source srcSet={src} type="image/svg+xml" />
-                {srcPng && <img src={srcPng} alt={alt} />}
-                <img 
-                    src={srcPng || src} 
-                    alt={alt} 
-                    className={`max-h-full w-auto object-contain group-hover:scale-110 transition-transform duration-300 ${invertOnDark ? 'dark:invert' : ''}`}
-                    loading="lazy"
-                    decoding="async"
-                    sizes="(max-width: 640px) 120px, 160px"
-                />
-            </picture>
-        </div>
-        {tagline && (
-            <p className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors duration-300 leading-tight font-medium">
-                {tagline}
-            </p>
-        )}
-    </a>
-);
+import { Modal } from '../ui';
+import { useEnhancedPartnerData } from '../../src/hooks/useEnhancedPartnerData';
+import { EnhancedPartnerShowcase } from '../../src/components/partners/EnhancedPartnerShowcase';
+import { Loader2 } from 'lucide-react';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 export const PartnerSection: React.FC = () => {
-    const partners = [
-        {
-            alt: "Stenbräcka Kursgård",
-            src: "/images/partners/stenbracka-logo.png",
-            href: "https://stenbracka.se/",
-            tagline: "Konstnärliga och tekniska miljöer i skärgården"
-        },
-        {
-            alt: "Maskin & Fritid",
-            src: "/images/partners/maskin-fritid-logo.png",
-            href: "https://www.maskfri.se/",
-            tagline: "Lokala resurser för bygg och teknik"
-        },
-        {
-            alt: "Karlskrona Kommun",
-            src: "/images/partners/karlskrona-kommun-logo.svg",
-            srcPng: "/images/partners/karlskrona-kommun-logo.png",
-            href: "https://www.karlskrona.se/",
-            tagline: "Regional utveckling och stöd"
-        },
-        {
-            alt: "Visit Blekinge",
-            src: "/images/partners/visit-blekinge-logo.svg",
-            srcPng: "/images/partners/visit-blekinge-logo.png",
-            href: "https://www.visitblekinge.se/",
-            tagline: "Regional turism och kultur"
-        },
-    ];
+    const { partners, loading, usingDatabase } = useEnhancedPartnerData();
+    const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+
+    const handlePartnershipClick = () => {
+        setShowSubmissionForm(true);
+    };
+
+    if (loading) {
+        return (
+            <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+                <div className="container mx-auto px-4 sm:px-6">
+                    <div className="flex items-center justify-center py-16">
+                        <Loader2 className="h-8 w-8 animate-spin text-white" />
+                        <span className="ml-2 text-white">Loading partners...</span>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
+        <>
         <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
             <div className="container mx-auto px-4 sm:px-6">
                 <div className="text-center mb-8 sm:mb-12">
@@ -68,24 +39,24 @@ export const PartnerSection: React.FC = () => {
                         Zeppel Inn bygger på samarbete med regionala organisationer som delar vår vision att skapa nya möjligheter genom konst och teknologi.
                         Varje partner bidrar med unik kompetens som tar vårt arbete till nästa nivå.
                     </p>
+                    {usingDatabase && (
+                        <p className="text-sm text-white/60 mt-2">
+                            • Partners loaded from database
+                        </p>
+                    )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-center max-w-5xl mx-auto">
-                    {partners.map(p => (
-                        <PartnerLogo
-                            key={p.alt}
-                            alt={p.alt}
-                            src={p.src}
-                            srcPng={p.srcPng}
-                            href={p.href}
-                            tagline={p.tagline}
-                            invertOnDark={p.invertOnDark}
-                        />
-                    ))}
-                </div>
+                
+                <EnhancedPartnerShowcase 
+                    partners={partners}
+                    showProjects={true}
+                    showHistory={false}
+                    layout="grid"
+                />
+                
                 <div className="text-center mt-12 sm:mt-16">
                     <Button
                         variant="primary"
-                        href="#engagement"
+                        onClick={handlePartnershipClick}
                         className="hover:scale-105 transition-transform duration-300"
                     >
                         Ansök om partnerskap
@@ -93,5 +64,16 @@ export const PartnerSection: React.FC = () => {
                 </div>
             </div>
         </section>
+
+        {/* Enhanced Submission Form Modal */}
+        {showSubmissionForm && (
+            <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
+                <ComprehensiveSubmissionForm 
+                    onClose={() => setShowSubmissionForm(false)}
+                    initialType="partnership"
+                />
+            </Modal>
+        )}
+        </>
     );
 };

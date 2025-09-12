@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui';
+import { Modal } from '../ui';
+import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
 const SystemStep: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
     <div className="text-center p-4 sm:p-6">
@@ -12,7 +14,15 @@ const SystemStep: React.FC<{ icon: React.ReactNode; title: string; children: Rea
 );
 
 export const SystematicsSection: React.FC = () => {
+    const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+    const [submissionType, setSubmissionType] = useState<'project' | 'participant'>('project');
+
+    const handleProjectSubmission = () => {
+        setSubmissionType('project');
+        setShowSubmissionForm(true);
+    };
     return (
+        <>
         <section id="systematik" aria-label="Systematics section: Zeppel Inn three-step methodology" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-gray-100 via-gray-50 to-white">
             <div className="container mx-auto px-4 sm:px-6">
                 <div className="text-center mb-8 sm:mb-12 md:mb-20">
@@ -134,10 +144,10 @@ export const SystematicsSection: React.FC = () => {
                             <div className="flex flex-col sm:flex-row justify-center gap-4">
                                 <Button
                                     variant="primary"
-                                    href="#engagement"
+                                    onClick={handleProjectSubmission}
                                     className="hover:scale-105 transition-transform duration-300"
                                 >
-                                    Bli en del av Zeppel Inn
+                                    Bidra med projekt
                                 </Button>
                                 <Button
                                     variant="secondary"
@@ -151,5 +161,16 @@ export const SystematicsSection: React.FC = () => {
                 </div>
             </div>
         </section>
+
+        {/* Enhanced Submission Form Modal */}
+        {showSubmissionForm && (
+            <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
+                <ComprehensiveSubmissionForm 
+                    onClose={() => setShowSubmissionForm(false)}
+                    initialType={submissionType}
+                />
+            </Modal>
+        )}
+        </>
     );
 };

@@ -1,12 +1,17 @@
 import type { ShowcaseCard } from '../types/index';
+import { ANASTASIYA_EXTRA_PROJECTS } from './anastasiyaProjects';
+import { buildShowcaseCards } from '../src/data/builders';
 
 export const NAV_LINKS = [
     { href: '#vision', label: 'Vision' },
     { href: '#systematik', label: 'Systematik' },
     { href: '/showcase', label: 'Showcase' },
-    { href: '#partner', label: 'Partners' },
+    { href: '/participants', label: 'Deltagare' },
+    { href: '/partners', label: 'Partners' },
+    { href: '#partner', label: 'Bli Partner' },
 ];
 
+<<<<<<< HEAD
 export const INITIAL_CARDS: ShowcaseCard[] = [
     {
         id: '1',
@@ -169,3 +174,7 @@ export const INITIAL_CARDS: ShowcaseCard[] = [
         ],
     },
 ];
+=======
+// Build showcase cards from normalized data
+export const INITIAL_CARDS: ShowcaseCard[] = buildShowcaseCards();
+>>>>>>> 4dc5f388285ff86d21b56793b251252e8ffac00b

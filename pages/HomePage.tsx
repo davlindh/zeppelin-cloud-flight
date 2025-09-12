@@ -22,6 +22,7 @@ export const HomePage: React.FC = () => {
             <EngagementSection />
             <SystematicsSection />
             <PartnerSection />
+            
         </>
     );
 };
