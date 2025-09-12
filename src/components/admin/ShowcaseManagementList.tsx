@@ -15,9 +15,11 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ShowcaseManagementListProps {
   onAddShowcase: () => void;
+  onEditShowcase: (showcaseId: string) => void;
+  onViewShowcase?: (showcaseId: string) => void;
 }
 
-export const ShowcaseManagementList = ({ onAddShowcase }: ShowcaseManagementListProps) => {
+export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewShowcase }: ShowcaseManagementListProps) => {
   const { toast } = useToast();
   const [showcases, setShowcases] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -375,15 +377,15 @@ export const ShowcaseManagementList = ({ onAddShowcase }: ShowcaseManagementList
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onViewShowcase?.(showcase.id)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onEditShowcase(showcase.id)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.open(`/showcase/${showcase.slug}`, '_blank')}>
                             <ExternalLink className="h-4 w-4 mr-2" />
                             View Public
                           </DropdownMenuItem>

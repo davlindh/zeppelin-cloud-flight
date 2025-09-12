@@ -19,9 +19,21 @@ import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings }
 export const AdminDashboardPage = () => {
   const { adminEmail, logout } = useAdminAuth();
   const [activeForm, setActiveForm] = useState<string | null>(null);
+  const [editingShowcaseId, setEditingShowcaseId] = useState<string | null>(null);
 
   const handleFormClose = () => {
     setActiveForm(null);
+    setEditingShowcaseId(null);
+  };
+
+  const handleEditShowcase = (showcaseId: string) => {
+    setEditingShowcaseId(showcaseId);
+    setActiveForm('showcase');
+  };
+
+  const handleViewShowcase = (showcaseId: string) => {
+    // Navigate to showcase detail page or open modal
+    window.open(`/showcase/${showcaseId}`, '_blank');
   };
 
   return (
@@ -122,7 +134,11 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="projects">
-            <ShowcaseManagementList onAddShowcase={() => setActiveForm('showcase')} />
+            <ShowcaseManagementList 
+              onAddShowcase={() => setActiveForm('showcase')} 
+              onEditShowcase={handleEditShowcase}
+              onViewShowcase={handleViewShowcase}
+            />
           </TabsContent>
 
           <TabsContent value="participants">
@@ -154,7 +170,7 @@ export const AdminDashboardPage = () => {
 
         {/* Form Modals */}
         {activeForm === 'showcase' && (
-          <EnhancedShowcaseForm onClose={handleFormClose} />
+          <EnhancedShowcaseForm onClose={handleFormClose} showcaseId={editingShowcaseId} />
         )}
         {activeForm === 'participant' && (
           <ParticipantForm onClose={handleFormClose} />

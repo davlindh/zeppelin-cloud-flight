@@ -48,7 +48,7 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
   const [newTag, setNewTag] = useState('');
   const [newLink, setNewLink] = useState({ type: 'website', url: '' });
   
-  const { register, handleSubmit, formState: { errors } } = useForm<ShowcaseFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ShowcaseFormData>({
     defaultValues: {
       title: '',
       description: '',
@@ -61,7 +61,10 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
 
   useEffect(() => {
     loadAvailableData();
-  }, []);
+    if (showcaseId) {
+      loadShowcaseData(showcaseId);
+    }
+  }, [showcaseId]);
 
   const loadAvailableData = async () => {
     try {
@@ -73,6 +76,53 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
       setAvailableSponsors(sponsors);
     } catch (error) {
       logError('loadAvailableData', error);
+    }
+  };
+
+  const loadShowcaseData = async (id: string) => {
+    try {
+      // Fetch showcase data with relationships
+      const { data: showcase, error } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          project_participants!inner(participant_id, role, participants(name)),
+          project_sponsors!inner(sponsor_id, sponsors(name, type)),
+          project_links(type, url),
+          project_tags(tag)
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      // Populate form fields
+      setValue('title', showcase.title || '');
+      setValue('description', showcase.description || '');
+      setValue('full_description', showcase.full_description || '');
+      setValue('purpose', showcase.purpose || '');
+      setValue('expected_impact', showcase.expected_impact || '');
+      setValue('associations', Array.isArray(showcase.associations) ? showcase.associations.join(', ') : '');
+
+      // Set relationships
+      setSelectedParticipants(showcase.project_participants?.map((pp: any) => ({
+        participant_id: pp.participant_id,
+        role: pp.role
+      })) || []);
+      
+      setSelectedSponsors(showcase.project_sponsors?.map((ps: any) => ps.sponsor_id) || []);
+      
+      setShowcaseLinks(showcase.project_links || []);
+      
+      setShowcaseTags(showcase.project_tags?.map((pt: any) => pt.tag) || []);
+
+    } catch (error) {
+      logError('loadShowcaseData', error);
+      toast({
+        title: 'Error loading showcase data',
+        description: 'Failed to load existing showcase data for editing.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -215,7 +265,7 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Add New Showcase Item</CardTitle>
+          <CardTitle>{showcaseId ? 'Edit Showcase Item' : 'Add New Showcase Item'}</CardTitle>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
