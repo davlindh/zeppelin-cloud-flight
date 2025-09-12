@@ -230,11 +230,11 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
       case 1:
         return !!(formData.fullName && formData.email && formData.title && formData.description);
       case 2:
-        return !!(formData.roles.length > 0 && formData.experienceLevel);
+        return !!(formData.roles.length > 0 || formData.experienceLevel);
       case 3:
-        return !!(formData.interests.length > 0 && formData.contributions.length > 0 && formData.timeCommitment);
+        return !!(formData.interests.length > 0 || formData.contributions.length > 0 || formData.timeCommitment);
       case 4:
-        return !!(formData.previousExperience);
+        return true; // Make final step optional
       default:
         return true;
     }
@@ -263,6 +263,7 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
       const metadata = getSubmissionMetadata();
       
       const content = {
+        // New structured fields
         description: formData.description,
         roles: formData.roles,
         experienceLevel: formData.experienceLevel,
@@ -272,6 +273,17 @@ export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participan
         previousExperience: formData.previousExperience,
         portfolioLinks: formData.portfolioLinks,
         comments: formData.comments,
+        
+        // Legacy field mappings for database validation
+        bio: formData.description,
+        skills: formData.roles?.length > 0 
+          ? formData.roles 
+          : formData.contributions?.length > 0 
+            ? formData.contributions 
+            : formData.experienceLevel 
+              ? [formData.experienceLevel] 
+              : [],
+              
         ...(formData.type === 'project' && {
           purpose: formData.purpose,
           expectedImpact: formData.expectedImpact,
