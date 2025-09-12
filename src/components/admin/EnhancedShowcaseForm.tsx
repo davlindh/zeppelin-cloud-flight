@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { FileUpload } from './FileUpload';
 import { useToast } from '@/hooks/use-toast';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { withTimeout, logError, createProjectWithRelationships, fetchParticipantsWithMedia, fetchSponsors } from '@/utils/adminApi';
+import { withTimeout, logError, createProjectWithRelationships, updateProjectWithRelationships, fetchParticipantsWithMedia, fetchSponsors } from '@/utils/adminApi';
 
 interface ShowcaseFormData {
   title: string;
@@ -45,8 +45,11 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
   const [selectedSponsors, setSelectedSponsors] = useState<string[]>([]);
   const [showcaseLinks, setShowcaseLinks] = useState<Array<{ type: string; url: string }>>([]);
   const [showcaseTags, setShowcaseTags] = useState<string[]>([]);
+  const [showcaseMedia, setShowcaseMedia] = useState<Array<{ type: string; url: string; title: string; description?: string }>>([]);
   const [newTag, setNewTag] = useState('');
   const [newLink, setNewLink] = useState({ type: 'website', url: '' });
+  const [newMedia, setNewMedia] = useState({ type: 'image', url: '', title: '', description: '' });
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
   
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<ShowcaseFormData>({
     defaultValues: {
@@ -91,7 +94,8 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
           project_participants(participant_id, role, participants(name)),
           project_sponsors(sponsor_id, sponsors(name, type)),
           project_links(type, url),
-          project_tags(tag)
+          project_tags(tag),
+          project_media(type, url, title, description)
         `)
         .eq('id', id)
         .single();
@@ -134,6 +138,8 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
       setShowcaseLinks(showcase.project_links || []);
       
       setShowcaseTags(showcase.project_tags?.map((pt: any) => pt.tag) || []);
+      
+      setShowcaseMedia(showcase.project_media || []);
 
       toast({
         title: 'Success',
@@ -225,6 +231,67 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
     setShowcaseLinks(showcaseLinks.filter((_, i) => i !== index));
   };
 
+  // Media management
+  const handleMediaUpload = (file: File) => {
+    setMediaFile(file);
+  };
+
+  const uploadMediaFile = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `media/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media-files')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('media-files')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      logError('uploadMediaFile', error);
+      return null;
+    }
+  };
+
+  const addMedia = async () => {
+    if (newMedia.title.trim() && (newMedia.url.trim() || mediaFile)) {
+      let finalUrl = newMedia.url.trim();
+      
+      if (mediaFile) {
+        const uploadedUrl = await uploadMediaFile(mediaFile);
+        if (uploadedUrl) {
+          finalUrl = uploadedUrl;
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Failed to upload media file',
+            variant: 'destructive'
+          });
+          return;
+        }
+      }
+
+      setShowcaseMedia([...showcaseMedia, { 
+        type: newMedia.type, 
+        url: finalUrl,
+        title: newMedia.title.trim(),
+        description: newMedia.description.trim() || undefined
+      }]);
+      setNewMedia({ type: 'image', url: '', title: '', description: '' });
+      setMediaFile(null);
+    }
+  };
+
+  const removeMedia = (index: number) => {
+    setShowcaseMedia(showcaseMedia.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (data: ShowcaseFormData) => {
     try {
       setIsSubmitting(true);
@@ -255,21 +322,34 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
         participants: selectedParticipants,
         sponsors: selectedSponsors,
         links: showcaseLinks,
-        tags: showcaseTags
+        tags: showcaseTags,
+        media: showcaseMedia
       };
 
-      console.log('Creating showcase with relationships...');
-      const showcase = await withTimeout(
-        createProjectWithRelationships(showcaseData, relationships),
-        30000
-      );
-
-      console.log('Showcase created successfully:', showcase);
-
-      toast({
-        title: 'Showcase item created successfully',
-        description: 'The showcase item and all relationships have been added to the showcase.',
-      });
+      let showcase;
+      if (showcaseId) {
+        console.log('Updating showcase with relationships...');
+        showcase = await withTimeout(
+          updateProjectWithRelationships(showcaseId, showcaseData, relationships),
+          30000
+        );
+        console.log('Showcase updated successfully:', showcase);
+        toast({
+          title: 'Showcase item updated successfully',
+          description: 'The showcase item and all relationships have been updated.',
+        });
+      } else {
+        console.log('Creating showcase with relationships...');
+        showcase = await withTimeout(
+          createProjectWithRelationships(showcaseData, relationships),
+          30000
+        );
+        console.log('Showcase created successfully:', showcase);
+        toast({
+          title: 'Showcase item created successfully',
+          description: 'The showcase item and all relationships have been added to the showcase.',
+        });
+      }
 
       onClose();
     } catch (err: any) {
@@ -306,7 +386,7 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
                 <TabsTrigger value="participants">
                   Participants {selectedParticipants.length > 0 && (
@@ -319,6 +399,13 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
                   Sponsors {selectedSponsors.length > 0 && (
                     <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
                       {selectedSponsors.length}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="media">
+                  Media {showcaseMedia.length > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      {showcaseMedia.length}
                     </Badge>
                   )}
                 </TabsTrigger>
@@ -508,6 +595,108 @@ const EnhancedShowcaseForm = ({ onClose, showcaseId }: ShowcaseFormProps) => {
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="media" className="space-y-4">
+                <div>
+                  <Label>Add Media</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="media-type">Type</Label>
+                      <Select value={newMedia.type} onValueChange={(value) => setNewMedia({ ...newMedia, type: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="image">Image</SelectItem>
+                          <SelectItem value="video">Video</SelectItem>
+                          <SelectItem value="document">Document</SelectItem>
+                          <SelectItem value="audio">Audio</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="media-title">Title *</Label>
+                      <Input
+                        id="media-title"
+                        value={newMedia.title}
+                        onChange={(e) => setNewMedia({ ...newMedia, title: e.target.value })}
+                        placeholder="Media title"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="media-description">Description</Label>
+                    <Textarea
+                      id="media-description"
+                      value={newMedia.description}
+                      onChange={(e) => setNewMedia({ ...newMedia, description: e.target.value })}
+                      placeholder="Media description (optional)"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Upload File or Enter URL</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm text-muted-foreground">Upload File</Label>
+                        <FileUpload
+                          onFileSelect={handleMediaUpload}
+                          bucketName="media-files"
+                          acceptedTypes="image/*,video/*,audio/*,.pdf,.doc,.docx"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm text-muted-foreground">Or Enter URL</Label>
+                        <Input
+                          value={newMedia.url}
+                          onChange={(e) => setNewMedia({ ...newMedia, url: e.target.value })}
+                          placeholder="https://example.com/media"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button type="button" onClick={addMedia} disabled={!newMedia.title.trim() || (!newMedia.url.trim() && !mediaFile)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Media
+                  </Button>
+                </div>
+
+                <div>
+                  <Label>Project Media</Label>
+                  {showcaseMedia.length === 0 ? (
+                    <p className="text-sm text-muted-foreground mt-2">No media added</p>
+                  ) : (
+                    <div className="space-y-2 mt-2">
+                      {showcaseMedia.map((media, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex-1">
+                            <p className="font-medium">{media.title}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">{media.type}</Badge>
+                              <p className="text-sm text-muted-foreground break-all">{media.url}</p>
+                            </div>
+                            {media.description && (
+                              <p className="text-sm text-muted-foreground mt-1">{media.description}</p>
+                            )}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeMedia(index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

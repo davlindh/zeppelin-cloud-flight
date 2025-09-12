@@ -144,6 +144,155 @@ export const fetchSponsors = async () => {
 };
 
 // Enhanced form submission utilities
+export const updateProjectWithRelationships = async (
+  projectId: string,
+  projectData: any,
+  relationships: {
+    participants?: Array<{ participant_id: string; role: string }>;
+    sponsors?: string[];
+    links?: Array<{ type: string; url: string }>;
+    tags?: string[];
+    media?: Array<{ type: string; url: string; title: string; description?: string }>;
+    budget?: { amount?: number; currency?: string; breakdown?: any[] };
+    timeline?: { start_date?: string; end_date?: string; milestones?: any[] };
+    access?: { requirements?: string[]; target_audience?: string; capacity?: number; registration_required?: boolean };
+  }
+) => {
+  try {
+    // Update project first
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .update(projectData)
+      .eq('id', projectId)
+      .select()
+      .single();
+
+    if (projectError) throw projectError;
+
+    // Delete existing relationships
+    await Promise.all([
+      supabase.from('project_participants').delete().eq('project_id', projectId),
+      supabase.from('project_sponsors').delete().eq('project_id', projectId),
+      supabase.from('project_links').delete().eq('project_id', projectId),
+      supabase.from('project_tags').delete().eq('project_id', projectId),
+      supabase.from('project_media').delete().eq('project_id', projectId),
+      supabase.from('project_budget').delete().eq('project_id', projectId),
+      supabase.from('project_timeline').delete().eq('project_id', projectId),
+      supabase.from('project_access').delete().eq('project_id', projectId)
+    ]);
+
+    // Create new relationships in parallel
+    const relationPromises = [];
+
+    if (relationships.participants?.length) {
+      relationPromises.push(
+        supabase
+          .from('project_participants')
+          .insert(
+            relationships.participants.map(p => ({
+              project_id: projectId,
+              participant_id: p.participant_id,
+              role: p.role
+            }))
+          )
+      );
+    }
+
+    if (relationships.sponsors?.length) {
+      relationPromises.push(
+        supabase
+          .from('project_sponsors')
+          .insert(
+            relationships.sponsors.map(sponsor_id => ({
+              project_id: projectId,
+              sponsor_id
+            }))
+          )
+      );
+    }
+
+    if (relationships.links?.length) {
+      relationPromises.push(
+        supabase
+          .from('project_links')
+          .insert(
+            relationships.links.map(link => ({
+              project_id: projectId,
+              ...link
+            }))
+          )
+      );
+    }
+
+    if (relationships.tags?.length) {
+      relationPromises.push(
+        supabase
+          .from('project_tags')
+          .insert(
+            relationships.tags.map(tag => ({
+              project_id: projectId,
+              tag
+            }))
+          )
+      );
+    }
+
+    if (relationships.media?.length) {
+      relationPromises.push(
+        supabase
+          .from('project_media')
+          .insert(
+            relationships.media.map(media => ({
+              project_id: projectId,
+              ...media
+            }))
+          )
+      );
+    }
+
+    if (relationships.budget) {
+      relationPromises.push(
+        supabase
+          .from('project_budget')
+          .insert([{
+            project_id: projectId,
+            ...relationships.budget
+          }])
+      );
+    }
+
+    if (relationships.timeline) {
+      relationPromises.push(
+        supabase
+          .from('project_timeline')
+          .insert([{
+            project_id: projectId,
+            ...relationships.timeline
+          }])
+      );
+    }
+
+    if (relationships.access) {
+      relationPromises.push(
+        supabase
+          .from('project_access')
+          .insert([{
+            project_id: projectId,
+            ...relationships.access
+          }])
+      );
+    }
+
+    // Wait for all relationships to be created
+    await Promise.all(relationPromises);
+
+    return project;
+  } catch (error) {
+    logError('updateProjectWithRelationships', error);
+    throw error;
+  }
+};
+
 export const createProjectWithRelationships = async (
   projectData: any,
   relationships: {
