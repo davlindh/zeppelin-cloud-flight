@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useMediaPlayer } from '@/contexts/MediaContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { PublicVoting } from '@/components/public';
 import { EnhancedProjectMedia } from '../../components/showcase/EnhancedProjectMedia';
+import { MediaGrid, PersistentPlayer } from '../../components/multimedia';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -18,7 +21,14 @@ import {
   Globe, 
   Play,
   Eye,
-  Download
+  Download,
+  DollarSign,
+  Clock,
+  Shield,
+  Vote,
+  Award,
+  Link as LinkIcon,
+  Hash
 } from 'lucide-react';
 
 interface ProjectDetail {
@@ -637,23 +647,18 @@ export const ProjectDetailPage: React.FC = () => {
                              'Supporter'}
                           </Badge>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
-
-        {/* Voting Section */}
-        {project.voting?.enabled && (
-          <div className="mt-12 border-t pt-8">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">Rösta på projektet</h2>
-            <PublicVoting projectId={project.id} />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+                       </div>
+                     ))}
+                   </div>
+                 </CardContent>
+               </Card>
+             )}
+           </div>
+         </div>
+       </div>
+       
+       {/* Persistent Media Player */}
+       <PersistentPlayer />
+     </div>
+   );
+ };

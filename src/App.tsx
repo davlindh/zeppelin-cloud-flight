@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MediaProvider } from "@/contexts/MediaContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
-import { PersistentPlayer } from "../components/multimedia/PersistentPlayer";
+import { PersistentPlayer } from "@/components/multimedia/PersistentPlayer";
 import { RootLayout } from "../components/layout";
 import { HomePage } from "../pages/HomePage";
 import { ShowcasePage } from "./pages/ShowcasePage";
