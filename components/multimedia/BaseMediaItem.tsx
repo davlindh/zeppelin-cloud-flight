@@ -50,7 +50,6 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
     isCurrentlyPlaying && "ring-2 ring-primary shadow-glow border-primary/50",
     className
   );
-  );
   
   if (viewMode === 'grid') {
     return (
