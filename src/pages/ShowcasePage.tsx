@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
+import { EnhancedImage } from '../../components/multimedia/EnhancedImage';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Search, Filter, ArrowUpDown, Plus, Eye, Play, Image, FileText, Volume2 } from 'lucide-react';
@@ -391,16 +392,17 @@ export const ShowcasePage: React.FC = () => {
                 onClick={() => handleProjectClick(project.slug)}
               >
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <img
+                  <EnhancedImage
                     src={getImageUrl(project.image_path)}
                     alt={project.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.currentTarget.src = '/public/images/ui/placeholder-project.jpg';
-                    }}
+                    className="w-full h-48"
+                    aspectRatio="landscape"
+                    showLoader={true}
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <Eye className="h-8 w-8 text-white" />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="bg-white/95 dark:bg-black/95 backdrop-blur-sm rounded-full p-3 shadow-xl">
+                      <Eye className="h-6 w-6 text-primary" />
+                    </div>
                   </div>
                   {getMediaPreview(project)}
                 </div>

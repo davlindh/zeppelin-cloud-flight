@@ -2,6 +2,7 @@ import React from 'react';
 import { ExternalLink, Plus } from 'lucide-react';
 import { getMediaIcon, getMediaTypeColor, isPlayableMedia } from '@/utils/mediaHelpers';
 import { useMediaPlayer, useCurrentMedia } from '@/hooks/useMediaPlayer';
+import { EnhancedImage } from './EnhancedImage';
 import type { MediaItem } from '@/types/media';
 import { cn } from '@/lib/utils';
 
@@ -54,25 +55,33 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
   if (viewMode === 'grid') {
     return (
       <div className={containerClass}>
-        {/* Preview section for grid view */}
+        {/* Enhanced preview section for grid view */}
         {showPreview && (media.type === 'image' || media.type === 'portfolio') && (
-          <div className="aspect-video bg-muted overflow-hidden relative">
-            <img 
-              src={media.url} 
+          <div className="aspect-video bg-muted overflow-hidden relative group">
+            <EnhancedImage
+              src={media.url}
               alt={media.title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
-              loading="lazy"
+              className="w-full h-full"
+              showLoader={true}
+              aspectRatio="video"
             />
             {isPlayable && showPlayButton && (
               <button
                 onClick={handlePlayClick}
-                className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
               >
-                <div className="bg-white/95 dark:bg-black/95 backdrop-blur-sm rounded-full p-3 shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                  {getMediaIcon(media.type, 'w-6 h-6 text-primary')}
+                <div className="bg-white/98 dark:bg-black/98 backdrop-blur-sm rounded-full p-4 shadow-2xl transform scale-75 group-hover:scale-100 transition-all duration-300 border border-white/20">
+                  {getMediaIcon(media.type, 'w-7 h-7 text-primary')}
                 </div>
               </button>
             )}
+            
+            {/* Loading state indicator */}
+            <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="bg-black/80 text-white px-2 py-1 rounded text-xs backdrop-blur-sm">
+                {media.type.charAt(0).toUpperCase() + media.type.slice(1)}
+              </div>
+            </div>
           </div>
         )}
         

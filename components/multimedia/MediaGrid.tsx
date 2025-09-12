@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BaseMediaItem } from './BaseMediaItem';
+import { MediaGridSkeleton } from './MediaGridSkeleton';
 import type { MediaItem } from '@/types/media';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +11,8 @@ interface MediaGridProps {
   showPlayButton?: boolean;
   showAddToQueue?: boolean;
   className?: string;
+  loading?: boolean;
+  skeletonCount?: number;
 }
 
 export const MediaGrid: React.FC<MediaGridProps> = ({ 
@@ -18,8 +21,30 @@ export const MediaGrid: React.FC<MediaGridProps> = ({
   showPreview = true,
   showPlayButton = true,
   showAddToQueue = true,
-  className
+  className,
+  loading = false,
+  skeletonCount = 6
 }) => {
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+
+  useEffect(() => {
+    if (media.length > 0) {
+      // Set a small delay to show loading state
+      const timer = setTimeout(() => setImagesLoaded(true), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [media.length]);
+
+  // Show skeleton while loading
+  if (loading || (!imagesLoaded && media.length > 0)) {
+    return (
+      <MediaGridSkeleton 
+        count={skeletonCount}
+        viewMode={viewMode}
+        className={className}
+      />
+    );
+  }
   if (media.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
