@@ -1,30 +1,11 @@
 import type { ShowcaseCard } from '../../types/index';
+import type { Participant } from '../types/unified';
 import { PARTICIPANT_DATA } from '../../constants/data/participants';
 import { PARTICIPANT_MEDIA } from '../../constants/data/relationships';
 import { getFullAssetUrl } from '../../constants/storage';
 
-export interface ParticipantWithMedia {
-  id: string;
-  name: string;
-  slug: string;
-  bio?: string;
-  avatar: string;
-  website?: string;
-  socialLinks?: Array<{ platform: string; url: string; }>;
-  media?: Array<{
-    type: 'portfolio' | 'video' | 'audio' | 'document' | 'image';
-    category: 'featured' | 'process' | 'archive' | 'collaboration';
-    url: string;
-    title: string;
-    description?: string;
-    year?: string;
-  }>;
-  projects?: Array<{
-    id: string;
-    title: string;
-    role: string;
-  }>;
-}
+// Legacy type alias for backwards compatibility
+export type ParticipantWithMedia = Participant;
 
 const normalizeAssetPath = (bucket: keyof typeof import('../../constants/storage').STORAGE_BUCKETS, rawPath: string | undefined): string => {
   if (!rawPath) return getFullAssetUrl(bucket, 'placeholder.svg');
@@ -49,7 +30,7 @@ const normalizeAssetPath = (bucket: keyof typeof import('../../constants/storage
 /**
  * Build ParticipantWithMedia objects from normalized data
  */
-export function buildParticipantsWithMedia(showcaseCards?: ShowcaseCard[]): ParticipantWithMedia[] {
+export function buildParticipantsWithMedia(showcaseCards?: ShowcaseCard[]): Participant[] {
   return PARTICIPANT_DATA.map(participant => {
     // Get participant media
     const participantMedia = PARTICIPANT_MEDIA
@@ -75,7 +56,7 @@ export function buildParticipantsWithMedia(showcaseCards?: ShowcaseCard[]): Part
         };
       }) || [];
 
-    const participantWithMedia: ParticipantWithMedia = {
+    const participantWithMedia: Participant = {
       id: participant.id,
       name: participant.name,
       slug: participant.slug,
@@ -94,7 +75,7 @@ export function buildParticipantsWithMedia(showcaseCards?: ShowcaseCard[]): Part
 /**
  * Get a single participant with media by slug
  */
-export function getParticipantBySlug(slug: string, showcaseCards?: ShowcaseCard[]): ParticipantWithMedia | null {
+export function getParticipantBySlug(slug: string, showcaseCards?: ShowcaseCard[]): Participant | null {
   const participants = buildParticipantsWithMedia(showcaseCards);
   return participants.find(p => p.slug === slug) || null;
 }

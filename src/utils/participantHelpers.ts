@@ -1,28 +1,8 @@
 import type { ShowcaseCard } from '../../types/index';
+import type { Participant } from '../types/unified';
 
-export interface ParticipantEntity {
-  slug: string;
-  name: string;
-  roles: string[];
-  bio?: string;
-  avatar?: string;
-  projects: Array<{
-    id: string;
-    title: string;
-  }>;
-  featuredMedia: Array<{
-    type: 'video' | 'audio' | 'image' | 'document';
-    url: string;
-    title: string;
-    description?: string;
-    projectTitle: string;
-  }>;
-  personalLinks: Array<{
-    type: 'github' | 'website' | 'demo' | 'other';
-    url: string;
-    projectTitle: string;
-  }>;
-}
+// Legacy type alias for backwards compatibility  
+export type ParticipantEntity = Participant;
 
 export function slugify(text: string): string {
   return text
@@ -36,8 +16,8 @@ export function slugify(text: string): string {
     .trim();
 }
 
-export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[] {
-  const participantMap = new Map<string, ParticipantEntity>();
+export function aggregateParticipants(cards: ShowcaseCard[]): Participant[] {
+  const participantMap = new Map<string, Participant>();
   const slugCounts = new Map<string, number>();
 
   cards.forEach((card) => {
@@ -73,23 +53,28 @@ export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[
         }
         
         // Add project if not already included
-        if (!existingParticipant.projects.find(p => p.id === card.id)) {
+        if (!existingParticipant.projects?.find(p => p.id === card.id)) {
+          if (!existingParticipant.projects) existingParticipant.projects = [];
           existingParticipant.projects.push({
             id: card.id,
-            title: card.title
+            title: card.title,
+            role: participant.role,
+            imageUrl: card.imageUrl
           });
         }
         
         // Add media from this project
         if (card.media) {
+          if (!existingParticipant.media) existingParticipant.media = [];
           card.media.forEach(mediaItem => {
-            const existingMedia = existingParticipant.featuredMedia.find(m => 
-              m.url === mediaItem.url && m.projectTitle === card.title
+            const existingMedia = existingParticipant.media?.find(m => 
+              m.url === mediaItem.url
             );
             if (!existingMedia) {
-              existingParticipant.featuredMedia.push({
+              existingParticipant.media?.push({
                 ...mediaItem,
-                projectTitle: card.title
+                category: 'featured' as const,
+                participantId: existingParticipant.id
               });
             }
           });
@@ -97,21 +82,23 @@ export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[
         
         // Add personal/professional links from this project
         if (card.links) {
+          if (!existingParticipant.personalLinks) existingParticipant.personalLinks = [];
           card.links.forEach(link => {
-            const existingLink = existingParticipant.personalLinks.find(l => 
-              l.url === link.url && l.projectTitle === card.title
+            const existingLink = existingParticipant.personalLinks?.find(l => 
+              l.url === link.url
             );
             if (!existingLink) {
-              existingParticipant.personalLinks.push({
-                ...link,
-                projectTitle: card.title
+              existingParticipant.personalLinks?.push({
+                type: link.type,
+                url: link.url
               });
             }
           });
         }
       } else {
         // Create new participant
-        const newParticipant: ParticipantEntity = {
+        const newParticipant: Participant = {
+          id: '', // Will be populated from database later
           slug: finalSlug,
           name: participant.name,
           roles: [participant.role],
@@ -119,18 +106,21 @@ export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[
           avatar: participant.avatar,
           projects: [{
             id: card.id,
-            title: card.title
+            title: card.title,
+            role: participant.role,
+            imageUrl: card.imageUrl
           }],
-          featuredMedia: [],
+          media: [],
           personalLinks: []
         };
         
         // Add media from this project
         if (card.media) {
           card.media.forEach(mediaItem => {
-            newParticipant.featuredMedia.push({
+            newParticipant.media?.push({
               ...mediaItem,
-              projectTitle: card.title
+              category: 'featured' as const,
+              participantId: newParticipant.id
             });
           });
         }
@@ -138,9 +128,9 @@ export function aggregateParticipants(cards: ShowcaseCard[]): ParticipantEntity[
         // Add personal/professional links from this project
         if (card.links) {
           card.links.forEach(link => {
-            newParticipant.personalLinks.push({
-              ...link,
-              projectTitle: card.title
+            newParticipant.personalLinks?.push({
+              type: link.type,
+              url: link.url
             });
           });
         }

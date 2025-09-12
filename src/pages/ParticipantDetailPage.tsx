@@ -5,17 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ImageWithFallback } from '../../components/showcase/ImageWithFallback';
-import { ProjectMedia, ProjectLinks } from '../../components/showcase';
+import { MediaGrid } from '../../components/multimedia';
 import { aggregateParticipants } from '../utils/participantHelpers';
 import { INITIAL_CARDS } from '../../constants/index';
-import type { ParticipantEntity } from '../utils/participantHelpers';
+import type { Participant } from '../types/unified';
 
 export const ParticipantDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
   const participants = useMemo(() => aggregateParticipants(INITIAL_CARDS), []);
-  const participant: ParticipantEntity | undefined = participants.find((p) => p.slug === slug);
+  const participant: Participant | undefined = participants.find((p) => p.slug === slug);
 
   if (!participant) {
     return (
@@ -64,7 +64,7 @@ export const ParticipantDetailPage: React.FC = () => {
               </h1>
               
               <div className="flex flex-wrap gap-2 mb-4">
-                {participant.roles.map((role, index) => (
+                {participant.roles?.map((role, index) => (
                   <Badge key={index} variant="secondary" className="bg-white/20 text-primary-foreground border-white/30">
                     {role}
                   </Badge>
@@ -72,7 +72,7 @@ export const ParticipantDetailPage: React.FC = () => {
               </div>
               
               <p className="text-primary-foreground/90">
-                Medverkar i {participant.projects.length} projekt
+                Medverkar i {participant.projects?.length || 0} projekt
               </p>
             </div>
           </div>
@@ -95,10 +95,14 @@ export const ParticipantDetailPage: React.FC = () => {
           )}
 
           {/* Featured Media Section */}
-          {participant.featuredMedia && participant.featuredMedia.length > 0 && (
+          {participant.media && participant.media.length > 0 && (
             <Card>
               <CardContent className="p-6">
-                <ProjectMedia media={participant.featuredMedia} />
+                <h2 className="text-2xl font-bold text-foreground mb-6">Media</h2>
+                <MediaGrid 
+                  media={participant.media} 
+                  viewMode="grid"
+                />
               </CardContent>
             </Card>
           )}
@@ -136,11 +140,11 @@ export const ParticipantDetailPage: React.FC = () => {
           <Card>
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold text-foreground mb-6">
-                Medverkar i ({participant.projects.length})
+                Medverkar i ({participant.projects?.length || 0})
               </h2>
               
               <div className="grid gap-4 md:grid-cols-2">
-                {participant.projects.map((project) => (
+                {participant.projects?.map((project) => (
                   <Link
                     key={project.id}
                     to={`/showcase/${project.id}`}

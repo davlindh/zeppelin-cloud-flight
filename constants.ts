@@ -1,5 +1,5 @@
 
-import type { ShowcaseCard } from './types';
+import type { ShowcaseCard } from './types/index';
 
 export const NAV_LINKS = [
     { href: '#vision', label: 'Vision' },
