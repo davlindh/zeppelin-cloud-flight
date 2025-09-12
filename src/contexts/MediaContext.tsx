@@ -20,7 +20,8 @@ type MediaAction =
   | { type: 'PREVIOUS_MEDIA' }
   | { type: 'SHUFFLE_QUEUE' }
   | { type: 'TOGGLE_MINIMIZE' }
-  | { type: 'CLOSE_PLAYER' };
+  | { type: 'CLOSE_PLAYER' }
+  | { type: 'SET_ERROR'; payload: string | null };
 
 const initialState: MediaPlayerState = {
   currentMedia: null,
@@ -33,6 +34,7 @@ const initialState: MediaPlayerState = {
   isMuted: false,
   isMinimized: true,
   playbackRate: 1,
+  error: null,
 };
 
 const mediaReducer = (state: MediaPlayerState, action: MediaAction): MediaPlayerState => {
@@ -195,6 +197,12 @@ const mediaReducer = (state: MediaPlayerState, action: MediaAction): MediaPlayer
         ...initialState,
       };
     
+    case 'SET_ERROR':
+      return {
+        ...state,
+        error: action.payload,
+      };
+    
     default:
       return state;
   }
@@ -208,8 +216,6 @@ interface MediaProviderProps {
 
 export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(mediaReducer, initialState);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   
   const playMedia = useCallback((media: MediaItem) => {
     dispatch({ type: 'PLAY_MEDIA', payload: media });
@@ -275,6 +281,14 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
     dispatch({ type: 'CLOSE_PLAYER' });
   }, []);
 
+  const setDuration = useCallback((duration: number) => {
+    dispatch({ type: 'SET_DURATION', payload: duration });
+  }, []);
+
+  const setError = useCallback((error: string | null) => {
+    dispatch({ type: 'SET_ERROR', payload: error });
+  }, []);
+
   const value: MediaContextValue = {
     ...state,
     playMedia,
@@ -293,14 +307,13 @@ export const MediaProvider: React.FC<MediaProviderProps> = ({ children }) => {
     shuffleQueue,
     toggleMinimize,
     closePlayer,
+    setDuration,
+    setError,
   };
 
   return (
     <MediaContext.Provider value={value}>
       {children}
-      {/* Hidden audio/video elements for playback */}
-      <audio ref={audioRef} style={{ display: 'none' }} />
-      <video ref={videoRef} style={{ display: 'none' }} />
     </MediaContext.Provider>
   );
 };

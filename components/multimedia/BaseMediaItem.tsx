@@ -4,7 +4,7 @@ import { getMediaIcon, getMediaTypeColor, isPlayableMedia } from '@/utils/mediaH
 import { useMediaPlayer, useCurrentMedia } from '@/hooks/useMediaPlayer';
 import { EnhancedImage } from './EnhancedImage';
 import type { MediaItem } from '@/types/media';
-import { cn } from '@/lib/utils';
+import { MediaErrorBoundary } from '@/components/ui/MediaErrorBoundary';
 
 interface BaseMediaItemProps {
   media: MediaItem;
@@ -54,7 +54,8 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
   
   if (viewMode === 'grid') {
     return (
-      <div className={containerClass}>
+      <MediaErrorBoundary>
+        <div className={containerClass}>
         {/* Enhanced preview section for grid view */}
         {showPreview && (media.type === 'image' || media.type === 'portfolio') && (
           <div className="aspect-video bg-muted overflow-hidden relative group">
@@ -145,12 +146,14 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
           </div>
         </div>
       </div>
+      </MediaErrorBoundary>
     );
   }
   
   // List view
   return (
-    <div className={containerClass}>
+    <MediaErrorBoundary>
+      <div className={containerClass}>
       <div className={`flex-shrink-0 p-3 rounded-md border ${getMediaTypeColor(media.type)}`}>
         {getMediaIcon(media.type)}
       </div>
@@ -220,5 +223,6 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
         </div>
       </div>
     </div>
+    </MediaErrorBoundary>
   );
 };

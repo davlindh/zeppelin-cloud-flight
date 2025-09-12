@@ -42,6 +42,7 @@ export interface MediaPlayerState {
   isMuted: boolean;
   isMinimized: boolean;
   playbackRate: number;
+  error: string | null;
 }
 
 export interface MediaContextValue extends MediaPlayerState {
@@ -66,4 +67,6 @@ export interface MediaContextValue extends MediaPlayerState {
   // Player state
   toggleMinimize: () => void;
   closePlayer: () => void;
+  setDuration: (duration: number) => void;
+  setError: (error: string | null) => void;
 }

@@ -1,7 +1,7 @@
 export { BaseMediaItem } from './BaseMediaItem';
 export { MediaGrid } from './MediaGrid';
 export { MediaFilters } from './MediaFilters';
-export { PersistentPlayer } from './PersistentPlayer';
+export { PersistentPlayer } from './EnhancedPersistentPlayer';
 export { EnhancedMediaPreview } from './EnhancedMediaPreview';
 export { MediaGallery } from './MediaGallery';
 export { EnhancedImage } from './EnhancedImage';

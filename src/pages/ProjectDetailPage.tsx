@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PublicVoting } from '@/components/public';
 import { EnhancedProjectMedia } from '../../components/showcase/EnhancedProjectMedia';
-import { MediaGrid, PersistentPlayer } from '../../components/multimedia';
+import { MediaGrid } from '../../components/multimedia';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -655,10 +655,7 @@ export const ProjectDetailPage: React.FC = () => {
              )}
            </div>
          </div>
-       </div>
-       
-       {/* Persistent Media Player */}
-       <PersistentPlayer />
-     </div>
-   );
- };
+        </div>
+      </div>
+    );
+  };

@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MediaProvider } from "@/contexts/MediaContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { PermissionProvider } from "@/components/providers/PermissionProvider";
-import { PersistentPlayer } from "@/components/multimedia/PersistentPlayer";
+import { MediaErrorBoundary } from "@/components/ui/MediaErrorBoundary";
+import { PersistentPlayer } from "../components/multimedia/EnhancedPersistentPlayer";
 import { RootLayout } from "../components/layout";
 import { HomePage } from "../pages/HomePage";
 import { ShowcasePage } from "./pages/ShowcasePage";
@@ -50,7 +51,9 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
-            <PersistentPlayer />
+            <MediaErrorBoundary>
+              <PersistentPlayer />
+            </MediaErrorBoundary>
           </PermissionProvider>
         </MediaProvider>
       </AdminAuthProvider>
