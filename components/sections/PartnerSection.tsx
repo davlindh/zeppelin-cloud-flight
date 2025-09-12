@@ -1,35 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '../ui';
 import { Modal } from '../ui';
-import { ImageWithFallback } from '../showcase/ImageWithFallback';
-import { usePartnerData } from '../../src/hooks/usePartnerData';
+import { useEnhancedPartnerData } from '../../src/hooks/useEnhancedPartnerData';
+import { EnhancedPartnerShowcase } from '../../src/components/partners/EnhancedPartnerShowcase';
 import { Loader2 } from 'lucide-react';
 import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
 
-const PartnerLogo: React.FC<{ alt: string, src: string, href: string, tagline?: string }> = ({ alt, src, href, tagline }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" 
-       className="group flex flex-col items-center justify-center p-4 sm:p-6 bg-white/5 rounded-xl hover:bg-white/15 transition-all duration-300 border border-white/10 hover:border-white/30 backdrop-blur-sm hover:scale-105"
-       aria-label={`Besök ${alt}`}>
-        <div className="h-16 sm:h-20 flex items-center justify-center mb-2 sm:mb-3">
-            <ImageWithFallback
-                src={src}
-                alt={alt}
-                className="max-h-full w-auto object-contain group-hover:scale-110 transition-transform duration-300"
-                loading="lazy"
-                sizes="(max-width: 640px) 120px, 160px"
-                fallbackSrc="/images/ui/placeholder-project.jpg"
-            />
-        </div>
-        {tagline && (
-            <p className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors duration-300 leading-tight font-medium">
-                {tagline}
-            </p>
-        )}
-    </a>
-);
-
 export const PartnerSection: React.FC = () => {
-    const { partners, loading, usingDatabase } = usePartnerData();
+    const { partners, loading, usingDatabase } = useEnhancedPartnerData();
     const [showSubmissionForm, setShowSubmissionForm] = useState(false);
 
     const handlePartnershipClick = () => {
@@ -67,17 +45,14 @@ export const PartnerSection: React.FC = () => {
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 items-center max-w-5xl mx-auto">
-                    {partners.map(partner => (
-                        <PartnerLogo
-                            key={partner.alt}
-                            alt={partner.alt}
-                            src={partner.src}
-                            href={partner.href}
-                            tagline={partner.tagline}
-                        />
-                    ))}
-                </div>
+                
+                <EnhancedPartnerShowcase 
+                    partners={partners}
+                    showProjects={true}
+                    showHistory={false}
+                    layout="grid"
+                />
+                
                 <div className="text-center mt-12 sm:mt-16">
                     <Button
                         variant="primary"

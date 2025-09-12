@@ -6,16 +6,29 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ImageWithFallback } from '../../components/showcase/ImageWithFallback';
 import { MediaGrid } from '../../components/multimedia';
-import { aggregateParticipants } from '../utils/participantHelpers';
-import { INITIAL_CARDS } from '../../constants/index';
+import { useParticipantData } from '../hooks/useParticipantData';
 import type { Participant } from '../types/unified';
 
 export const ParticipantDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
-  const participants = useMemo(() => aggregateParticipants(INITIAL_CARDS), []);
-  const participant: Participant | undefined = participants.find((p) => p.slug === slug);
+  const { getParticipantBySlug, loading } = useParticipantData();
+  const participant: Participant | undefined = getParticipantBySlug(slug || '');
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+        <div className="text-center">
+          <div className="animate-pulse">
+            <div className="w-24 h-24 bg-muted rounded-full mx-auto mb-4"></div>
+            <div className="h-6 bg-muted rounded w-48 mx-auto mb-2"></div>
+            <div className="h-4 bg-muted rounded w-32 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!participant) {
     return (
