@@ -5,6 +5,7 @@ import { useMediaPlayer, useCurrentMedia } from '@/hooks/useMediaPlayer';
 import { EnhancedImage } from './EnhancedImage';
 import type { MediaItem } from '@/types/media';
 import { MediaErrorBoundary } from '@/components/ui/MediaErrorBoundary';
+import { cn } from '@/lib/utils';
 
 interface BaseMediaItemProps {
   media: MediaItem;
