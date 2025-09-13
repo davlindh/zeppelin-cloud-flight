@@ -15,27 +15,6 @@ export interface ShowcaseCard {
         url: string;
     }>;
     tags?: string[];
-<<<<<<< HEAD
-    media?: {
-        primaryVideo?: {
-            type: 'youtube' | 'vimeo' | 'external';
-            url: string;
-            title?: string;
-            thumbnail?: string;
-        };
-        gallery?: Array<{
-            type: 'video' | 'image';
-            url: string;
-            title?: string;
-        }>;
-    };
-    schedule?: {
-        date?: string;
-        time?: string;
-        duration?: string;
-        status?: 'upcoming' | 'live' | 'past' | 'archived';
-    };
-=======
     
     // Enhanced project data
     purpose?: string;
@@ -74,5 +53,10 @@ export interface ShowcaseCard {
     };
     associations?: string[];
     expected_impact?: string;
->>>>>>> 4dc5f388285ff86d21b56793b251252e8ffac00b
+    schedule?: {
+        date?: string;
+        time?: string;
+        duration?: string;
+        status?: 'upcoming' | 'live' | 'past' | 'archived';
+    };
 }
