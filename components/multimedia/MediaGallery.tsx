@@ -160,7 +160,7 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
                     </div>
                   </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 md:p-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 md:p-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 z-10">
                   <p className="text-white font-semibold text-sm md:text-base truncate drop-shadow-sm leading-tight">{item.title}</p>
                   {item.duration && (
                     <p className="text-white/90 text-xs md:text-sm font-medium drop-shadow-sm mt-1">
