@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import type { ProjectMediaItem } from '@/types/media';
 import { generateMediaId } from '@/utils/mediaHelpers';
 import { useMediaFiltering } from '@/hooks/useMediaFiltering';
-import { getFullAssetUrl } from '@/constants/storage';
+import { getFullAssetUrl } from '../../constants/storage';
 
 interface EnhancedProjectMediaProps {
   media?: Array<{
