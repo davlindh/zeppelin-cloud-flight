@@ -1,10 +1,11 @@
 import React from 'react';
-import { MediaFilters, MediaGrid, MediaGallery } from '../multimedia';
+import { MediaFilters } from '../multimedia';
+import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
 import { Button } from '@/components/ui/button';
 import type { ProjectMediaItem } from '@/types/media';
 import { generateMediaId } from '@/utils/mediaHelpers';
 import { useMediaFiltering } from '@/hooks/useMediaFiltering';
-import { getFullAssetUrl } from '../../constants/storage';
+import { resolveMediaUrl } from '@/utils/assetHelpers';
 
 interface EnhancedProjectMediaProps {
   media?: Array<{
@@ -17,46 +18,19 @@ interface EnhancedProjectMediaProps {
   allowCategorization?: boolean;
 }
 
-// URL resolution function
-const resolveMediaUrl = (url: string, type: string): string => {
-  // If already a full URL (http/https), return as-is
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  
-  // If starts with /, it's already a proper path
-  if (url.startsWith('/')) {
-    return url;
-  }
-  
-  // Handle relative paths based on media type
-  if (type === 'image') {
-    // Check if it's a project image path
-    if (url.startsWith('projects/')) {
-      return getFullAssetUrl('projects', url.replace('projects/', ''));
-    }
-    return `/images/${url}`;
-  }
-  
-  // For videos and other media, assume media bucket
-  if (type === 'video' || type === 'audio') {
-    return `/media/${url}`;
-  }
-  
-  // Default fallback
-  return url.startsWith('/') ? url : `/${url}`;
-};
-
 export const EnhancedProjectMedia: React.FC<EnhancedProjectMediaProps> = ({ 
   media = [], 
   showPreview = true,
   allowCategorization = true 
 }) => {
-  // Convert to ProjectMediaItem format with URL resolution
+  // Convert to ProjectMediaItem format with centralized URL resolution
   const mediaItems: ProjectMediaItem[] = media.map((item, index) => ({
     id: generateMediaId(item),
-    ...item,
-    url: resolveMediaUrl(item.url, item.type),
+    type: item.type as any,
+    url: resolveMediaUrl(item.url, item.type as any, 'project'),
+    title: item.title,
+    description: item.description,
+    projectId: 'current-project'
   }));
 
   const {
@@ -95,21 +69,13 @@ export const EnhancedProjectMedia: React.FC<EnhancedProjectMediaProps> = ({
       )}
 
       {filteredMedia.length > 0 ? (
-        viewMode === 'gallery' ? (
-          <MediaGallery
-            media={filteredMedia}
-            viewMode="gallery"
-            showPreview={showPreview}
-          />
-        ) : (
-          <MediaGrid
-            media={filteredMedia}
-            viewMode={viewMode}
-            showPreview={showPreview}
-            showPlayButton={true}
-            showAddToQueue={true}
-          />
-        )
+        <UnifiedMediaGrid
+          media={filteredMedia}
+          viewMode={viewMode}
+          showPreview={showPreview}
+          context="project"
+          className="mt-4"
+        />
       ) : (
         <div className="text-center py-8">
           <p className="text-muted-foreground mb-4">
