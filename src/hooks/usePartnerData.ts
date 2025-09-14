@@ -1,120 +1,98 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import type { Sponsor } from '@/types/unified';
+import { SPONSOR_DATA } from '../../constants/data/sponsors';
+import { useDataFetcher } from './useDataFetcher';
 
-interface Partner {
-  alt: string;
-  src: string;
-  href: string;
-  tagline?: string;
+interface EnhancedPartner extends Sponsor {
+  description?: string;
+  projects?: Array<{
+    id: string;
+    title: string;
+    year: string;
+  }>;
+  partnershipHistory?: Array<{
+    year: string;
+    milestone: string;
+    description?: string;
+  }>;
+  collaborationTypes?: string[];
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
 }
 
-interface DatabasePartner {
+interface DbSponsor {
   id: string;
   name: string;
-  type: string;
-  logo_path: string | null;
-  website: string | null;
+  type: 'main' | 'partner' | 'supporter';
+  logo_path?: string | null;
+  website?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
-// Static partner data as fallback
-const STATIC_PARTNERS: Partner[] = [
-  {
-    alt: "Stenbräcka Kursgård",
-    src: "/images/partners/stenbracka-logo.png",
-    href: "https://stenbracka.se/",
-    tagline: "Konstnärliga och tekniska miljöer i skärgården"
-  },
-  {
-    alt: "Maskin & Fritid",
-    src: "/images/partners/maskin-fritid-logo.png",
-    href: "https://www.maskfri.se/",
-    tagline: "Lokala resurser för bygg och teknik"
-  },
-  {
-    alt: "Karlskrona Kommun",
-    src: "/images/partners/karlskrona-kommun-logo.png",
-    href: "https://www.karlskrona.se/",
-    tagline: "Regional utveckling och stöd"
-  },
-  {
-    alt: "Visit Blekinge",
-    src: "/images/partners/visit-blekinge-logo.png",
-    href: "https://www.visitblekinge.se/",
-    tagline: "Regional turism och kultur"
-  },
-];
-
-const getTaglineForPartner = (name: string): string => {
-  const taglines: { [key: string]: string } = {
-    'Stenbräcka Kursgård': 'Konstnärliga och tekniska miljöer i skärgården',
-    'Maskin & Fritid': 'Lokala resurser för bygg och teknik',
-    'Karlskrona Kommun': 'Regional utveckling och stöd',
-    'Visit Blekinge': 'Regional turism och kultur',
+interface ProjectRow {
+  projects: {
+    id: string;
+    title: string;
+    created_at: string;
   };
-  return taglines[name] || 'Partner och stödjare av Zeppel Inn';
+}
+
+const transformSponsor = async (dbSponsor: DbSponsor, enhanced: boolean): Promise<EnhancedPartner> => {
+  const partner: EnhancedPartner = {
+    id: dbSponsor.id,
+    name: dbSponsor.name,
+    type: (dbSponsor.type as 'main' | 'partner' | 'supporter'),
+    logo: dbSponsor.logo_path ? `/images/${dbSponsor.logo_path}` : undefined,
+    website: dbSponsor.website || undefined,
+    createdAt: dbSponsor.created_at,
+    updatedAt: dbSponsor.updated_at,
+  };
+
+  if (enhanced) {
+    const { data: projectSponsors } = await supabase
+      .from('project_sponsors')
+      .select('projects(id, title, created_at)')
+      .eq('sponsor_id', dbSponsor.id);
+
+    partner.projects = (projectSponsors as ProjectRow[] | null | undefined)?.map((ps) => ({
+      id: ps.projects.id,
+      title: ps.projects.title,
+      year: new Date(ps.projects.created_at).getFullYear().toString(),
+    })) || [];
+    
+    partner.description = 'Enhanced description';
+    partner.partnershipHistory = [{ year: '2023', milestone: 'Became a partner' }];
+    partner.collaborationTypes = ['Funding', 'Support'];
+  }
+
+  return partner;
 };
 
-export const usePartnerData = () => {
-  const [partners, setPartners] = useState<Partner[]>(STATIC_PARTNERS);
-  const [loading, setLoading] = useState(true);
-  const [usingDatabase, setUsingDatabase] = useState(false);
+const transformStaticSponsor = (staticSponsor: DbSponsor): EnhancedPartner => ({
+  id: staticSponsor.id,
+  name: staticSponsor.name,
+  type: staticSponsor.type,
+  logo: staticSponsor.logo_path ? `/images/${staticSponsor.logo_path}` : undefined,
+  website: staticSponsor.website,
+  createdAt: staticSponsor.created_at,
+  updatedAt: staticSponsor.updated_at,
+});
 
-  useEffect(() => {
-    loadPartnerData();
-  }, []);
+export const usePartnerData = ({ enhanced = false } = {}) => {
+  const staticPartners = useMemo(() => SPONSOR_DATA.map(transformStaticSponsor), []);
 
-  const loadPartnerData = async () => {
-    try {
-      setLoading(true);
+  const { data: partners, loading, error, refetch } = useDataFetcher<EnhancedPartner, EnhancedPartner[]>({
+    tableName: 'sponsors',
+    staticFallback: staticPartners,
+    transformData: async (dbData) => {
+      return Promise.all((dbData as unknown as DbSponsor[]).map(sponsor => transformSponsor(sponsor, enhanced)));
+    },
+  });
 
-      // Check if we should use database partners
-      const { data: settingData } = await supabase
-        .from('admin_settings')
-        .select('setting_value')
-        .eq('setting_key', 'use_database_partners')
-        .maybeSingle();
-
-      const useDatabase = (settingData?.setting_value as any)?.enabled || false;
-      setUsingDatabase(useDatabase);
-
-      if (useDatabase) {
-        // Load partners from database
-        const { data: dbPartners, error } = await supabase
-          .from('sponsors')
-          .select('*')
-          .order('name');
-
-        if (error) {
-          console.error('Error loading database partners:', error);
-          // Fallback to static data
-          setPartners(STATIC_PARTNERS);
-          setUsingDatabase(false);
-        } else if (dbPartners && dbPartners.length > 0) {
-          // Transform database partners to Partner format
-          const transformedPartners: Partner[] = dbPartners.map((dbPartner: DatabasePartner) => ({
-            alt: dbPartner.name,
-            src: dbPartner.logo_path ? `/images/${dbPartner.logo_path}` : "/images/ui/placeholder-project.jpg",
-            href: dbPartner.website || "#",
-            tagline: getTaglineForPartner(dbPartner.name)
-          }));
-          setPartners(transformedPartners);
-        } else {
-          // No database partners found, use static
-          setPartners(STATIC_PARTNERS);
-          setUsingDatabase(false);
-        }
-      } else {
-        // Use static partners
-        setPartners(STATIC_PARTNERS);
-      }
-    } catch (error) {
-      console.error('Error in loadPartnerData:', error);
-      setPartners(STATIC_PARTNERS);
-      setUsingDatabase(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { partners, loading, usingDatabase, refreshData: loadPartnerData };
+  return { partners, loading, error, refreshData: refetch };
 };

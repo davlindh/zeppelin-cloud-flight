@@ -1,6 +1,6 @@
 {
   "name": "Zeppel Inn Community Showcase",
-  "description": "A dynamic web application for Zeppel Inn, featuring a community showcase where project descriptions are enhanced by the Gemini API. It serves as a presentation platform for art, technology, and community development initiatives.",
+  "description": "A dynamic web application for Zeppel Inn, featuring a community showcase. It serves as a presentation platform for art, technology, and community development initiatives.",
   "requestFramePermissions": [],
   "prompt": ""
 }

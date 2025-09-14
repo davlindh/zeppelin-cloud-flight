@@ -60,12 +60,12 @@ export const getPlaceholderAsset = (
   // Context-specific placeholders
   const contextPlaceholders: Record<string, string> = {
     project: PLACEHOLDER_ASSETS.project,
-    participant: PLACEHOLDER_ASSETS.participant, 
+    participant: PLACEHOLDER_ASSETS.participant,
     partner: PLACEHOLDER_ASSETS.partner,
     ui: PLACEHOLDER_ASSETS.ui,
     media: PLACEHOLDER_ASSETS.ui // fallback to ui for media context
   };
-  
+
   // Type-specific placeholders with fallbacks
   const typePlaceholders: Record<MediaType, string> = {
     video: '/images/ui/placeholder-video.svg',
@@ -79,8 +79,18 @@ export const getPlaceholderAsset = (
     code: '/images/ui/placeholder-code.svg',
     '3d': '/images/ui/placeholder-3d.svg'
   };
-  
+
   return typePlaceholders[type] || contextPlaceholders[context];
+};
+
+export const getPlaceholderImage = (context: 'project' | 'participant' | 'partner' | 'ui' = 'ui'): string => {
+  const placeholders = {
+    project: '/images/projects/placeholder-project.svg',
+    participant: '/images/participants/placeholder-avatar.svg',
+    partner: '/images/partners/placeholder-logo.png',
+    ui: '/images/ui/placeholder-project.jpg',
+  };
+  return placeholders[context] || placeholders.ui;
 };
 
 export const generateThumbnailUrl = (url: string, type: MediaType): string => {

@@ -108,13 +108,13 @@ export interface Participant {
  * Legacy support - mapped to Participant for backwards compatibility
  * @deprecated Use Participant instead
  */
-export interface ParticipantWithMedia extends Participant {}
+export type ParticipantWithMedia = Participant;
 
 /**
  * Legacy support - mapped to Participant for backwards compatibility  
  * @deprecated Use Participant instead
  */
-export interface ParticipantEntity extends Participant {}
+export type ParticipantEntity = Participant;
 
 // ============= PROJECT TYPES =============
 

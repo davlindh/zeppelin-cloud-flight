@@ -9,6 +9,7 @@ import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSu
 import { EnhancedImage } from '../../components/multimedia/EnhancedImage';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { getPlaceholderImage } from '@/utils/assetHelpers';
 import { Search, Filter, ArrowUpDown, Plus, Eye, Play, Image, FileText, Volume2 } from 'lucide-react';
 
 interface Project {
@@ -86,22 +87,56 @@ export const ShowcasePage: React.FC = () => {
         if (projectsError) throw projectsError;
 
         // Transform data to match our interface
-        const transformedProjects: Project[] = (projectsData || []).map(project => ({
-          ...project,
-          tags: project.project_tags?.map((t: any) => t.tag) || [],
-          participants: project.project_participants?.map((pp: any) => ({
+        type SupabaseProjectRow = {
+          id: string;
+          slug: string;
+          title: string;
+          description: string;
+          full_description?: string | null;
+          image_path?: string | null;
+          purpose?: string | null;
+          expected_impact?: string | null;
+          associations?: string[] | null;
+          created_at: string;
+          project_tags?: Array<{ tag: string }>;
+          project_participants?: Array<{
+            role: string;
+            participants: { id: string; name: string; avatar_path?: string | null };
+          }>;
+          project_sponsors?: Array<{ sponsors: { id: string; name: string; type: string; logo_path?: string | null } }>;
+          // Supabase returns raw strings for enum-like columns; accept string here and cast when mapping
+          project_media?: Array<{ id: string; type: string; url: string; title: string; description?: string | null }>;
+        };
+
+        const transformedProjects: Project[] = (projectsData || []).map((project: SupabaseProjectRow) => ({
+          id: project.id,
+          slug: project.slug,
+          title: project.title,
+          description: project.description,
+          full_description: project.full_description || undefined,
+          image_path: project.image_path || undefined,
+          purpose: project.purpose || undefined,
+          expected_impact: project.expected_impact || undefined,
+          associations: project.associations || [],
+          created_at: project.created_at,
+          tags: project.project_tags?.map((t) => t.tag) || [],
+          participants: project.project_participants?.map((pp) => ({
             id: pp.participants.id,
             name: pp.participants.name,
             role: pp.role,
-            avatar_path: pp.participants.avatar_path
+            avatar_path: pp.participants.avatar_path || undefined
           })) || [],
-          sponsors: project.project_sponsors?.map((ps: any) => ps.sponsors) || [],
-          media: project.project_media?.map((m: any) => ({
-            ...m,
-            type: m.type as 'video' | 'audio' | 'image' | 'document'
+          sponsors: project.project_sponsors?.map((ps) => ps.sponsors) || [],
+          media: project.project_media?.map((m) => ({
+            id: m.id,
+            // Cast the incoming string to the narrower union we use in our Project interface
+            type: m.type as 'video' | 'audio' | 'image' | 'document',
+            url: m.url,
+            title: m.title,
+            description: m.description || undefined,
           })) || []
         }));
-
+        
         setProjects(transformedProjects);
       } catch (err) {
         console.error('Error fetching projects:', err);
@@ -192,7 +227,7 @@ export const ShowcasePage: React.FC = () => {
   };
 
   const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return '/public/images/ui/placeholder-project.jpg';
+    if (!imagePath) return getPlaceholderImage('project');
     
     if (imagePath.startsWith('http')) {
       return imagePath;

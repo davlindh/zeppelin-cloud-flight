@@ -1,17 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
+import type { TableName } from '../types/schema';
 
-type TableName = keyof Database['public']['Tables'];
-
+/**
+ * Configuration for the generic data fetcher hook.
+ * @template T The type of the transformed data items.
+ * @template R The final return type of the data property.
+ */
 export interface DataFetcherConfig<T, R> {
   tableName: TableName;
+  query?: string;
   staticFallback: T[];
-  transformData?: (data: any[]) => T[];
+  transformData?: (data: Record<string, unknown>[]) => T[] | Promise<T[]>;
   postProcess?: (data: T[]) => R;
   enableRealtime?: boolean;
 }
 
+/**
+ * Result object returned by the data fetcher hook.
+ * @template R The final return type of the data property.
+ */
 export interface DataFetcherResult<R> {
   data: R;
   loading: boolean;
@@ -20,15 +28,19 @@ export interface DataFetcherResult<R> {
 }
 
 /**
- * Generic hook for fetching data with database/static fallback pattern
- * Consolidates the common pattern used across all entity data hooks
+ * A generic hook for fetching data from Supabase with a static fallback.
+ * This consolidates the common data fetching pattern used across multiple hooks.
+ *
+ * @param config The configuration object for the data fetcher.
+ * @returns An object containing the fetched data, loading state, and error status.
  */
-export const useDataFetcher = <T = any, R = T[]>({
+export const useDataFetcher = <T, R>({
   tableName,
+  query = '*',
   staticFallback,
-  transformData = (data) => data as T[],
+  transformData = (data: Record<string, unknown>[]) => data as unknown as T[],
   postProcess = (data) => data as unknown as R,
-  enableRealtime = false
+  enableRealtime = false,
 }: DataFetcherConfig<T, R>): DataFetcherResult<R> => {
   const [data, setData] = useState<R>(postProcess(staticFallback));
   const [loading, setLoading] = useState(true);
@@ -41,28 +53,29 @@ export const useDataFetcher = <T = any, R = T[]>({
 
       const { data: dbData, error: dbError } = await supabase
         .from(tableName)
-        .select('*')
+        .select(query)
         .order('created_at', { ascending: false });
 
       if (dbError) {
-        console.warn(`Database fetch failed for ${tableName}:`, dbError);
-        console.log(`Using static fallback data for ${tableName}`);
+        console.warn(`[DataFetcher] Database fetch failed for '${tableName}':`, dbError.message);
+        console.log(`[DataFetcher] Using static fallback data for '${tableName}'.`);
         setData(postProcess(staticFallback));
       } else if (dbData && dbData.length > 0) {
-        const transformed = transformData(dbData);
+        const transformed = await transformData(dbData as unknown as Record<string, unknown>[]);
         setData(postProcess(transformed));
       } else {
-        console.log(`No data found in ${tableName}, using static fallback`);
+        console.log(`[DataFetcher] No data in '${tableName}', using static fallback.`);
         setData(postProcess(staticFallback));
       }
     } catch (err) {
-      console.error(`Error fetching ${tableName}:`, err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+      console.error(`[DataFetcher] Error fetching '${tableName}':`, errorMessage);
+      setError(errorMessage);
       setData(postProcess(staticFallback));
     } finally {
       setLoading(false);
     }
-  }, [tableName, staticFallback, transformData, postProcess]);
+  }, [tableName, query, staticFallback, transformData, postProcess]);
 
   useEffect(() => {
     fetchData();
@@ -72,23 +85,24 @@ export const useDataFetcher = <T = any, R = T[]>({
   useEffect(() => {
     if (!enableRealtime) return;
 
-    const subscription = supabase
+    const channel = supabase
       .channel(`${tableName}_changes`)
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: tableName 
-        }, 
-        () => {
-          console.log(`Realtime update detected for ${tableName}`);
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: tableName,
+        },
+        (payload) => {
+          console.log(`[DataFetcher] Realtime update for '${tableName}':`, payload);
           fetchData();
         }
       )
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [tableName, fetchData, enableRealtime]);
 
@@ -96,67 +110,6 @@ export const useDataFetcher = <T = any, R = T[]>({
     data,
     loading,
     error,
-    refetch: fetchData
-  };
-};
-
-/**
- * Enhanced version with relationship loading
- */
-export const useEnhancedDataFetcher = <T = any, R = T[]>({
-  tableName,
-  staticFallback,
-  transformData = (data) => data as T[],
-  postProcess = (data) => data as unknown as R,
-  enableRealtime = false,
-  relationships = []
-}: DataFetcherConfig<T, R> & {
-  relationships?: TableName[];
-}): DataFetcherResult<R> & {
-  relationshipData: Record<string, any[]>;
-} => {
-  const [relationshipData, setRelationshipData] = useState<Record<string, any[]>>({});
-  
-  const baseResult = useDataFetcher({
-    tableName,
-    staticFallback,
-    transformData,
-    postProcess,
-    enableRealtime
-  });
-
-  const fetchRelationships = useCallback(async () => {
-    if (relationships.length === 0) return;
-
-    const relationshipPromises = relationships.map(async (relationTable) => {
-      try {
-        const { data, error } = await supabase
-          .from(relationTable)
-          .select('*');
-
-        return { table: relationTable, data: data || [], error };
-      } catch (err) {
-        console.error(`Error fetching ${relationTable}:`, err);
-        return { table: relationTable, data: [], error: err };
-      }
-    });
-
-    const results = await Promise.all(relationshipPromises);
-    const relationshipMap: Record<string, any[]> = {};
-    
-    results.forEach(({ table, data }) => {
-      relationshipMap[table] = data;
-    });
-
-    setRelationshipData(relationshipMap);
-  }, [relationships]);
-
-  useEffect(() => {
-    fetchRelationships();
-  }, [fetchRelationships]);
-
-  return {
-    ...baseResult,
-    relationshipData
+    refetch: fetchData,
   };
 };
