@@ -1,15 +1,25 @@
-// Main types file - Clean implementation based on Supabase database schema
-// No legacy types - modern type system for first version
+// Main types file - Consolidated type system
+// Single source of truth for all application types
 
-// Re-export admin types for convenience
+// Re-export unified types (includes ShowcaseCard and core types)
 export type {
+  ShowcaseCard,
   Participant,
   Project,
   Sponsor,
-  SocialLink,
+  ProjectParticipant,
+  ProjectSponsor,
+  ProjectLink,
+  ProjectTag,
+  ProjectMedia
+} from '../src/types/unified';
+
+// Re-export admin types for convenience
+export type {
   ParticipantFormData,
   ProjectFormData,
-  SponsorFormData
+  SponsorFormData,
+  SocialLink
 } from '../src/types/admin';
 
 // Re-export unified media types
@@ -23,8 +33,14 @@ export type {
   MediaDisplayConfig
 } from '../src/types/unified-media';
 
-// Database-specific types for complex fields
-export interface ProjectBudget {
+// Re-export database schema types
+export type {
+  TableName,
+  Database
+} from '../src/types/schema';
+
+// Database-specific types for complex fields (no conflicts)
+export interface ProjectBudgetData {
   id: string;
   project_id: string;
   amount?: number;
@@ -33,7 +49,7 @@ export interface ProjectBudget {
   created_at: string;
 }
 
-export interface ProjectTimeline {
+export interface ProjectTimelineData {
   id: string;
   project_id: string;
   start_date?: string;
@@ -42,7 +58,7 @@ export interface ProjectTimeline {
   created_at: string;
 }
 
-export interface ProjectVoting {
+export interface ProjectVotingData {
   id: string;
   project_id: string;
   enabled?: boolean;
@@ -51,7 +67,7 @@ export interface ProjectVoting {
   created_at: string;
 }
 
-export interface ProjectAccess {
+export interface ProjectAccessData {
   id: string;
   project_id: string;
   requirements?: string[];

@@ -1,8 +1,7 @@
-import { useContext } from 'react';
-import { useMediaPlayer as useMediaPlayerContext } from '@/contexts/MediaContext';
+import { useMediaPlayer as useMediaPlayerHook } from '@/contexts/MediaContext';
 
 // Re-export the hook for convenience
-export const useMediaPlayer = useMediaPlayerContext;
+export const useMediaPlayer = useMediaPlayerHook;
 
 // Additional utility hooks for specific use cases
 export const useMediaQueue = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { slugify } from '../../src/utils/participantHelpers';
+import { slugify } from '@/utils/participantHelpers';
 
 interface Participant {
   name: string;

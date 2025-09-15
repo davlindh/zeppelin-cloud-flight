@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TagList } from './TagList';
 import { ImageWithFallback } from './ImageWithFallback';
-import type { Project } from '../../types/index';
+import type { Project } from '@/types/unified';
 
 // Extended interface for ProjectCard display with computed/derived fields
 interface ProjectCardData extends Project {

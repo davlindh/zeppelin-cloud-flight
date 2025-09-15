@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ShowcaseCard as ShowcaseCardType } from '../../types/index';
+import type { ShowcaseCard as ShowcaseCardType } from '@/types/unified';
 import { ProjectCard } from './ProjectCard';
 
 interface ShowcaseSectionProps {

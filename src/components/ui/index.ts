@@ -24,6 +24,7 @@ export * from './input';
 export * from './input-otp';
 export * from './label';
 export * from './menubar';
+export * from './modal';
 export * from './navigation-menu';
 export * from './pagination';
 export * from './popover';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../ui';
-import { Modal } from '../ui';
+import { Link } from 'react-router-dom';
+import { Button, Modal } from '../ui';
 import { motion } from 'framer-motion';
-import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
+import { ComprehensiveSubmissionForm } from '../public/ComprehensiveSubmissionForm';
 
 
 
@@ -65,7 +65,7 @@ export const HeroSection: React.FC = () => {
                             className="sm:mb-0 mb-4"
                         >
                             <Button
-                                variant="primary"
+                                variant="default"
                                 onClick={handleParticipantClick}
                                 className="hover:scale-105 transition-transform duration-300"
                             >
@@ -86,10 +86,10 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
-                                to="/showcase"
+                                asChild
                                 className="hover:scale-105 transition-transform duration-300"
                             >
-                                Utforska Showcase
+                                <Link to="/showcase">Utforska Showcase</Link>
                             </Button>
                         </motion.div>
 
@@ -105,10 +105,10 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
-                                to="/partners"
+                                asChild
                                 className="hover:scale-105 transition-transform duration-300"
                             >
-                                Våra Partners
+                                <Link to="/partners">Våra Partners</Link>
                             </Button>
                         </motion.div>
                         
@@ -124,10 +124,10 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
-                                href="#partner"
+                                asChild
                                 className="hover:scale-105 transition-transform duration-300"
                             >
-                                Bli Partner
+                                <a href="#partner">Bli Partner</a>
                             </Button>
                         </motion.div>
                     </div>
@@ -144,7 +144,7 @@ export const HeroSection: React.FC = () => {
 
             {/* Enhanced Submission Form Modal */}
             {showSubmissionForm && (
-                <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
+                <Modal open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
                     <ComprehensiveSubmissionForm 
                         onClose={() => setShowSubmissionForm(false)}
                         initialType="participant"

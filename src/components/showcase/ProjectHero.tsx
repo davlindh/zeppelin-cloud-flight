@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TagList } from './TagList';
 import { ImageWithFallback } from './ImageWithFallback';
-import type { ShowcaseCard } from '../../types/index';
+import type { ShowcaseCard } from '@/types/unified';
 
 interface ProjectHeroProps {
   card: ShowcaseCard;
