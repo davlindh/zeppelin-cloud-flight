@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { TableName } from '../types/schema';
+import { errorHandler } from '../utils/errorHandler';
 
 /**
  * Configuration for the generic data fetcher hook.
@@ -29,10 +30,6 @@ export interface DataFetcherResult<R> {
 
 /**
  * A generic hook for fetching data from Supabase with a static fallback.
- * This consolidates the common data fetching pattern used across multiple hooks.
- *
- * @param config The configuration object for the data fetcher.
- * @returns An object containing the fetched data, loading state, and error status.
  */
 export const useDataFetcher = <T, R>({
   tableName,
@@ -57,20 +54,20 @@ export const useDataFetcher = <T, R>({
         .order('created_at', { ascending: false });
 
       if (dbError) {
-        console.warn(`[DataFetcher] Database fetch failed for '${tableName}':`, dbError.message);
-        console.log(`[DataFetcher] Using static fallback data for '${tableName}'.`);
         setData(postProcess(staticFallback));
       } else if (dbData && dbData.length > 0) {
         const transformed = await transformData(dbData as unknown as Record<string, unknown>[]);
         setData(postProcess(transformed));
       } else {
-        console.log(`[DataFetcher] No data in '${tableName}', using static fallback.`);
         setData(postProcess(staticFallback));
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-      console.error(`[DataFetcher] Error fetching '${tableName}':`, errorMessage);
-      setError(errorMessage);
+      const result = errorHandler.handleError(err, {
+        component: 'DataFetcher',
+        action: `fetching data from ${tableName}`,
+        technicalDetails: { tableName, query }
+      });
+      setError(result.userMessage);
       setData(postProcess(staticFallback));
     } finally {
       setLoading(false);
@@ -81,35 +78,22 @@ export const useDataFetcher = <T, R>({
     fetchData();
   }, [fetchData]);
 
-  // Set up realtime subscription if enabled
   useEffect(() => {
     if (!enableRealtime) return;
-
-    const channel = supabase
-      .channel(`${tableName}_changes`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: tableName,
-        },
-        (payload) => {
-          console.log(`[DataFetcher] Realtime update for '${tableName}':`, payload);
-          fetchData();
-        }
-      )
-      .subscribe();
-
+    const channel = supabase.channel(`${tableName}_changes`);
+    channel.on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: tableName },
+      () => {
+        fetchData();
+      }
+    );
+    // Subscribe without returning the subscribe promise
+    channel.subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
   }, [tableName, fetchData, enableRealtime]);
 
-  return {
-    data,
-    loading,
-    error,
-    refetch: fetchData,
-  };
+  return { data, loading, error, refetch: fetchData };
 };

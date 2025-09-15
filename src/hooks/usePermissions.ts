@@ -51,10 +51,14 @@ export const usePermissions = () => {
 
       setPermissions(prev => ({
         ...prev,
-        storage: results[0].status === 'fulfilled' ? results[0].value.state as any : 'prompt',
-        cache: results[0].status === 'fulfilled' ? results[0].value.state as any : 'prompt',
-        notifications: results[1] ? (results[1] as any).value.state as 'granted' | 'denied' | 'prompt' | 'default' : 'prompt',
-        location: results[2]?.status === 'fulfilled' ? results[2].value.state as any : 'prompt'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        storage: results[0].status === 'fulfilled' ? (results[0].value as any).state : 'prompt',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cache: results[0].status === 'fulfilled' ? (results[0].value as any).state : 'prompt',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        notifications: results[1] ? ((results[1] as any).value?.state as 'granted' | 'denied' | 'prompt' | 'default') || 'prompt' : 'prompt',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        location: results[2]?.status === 'fulfilled' ? (results[2].value as any).state : 'prompt'
       }));
     } catch (error) {
       console.warn('Error checking permissions:', error);

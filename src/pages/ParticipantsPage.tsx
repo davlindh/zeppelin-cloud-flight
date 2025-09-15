@@ -1,39 +1,112 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Users } from 'lucide-react';
-import { ImageWithFallback } from '../../components/showcase/ImageWithFallback';
+import { Users, Sparkles, Heart, MessageCircle, ExternalLink, Award, Star, Zap, Target, Briefcase, Code, Palette, Camera, Music, BookOpen, Coffee, TrendingUp } from 'lucide-react';
+import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 import { useParticipantData } from '../hooks/useParticipantData';
 import { EnhancedParticipantFilters } from '../components/participants/EnhancedParticipantFilters';
 import { ParticipantStats } from '../components/participants/ParticipantStats';
 import type { ParticipantEntity } from '../utils/participantHelpers';
+import type { FilterGroup } from '../components/participants/EnhancedParticipantFilters';
 
 export const ParticipantsPage: React.FC = () => {
-  const [filters, setFilters] = useState({
-    searchTerm: '',
-    roles: [] as string[],
-    skills: [] as string[],
-    experienceLevel: [] as string[],
-    contributionTypes: [] as string[]
-  });
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[] | { min: number; max: number } | string>>({});
+  const [showParticipantDialog, setShowParticipantDialog] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<ParticipantEntity | null>(null);
 
-  const { 
-    participants, 
-    loading, 
-    usingDatabase, 
-    availableFilters, 
-    filterParticipants, 
-    getParticipantStats 
+  const {
+    participants,
+    loading,
+    availableFilters,
+    filterParticipants,
+    getParticipantStats
   } = useParticipantData();
 
-  const filteredParticipants = useMemo(() => 
-    filterParticipants(filters), 
-    [participants, filters, filterParticipants]
+  const { toast } = useToast();
+
+  // Create FilterGroup[] structure for EnhancedParticipantFilters
+  const filterGroups: FilterGroup[] = useMemo(() => {
+    const groups: FilterGroup[] = [];
+
+    // Add search filter
+    groups.push({
+      id: 'searchTerm',
+      label: 'Sök deltagare',
+      type: 'search',
+      placeholder: 'Sök efter namn, roller eller färdigheter...'
+    });
+
+    // Add roles filter
+    if (availableFilters.roles.length > 0) {
+      groups.push({
+        id: 'roles',
+        label: 'Roller',
+        type: 'multiple',
+        options: availableFilters.roles.map(role => ({
+          id: role,
+          label: role,
+          value: role
+        }))
+      });
+    }
+
+    // Add skills filter
+    if (availableFilters.skills.length > 0) {
+      groups.push({
+        id: 'skills',
+        label: 'Färdigheter',
+        type: 'multiple',
+        options: availableFilters.skills.map(skill => ({
+          id: skill,
+          label: skill,
+          value: skill
+        }))
+      });
+    }
+
+    // Add experience level filter
+    if (availableFilters.experienceLevel.length > 0) {
+      groups.push({
+        id: 'experienceLevel',
+        label: 'Erfarenhetsnivå',
+        type: 'single',
+        options: availableFilters.experienceLevel.map(level => ({
+          id: level,
+          label: level,
+          value: level
+        }))
+      });
+    }
+
+    // Add contribution types filter
+    if (availableFilters.contributionTypes.length > 0) {
+      groups.push({
+        id: 'contributionTypes',
+        label: 'Bidragstyper',
+        type: 'multiple',
+        options: availableFilters.contributionTypes.map(type => ({
+          id: type,
+          label: type,
+          value: type
+        }))
+      });
+    }
+
+    return groups;
+  }, [availableFilters]);
+
+  const filteredParticipants = useMemo(() =>
+    filterParticipants(activeFilters),
+    [activeFilters, filterParticipants]
   );
 
-  const stats = useMemo(() => 
-    getParticipantStats(), 
-    [participants, getParticipantStats]
+  const stats = useMemo(() =>
+    getParticipantStats(),
+    [getParticipantStats]
   );
 
   if (loading) {
@@ -60,11 +133,10 @@ export const ParticipantsPage: React.FC = () => {
             <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
               Upptäck de kreativa människorna bakom Zeppel Inn-projekten
             </p>
-            {usingDatabase && (
-              <p className="text-sm opacity-70 mt-2">
-                • Data från databas
-              </p>
-            )}
+            <Badge variant="secondary" className="mt-4 shadow-soft">
+              <Sparkles className="w-3 h-3 mr-1" />
+              Context7 Components Showcase
+            </Badge>
           </div>
         </div>
       </div>
@@ -77,11 +149,8 @@ export const ParticipantsPage: React.FC = () => {
       {/* Enhanced Filters */}
       <div className="container mx-auto px-6 pb-8">
         <EnhancedParticipantFilters
-          filters={filters}
-          availableFilters={availableFilters}
-          onFiltersChange={setFilters}
-          resultCount={filteredParticipants.length}
-          totalCount={participants.length}
+          filters={filterGroups}
+          onFiltersChange={setActiveFilters}
         />
       </div>
 
@@ -95,15 +164,23 @@ export const ParticipantsPage: React.FC = () => {
                 className="group block bg-card rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
               >
                 <div className="flex items-center space-x-4 mb-4">
-                  <div className="flex-shrink-0">
-                    <ImageWithFallback
-                      src={participant.avatar || ''}
+                  <div className="flex-shrink-0 relative">
+                    <EnhancedImage
+                      src={participant.avatar || '/images/participants/placeholder-avatar.svg'}
                       alt={participant.name}
                       className="w-16 h-16 rounded-full object-cover"
-                      fallbackSrc="/images/participants/placeholder-avatar.svg"
+                      rounded="full"
+                      shadow="md"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.src = '/images/participants/placeholder-avatar.svg';
+                      }}
                     />
+                    <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1 shadow-sm">
+                      <Award className="h-3 w-3" />
+                    </div>
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-lg text-card-foreground group-hover:text-primary transition-colors">
                       {participant.name}

@@ -6,9 +6,54 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, UserPlus, Briefcase, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Submission = Tables<'submissions'>;
+
+interface SubmissionContent {
+  description?: string;
+  bio?: string;
+  portfolioLinks?: string;
+  skills?: string[];
+  experienceLevel?: string;
+  interests?: string[];
+  timeCommitment?: string;
+  contributions?: string[];
+  availability?: string;
+  purpose?: string;
+  expectedImpact?: string;
+  expected_impact?: string;
+}
+
+interface SubmissionFile {
+  name: string;
+  url: string;
+  type?: string;
+  size?: number;
+}
+
+interface EnhancedSubmission {
+  id: string;
+  type: 'project' | 'participant' | 'media' | 'collaboration' | 'feedback' | 'suggestion';
+  title: string;
+  content: SubmissionContent;
+  status: 'pending' | 'approved' | 'rejected';
+  submitted_by?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  location?: string;
+  language_preference?: string;
+  how_found_us?: string;
+  publication_permission?: boolean;
+  files?: SubmissionFile[];
+  created_at: string;
+  processed_at?: string;
+  session_id?: string;
+  device_fingerprint?: string;
+}
 
 interface ConversionModalProps {
-  submission: any;
+  submission: Submission | EnhancedSubmission | { id: string; type: string; title: string; content: unknown; submitted_by?: string; contact_email?: string; contact_phone?: string; location?: string; how_found_us?: string; };
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -37,23 +82,24 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
           .trim();
       };
 
+      const content = submission.content as SubmissionContent;
       const participantData = {
         name: submission.submitted_by || submission.title,
         slug: generateSlug(submission.submitted_by || submission.title),
-        bio: submission.content?.description || submission.content?.bio || '',
-        social_links: submission.content?.portfolioLinks ? 
-          [{ platform: 'website', url: submission.content.portfolioLinks }] : [],
+        bio: content?.description || content?.bio || '',
+        social_links: content?.portfolioLinks ?
+          [{ platform: 'website', url: content.portfolioLinks }] : [],
         // Enhanced participant fields
-        skills: submission.content?.skills || [],
-        experience_level: submission.content?.experienceLevel || null,
-        interests: submission.content?.interests || [],
-        time_commitment: submission.content?.timeCommitment || null,
-        contributions: submission.content?.contributions || [],
+        skills: content?.skills || [],
+        experience_level: content?.experienceLevel || null,
+        interests: content?.interests || [],
+        time_commitment: content?.timeCommitment || null,
+        contributions: content?.contributions || [],
         location: submission.location || null,
         contact_email: submission.contact_email || null,
         contact_phone: submission.contact_phone || null,
         how_found_us: submission.how_found_us || null,
-        availability: submission.content?.availability || null
+        availability: content?.availability || null
       };
 
       const { error: participantError } = await supabase
@@ -77,10 +123,11 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
       });
 
       onSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Kunde inte skapa deltagare';
       toast({
         title: 'Fel',
-        description: error.message || 'Kunde inte skapa deltagare',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -106,13 +153,14 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
           .trim();
       };
 
+      const content = submission.content as SubmissionContent;
       const projectData = {
         title: submission.title,
         slug: generateSlug(submission.title),
-        description: submission.content?.description || '',
-        full_description: submission.content?.purpose || submission.content?.description || '',
-        purpose: submission.content?.purpose || '',
-        expected_impact: submission.content?.expectedImpact || submission.content?.expected_impact || ''
+        description: content?.description || '',
+        full_description: content?.purpose || content?.description || '',
+        purpose: content?.purpose || '',
+        expected_impact: content?.expectedImpact || content?.expected_impact || ''
       };
 
       const { error: projectError } = await supabase
@@ -136,10 +184,11 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
       });
 
       onSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Kunde inte skapa projekt';
       toast({
         title: 'Fel',
-        description: error.message || 'Kunde inte skapa projekt',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -158,6 +207,8 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
   const getConversionPreview = () => {
     if (!conversionType) return null;
 
+    const content = submission.content as SubmissionContent;
+
     if (conversionType === 'participant') {
       return (
         <div className="space-y-2 p-4 bg-muted rounded-lg">
@@ -166,37 +217,37 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
             <strong>Namn:</strong> {submission.submitted_by || submission.title}
           </div>
           <div>
-            <strong>Bio:</strong> {submission.content?.description || submission.content?.bio || 'Ingen beskrivning'}
+            <strong>Bio:</strong> {content?.description || content?.bio || 'Ingen beskrivning'}
           </div>
-          {submission.content?.skills && submission.content.skills.length > 0 && (
+          {content?.skills && content.skills.length > 0 && (
             <div>
               <strong>Färdigheter:</strong>{' '}
-              {submission.content.skills.map((skill: string, index: number) => (
+              {content.skills.map((skill: string, index: number) => (
                 <Badge key={index} variant="secondary" className="text-xs mr-1">
                   {skill}
                 </Badge>
               ))}
             </div>
           )}
-          {submission.content?.experienceLevel && (
+          {content?.experienceLevel && (
             <div>
-              <strong>Erfarenhetsnivå:</strong> {submission.content.experienceLevel}
+              <strong>Erfarenhetsnivå:</strong> {content.experienceLevel}
             </div>
           )}
-          {submission.content?.contributions && submission.content.contributions.length > 0 && (
+          {content?.contributions && content.contributions.length > 0 && (
             <div>
               <strong>Bidragstyper:</strong>{' '}
-              {submission.content.contributions.map((contribution: string, index: number) => (
+              {content.contributions.map((contribution: string, index: number) => (
                 <Badge key={index} variant="outline" className="text-xs mr-1">
                   {contribution}
                 </Badge>
               ))}
             </div>
           )}
-          {submission.content?.interests && submission.content.interests.length > 0 && (
+          {content?.interests && content.interests.length > 0 && (
             <div>
               <strong>Intressen:</strong>{' '}
-              {submission.content.interests.map((interest: string, index: number) => (
+              {content.interests.map((interest: string, index: number) => (
                 <Badge key={index} variant="outline" className="text-xs mr-1">
                   {interest}
                 </Badge>
@@ -215,16 +266,16 @@ export const ConversionModal = ({ submission, isOpen, onClose, onSuccess }: Conv
             <strong>Titel:</strong> {submission.title}
           </div>
           <div>
-            <strong>Beskrivning:</strong> {submission.content?.description || 'Ingen beskrivning'}
+            <strong>Beskrivning:</strong> {content?.description || 'Ingen beskrivning'}
           </div>
-          {submission.content?.purpose && (
+          {content?.purpose && (
             <div>
-              <strong>Syfte:</strong> {submission.content.purpose}
+              <strong>Syfte:</strong> {content.purpose}
             </div>
           )}
-          {submission.content?.expectedImpact && (
+          {content?.expectedImpact && (
             <div>
-              <strong>Förväntad påverkan:</strong> {submission.content.expectedImpact}
+              <strong>Förväntad påverkan:</strong> {content.expectedImpact}
             </div>
           )}
         </div>

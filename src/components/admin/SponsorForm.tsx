@@ -93,8 +93,9 @@ export const SponsorForm = ({ onClose, sponsorId }: SponsorFormProps) => {
       });
 
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create sponsor');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create sponsor';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

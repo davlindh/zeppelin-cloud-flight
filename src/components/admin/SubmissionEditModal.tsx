@@ -10,18 +10,59 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Save, X } from 'lucide-react';
+import type { Submission } from '../../../types/index';
+import type { Json } from '@/integrations/supabase/types';
+
+// Type helpers for safe Json handling
+type JsonObject = { [key: string]: Json | undefined };
+type TypedJson = JsonObject | null;
+
+// Type guards for safe Json access
+const isJsonObject = (value: Json): value is JsonObject => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+};
+
+function safeJsonAccess<T>(json: Json, key: string, defaultValue: T): T {
+  if (isJsonObject(json) && json[key] !== undefined) {
+    return json[key] as T;
+  }
+  return defaultValue;
+}
+
+const safeJsonUpdate = (json: Json, key: string, value: Json): JsonObject => {
+  const baseObject = isJsonObject(json) ? { ...json } : {};
+  return { ...baseObject, [key]: value };
+};
+
+interface SubmissionFormData {
+  title: string;
+  submitted_by?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  location?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  content: Record<string, unknown>;
+}
 
 interface SubmissionEditModalProps {
-  submission: any;
+  submission: Submission;
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (updatedSubmission: any) => void;
+  onUpdate: (updatedSubmission: Submission) => void;
 }
 
 export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: SubmissionEditModalProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<SubmissionFormData>({
+    title: '',
+    submitted_by: '',
+    contact_email: '',
+    contact_phone: '',
+    location: '',
+    status: 'pending',
+    content: {}
+  });
 
   useEffect(() => {
     if (submission) {
@@ -32,7 +73,9 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
         contact_phone: submission.contact_phone || '',
         location: submission.location || '',
         status: submission.status || 'pending',
-        content: submission.content || {}
+        content: (typeof submission.content === 'object' && submission.content !== null && !Array.isArray(submission.content))
+          ? submission.content as Record<string, unknown>
+          : {}
       });
     }
   }, [submission]);
@@ -50,7 +93,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
           contact_phone: formData.contact_phone,
           location: formData.location,
           status: formData.status,
-          content: formData.content,
+          content: formData.content as Json,
           processed_at: new Date().toISOString()
         })
         .eq('id', submission.id);
@@ -70,10 +113,11 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
         title: 'Inlämning uppdaterad',
         description: 'Ändringarna har sparats.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Kunde inte uppdatera inlämning';
       toast({
         title: 'Fel',
-        description: error.message || 'Kunde inte uppdatera inlämning',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -81,28 +125,28 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
     }
   };
 
-  const updateFormData = (key: string, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [key]: value }));
+  const updateFormData = (key: string, value: string | Submission['status']) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const updateContentData = (key: string, value: any) => {
-    setFormData((prev: any) => ({
+  const updateContentData = (key: string, value: unknown) => {
+    setFormData((prev) => ({
       ...prev,
       content: { ...prev.content, [key]: value }
     }));
   };
 
   const handleRoleChange = (roleId: string, checked: boolean) => {
-    const currentRoles = formData.content.roles || [];
-    updateContentData('roles', checked 
+    const currentRoles = (formData.content.roles as string[]) || [];
+    updateContentData('roles', checked
       ? [...currentRoles, roleId]
       : currentRoles.filter((r: string) => r !== roleId)
     );
   };
 
   const handleInterestChange = (interestId: string, checked: boolean) => {
-    const currentInterests = formData.content.interests || [];
-    updateContentData('interests', checked 
+    const currentInterests = (formData.content.interests as string[]) || [];
+    updateContentData('interests', checked
       ? [...currentInterests, interestId]
       : currentInterests.filter((i: string) => i !== interestId)
     );
@@ -228,7 +272,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
               <Label htmlFor="description">Beskrivning</Label>
               <Textarea
                 id="description"
-                value={formData.content?.description || ''}
+                value={(formData.content?.description as string) || ''}
                 onChange={(e) => updateContentData('description', e.target.value)}
                 rows={3}
               />
@@ -243,7 +287,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
                       <div key={role.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={`edit-${role.id}`}
-                          checked={formData.content?.roles?.includes(role.id) || false}
+                          checked={(formData.content?.roles as string[])?.includes(role.id) || false}
                           onCheckedChange={(checked) => handleRoleChange(role.id, checked as boolean)}
                         />
                         <Label htmlFor={`edit-${role.id}`} className="text-sm font-normal cursor-pointer">
@@ -257,7 +301,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
                 <div className="space-y-3">
                   <Label>Erfarenhetsnivå</Label>
                   <RadioGroup
-                    value={formData.content?.experienceLevel || ''}
+                    value={(formData.content?.experienceLevel as string) || ''}
                     onValueChange={(value) => updateContentData('experienceLevel', value)}
                   >
                     {experienceOptions.map((option) => (
@@ -278,7 +322,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
                       <div key={interest.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={`int-${interest.id}`}
-                          checked={formData.content?.interests?.includes(interest.id) || false}
+                          checked={(formData.content?.interests as string[])?.includes(interest.id) || false}
                           onCheckedChange={(checked) => handleInterestChange(interest.id, checked as boolean)}
                         />
                         <Label htmlFor={`int-${interest.id}`} className="text-sm font-normal cursor-pointer">
@@ -297,7 +341,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
                   <Label htmlFor="purpose">Syfte</Label>
                   <Textarea
                     id="purpose"
-                    value={formData.content?.purpose || ''}
+                    value={(formData.content?.purpose as string) || ''}
                     onChange={(e) => updateContentData('purpose', e.target.value)}
                     rows={2}
                   />
@@ -307,7 +351,7 @@ export const SubmissionEditModal = ({ submission, isOpen, onClose, onUpdate }: S
                   <Label htmlFor="expectedImpact">Förväntad påverkan</Label>
                   <Textarea
                     id="expectedImpact"
-                    value={formData.content?.expectedImpact || ''}
+                    value={(formData.content?.expectedImpact as string) || ''}
                     onChange={(e) => updateContentData('expectedImpact', e.target.value)}
                     rows={2}
                   />

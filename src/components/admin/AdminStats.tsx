@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { FolderOpen, Users, Building, Inbox, TrendingUp } from 'lucide-react';
+import { FolderOpen, Users, Building, Inbox, TrendingUp, type LucideIcon } from 'lucide-react';
 
 interface Stats {
   showcases: number;
@@ -66,16 +66,16 @@ export const AdminStats = () => {
     }
   };
 
-  const StatCard = ({ 
-    title, 
-    value, 
-    icon: Icon, 
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
     description,
-    trend 
-  }: { 
-    title: string; 
-    value: number; 
-    icon: any; 
+    trend
+  }: {
+    title: string;
+    value: number;
+    icon: LucideIcon;
     description: string;
     trend?: string;
   }) => (

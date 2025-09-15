@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Participant } from '@/types/unified';
 import type { MediaCategory, MediaType } from '@/types/media';
 import { PARTICIPANT_DATA } from '../../constants/data/participants';
-import { useDataFetcher } from './useDataFetcher';
+import { useParticipants, queryKeys } from './useApi';
 
 interface SocialLink {
   platform: string;
@@ -151,25 +152,53 @@ const transformStaticParticipant = (staticParticipant: Partial<DbParticipant>): 
 });
 
 export const useParticipantData = () => {
+  const queryClient = useQueryClient();
   const staticParticipants = useMemo(() => PARTICIPANT_DATA.map(transformStaticParticipant), []);
 
-  const { data: participants, loading, error, refetch } = useDataFetcher<Participant, Participant[]>({
-    tableName: 'participants',
-    query: `
-      *,
-      participant_media(*),
-      project_participants(
-        role,
-        projects(
-          id,
-          title,
-          image_path
-        )
-      )
-    `,
-    staticFallback: staticParticipants,
-    transformData: (dbData) => (dbData as unknown as DbParticipant[]).map((p) => transformParticipant(p)),
-  });
+  // Use TanStack Query hook instead of useDataFetcher
+  const { data: participantsData, isLoading: loading, error } = useParticipants();
+
+  // Create refetch function for compatibility
+  const refetch = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.participants });
+  };
+
+  // Transform API data to match expected format
+  const participants = useMemo(() => {
+    if (!participantsData) return staticParticipants;
+
+    return participantsData.map(participant => {
+      const socialLinks = (participant.social_links as unknown as SocialLink[]) || [];
+      return {
+        id: participant.id,
+        name: participant.name,
+        slug: participant.slug,
+        bio: participant.bio,
+        avatar: participant.avatar_path,
+        website: participant.website,
+        socialLinks,
+        roles: [], // Will be populated when relationships are added
+        projects: [], // Will be populated when relationships are added
+        media: [], // Will be populated when relationships are added
+        personalLinks: socialLinks.map((link: SocialLink) => ({
+          type: link.platform.toLowerCase(),
+          url: link.url
+        })),
+        createdAt: participant.created_at,
+        updatedAt: participant.updated_at,
+        skills: participant.skills || [],
+        experienceLevel: participant.experience_level,
+        interests: participant.interests || [],
+        timeCommitment: participant.time_commitment,
+        contributions: participant.contributions || [],
+        location: participant.location,
+        contactEmail: participant.contact_email,
+        contactPhone: participant.contact_phone,
+        howFoundUs: participant.how_found_us,
+        availability: participant.availability
+      };
+    });
+  }, [participantsData, staticParticipants]);
 
   const availableFilters = useMemo(() => {
     const roles = new Set<string>();

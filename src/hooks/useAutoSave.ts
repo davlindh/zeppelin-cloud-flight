@@ -71,7 +71,9 @@ export const useAutoSave = () => {
       const draftData = {
         session_id: metadata.sessionId,
         device_fingerprint: metadata.deviceFingerprint,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         form_data: formData as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         uploaded_files: uploadedFiles as any,
         current_step: currentStep
       };

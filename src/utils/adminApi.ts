@@ -1,21 +1,32 @@
 import { supabase } from '@/integrations/supabase/client';
+import { Participant, SocialLink, ParticipantMedia } from '@/types/admin';
+import type { Json } from '@/integrations/supabase/types';
+
+// Types for better error handling
+interface DatabaseError {
+  message: string;
+  code?: string;
+  details?: string;
+  hint?: string;
+}
 
 // Enhanced error handling and timeout utilities
 export const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> => {
   return Promise.race([
     promise,
-    new Promise<never>((_, reject) => 
+    new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Operation timed out')), timeoutMs)
     )
   ]);
 };
 
-export const logError = (operation: string, error: any) => {
+export const logError = (operation: string, error: unknown) => {
+  const dbError = error as DatabaseError;
   console.error(`[Admin API] ${operation} failed:`, {
-    message: error.message,
-    code: error.code,
-    details: error.details,
-    hint: error.hint,
+    message: dbError.message,
+    code: dbError.code,
+    details: dbError.details,
+    hint: dbError.hint,
     timestamp: new Date().toISOString()
   });
 };
@@ -110,6 +121,53 @@ export const fetchProjectsWithRelationships = async () => {
   }
 };
 
+interface RawParticipantData {
+  id: string;
+  name: string;
+  slug: string;
+  bio?: string;
+  website?: string;
+  avatar_path?: string;
+  social_links?: unknown;
+  skills?: string[];
+  experience_level?: string;
+  interests?: string[];
+  time_commitment?: string;
+  contributions?: string[];
+  location?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  how_found_us?: string;
+  availability?: string;
+  participant_media?: unknown[];
+  created_at: string;
+  updated_at: string;
+}
+
+function transformParticipantData(raw: RawParticipantData): Participant {
+  return {
+    id: raw.id,
+    name: raw.name,
+    slug: raw.slug,
+    bio: raw.bio,
+    website: raw.website,
+    avatar_path: raw.avatar_path,
+    social_links: Array.isArray(raw.social_links) ? raw.social_links as SocialLink[] : [],
+    skills: raw.skills,
+    experience_level: raw.experience_level,
+    interests: raw.interests,
+    time_commitment: raw.time_commitment,
+    contributions: raw.contributions,
+    location: raw.location,
+    contact_email: raw.contact_email,
+    contact_phone: raw.contact_phone,
+    how_found_us: raw.how_found_us,
+    availability: raw.availability,
+    participant_media: raw.participant_media as ParticipantMedia[] || [],
+    created_at: raw.created_at,
+    updated_at: raw.updated_at
+  };
+}
 export const fetchParticipantsWithMedia = async () => {
   try {
     const { data: participants, error } = await supabase
@@ -121,7 +179,7 @@ export const fetchParticipantsWithMedia = async () => {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return participants || [];
+    return (participants || []).map(transformParticipantData);
   } catch (error) {
     logError('fetchParticipantsWithMedia', error);
     throw error;
@@ -143,20 +201,35 @@ export const fetchSponsors = async () => {
   }
 };
 
+// Types for project relationships
+interface ProjectRelationships {
+  participants?: Array<{ participant_id: string; role: string }>;
+  sponsors?: string[];
+  links?: Array<{ type: string; url: string }>;
+  tags?: string[];
+  media?: Array<{ type: string; url: string; title: string; description?: string }>;
+  budget?: { amount?: number; currency?: string; breakdown?: unknown[] };
+  timeline?: { start_date?: string; end_date?: string; milestones?: unknown[] };
+  access?: { requirements?: string[]; target_audience?: string; capacity?: number; registration_required?: boolean };
+}
+
+interface ProjectData {
+  title: string;
+  slug?: string;
+  description: string;
+  full_description?: string;
+  purpose?: string;
+  expected_impact?: string;
+  associations?: string[];
+  image_path?: string;
+  [key: string]: unknown;
+}
+
 // Enhanced form submission utilities
 export const updateProjectWithRelationships = async (
   projectId: string,
-  projectData: any,
-  relationships: {
-    participants?: Array<{ participant_id: string; role: string }>;
-    sponsors?: string[];
-    links?: Array<{ type: string; url: string }>;
-    tags?: string[];
-    media?: Array<{ type: string; url: string; title: string; description?: string }>;
-    budget?: { amount?: number; currency?: string; breakdown?: any[] };
-    timeline?: { start_date?: string; end_date?: string; milestones?: any[] };
-    access?: { requirements?: string[]; target_audience?: string; capacity?: number; registration_required?: boolean };
-  }
+  projectData: ProjectData,
+  relationships: ProjectRelationships
 ) => {
   try {
     // Update project first
@@ -254,10 +327,12 @@ export const updateProjectWithRelationships = async (
       relationPromises.push(
         supabase
           .from('project_budget')
-          .insert([{
+          .insert({
             project_id: projectId,
-            ...relationships.budget
-          }])
+            amount: relationships.budget.amount,
+            currency: relationships.budget.currency,
+            breakdown: relationships.budget.breakdown as Json
+          })
       );
     }
 
@@ -265,10 +340,12 @@ export const updateProjectWithRelationships = async (
       relationPromises.push(
         supabase
           .from('project_timeline')
-          .insert([{
+          .insert({
             project_id: projectId,
-            ...relationships.timeline
-          }])
+            start_date: relationships.timeline.start_date,
+            end_date: relationships.timeline.end_date,
+            milestones: relationships.timeline.milestones as Json
+          })
       );
     }
 
@@ -294,23 +371,20 @@ export const updateProjectWithRelationships = async (
 };
 
 export const createProjectWithRelationships = async (
-  projectData: any,
-  relationships: {
-    participants?: Array<{ participant_id: string; role: string }>;
-    sponsors?: string[];
-    links?: Array<{ type: string; url: string }>;
-    tags?: string[];
-    media?: Array<{ type: string; url: string; title: string; description?: string }>;
-    budget?: { amount?: number; currency?: string; breakdown?: any[] };
-    timeline?: { start_date?: string; end_date?: string; milestones?: any[] };
-    access?: { requirements?: string[]; target_audience?: string; capacity?: number; registration_required?: boolean };
-  }
+  projectData: ProjectData,
+  relationships: ProjectRelationships
 ) => {
   try {
+    // Ensure slug is provided, generate from title if missing
+    const dataToInsert = {
+      ...projectData,
+      slug: projectData.slug || projectData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    };
+
     // Create project first
     const { data: project, error: projectError } = await supabase
       .from('projects')
-      .insert([projectData])
+      .insert(dataToInsert)
       .select()
       .single();
 
@@ -389,10 +463,12 @@ export const createProjectWithRelationships = async (
       relationPromises.push(
         supabase
           .from('project_budget')
-          .insert([{
+          .insert({
             project_id: project.id,
-            ...relationships.budget
-          }])
+            amount: relationships.budget.amount,
+            currency: relationships.budget.currency,
+            breakdown: relationships.budget.breakdown as Json
+          })
       );
     }
 
@@ -400,10 +476,12 @@ export const createProjectWithRelationships = async (
       relationPromises.push(
         supabase
           .from('project_timeline')
-          .insert([{
+          .insert({
             project_id: project.id,
-            ...relationships.timeline
-          }])
+            start_date: relationships.timeline.start_date,
+            end_date: relationships.timeline.end_date,
+            milestones: relationships.timeline.milestones as Json
+          })
       );
     }
 

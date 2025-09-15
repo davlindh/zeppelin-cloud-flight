@@ -132,8 +132,9 @@ export const ParticipantForm = ({ onClose, participantId }: ParticipantFormProps
       });
 
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create participant');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create participant';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

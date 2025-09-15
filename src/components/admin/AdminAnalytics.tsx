@@ -6,6 +6,15 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Users, MapPin, Clock, Award } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Submission = Tables<'submissions'>;
+
+interface SubmissionContent {
+  experienceLevel?: string;
+  interests?: string[];
+  roles?: string[];
+}
 
 interface AnalyticsData {
   submissionsByType: { name: string; value: number; }[];
@@ -64,7 +73,8 @@ export const AdminAnalytics = () => {
       ).map(([name, value]) => ({ name, value }));
 
       const experienceCount = submissions.reduce((acc, sub) => {
-        const exp = (sub.content as any)?.experienceLevel;
+        const content = sub.content as SubmissionContent;
+        const exp = content?.experienceLevel;
         if (exp) acc[exp] = (acc[exp] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
@@ -86,7 +96,8 @@ export const AdminAnalytics = () => {
 
       // Popular interests
       const interestCount = submissions.reduce((acc, sub) => {
-        const interests = (sub.content as any)?.interests || [];
+        const content = sub.content as SubmissionContent;
+        const interests = content?.interests || [];
         if (Array.isArray(interests)) {
           interests.forEach((interest: string) => {
             acc[interest] = (acc[interest] || 0) + 1;
@@ -102,7 +113,8 @@ export const AdminAnalytics = () => {
 
       // Popular roles
       const roleCount = submissions.reduce((acc, sub) => {
-        const roles = (sub.content as any)?.roles || [];
+        const content = sub.content as SubmissionContent;
+        const roles = content?.roles || [];
         if (Array.isArray(roles)) {
           roles.forEach((role: string) => {
             acc[role] = (acc[role] || 0) + 1;

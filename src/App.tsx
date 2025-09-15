@@ -1,35 +1,44 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MediaProvider } from "@/contexts/MediaContext";
+import { UnifiedMediaProvider } from "@/contexts/UnifiedMediaContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { AdminProvider } from "@/contexts/AdminContext";
 import { PermissionProvider } from "@/components/providers/PermissionProvider";
 import { MediaErrorBoundary } from "@/components/ui/MediaErrorBoundary";
-import { PersistentPlayer } from "../components/multimedia/EnhancedPersistentPlayer";
-import { RootLayout } from "../components/layout";
-import { HomePage } from "../pages/HomePage";
+import { RootLayout } from "./components/layout";
+import { HomePage } from "./pages/HomePage";
 import { ShowcasePage } from "./pages/ShowcasePage";
 import { ProjectDetailPage } from "./pages/ProjectDetailPage";
 import { ParticipantsPage } from "./pages/ParticipantsPage";
 import { ParticipantDetailPage } from "./pages/ParticipantDetailPage";
+import { PartnersPage } from "./pages/PartnersPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
+import { ComponentTest } from "./components/admin/ComponentTest";
 import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
+import { queryClient } from "./lib/queryClient";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AdminAuthProvider>
         <MediaProvider>
+          <UnifiedMediaProvider>
           <PermissionProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true
+              }}
+            >
               <Routes>
                 <Route path="/" element={<RootLayout />}>
                   <Route index element={<Navigate to="/home" replace />} />
@@ -38,26 +47,35 @@ const App = () => (
                   <Route path="showcase/:slug" element={<ProjectDetailPage />} />
                   <Route path="participants" element={<ParticipantsPage />} />
                   <Route path="participants/:slug" element={<ParticipantDetailPage />} />
+                  <Route path="partners" element={<PartnersPage />} />
                 </Route>
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route path="/admin" element={
-                  <AdminRoute>
-                    <AdminDashboardPage />
-                  </AdminRoute>
+                  <AdminProvider>
+                    <AdminRoute>
+                      <AdminDashboardPage />
+                    </AdminRoute>
+                  </AdminProvider>
                 } />
                 
+                {/* Component compatibility test */}
+                <Route path="/component-test" element={<ComponentTest />} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
             <MediaErrorBoundary>
-              <PersistentPlayer />
+              <div />
             </MediaErrorBoundary>
           </PermissionProvider>
+          </UnifiedMediaProvider>
         </MediaProvider>
       </AdminAuthProvider>
     </TooltipProvider>
+    {/* React Query DevTools - only in development */}
+    <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>
 );
 

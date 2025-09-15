@@ -1,258 +1,307 @@
-import React from 'react';
-import { Search, Filter, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
+import React, { useState, useMemo, useCallback } from 'react';
+import { cn } from '@/lib/utils';
+import FilterGroup from './FilterGroup';
 
-interface FilterOptions {
-  roles: string[];
-  skills: string[];
-  experienceLevel: string[];
-  contributionTypes: string[];
+// Enhanced Participant Filters Component with Context7 Best Practices
+// Features: Advanced filtering, search, sorting, accessibility, performance optimization
+
+interface FilterOption {
+  id: string;
+  label: string;
+  value: string | number;
+  count?: number;
+  icon?: React.ReactNode;
+  color?: string;
 }
 
-interface ActiveFilters {
-  searchTerm: string;
-  roles: string[];
-  skills: string[];
-  experienceLevel: string[];
-  contributionTypes: string[];
+interface FilterGroup {
+  id: string;
+  label: string;
+  type: 'single' | 'multiple' | 'range' | 'search';
+  options?: FilterOption[];
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
 }
+
+interface SortOption {
+  id: string;
+  label: string;
+  value: string;
+  direction: 'asc' | 'desc';
+  icon?: React.ReactNode;
+}
+
+type ActiveFilters = Record<string, string[] | { min: number; max: number } | string>;
 
 interface EnhancedParticipantFiltersProps {
-  filters: ActiveFilters;
-  availableFilters: FilterOptions;
+  filters: FilterGroup[];
+  sortOptions?: SortOption[];
+  searchPlaceholder?: string;
   onFiltersChange: (filters: ActiveFilters) => void;
-  resultCount: number;
-  totalCount: number;
+  onSortChange?: (sort: SortOption) => void;
+  onSearchChange?: (search: string) => void;
+  onReset?: () => void;
+  className?: string;
+  layout?: 'horizontal' | 'vertical' | 'grid';
+  showSearch?: boolean;
+  showSort?: boolean;
+  showReset?: boolean;
+  compact?: boolean;
+  theme?: 'default' | 'modern' | 'minimal';
+  animation?: boolean;
+  accessibility?: {
+    ariaLabel?: string;
+    liveRegion?: boolean;
+  };
 }
 
-export const EnhancedParticipantFilters: React.FC<EnhancedParticipantFiltersProps> = ({
+const EnhancedParticipantFilters: React.FC<EnhancedParticipantFiltersProps> = ({
   filters,
-  availableFilters,
+  sortOptions = [],
+  searchPlaceholder = 'Search participants...',
   onFiltersChange,
-  resultCount,
-  totalCount
+  onSortChange,
+  onSearchChange,
+  onReset,
+  className,
+  layout = 'horizontal',
+  showSearch = true,
+  showSort = true,
+  showReset = true,
+  compact = false,
+  theme = 'default',
+  animation = true,
+  accessibility,
 }) => {
-  const updateFilter = (key: keyof ActiveFilters, value: any) => {
-    onFiltersChange({
-      ...filters,
-      [key]: value
-    });
-  };
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSort, setSelectedSort] = useState<SortOption | null>(null);
+  const [isExpanded, setIsExpanded] = useState(!compact);
 
-  const toggleArrayFilter = (key: 'roles' | 'skills' | 'experienceLevel' | 'contributionTypes', value: string) => {
-    const currentArray = filters[key];
-    const newArray = currentArray.includes(value)
-      ? currentArray.filter(item => item !== value)
-      : [...currentArray, value];
-    
-    updateFilter(key, newArray);
-  };
+  // Handle filter changes
+  const handleFilterChange = useCallback((filterId: string, value: string[] | { min: number; max: number } | string) => {
+    setActiveFilters(prev => ({ ...prev, [filterId]: value }));
+    onFiltersChange({ ...activeFilters, [filterId]: value });
+  }, [activeFilters, onFiltersChange]);
 
-  const clearAllFilters = () => {
-    onFiltersChange({
-      searchTerm: '',
-      roles: [],
-      skills: [],
-      experienceLevel: [],
-      contributionTypes: []
-    });
-  };
+  // Handle search changes
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+    onSearchChange?.(value);
+  }, [onSearchChange]);
 
-  const hasActiveFilters = filters.searchTerm || 
-    filters.roles.length > 0 || 
-    filters.skills.length > 0 || 
-    filters.experienceLevel.length > 0 || 
-    filters.contributionTypes.length > 0;
+  // Handle sort changes
+  const handleSortChange = useCallback((sort: SortOption) => {
+    setSelectedSort(sort);
+    onSortChange?.(sort);
+  }, [onSortChange]);
 
-  const FilterPopover: React.FC<{
-    title: string;
-    options: string[];
-    selectedValues: string[];
-    onToggle: (value: string) => void;
-  }> = ({ title, options, selectedValues, onToggle }) => (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Filter className="h-4 w-4" />
-          {title}
-          {selectedValues.length > 0 && (
-            <Badge variant="secondary" className="ml-1">
-              {selectedValues.length}
-            </Badge>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-64" align="start">
-        <div className="space-y-2">
-          <h4 className="font-medium text-sm">{title}</h4>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {options.map((option) => (
-              <div key={option} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${title}-${option}`}
-                  checked={selectedValues.includes(option)}
-                  onCheckedChange={() => onToggle(option)}
-                />
-                <label
-                  htmlFor={`${title}-${option}`}
-                  className="text-sm cursor-pointer flex-1"
-                >
-                  {option}
-                </label>
-              </div>
-            ))}
-          </div>
-          {selectedValues.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => selectedValues.forEach(value => onToggle(value))}
-              className="w-full text-xs"
-            >
-              Rensa alla
-            </Button>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+  // Handle reset
+  const handleReset = useCallback(() => {
+    setActiveFilters({});
+    setSearchTerm('');
+    setSelectedSort(null);
+    onFiltersChange({});
+    onSearchChange?.('');
+    onSortChange?.(sortOptions[0]);
+    onReset?.();
+  }, [onFiltersChange, onSearchChange, onSortChange, onReset, sortOptions]);
+
+  // Get active filter count
+  const activeFilterCount = useMemo(() => {
+    return Object.values(activeFilters).filter(value => {
+      if (Array.isArray(value)) {
+        return value.length > 0;
+      }
+      if (typeof value === 'string') {
+        return value !== '';
+      }
+      if (typeof value === 'object' && value !== null) {
+        return true; // range objects are considered active
+      }
+      return false;
+    }).length;
+  }, [activeFilters]);
+
+  // Generate container classes
+  const containerClasses = cn(
+    'relative',
+    {
+      'flex flex-wrap gap-4 items-center': layout === 'horizontal',
+      'flex flex-col gap-4': layout === 'vertical',
+      'grid gap-4': layout === 'grid',
+      'p-4 bg-card border border-border rounded-lg shadow-sm': theme === 'default',
+      'p-6 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl shadow-lg': theme === 'modern',
+      'p-2 bg-transparent border-none shadow-none': theme === 'minimal',
+      'transition-all duration-300 ease-in-out': animation,
+    },
+    className
   );
 
-  return (
-    <div className="space-y-4">
-      {/* Search and primary filters */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            type="text"
-            placeholder="Sök deltagare, roller, eller färdigheter..."
-            value={filters.searchTerm}
-            onChange={(e) => updateFilter('searchTerm', e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        
-        <div className="flex flex-wrap gap-2">
-          {availableFilters.roles.length > 0 && (
-            <FilterPopover
-              title="Roller"
-              options={availableFilters.roles}
-              selectedValues={filters.roles}
-              onToggle={(value) => toggleArrayFilter('roles', value)}
-            />
-          )}
-          
-          {availableFilters.contributionTypes.length > 0 && (
-            <FilterPopover
-              title="Bidragstyper"
-              options={availableFilters.contributionTypes}
-              selectedValues={filters.contributionTypes}
-              onToggle={(value) => toggleArrayFilter('contributionTypes', value)}
-            />
-          )}
-          
-          {availableFilters.skills.length > 0 && (
-            <FilterPopover
-              title="Färdigheter"
-              options={availableFilters.skills}
-              selectedValues={filters.skills}
-              onToggle={(value) => toggleArrayFilter('skills', value)}
-            />
-          )}
-          
-          {availableFilters.experienceLevel.length > 0 && (
-            <FilterPopover
-              title="Erfarenhetsnivå"
-              options={availableFilters.experienceLevel}
-              selectedValues={filters.experienceLevel}
-              onToggle={(value) => toggleArrayFilter('experienceLevel', value)}
-            />
-          )}
-        </div>
+  // Search input component
+  const SearchInput = () => (
+    <div className="relative flex-1 min-w-0">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg className="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
       </div>
-
-      {/* Active filters and results */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Visar {resultCount} av {totalCount} deltagare</span>
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="h-auto p-1"
-            >
-              <X className="h-3 w-3 mr-1" />
-              Rensa filter
-            </Button>
-          )}
-        </div>
-
-        {/* Active filters display */}
-        {hasActiveFilters && (
-          <div className="flex flex-wrap gap-1">
-            {filters.roles.map(role => (
-              <Badge key={role} variant="secondary" className="text-xs">
-                {role}
-                <button
-                  onClick={() => toggleArrayFilter('roles', role)}
-                  className="ml-1 hover:text-destructive"
-                >
-                  <X className="h-2.5 w-2.5" />
-                </button>
-              </Badge>
-            ))}
-            {filters.contributionTypes.map(type => (
-              <Badge key={type} variant="secondary" className="text-xs">
-                {type}
-                <button
-                  onClick={() => toggleArrayFilter('contributionTypes', type)}
-                  className="ml-1 hover:text-destructive"
-                >
-                  <X className="h-2.5 w-2.5" />
-                </button>
-              </Badge>
-            ))}
-            {filters.skills.map(skill => (
-              <Badge key={skill} variant="secondary" className="text-xs">
-                {skill}
-                <button
-                  onClick={() => toggleArrayFilter('skills', skill)}
-                  className="ml-1 hover:text-destructive"
-                >
-                  <X className="h-2.5 w-2.5" />
-                </button>
-              </Badge>
-            ))}
-            {filters.experienceLevel.map(level => (
-              <Badge key={level} variant="secondary" className="text-xs">
-                {level}
-                <button
-                  onClick={() => toggleArrayFilter('experienceLevel', level)}
-                  className="ml-1 hover:text-destructive"
-                >
-                  <X className="h-2.5 w-2.5" />
-                </button>
-              </Badge>
-            ))}
-          </div>
+      <input
+        type="text"
+        placeholder={searchPlaceholder}
+        value={searchTerm}
+        onChange={(e) => handleSearchChange(e.target.value)}
+        className={cn(
+          'block w-full pl-10 pr-3 py-2 border border-border rounded-md leading-5 bg-background placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors',
+          {
+            'text-sm': compact,
+            'text-base': !compact,
+          }
         )}
+        aria-label={accessibility?.ariaLabel || 'Search participants'}
+      />
+      {searchTerm && (
+        <button
+          onClick={() => handleSearchChange('')}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          aria-label="Clear search"
+        >
+          <svg className="h-5 w-5 text-muted-foreground hover:text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+
+  // Sort dropdown component
+  const SortDropdown = () => (
+    <div className="relative">
+      <select
+        value={selectedSort?.id || ''}
+        onChange={(e) => {
+          const sort = sortOptions.find(s => s.id === e.target.value);
+          if (sort) handleSortChange(sort);
+        }}
+        className={cn(
+          'appearance-none px-3 py-2 pr-8 border border-border rounded-md bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer',
+          {
+            'text-sm': compact,
+            'text-base': !compact,
+          }
+        )}
+        aria-label="Sort participants"
+      >
+        <option value="">Sort by...</option>
+        {sortOptions.map((sort) => (
+          <option key={sort.id} value={sort.id}>
+            {sort.label}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+        <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
       </div>
     </div>
   );
+
+  return (
+    <div className={containerClasses} role="region" aria-label={accessibility?.ariaLabel || 'Participant filters'}>
+      {/* Mobile toggle for compact mode */}
+      {compact && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center justify-between w-full p-2 text-left"
+          aria-expanded={isExpanded}
+        >
+          <span className="flex items-center">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
+                {activeFilterCount}
+              </span>
+            )}
+          </span>
+          <svg
+            className={cn('h-5 w-5 transition-transform', {
+              'transform rotate-180': isExpanded,
+            })}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      )}
+
+      {/* Filter content */}
+      {(isExpanded || !compact) && (
+        <div className={cn(
+          'flex flex-wrap gap-4 items-end',
+          {
+            'flex-col': layout === 'vertical',
+            'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4': layout === 'grid',
+          }
+        )}>
+          {/* Search */}
+          {showSearch && (
+            <div className={cn('flex-1 min-w-0', {
+              'order-first': layout === 'vertical',
+            })}>
+              <SearchInput />
+            </div>
+          )}
+
+          {/* Filters */}
+          {filters.map((filter) => (
+            <div key={filter.id} className="min-w-0">
+              <FilterGroup
+                filter={filter}
+                activeFilters={activeFilters}
+                handleFilterChange={handleFilterChange}
+                compact={compact}
+              />
+            </div>
+          ))}
+
+          {/* Sort */}
+          {showSort && sortOptions.length > 0 && (
+            <div className="min-w-0">
+              <SortDropdown />
+            </div>
+          )}
+
+          {/* Reset */}
+          {showReset && (activeFilterCount > 0 || searchTerm || selectedSort) && (
+            <button
+              onClick={handleReset}
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-accent transition-colors"
+              aria-label="Reset all filters"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Live region for accessibility */}
+      {accessibility?.liveRegion && (
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {activeFilterCount > 0 && `${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} applied`}
+          {searchTerm && `Searching for "${searchTerm}"`}
+        </div>
+      )}
+    </div>
+  );
 };
+
+export { EnhancedParticipantFilters };
+export type { EnhancedParticipantFiltersProps, FilterOption, FilterGroup, SortOption, ActiveFilters };

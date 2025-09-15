@@ -12,6 +12,20 @@ import { fetchProjectsWithRelationships, logError } from '@/utils/adminApi';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import type { Participant, Sponsor } from '@/types/admin';
+
+interface ShowcaseItem {
+  id: string;
+  title: string;
+  description: string;
+  image_path?: string;
+  created_at: string;
+  updated_at: string;
+  participants?: Array<{ role: string; participants: Participant }>;
+  sponsors?: Array<{ sponsors: Sponsor }>;
+  tags?: string[];
+  slug?: string;
+}
 
 interface ShowcaseManagementListProps {
   onAddShowcase: () => void;
@@ -21,7 +35,7 @@ interface ShowcaseManagementListProps {
 
 export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewShowcase }: ShowcaseManagementListProps) => {
   const { toast } = useToast();
-  const [showcases, setShowcases] = useState<any[]>([]);
+  const [showcases, setShowcases] = useState<ShowcaseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,35 +45,35 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
   const [selectedShowcases, setSelectedShowcases] = useState<string[]>([]);
 
   useEffect(() => {
+    const loadShowcases = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchProjectsWithRelationships();
+        setShowcases(data as unknown as ShowcaseItem[]);
+      } catch (err) {
+        logError('loadShowcases', err);
+        setError('Failed to load showcase items');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const setupRealtimeSubscription = () => {
+      const channel = supabase
+        .channel('showcase_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, loadShowcases)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'project_participants' }, loadShowcases)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'project_sponsors' }, loadShowcases)
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
     loadShowcases();
     setupRealtimeSubscription();
   }, []);
-
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('showcase_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, loadShowcases)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'project_participants' }, loadShowcases)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'project_sponsors' }, loadShowcases)
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
-
-  const loadShowcases = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchProjectsWithRelationships();
-      setShowcases(data);
-    } catch (err) {
-      logError('loadShowcases', err);
-      setError('Failed to load showcase items');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const deleteShowcase = async (id: string) => {
     try {
@@ -77,10 +91,11 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
         title: 'Showcase item deleted',
         description: 'The showcase item has been removed successfully.',
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete showcase item';
       toast({
         title: 'Error',
-        description: err.message || 'Failed to delete showcase item',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -104,10 +119,11 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
         title: 'Bulk delete completed',
         description: `${selectedShowcases.length} showcase items have been deleted.`,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete showcase items';
       toast({
         title: 'Error',
-        description: err.message || 'Failed to delete showcase items',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -117,15 +133,15 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
     const csvContent = showcases.map(item => ({
       title: item.title,
       description: item.description,
-      participants: item.participants?.length || 0,
-      sponsors: item.sponsors?.length || 0,
+      participants: String(item.participants?.length || 0),
+      sponsors: String(item.sponsors?.length || 0),
       tags: item.tags?.join(', ') || '',
       created: new Date(item.created_at).toLocaleDateString()
     }));
 
     const csv = [
       Object.keys(csvContent[0]).join(','),
-      ...csvContent.map(row => Object.values(row).join(','))
+      ...csvContent.map(row => Object.values(row).map(value => String(value)))
     ].join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -153,22 +169,7 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
       filtered = filtered.filter(item => (item.participants?.length || 0) >= 2);
     }
 
-    // Apply sorting
-    filtered.sort((a, b) => {
-      let aVal = a[sortBy];
-      let bVal = b[sortBy];
-      
-      if (sortBy === 'created_at' || sortBy === 'updated_at') {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      }
-      
-      if (sortOrder === 'asc') {
-        return aVal > bVal ? 1 : -1;
-      } else {
-        return aVal < bVal ? 1 : -1;
-      }
-    });
+    
 
     return filtered;
   };
@@ -255,7 +256,7 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
           </div>
           
           <div className="flex gap-2">
-            <Select value={filterBy} onValueChange={(value: any) => setFilterBy(value)}>
+            <Select value={filterBy} onValueChange={(value: 'all' | 'recent' | 'popular') => setFilterBy(value)}>
               <SelectTrigger className="w-32">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
@@ -267,10 +268,10 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
               </SelectContent>
             </Select>
 
-            <Select value={`${sortBy}-${sortOrder}`} onValueChange={(value) => {
+            <Select value={`${sortBy}-${sortOrder}`} onValueChange={(value: string) => {
               const [field, order] = value.split('-');
-              setSortBy(field as any);
-              setSortOrder(order as any);
+              setSortBy(field as 'title' | 'created_at' | 'updated_at');
+              setSortOrder(order as 'asc' | 'desc');
             }}>
               <SelectTrigger className="w-40">
                 {sortOrder === 'asc' ? <SortAsc className="h-4 w-4 mr-2" /> : <SortDesc className="h-4 w-4 mr-2" />}

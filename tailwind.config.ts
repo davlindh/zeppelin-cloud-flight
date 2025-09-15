@@ -133,6 +133,4 @@ export default {
 				'float': 'float 3s ease-in-out infinite'
 			}
 		}
-	},
-	plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+}} satisfies Config

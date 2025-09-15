@@ -40,7 +40,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     // Set loading timeout as fallback
     const setLoadingTimeout = () => {
       timeoutId = setTimeout(() => {
-        console.log('AdminAuth: Loading timeout reached, setting loading to false');
+        // console.log('AdminAuth: Loading timeout reached, setting loading to false');
         setLoading(false);
       }, 10000); // 10 second timeout
     };
@@ -48,7 +48,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     // Set up auth state listener - CRITICAL: No async callback to prevent deadlocks
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('AdminAuth: Auth state changed', event, session?.user?.email);
+        // console.log('AdminAuth: Auth state changed', event, session?.user?.email);
         
         // Clear any existing timeout
         if (timeoutId) clearTimeout(timeoutId);
@@ -83,7 +83,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     // Check for existing session
     setLoadingTimeout();
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('AdminAuth: Initial session check', session?.user?.email);
+      // console.log('AdminAuth: Initial session check', session?.user?.email);
       
       if (timeoutId) clearTimeout(timeoutId);
       

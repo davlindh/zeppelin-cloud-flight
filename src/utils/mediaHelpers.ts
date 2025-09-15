@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, FileText, Image, Headphones, Video, File, User, Palette, Settings, Star, Archive, Code, Box, Monitor } from 'lucide-react';
 import type { MediaType, MediaCategory } from '@/types/media';
+import type { UnifiedMediaItem, MediaFilters, MediaCollection } from '@/types/unified-media';
 
 export const getMediaIcon = (type: MediaType, size: string = 'w-5 h-5') => {
   const props = { className: size };
@@ -136,4 +137,92 @@ export const getMediaPreviewUrl = (url: string, type: MediaType): string => {
 
 export const generateMediaId = (media: { url: string; title: string }): string => {
   return `${media.url}-${media.title}`.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+};
+
+
+
+export const organizeMediaByCategory = (media: UnifiedMediaItem[]): MediaCollection[] => {
+  const categoryGroups: Record<string, UnifiedMediaItem[]> = {};
+
+  media.forEach(item => {
+    if (!categoryGroups[item.category]) {
+      categoryGroups[item.category] = [];
+    }
+    categoryGroups[item.category].push(item);
+  });
+
+  return Object.entries(categoryGroups).map(([category, items]) => ({
+    id: `collection-${category}`,
+    title: getCategoryLabel(category as MediaCategory),
+    description: `${items.length} media items`,
+    items: items.sort((a, b) => a.title.localeCompare(b.title)),
+    category: category as MediaCategory,
+    thumbnail: items[0]?.thumbnail || items[0]?.url
+  }));
+};
+
+export const filterAndSortMedia = (media: UnifiedMediaItem[], filters: MediaFilters): UnifiedMediaItem[] => {
+  let filtered = [...media];
+
+  // Type filter
+  if (filters.types && filters.types.length > 0) {
+    filtered = filtered.filter(item => filters.types!.includes(item.type));
+  }
+
+  // Category filter
+  if (filters.categories && filters.categories.length > 0) {
+    filtered = filtered.filter(item => filters.categories!.includes(item.category));
+  }
+
+  // Year filter
+  if (filters.year) {
+    filtered = filtered.filter(item => item.year === filters.year);
+  }
+
+  // Search term filter
+  if (filters.searchTerm) {
+    const searchLower = filters.searchTerm.toLowerCase();
+    filtered = filtered.filter(item =>
+      item.title.toLowerCase().includes(searchLower) ||
+      item.description?.toLowerCase().includes(searchLower) ||
+      item.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+    );
+  }
+
+  // Tags filter
+  if (filters.tags && filters.tags.length > 0) {
+    filtered = filtered.filter(item =>
+      item.tags?.some(tag => filters.tags!.includes(tag))
+    );
+  }
+
+  // Sort
+  const { sortBy = 'title', sortOrder = 'asc' } = filters;
+  filtered.sort((a, b) => {
+    let comparison = 0;
+
+    switch (sortBy) {
+      case 'title':
+        comparison = a.title.localeCompare(b.title);
+        break;
+      case 'type':
+        comparison = a.type.localeCompare(b.type);
+        break;
+      case 'year':
+        comparison = (a.year || '').localeCompare(b.year || '');
+        break;
+      case 'created':
+        comparison = String(a.metadata?.createdAt || '').localeCompare(String(b.metadata?.createdAt || ''));
+        break;
+      case 'size':
+        comparison = (a.size || 0) - (b.size || 0);
+        break;
+      default:
+        comparison = 0;
+    }
+
+    return sortOrder === 'desc' ? -comparison : comparison;
+  });
+
+  return filtered;
 };

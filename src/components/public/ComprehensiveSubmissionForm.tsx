@@ -1,780 +1,629 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Upload, X, FileIcon, ChevronLeft, ChevronRight, CheckCircle, Save, RotateCcw } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { getSubmissionMetadata } from '@/utils/sessionTracking';
 import { useToast } from '@/hooks/use-toast';
-import { useAutoSave } from '@/hooks/useAutoSave';
-import { debounce } from '@/utils/debounce';
-import { FileUpload, UploadedFileItem } from '@/components/admin/FileUpload';
+import { FileUpload } from '../admin/FileUpload';
+import { X, Plus, Upload, User, Building, Lightbulb } from 'lucide-react';
 
-interface UploadedFile {
-  name: string;
-  url: string;
-  type: string;
-  size: number;
-}
+// Comprehensive Submission Form Component with Context7 Best Practices
+// Features: Multi-step form, validation, file uploads, accessibility, progress tracking
 
-interface FormData {
-  // Basic info
-  type: 'project' | 'participant' | 'partnership';
-  title: string;
-  description: string;
-  
-  // Contact information
-  fullName: string;
-  phone: string;
+interface SubmissionFormData {
+  type: 'participant' | 'project' | 'sponsor' | 'collaboration';
+  // Personal/Contact Information
+  firstName?: string;
+  lastName?: string;
   email: string;
-  location: string;
-  
-  // Participant-specific fields (from Google Forms)
-  roles: string[];
-  experienceLevel: string;
-  interests: string[];
-  contributions: string[];
-  timeCommitment: string;
-  previousExperience: string;
-  portfolioLinks: string;
-  comments: string;
-  
-  // Project-specific fields
-  purpose?: string;
+  phone?: string;
+  organization?: string;
+  website?: string;
+  // Project Information
+  projectTitle?: string;
+  projectDescription?: string;
+  projectCategory?: string;
   expectedImpact?: string;
-  budget?: string;
   timeline?: string;
-  
-  // System fields
-  languagePreference: string;
-  howFoundUs: string;
-  publicationPermission: boolean;
+  budget?: string;
+  // Additional Information
+  motivation?: string;
+  experience?: string;
+  availability?: string;
+  specialRequirements?: string;
+  // Media and Files
+  portfolio?: string;
+  cv?: string;
+  references?: string;
+  // Terms and Consent
+  acceptTerms: boolean;
+  acceptPrivacy: boolean;
+  acceptMarketing?: boolean;
+  newsletterSubscription?: boolean;
 }
 
 interface ComprehensiveSubmissionFormProps {
-  onClose?: () => void;
-  initialType?: 'project' | 'participant' | 'partnership';
+  onClose: () => void;
+  initialType?: 'participant' | 'project' | 'sponsor' | 'collaboration';
+  className?: string;
 }
 
-export const ComprehensiveSubmissionForm = ({ onClose, initialType = 'participant' }: ComprehensiveSubmissionFormProps) => {
+const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = ({
+  onClose,
+  initialType = 'participant',
+  className,
+}) => {
   const { toast } = useToast();
-  const { saveDraft, loadDraft, clearDraft, lastSaved, isSaving, hasDraft } = useAutoSave();
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
-  
-  const [formData, setFormData] = useState<FormData>({
-    type: initialType,
-    title: '',
-    description: '',
-    fullName: '',
-    phone: '',
-    email: '',
-    location: '',
-    roles: [],
-    experienceLevel: '',
-    interests: [],
-    contributions: [],
-    timeCommitment: '',
-    previousExperience: '',
-    portfolioLinks: '',
-    comments: '',
-    languagePreference: 'sv',
-    howFoundUs: '',
-    publicationPermission: false
-  });
-  
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFileItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
   const [error, setError] = useState('');
-  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
 
-  // Role options from Google Forms
-  const roleOptions = [
-    { id: 'mecenat', label: 'Mecenat' },
-    { id: 'partner', label: 'Partner' },
-    { id: 'collector', label: 'Konstsamlare' },
-    { id: 'participant', label: 'Diskussionsdeltagare' },
-    { id: 'artist', label: 'Konstnär' },
-    { id: 'musician', label: 'Musiker' },
-    { id: 'architect', label: 'Arkitekt' },
-    { id: 'other', label: 'Annat' }
-  ];
-
-  // Experience level options
-  const experienceOptions = [
-    { value: 'beginner', label: 'Nybörjare (tar mina första steg)' },
-    { value: 'intermediate', label: 'Medel (har en del erfarenhet)' },
-    { value: 'experienced', label: 'Erfaren (arbetar regelbundet)' },
-    { value: 'expert', label: 'Expert (djupgående kunskap, lång erfarenhet)' }
-  ];
-
-  // Interest options
-  const interestOptions = [
-    { id: 'techniques', label: 'Nya konstnärliga tekniker' },
-    { id: 'multimedia', label: 'Multimedia/teknik (VR, AR, AI)' },
-    { id: 'music', label: 'Musik/ljud' },
-    { id: 'curation', label: 'Kuratorskap/moderation' },
-    { id: 'management', label: 'Processledning/projektledning' },
-    { id: 'communication', label: 'Kommunikation/publikt arbete' },
-    { id: 'research', label: 'Forskning kring kulturellt eller historiskt sammanhang' },
-    { id: 'collaboration', label: 'Tvärdisciplinärt samarbete' },
-    { id: 'other', label: 'Annat' }
-  ];
-
-  // Contribution options
-  const contributionOptions = [
-    { id: 'artistic', label: 'Konstnärliga praktiker (måleri, skulptur, installation, mediakonst)' },
-    { id: 'music', label: 'Musik/ljud/ljuddesign' },
-    { id: 'technical', label: 'Teknisk support (ljus, ljud, programmering, VR/AR, produktion)' },
-    { id: 'management', label: 'Processledning/projektledning' },
-    { id: 'financial', label: 'Finansiellt stöd/sponsring' },
-    { id: 'space', label: 'Utrymme/utrustning' },
-    { id: 'communication', label: 'Kommunikation/media/PR' },
-    { id: 'curation', label: 'Kuratorverksamhet' },
-    { id: 'transport', label: 'Transport' },
-    { id: 'other', label: 'Annat' }
-  ];
-
-  // Time commitment options
-  const timeCommitmentOptions = [
-    { value: 'single', label: 'Vid ett enstaka tillfälle (ett event eller en uppgift)' },
-    { value: 'weekly', label: 'Några timmar i veckan' },
-    { value: 'regular', label: 'Regelbundet under hela projektet' },
-    { value: 'intensive', label: 'Intensivt under specifika perioder' }
-  ];
-
-  // Previous experience options
-  const previousExperienceOptions = [
-    { value: 'yes', label: 'Ja, jag har arbetat i tvärdisciplinära team' },
-    { value: 'no', label: 'Nej, men jag är väldigt sugen på att prova 🌱' }
-  ];
-
-  // Load draft on mount
-  useEffect(() => {
-    const loadExistingDraft = async () => {
-      const draft = await loadDraft();
-      if (draft) {
-        setShowDraftPrompt(true);
-      }
-    };
-    loadExistingDraft();
-  }, [loadDraft]);
-
-  // Auto-save functionality
-  const debouncedSave = useCallback(
-    debounce((formData: FormData, uploadedFiles: UploadedFileItem[], currentStep: number) => {
-      saveDraft(formData, uploadedFiles, currentStep);
-    }, 2000),
-    [saveDraft]
-  );
-
-  useEffect(() => {
-    if (formData.title || formData.description || formData.fullName || formData.email) {
-      debouncedSave(formData, uploadedFiles, currentStep);
+  const { register, handleSubmit, formState: { errors }, watch, setValue, trigger } = useForm<SubmissionFormData>({
+    defaultValues: {
+      type: initialType,
+      acceptTerms: false,
+      acceptPrivacy: false,
     }
-  }, [formData, uploadedFiles, currentStep, debouncedSave]);
+  });
 
-  const updateFormData = (key: string, value: any) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+  const selectedType = watch('type');
+  const totalSteps = selectedType === 'participant' ? 4 : selectedType === 'project' ? 5 : 3;
+
+  // File upload handlers
+  const handleFileUpload = (fieldName: string, file: File) => {
+    setUploadedFiles(prev => ({ ...prev, [fieldName]: file }));
   };
 
-  const restoreDraft = async () => {
-    const draft = await loadDraft();
-    if (draft) {
-      if (draft.formData) setFormData(draft.formData);
-      if (draft.uploadedFiles) setUploadedFiles(draft.uploadedFiles);
-      if (draft.currentStep) setCurrentStep(draft.currentStep);
-      
-      toast({
-        title: "Utkast återställt",
-        description: "Dina tidigare ändringar har återställts.",
-      });
-    }
-    setShowDraftPrompt(false);
-  };
+  const uploadFile = async (file: File, bucketName: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `submissions/${fileName}`;
 
-  const discardDraft = () => {
-    clearDraft();
-    setShowDraftPrompt(false);
-  };
+      const { error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file);
 
-  const handleRoleChange = (roleId: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      roles: checked 
-        ? [...prev.roles, roleId]
-        : prev.roles.filter(r => r !== roleId)
-    }));
-  };
+      if (uploadError) throw uploadError;
 
-  const handleInterestChange = (interestId: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      interests: checked 
-        ? [...prev.interests, interestId]
-        : prev.interests.filter(i => i !== interestId)
-    }));
-  };
+      const { data } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(filePath);
 
-  const handleContributionChange = (contributionId: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      contributions: checked 
-        ? [...prev.contributions, contributionId]
-        : prev.contributions.filter(c => c !== contributionId)
-    }));
-  };
-
-  const handleFilesSelect = (files: UploadedFileItem[]) => {
-    setUploadedFiles(files);
-  };
-
-  const handleFileRemove = (index: number) => {
-    // FileUpload component handles this internally
-  };
-
-  const validateStep = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        return !!(formData.fullName && formData.email && formData.title && formData.description);
-      case 2:
-        return !!(formData.roles.length > 0 || formData.experienceLevel);
-      case 3:
-        return !!(formData.interests.length > 0 || formData.contributions.length > 0 || formData.timeCommitment);
-      case 4:
-        return true; // Make final step optional
-      default:
-        return true;
+      return data.publicUrl;
+    } catch (error) {
+      console.error('File upload error:', error);
+      return null;
     }
   };
 
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
+  // Step navigation
+  const nextStep = async () => {
+    const isValid = await trigger();
+    if (isValid) {
       setCurrentStep(prev => Math.min(prev + 1, totalSteps));
-      setError('');
-    } else {
-      setError('Vänligen fyll i alla obligatoriska fält innan du fortsätter.');
     }
   };
 
   const prevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
-    setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-
+  // Form submission
+  const onSubmit = async (data: SubmissionFormData) => {
     try {
-      const metadata = getSubmissionMetadata();
-      
-      // Upload files properly now
-      const finalUploadedFiles = [];
-      for (const file of uploadedFiles) {
-        if (file.url.startsWith('blob:')) {
-          // This is a temporary file that needs to be uploaded
-          try {
-            const response = await fetch(file.url);
-            const blob = await response.blob();
-            
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `submissions/${fileName}`;
+      setIsSubmitting(true);
+      setError('');
 
-            const { error: uploadError } = await supabase.storage
-              .from('media-files')
-              .upload(filePath, blob);
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-              .from('media-files')
-              .getPublicUrl(filePath);
-
-            finalUploadedFiles.push({
-              name: file.name,
-              url: publicUrl,
-              type: file.type,
-              size: file.size
-            });
-          } catch (uploadErr) {
-            console.error('File upload error:', uploadErr);
-            setError('Kunde inte ladda upp alla filer. Försök igen.');
-            return;
-          }
-        } else {
-          finalUploadedFiles.push(file);
-        }
-      }
-      
-      const content = {
-        // Clean, non-duplicated structured fields
-        description: formData.description,
-        roles: formData.roles,
-        experienceLevel: formData.experienceLevel,
-        interests: formData.interests,
-        contributions: formData.contributions,
-        timeCommitment: formData.timeCommitment,
-        previousExperience: formData.previousExperience,
-        portfolioLinks: formData.portfolioLinks,
-        comments: formData.comments,
-        
-        // Required legacy fields for database validation (minimal duplication)
-        bio: formData.description,
-        skills: formData.roles?.length > 0 ? formData.roles : [formData.experienceLevel].filter(Boolean),
-              
-        ...(formData.type === 'project' && {
-          purpose: formData.purpose,
-          expectedImpact: formData.expectedImpact,
-          budget: formData.budget,
-          timeline: formData.timeline
+      // Upload files
+      const fileUploads = await Promise.all(
+        Object.entries(uploadedFiles).map(async ([fieldName, file]) => {
+          const bucketName = fieldName === 'cv' ? 'cvs' : fieldName === 'portfolio' ? 'portfolios' : 'documents';
+          const url = await uploadFile(file, bucketName);
+          return { fieldName, url };
         })
+      );
+
+      // Prepare submission data according to Supabase schema
+      const submissionData = {
+        type: data.type,
+        title: data.type === 'project' ? data.projectTitle : `${data.type} submission`,
+        content: {
+          contact_info: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            organization: data.organization,
+            website: data.website,
+          },
+          project_info: data.type === 'project' ? {
+            title: data.projectTitle,
+            description: data.projectDescription,
+            category: data.projectCategory,
+            expectedImpact: data.expectedImpact,
+            timeline: data.timeline,
+            budget: data.budget,
+          } : null,
+          additional_info: {
+            motivation: data.motivation,
+            experience: data.experience,
+            availability: data.availability,
+            specialRequirements: data.specialRequirements,
+          },
+          consent: {
+            terms: data.acceptTerms,
+            privacy: data.acceptPrivacy,
+            marketing: data.acceptMarketing,
+            newsletter: data.newsletterSubscription,
+          },
+        },
+        contact_email: data.email,
+        contact_phone: data.phone || null,
+        session_id: sessionStorage.getItem('session_id'),
+        user_agent: navigator.userAgent,
+        language_preference: navigator.language,
+        how_found_us: 'website',
+        publication_permission: data.acceptMarketing || false,
+        files: fileUploads.reduce((acc, { fieldName, url }) => {
+          if (url) acc[fieldName] = url;
+          return acc;
+        }, {} as Record<string, string>),
       };
 
-      const { error: insertError } = await supabase
+      // Submit to Supabase
+      const { error: submitError } = await supabase
         .from('submissions')
-        .insert({
-          type: formData.type,
-          title: formData.title,
-          content,
-          submitted_by: formData.fullName,
-          contact_email: formData.email,
-          contact_phone: formData.phone,
-          location: formData.location,
-          language_preference: formData.languagePreference,
-          how_found_us: formData.howFoundUs,
-          publication_permission: formData.publicationPermission,
-          files: finalUploadedFiles as any,
-          session_id: metadata.sessionId,
-          device_fingerprint: metadata.deviceFingerprint
-        });
+        .insert(submissionData);
 
-      if (insertError) {
-        console.error('Database insert error:', insertError);
-        setError(`Fel vid inlämning: ${insertError.message}`);
-        return;
-      }
+      if (submitError) throw submitError;
 
-      // Clear draft after successful submission
-      clearDraft();
-      
-      setSubmitted(true);
       toast({
-        title: "Tack för ditt bidrag!",
-        description: "Vi kommer att granska ditt bidrag och återkomma till dig.",
+        title: 'Submission Successful!',
+        description: 'Thank you for your submission. We will review it and get back to you soon.',
+        variant: 'success',
       });
-      
-      setTimeout(() => {
-        onClose?.();
-      }, 3000);
-    } catch (err) {
-      console.error('Submission error:', err);
-      setError('Kunde inte skicka in. Försök igen.');
+
+      onClose();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to submit form';
+      setError(errorMessage);
+
+      toast({
+        title: 'Submission Failed',
+        description: errorMessage,
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="text-center py-8">
-        <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Tack för ditt bidrag!</h3>
-        <p className="text-muted-foreground">
-          Vi kommer att granska ditt bidrag och återkomma till dig via e-post.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-2xl mx-auto">
-      {/* Draft restore prompt */}
-      {showDraftPrompt && (
-        <Alert className="mb-6">
-          <RotateCcw className="h-4 w-4" />
-          <div className="flex justify-between items-center w-full">
-            <div>
-              <h4 className="font-medium">Tidigare utkast hittades</h4>
-              <p className="text-sm text-muted-foreground">
-                Vill du fortsätta från där du slutade?
-              </p>
+  // Progress indicator
+  const ProgressIndicator = () => (
+    <div className="flex items-center justify-center mb-6">
+      <div className="flex items-center space-x-2">
+        {Array.from({ length: totalSteps }, (_, i) => (
+          <div key={i} className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                i + 1 <= currentStep
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {i + 1}
             </div>
-            <div className="flex gap-2 ml-4">
-              <Button size="sm" onClick={restoreDraft}>
-                Återställ
-              </Button>
-              <Button size="sm" variant="outline" onClick={discardDraft}>
-                Ignorera
-              </Button>
-            </div>
-          </div>
-        </Alert>
-      )}
-
-      {/* Progress bar and auto-save indicator */}
-      <div className="mb-6">
-        <div className="flex justify-between text-sm text-muted-foreground mb-2">
-          <span>Steg {currentStep} av {totalSteps}</span>
-          <div className="flex items-center gap-2">
-            <span>{Math.round((currentStep / totalSteps) * 100)}%</span>
-            {isSaving && (
-              <div className="flex items-center gap-1">
-                <Save className="h-3 w-3 animate-pulse" />
-                <span className="text-xs">Sparar...</span>
-              </div>
-            )}
-            {lastSaved && !isSaving && (
-              <span className="text-xs">
-                Senast sparad: {lastSaved.toLocaleTimeString()}
-              </span>
+            {i < totalSteps - 1 && (
+              <div
+                className={`w-12 h-0.5 mx-2 transition-colors ${
+                  i + 1 < currentStep ? 'bg-primary' : 'bg-muted'
+                }`}
+              />
             )}
           </div>
-        </div>
-        <Progress value={(currentStep / totalSteps) * 100} className="h-2" />
-      </div>
-
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        {/* Step 1: Basic Information */}
-        {currentStep === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Grundläggande information</CardTitle>
-              <CardDescription>
-                Vad roligt att du är nyfiken på vårt gemensamma projekt! 
-                Det här formuläret hjälper oss att lära känna dig, dina idéer och förstå vad vi kan skapa tillsammans 🌿✨
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Namn och efternamn *</Label>
-                  <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={(e) => updateFormData('fullName', e.target.value)}
-                    placeholder="Ditt fullständiga namn"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefon</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => updateFormData('phone', e.target.value)}
-                    placeholder="+46 70 123 45 67"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => updateFormData('email', e.target.value)}
-                  placeholder="din@email.se"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="location">Plats/Stad</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => updateFormData('location', e.target.value)}
-                  placeholder="Var befinner du dig?"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="title">Titel på ditt bidrag *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => updateFormData('title', e.target.value)}
-                  placeholder="Ge ditt bidrag en titel"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Kort beskrivning *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => updateFormData('description', e.target.value)}
-                  placeholder="Beskriv kort vad du vill bidra med..."
-                  rows={3}
-                  required
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 2: Roles and Experience */}
-        {currentStep === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Din roll och erfarenhet</CardTitle>
-              <CardDescription>
-                Berätta för oss vem du känner dig som i projektet och vilken erfarenhet du har.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Vem känner du dig som i det här projektet? (du kan välja flera alternativ) *</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {roleOptions.map((role) => (
-                    <div key={role.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={role.id}
-                        checked={formData.roles.includes(role.id)}
-                        onCheckedChange={(checked) => handleRoleChange(role.id, checked as boolean)}
-                      />
-                      <Label htmlFor={role.id} className="text-sm font-normal cursor-pointer">
-                        {role.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-                {formData.roles.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {formData.roles.map(roleId => {
-                      const role = roleOptions.find(r => r.id === roleId);
-                      return role ? (
-                        <Badge key={roleId} variant="secondary" className="text-xs">
-                          {role.label}
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                <Label>Din erfarenhet - Uppskatta din erfarenhetsnivå inom ditt fält: *</Label>
-                <RadioGroup
-                  value={formData.experienceLevel}
-                  onValueChange={(value) => updateFormData('experienceLevel', value)}
-                >
-                  {experienceOptions.map((option) => (
-                    <div key={option.value} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.value} id={option.value} />
-                      <Label htmlFor={option.value} className="text-sm font-normal cursor-pointer">
-                        {option.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 3: Interests and Contributions */}
-        {currentStep === 3 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Intressen och bidrag</CardTitle>
-              <CardDescription>
-                Vad intresserar dig och vad kan du bidra med till projektet?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Vad intresserar dig? Vilka områden vill du utforska eller utveckla under ditt deltagande? *</Label>
-                <div className="grid grid-cols-1 gap-3">
-                  {interestOptions.map((interest) => (
-                    <div key={interest.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={interest.id}
-                        checked={formData.interests.includes(interest.id)}
-                        onCheckedChange={(checked) => handleInterestChange(interest.id, checked as boolean)}
-                      />
-                      <Label htmlFor={interest.id} className="text-sm font-normal cursor-pointer">
-                        {interest.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label>Vad kan du bidra med? *</Label>
-                <div className="grid grid-cols-1 gap-3">
-                  {contributionOptions.map((contribution) => (
-                    <div key={contribution.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={contribution.id}
-                        checked={formData.contributions.includes(contribution.id)}
-                        onCheckedChange={(checked) => handleContributionChange(contribution.id, checked as boolean)}
-                      />
-                      <Label htmlFor={contribution.id} className="text-sm font-normal cursor-pointer">
-                        {contribution.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label>Hur mycket tid kan och vill du bidra med? *</Label>
-                <RadioGroup
-                  value={formData.timeCommitment}
-                  onValueChange={(value) => updateFormData('timeCommitment', value)}
-                >
-                  {timeCommitmentOptions.map((option) => (
-                    <div key={option.value} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.value} id={option.value} />
-                      <Label htmlFor={option.value} className="text-sm font-normal cursor-pointer">
-                        {option.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 4: Final Details */}
-        {currentStep === 4 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Slutliga detaljer</CardTitle>
-              <CardDescription>
-                Sista informationen vi behöver för att slutföra din ansökan.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Har du erfarenhet av liknande samarbeten? *</Label>
-                <RadioGroup
-                  value={formData.previousExperience}
-                  onValueChange={(value) => updateFormData('previousExperience', value)}
-                >
-                  {previousExperienceOptions.map((option) => (
-                    <div key={option.value} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.value} id={option.value} />
-                      <Label htmlFor={option.value} className="text-sm font-normal cursor-pointer">
-                        {option.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="portfolioLinks">Länk till hemsida/portfolio/sociala medier</Label>
-                <Textarea
-                  id="portfolioLinks"
-                  value={formData.portfolioLinks}
-                  onChange={(e) => updateFormData('portfolioLinks', e.target.value)}
-                  placeholder="Dela länkar till ditt arbete, sociala medier, hemsida etc."
-                  rows={3}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="comments">Kommentarer eller önskemål</Label>
-                <Textarea
-                  id="comments"
-                  value={formData.comments}
-                  onChange={(e) => updateFormData('comments', e.target.value)}
-                  placeholder="Har du några speciella kommentarer, önskemål eller frågor?"
-                  rows={4}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="howFoundUs">Hur hittade du till oss?</Label>
-                <Input
-                  id="howFoundUs"
-                  value={formData.howFoundUs}
-                  onChange={(e) => updateFormData('howFoundUs', e.target.value)}
-                  placeholder="Sociala medier, vänner, sökning..."
-                />
-              </div>
-
-              {/* File upload */}
-              <div className="space-y-2">
-                <Label>Bifoga filer (valfritt)</Label>
-                <FileUpload
-                  multiple
-                  variant="public"
-                  acceptedTypes="image/*,video/*,audio/*,.pdf,.doc,.docx"
-                  maxSizeMB={10}
-                  onFilesSelect={handleFilesSelect}
-                  onFileRemove={handleFileRemove}
-                  initialFiles={uploadedFiles}
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="publication"
-                  checked={formData.publicationPermission}
-                  onCheckedChange={(checked) => updateFormData('publicationPermission', checked)}
-                />
-                <Label htmlFor="publication" className="text-sm">
-                  Jag ger tillstånd att dela mitt bidrag offentligt
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Navigation buttons */}
-        <div className="flex justify-between mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Föregående
-          </Button>
-
-          {currentStep < totalSteps ? (
-            <Button type="button" onClick={nextStep}>
-              Nästa
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Skickar...' : 'Skicka ansökan'}
-            </Button>
-          )}
-        </div>
-      </form>
-
-      <div className="text-center mt-6">
-        <p className="text-sm text-muted-foreground">
-          🌟 Stort tack för att du delar med dig!
-        </p>
+        ))}
       </div>
     </div>
   );
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <Card className={`w-full max-w-2xl max-h-[90vh] overflow-auto ${className}`}>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              {selectedType === 'participant' && <User className="h-5 w-5" />}
+              {selectedType === 'project' && <Lightbulb className="h-5 w-5" />}
+              {selectedType === 'sponsor' && <Building className="h-5 w-5" />}
+              {selectedType === 'collaboration' && <Plus className="h-5 w-5" />}
+              {selectedType === 'participant' && 'Join as Participant'}
+              {selectedType === 'project' && 'Submit Project Proposal'}
+              {selectedType === 'sponsor' && 'Become a Sponsor'}
+              {selectedType === 'collaboration' && 'Propose Collaboration'}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Step {currentStep} of {totalSteps}
+            </p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+
+        <ProgressIndicator />
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <CardContent className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Step 1: Type Selection */}
+            {currentStep === 1 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="type">What would you like to submit?</Label>
+                  <Select
+                    value={selectedType}
+                    onValueChange={(value: SubmissionFormData['type']) => setValue('type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="participant">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          Join as Participant
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="project">
+                        <div className="flex items-center gap-2">
+                          <Lightbulb className="h-4 w-4" />
+                          Submit Project Proposal
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="sponsor">
+                        <div className="flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          Become a Sponsor
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="collaboration">
+                        <div className="flex items-center gap-2">
+                          <Plus className="h-4 w-4" />
+                          Propose Collaboration
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Invalid email address'
+                      }
+                    })}
+                    placeholder="your.email@example.com"
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Personal Information */}
+            {currentStep === 2 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      {...register('firstName', { required: 'First name is required' })}
+                      placeholder="John"
+                    />
+                    {errors.firstName && (
+                      <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      {...register('lastName', { required: 'Last name is required' })}
+                      placeholder="Doe"
+                    />
+                    {errors.lastName && (
+                      <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    {...register('phone')}
+                    placeholder="+46 123 456 789"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Organization/Company</Label>
+                  <Input
+                    id="organization"
+                    {...register('organization')}
+                    placeholder="Your organization"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="website">Website/Social Media</Label>
+                  <Input
+                    id="website"
+                    {...register('website')}
+                    placeholder="https://your-website.com"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Project Information (for project submissions) */}
+            {currentStep === 3 && selectedType === 'project' && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="projectTitle">Project Title *</Label>
+                  <Input
+                    id="projectTitle"
+                    {...register('projectTitle', { required: 'Project title is required' })}
+                    placeholder="Enter your project title"
+                  />
+                  {errors.projectTitle && (
+                    <p className="text-sm text-destructive">{errors.projectTitle.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="projectDescription">Project Description *</Label>
+                  <Textarea
+                    id="projectDescription"
+                    {...register('projectDescription', { required: 'Project description is required' })}
+                    placeholder="Describe your project in detail..."
+                    rows={4}
+                  />
+                  {errors.projectDescription && (
+                    <p className="text-sm text-destructive">{errors.projectDescription.message}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="projectCategory">Category</Label>
+                    <Select onValueChange={(value) => setValue('projectCategory', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="art">Art & Culture</SelectItem>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="sustainability">Sustainability</SelectItem>
+                        <SelectItem value="education">Education</SelectItem>
+                        <SelectItem value="community">Community</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="timeline">Timeline</Label>
+                    <Input
+                      id="timeline"
+                      {...register('timeline')}
+                      placeholder="e.g., 3-6 months"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Additional Information */}
+            {(currentStep === 3 || (currentStep === 4 && selectedType === 'project')) && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="motivation">Motivation *</Label>
+                  <Textarea
+                    id="motivation"
+                    {...register('motivation', { required: 'Motivation is required' })}
+                    placeholder="Why do you want to participate/join this project?"
+                    rows={3}
+                  />
+                  {errors.motivation && (
+                    <p className="text-sm text-destructive">{errors.motivation.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="experience">Relevant Experience</Label>
+                  <Textarea
+                    id="experience"
+                    {...register('experience')}
+                    placeholder="Tell us about your relevant experience..."
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="availability">Availability</Label>
+                  <Textarea
+                    id="availability"
+                    {...register('availability')}
+                    placeholder="When are you available to participate?"
+                    rows={2}
+                  />
+                </div>
+
+                {/* File Uploads */}
+                <div className="space-y-4">
+                  <Label>File Uploads</Label>
+
+                  {selectedType === 'participant' && (
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">CV/Resume</Label>
+                      <FileUpload
+                        onFileSelect={(file) => handleFileUpload('cv', file)}
+                        bucketName="cvs"
+                        acceptedTypes=".pdf,.doc,.docx"
+                      />
+                    </div>
+                  )}
+
+                  {(selectedType === 'participant' || selectedType === 'project') && (
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">Portfolio/Examples</Label>
+                      <FileUpload
+                        onFileSelect={(file) => handleFileUpload('portfolio', file)}
+                        bucketName="portfolios"
+                        acceptedTypes="image/*,.pdf"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Terms and Consent */}
+            {((currentStep === 4 && selectedType !== 'project') || (currentStep === 5 && selectedType === 'project')) && (
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <input
+                      type="checkbox"
+                      id="acceptTerms"
+                      {...register('acceptTerms', { required: 'You must accept the terms' })}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="acceptTerms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        I accept the Terms and Conditions *
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        I agree to the terms of participation and code of conduct.
+                      </p>
+                    </div>
+                  </div>
+                  {errors.acceptTerms && (
+                    <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>
+                  )}
+
+                  <div className="flex items-start space-x-2">
+                    <input
+                      type="checkbox"
+                      id="acceptPrivacy"
+                      {...register('acceptPrivacy', { required: 'You must accept the privacy policy' })}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="acceptPrivacy" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        I accept the Privacy Policy *
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        I consent to the collection and processing of my personal data.
+                      </p>
+                    </div>
+                  </div>
+                  {errors.acceptPrivacy && (
+                    <p className="text-sm text-destructive">{errors.acceptPrivacy.message}</p>
+                  )}
+
+                  <div className="flex items-start space-x-2">
+                    <input
+                      type="checkbox"
+                      id="acceptMarketing"
+                      {...register('acceptMarketing')}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="acceptMarketing" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        I agree to receive marketing communications
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Receive updates about future events and opportunities.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-2">
+                    <input
+                      type="checkbox"
+                      id="newsletterSubscription"
+                      {...register('newsletterSubscription')}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="newsletterSubscription" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Subscribe to our newsletter
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Stay updated with our latest news and announcements.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+
+          <CardFooter className="flex justify-between">
+            <div>
+              {currentStep > 1 && (
+                <Button type="button" variant="outline" onClick={prevStep}>
+                  Previous
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+
+              {currentStep < totalSteps ? (
+                <Button type="button" onClick={nextStep}>
+                  Next
+                </Button>
+              ) : (
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                </Button>
+              )}
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
+  );
 };
+
+export { ComprehensiveSubmissionForm };
+export type { SubmissionFormData, ComprehensiveSubmissionFormProps };

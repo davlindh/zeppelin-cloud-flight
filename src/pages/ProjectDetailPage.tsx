@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useMediaPlayer } from '@/contexts/MediaContext';
+import { useProject } from '@/hooks/useApi';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PublicVoting } from '@/components/public';
-import { EnhancedProjectMedia } from '../../components/showcase/EnhancedProjectMedia';
-import { MediaGrid } from '../../components/multimedia';
+import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
+import type { UnifiedMediaItem } from '@/types/unified-media';
+import { generateMediaId } from '@/utils/mediaHelpers';
+import { MediaGrid } from '@/components/multimedia';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -96,100 +99,36 @@ export const ProjectDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const [project, setProject] = useState<ProjectDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchProject = async () => {
-      if (!slug) {
-        setError('Ingen projektslug angiven');
-        setLoading(false);
-        return;
-      }
+  // Use TanStack Query for data fetching - replaces all manual data fetching
+  const { data: projectData, isLoading: loading, error } = useProject(slug || '');
 
-      try {
-        setLoading(true);
-        
-        // Fetch project with all related data
-        const { data: projectData, error: projectError } = await supabase
-          .from('projects')
-          .select(`
-            *,
-            project_tags (tag),
-            project_participants (
-              role,
-              participants (id, name, avatar_path, bio)
-            ),
-            project_sponsors (
-              sponsors (id, name, type, logo_path, website)
-            ),
-            project_links (type, url),
-            project_media (type, url, title, description),
-            project_budget (amount, currency, breakdown),
-            project_timeline (start_date, end_date, milestones),
-            project_access (requirements, target_audience, capacity, registration_required),
-            project_voting (enabled, categories, results)
-          `)
-          .eq('slug', slug)
-          .single();
+  // Transform API data to match our local interface
+  const project: ProjectDetail | null = useMemo(() => {
+    if (!projectData) return null;
 
-        if (projectError) {
-          if (projectError.code === 'PGRST116') {
-            setError('Projektet hittades inte');
-          } else {
-            throw projectError;
-          }
-          return;
-        }
-
-        // Transform the data
-        const transformedProject: ProjectDetail = {
-          ...projectData,
-          tags: projectData.project_tags?.map((t: any) => t.tag) || [],
-          participants: projectData.project_participants?.map((pp: any) => ({
-            id: pp.participants.id,
-            name: pp.participants.name,
-            role: pp.role,
-            avatar_path: pp.participants.avatar_path,
-            bio: pp.participants.bio
-          })) || [],
-          sponsors: projectData.project_sponsors?.map((ps: any) => ps.sponsors) || [],
-          links: projectData.project_links || [],
-          media: projectData.project_media || [],
-          budget: projectData.project_budget?.[0] ? {
-            ...projectData.project_budget[0],
-            breakdown: (projectData.project_budget[0].breakdown as any) || []
-          } : undefined,
-          timeline: projectData.project_timeline?.[0] ? {
-            ...projectData.project_timeline[0],
-            milestones: (projectData.project_timeline[0].milestones as any) || []
-          } : undefined,
-          access: projectData.project_access?.[0] || undefined,
-          voting: projectData.project_voting?.[0] ? {
-            ...projectData.project_voting[0],
-            categories: (projectData.project_voting[0].categories as any) || [],
-            results: (projectData.project_voting[0].results as any) || []
-          } : undefined
-        };
-
-        setProject(transformedProject);
-      } catch (err) {
-        console.error('Error fetching project:', err);
-        setError('Kunde inte ladda projektet. Försök igen senare.');
-        toast({
-          title: "Fel",
-          description: "Kunde inte ladda projektinformation.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
+    return {
+      id: projectData.id,
+      title: projectData.title,
+      description: projectData.description,
+      full_description: projectData.full_description,
+      image_path: projectData.image_path,
+      purpose: projectData.purpose,
+      expected_impact: projectData.expected_impact,
+      associations: projectData.associations || [],
+      created_at: projectData.created_at,
+      updated_at: projectData.updated_at,
+      tags: [], // Will be populated when relationships are added
+      participants: [], // Will be populated when relationships are added
+      sponsors: [], // Will be populated when relationships are added
+      links: [], // Will be populated when relationships are added
+      media: [], // Will be populated when relationships are added
+      budget: undefined, // Will be populated when relationships are added
+      timeline: undefined, // Will be populated when relationships are added
+      access: undefined, // Will be populated when relationships are added
+      voting: undefined // Will be populated when relationships are added
     };
-
-    fetchProject();
-  }, [slug, toast]);
+  }, [projectData]);
 
   const getImageUrl = (imagePath?: string) => {
     if (!imagePath) return '/public/images/ui/placeholder-project.jpg';
@@ -286,12 +225,13 @@ export const ProjectDetailPage: React.FC = () => {
   }
 
   if (error || !project) {
+    const errorMessage = error instanceof Error ? error.message : (error || 'Projekt hittades inte');
     return (
       <div className="min-h-screen gradient-hero">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 text-center">
           <div className="card-enhanced p-12 md:p-16 inline-block border-0 shadow-glow">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-8 font-serif">
-              {error || 'Projekt hittades inte'}
+              {errorMessage}
             </h1>
             <Button onClick={() => navigate('/showcase')} className="btn-glow shadow-elegant hover:shadow-glow">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -490,13 +430,24 @@ export const ProjectDetailPage: React.FC = () => {
             {project.media && project.media.length > 0 && (
               <Card className="card-glow reveal-up stagger-3">
                 <CardContent className="p-8">
-                  <EnhancedProjectMedia 
-                    media={project.media.map(item => ({
-                      ...item,
-                      type: item.type as 'video' | 'audio' | 'image' | 'document'
+                  <UnifiedMediaGrid
+                    media={project.media.map((item, index): UnifiedMediaItem => ({
+                      id: generateMediaId(item),
+                      type: item.type as UnifiedMediaItem['type'],
+                      category: 'featured',
+                      url: item.url,
+                      title: item.title,
+                      description: item.description,
+                      projectId: project.id
                     }))}
-                    showPreview={true}
-                    allowCategorization={true}
+                    viewMode="grid"
+                    showPreview
+                    showPlayButton
+                    showAddToQueue
+                    showDownloadButton
+                    showMetadata
+                    enableSearch
+                    enableFilters
                   />
                 </CardContent>
               </Card>

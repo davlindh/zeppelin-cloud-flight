@@ -8,13 +8,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Plus, Search, Edit, Trash2, ExternalLink, Globe } from 'lucide-react';
 import { fetchSponsors, logError } from '@/utils/adminApi';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import type { Sponsor } from '@/types/admin';
 
 interface SponsorManagementListProps {
   onAddSponsor: () => void;
 }
 
 export const SponsorManagementList = ({ onAddSponsor }: SponsorManagementListProps) => {
-  const [sponsors, setSponsors] = useState<any[]>([]);
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +28,7 @@ export const SponsorManagementList = ({ onAddSponsor }: SponsorManagementListPro
     try {
       setLoading(true);
       const data = await fetchSponsors();
-      setSponsors(data);
+      setSponsors(data as Sponsor[]);
     } catch (err) {
       logError('loadSponsors', err);
       setError('Failed to load sponsors');

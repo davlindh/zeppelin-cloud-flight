@@ -9,13 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CacheManager } from '@/components/ui/CacheManager';
 import { Loader2, Database, FileText, HardDrive } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import type { Tables } from '@/integrations/supabase/types';
 
-interface AdminSetting {
-  id: string;
-  setting_key: string;
-  setting_value: any;
-  description: string;
-}
+type AdminSetting = Tables<'admin_settings'>;
 
 export const AdminSettings = () => {
   const [settings, setSettings] = useState<AdminSetting[]>([]);
@@ -24,32 +20,32 @@ export const AdminSettings = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('admin_settings')
+          .select('*')
+          .order('setting_key');
+
+        if (error) throw error;
+        setSettings(data || []);
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load settings',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadSettings();
-  }, []);
+  }, [toast]);
 
-  const loadSettings = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('admin_settings')
-        .select('*')
-        .order('setting_key');
-
-      if (error) throw error;
-      setSettings(data || []);
-    } catch (error) {
-      console.error('Error loading settings:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load settings',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateSetting = async (settingKey: string, newValue: any) => {
+  const updateSetting = async (settingKey: string, newValue: Tables<'admin_settings'>['setting_value']) => {
     try {
       setUpdating(settingKey);
       const { error } = await supabase
@@ -83,7 +79,8 @@ export const AdminSettings = () => {
 
   const getPartnerDataSource = () => {
     const setting = settings.find(s => s.setting_key === 'use_database_partners');
-    return setting?.setting_value?.enabled ? 'database' : 'static';
+    const settingValue = setting?.setting_value as { enabled?: boolean } | undefined;
+    return settingValue?.enabled ? 'database' : 'static';
   };
 
   const togglePartnerDataSource = async () => {

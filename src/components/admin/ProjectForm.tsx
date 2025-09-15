@@ -102,8 +102,9 @@ export const ProjectForm = ({ onClose, projectId }: ProjectFormProps) => {
       });
 
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create project');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create project';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

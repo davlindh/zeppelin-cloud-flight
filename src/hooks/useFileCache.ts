@@ -102,14 +102,14 @@ export const useCachedFile = (url: string, metadata?: CacheEntry['metadata']): U
 
   useEffect(() => {
     checkCache();
-    
+
     // Cleanup blob URL on unmount
     return () => {
       if (cachedUrl) {
         URL.revokeObjectURL(cachedUrl);
       }
     };
-  }, [checkCache]);
+  }, [checkCache, cachedUrl]);
 
   return {
     cachedUrl,

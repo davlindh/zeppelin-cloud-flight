@@ -8,16 +8,26 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Plus, Search, Edit, Trash2, ExternalLink, Globe } from 'lucide-react';
 import { fetchParticipantsWithMedia, logError } from '@/utils/adminApi';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Participant } from '@/types/admin';
 
 interface ParticipantManagementListProps {
   onAddParticipant: () => void;
+  onEditParticipant: (id: string) => void;
+  onViewParticipant: (slug: string) => void;
 }
 
-export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManagementListProps) => {
-  const [participants, setParticipants] = useState<any[]>([]);
+export const ParticipantManagementList = ({
+  onAddParticipant,
+  onEditParticipant,
+  onViewParticipant
+}: ParticipantManagementListProps) => {
+  const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     loadParticipants();
@@ -27,12 +37,36 @@ export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManag
     try {
       setLoading(true);
       const data = await fetchParticipantsWithMedia();
-      setParticipants(data);
+      setParticipants(data as Participant[]);
     } catch (err) {
       logError('loadParticipants', err);
       setError('Failed to load participants');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteParticipant = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('participants')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setParticipants(prev => prev.filter(p => p.id !== id));
+      toast({
+        title: 'Participant deleted',
+        description: 'The participant has been removed successfully.'
+      });
+    } catch (err: unknown) {
+      const e = err as { message?: string };
+      toast({
+        title: 'Error deleting participant',
+        description: e.message || 'Failed to delete participant',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -69,7 +103,6 @@ export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManag
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
         <div className="flex items-center space-x-2">
           <Search className="h-4 w-4 text-muted-foreground" />
           <Input
@@ -79,7 +112,6 @@ export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManag
             className="max-w-sm"
           />
         </div>
-
         {filteredParticipants.length === 0 ? (
           <p className="text-muted-foreground">No participants found.</p>
         ) : (
@@ -101,9 +133,9 @@ export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManag
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={participant.avatar_path} />
+                          <AvatarImage src={participant.avatar_path || undefined} />
                           <AvatarFallback>
-                            {participant.name.split(' ').map((n: string) => n[0]).join('')}
+                            {participant.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
                         <div>
@@ -131,7 +163,7 @@ export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManag
                         {participant.website && (
                           <Globe className="h-4 w-4 text-muted-foreground" />
                         )}
-                        {participant.social_links && participant.social_links.length > 0 && (
+                        {participant.social_links.length > 0 && (
                           <Badge variant="secondary" className="text-xs">
                             {participant.social_links.length} social
                           </Badge>
@@ -145,13 +177,26 @@ export const ParticipantManagementList = ({ onAddParticipant }: ParticipantManag
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEditParticipant(participant.id)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onViewParticipant(participant.slug)}
+                        >
                           <ExternalLink className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-destructive">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => deleteParticipant(participant.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

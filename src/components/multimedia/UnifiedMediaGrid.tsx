@@ -1,449 +1,363 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useUnifiedMedia } from '@/contexts/UnifiedMediaContext';
+import { MediaGridSkeleton } from './MediaGridSkeleton';
+import { EnhancedImageProps } from '@/components/multimedia/EnhancedImage';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MediaErrorBoundary } from '@/components/ui/MediaErrorBoundary';
-import { EnhancedImage } from '../../../components/multimedia/EnhancedImage';
-import { EnhancedMediaPreview } from '../../../components/multimedia/EnhancedMediaPreview';
-import { MediaGridSkeleton } from '../../../components/multimedia/MediaGridSkeleton';
-import { useMediaPlayer } from '@/hooks/useMediaPlayer';
-import { 
-  getMediaIcon, 
-  getMediaTypeColor, 
-  getMediaTypeName,
-  isPlayableMedia,
-  formatDuration 
-} from '@/utils/mediaHelpers';
-import { resolveMediaUrl, generateThumbnailUrl, getPlaceholderAsset } from '@/utils/assetHelpers';
-import type { MediaItem } from '@/types/media';
+import {
+  Play,
+  Image as ImageIcon,
+  FileText,
+  Download,
+  ExternalLink,
+  Plus,
+  Search,
+  Filter,
+  Grid,
+  List
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Play, Plus, Download, Maximize2 } from 'lucide-react';
+import type { UnifiedMediaItem } from '@/types/unified-media';
+import {
+  getMediaIcon,
+  getMediaTypeColor,
+  getCategoryColor,
+  getCategoryIcon,
+  isPlayableMedia,
+  formatFileSize,
+  formatDuration,
+  getMediaPreviewUrl
+} from '@/utils/mediaHelpers';
 
-export interface UnifiedMediaGridProps {
-  media: MediaItem[];
-  viewMode?: 'grid' | 'list' | 'gallery';
+// Local fallback EnhancedImage component used when external module is not available
+const EnhancedImage: React.FC<{ src: string; alt?: string; className?: string }> = ({ src, alt, className }) => {
+  return <img src={src} alt={alt || ''} className={className} loading="lazy" />;
+};
+
+// Constants
+const IMAGE_LOAD_DELAY = 300;
+const DEFAULT_SKELETON_COUNT = 6;
+const GRID_BREAKPOINTS = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
+const LIST_LAYOUT = "space-y-3";
+const MASONRY_LAYOUT = "columns-1 md:columns-2 lg:columns-3 gap-4";
+
+interface UnifiedMediaGridProps {
+  media?: UnifiedMediaItem[];
+  viewMode?: 'grid' | 'list';
   showPreview?: boolean;
   showPlayButton?: boolean;
   showAddToQueue?: boolean;
-  showDownload?: boolean;
+  showDownloadButton?: boolean;
+  showMetadata?: boolean;
+  enableSearch?: boolean;
+  enableFilters?: boolean;
+  enableViewModeToggle?: boolean;
   className?: string;
   loading?: boolean;
   skeletonCount?: number;
-  emptyMessage?: string;
-  context?: 'project' | 'participant' | 'partner' | 'media';
+  emptyStateMessage?: string;
 }
 
 export const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
-  media,
-  viewMode = 'grid',
+  media: propMedia,
+  viewMode: propViewMode = 'grid',
   showPreview = true,
   showPlayButton = true,
   showAddToQueue = true,
-  showDownload = false,
+  showDownloadButton = true,
+  showMetadata = false,
+  enableSearch = false,
+  enableFilters = false,
+  enableViewModeToggle = false,
   className,
   loading = false,
-  skeletonCount = 6,
-  emptyMessage = 'Inga mediafiler hittades.',
-  context = 'media'
+  skeletonCount = DEFAULT_SKELETON_COUNT,
+  emptyStateMessage = 'Inga mediafiler hittades.'
 }) => {
+  const { state, actions } = useUnifiedMedia();
+
   const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  
-  const { playMedia, addToQueue } = useMediaPlayer();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [localViewMode, setLocalViewMode] = useState(propViewMode);
+
+  // Use prop media if provided, otherwise use filtered media from context
+  const media = propMedia || state.filteredItems;
+
+  // Use local view mode since displayConfig doesn't exist
+  const currentViewMode = propViewMode !== 'grid' ? propViewMode : localViewMode;
+
+  const effectiveViewMode = enableViewModeToggle ? localViewMode : currentViewMode;
 
   useEffect(() => {
     if (media.length > 0) {
-      const timer = setTimeout(() => setImagesLoaded(true), 300);
+      const timer = setTimeout(() => setImagesLoaded(true), IMAGE_LOAD_DELAY);
       return () => clearTimeout(timer);
     }
   }, [media.length]);
 
-  const handleMediaClick = useCallback((mediaItem: MediaItem) => {
-    if (showPreview) {
-      setSelectedMedia(mediaItem);
-      setPreviewOpen(true);
+  // Handle search
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (enableSearch) {
+      actions.searchItems(query);
     }
-  }, [showPreview]);
+  };
 
-  const closePreview = useCallback(() => {
-    setPreviewOpen(false);
-    setSelectedMedia(null);
-  }, []);
+  // Filter controls
+  const FilterControls = () => {
+    if (!enableFilters) return null;
+
+    return (
+      <div className="flex flex-wrap gap-2 mb-4">
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Sök media..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="pl-8 pr-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => actions.setFilters({ type: undefined })}
+          className="flex items-center gap-2"
+        >
+          <Filter className="h-4 w-4" />
+          Filter
+        </Button>
+      </div>
+    );
+  };
+
+  // View mode toggle
+  const ViewModeToggle = () => {
+    if (!enableViewModeToggle) return null;
+
+    return (
+      <div className="flex gap-1 mb-4 border rounded-lg p-1">
+        <Button
+          variant={effectiveViewMode === 'grid' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setLocalViewMode('grid')}
+        >
+          <Grid className="h-4 w-4" />
+        </Button>
+        <Button
+          variant={effectiveViewMode === 'list' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setLocalViewMode('list')}
+        >
+          <List className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
 
   // Show skeleton while loading
   if (loading || (!imagesLoaded && media.length > 0)) {
     return (
-      <MediaGridSkeleton 
-        count={skeletonCount}
-        viewMode={viewMode === 'gallery' ? 'grid' : viewMode}
-        className={className}
-      />
+      <div className="space-y-4">
+        {enableFilters && <FilterControls />}
+        {enableViewModeToggle && <ViewModeToggle />}
+        <MediaGridSkeleton
+          count={skeletonCount}
+          viewMode={effectiveViewMode}
+          className={className}
+        />
+      </div>
     );
   }
 
-  // Show empty state
+  // Empty state
   if (media.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        <p>{emptyMessage}</p>
+        <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+        <p>{emptyStateMessage}</p>
       </div>
     );
   }
 
-  // Gallery view with type-specific sections
-  if (viewMode === 'gallery') {
-    const imageMedia = media.filter(item => item.type === 'image' || item.type === 'portfolio');
-    const videoMedia = media.filter(item => item.type === 'video');
-    const audioMedia = media.filter(item => item.type === 'audio');
-    const otherMedia = media.filter(item => !['image', 'portfolio', 'video', 'audio'].includes(item.type));
+  // Handle media action
+  const handleMediaAction = (mediaItem: UnifiedMediaItem) => {
+    if (isPlayableMedia(mediaItem.type)) {
+      // For now, just open playable media in new tab
+      window.open(mediaItem.url, '_blank', 'noopener,noreferrer');
+    } else {
+      // For non-playable media, open in new tab
+      window.open(mediaItem.url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
-    return (
-      <div className={cn('space-y-8', className)}>
-        {/* Images Section */}
-        {imageMedia.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-4">Bilder ({imageMedia.length})</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {imageMedia.map((item, index) => (
-                <MediaErrorBoundary key={item.id || `image-${index}`}>
-                  <div 
-                    className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer bg-muted"
-                    onClick={() => handleMediaClick(item)}
-                  >
-                    <EnhancedImage
-                      src={resolveMediaUrl(item.url, item.type, context)}
-                      alt={item.title}
-                      className="w-full h-full object-cover object-center group-hover:scale-110 transition-all duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <Maximize2 className="w-8 h-8 text-white mb-2" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <p className="text-white text-sm font-medium truncate">{item.title}</p>
-                    </div>
-                  </div>
-                </MediaErrorBoundary>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Videos Section */}
-        {videoMedia.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-4">Videor ({videoMedia.length})</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {videoMedia.map((item, index) => (
-                <MediaErrorBoundary key={item.id || `video-${index}`}>
-                  <VideoMediaItem
-                    media={item}
-                    onMediaClick={handleMediaClick}
-                    context={context}
-                    showPlayButton={showPlayButton}
-                    showAddToQueue={showAddToQueue}
-                    showDownload={showDownload}
-                  />
-                </MediaErrorBoundary>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Audio Section */}
-        {audioMedia.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-4">Ljud ({audioMedia.length})</h3>
-            <div className="space-y-2">
-              {audioMedia.map((item, index) => (
-                <MediaErrorBoundary key={item.id || `audio-${index}`}>
-                  <BaseMediaItem
-                    media={item}
-                    viewMode="list"
-                    showPreview={showPreview}
-                    showPlayButton={showPlayButton}
-                    showAddToQueue={showAddToQueue}
-                    context={context}
-                    onMediaClick={handleMediaClick}
-                  />
-                </MediaErrorBoundary>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Other Media Section */}
-        {otherMedia.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-4">Andra filer ({otherMedia.length})</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {otherMedia.map((item, index) => (
-                <MediaErrorBoundary key={item.id || `other-${index}`}>
-                  <BaseMediaItem
-                    media={item}
-                    viewMode="grid"
-                    showPreview={showPreview}
-                    showPlayButton={showPlayButton}
-                    showAddToQueue={showAddToQueue}
-                    context={context}
-                    onMediaClick={handleMediaClick}
-                  />
-                </MediaErrorBoundary>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Media Preview Modal */}
-        {selectedMedia && (
-          <EnhancedMediaPreview
-            media={selectedMedia}
-            isOpen={previewOpen}
-            onClose={closePreview}
-          />
-        )}
-      </div>
-    );
-  }
-
-  // Grid and List views
+  // Container class based on view mode
   const containerClass = cn(
-    viewMode === 'grid' 
-      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
-      : "space-y-3",
+    effectiveViewMode === 'grid'
+      ? GRID_BREAKPOINTS
+      : LIST_LAYOUT,
     className
   );
-  
+
   return (
-    <div className={containerClass}>
-      {media.map((item, index) => (
-        <MediaErrorBoundary key={item.id || `${item.url}-${index}`}>
-          <BaseMediaItem
-            media={item}
-            viewMode={viewMode as 'grid' | 'list'}
+    <div className="space-y-4">
+      {enableFilters && <FilterControls />}
+      {enableViewModeToggle && <ViewModeToggle />}
+
+      <div className={containerClass}>
+        {media.map((item) => (
+          <UnifiedMediaItem
+            key={item.id}
+            item={item}
+            viewMode={effectiveViewMode}
             showPreview={showPreview}
             showPlayButton={showPlayButton}
             showAddToQueue={showAddToQueue}
-            context={context}
-            onMediaClick={handleMediaClick}
+            showDownloadButton={showDownloadButton}
+            showMetadata={showMetadata}
+            onPlay={handleMediaAction}
           />
-        </MediaErrorBoundary>
-      ))}
-
-      {/* Media Preview Modal */}
-      {selectedMedia && (
-        <EnhancedMediaPreview
-          media={selectedMedia}
-          isOpen={previewOpen}
-          onClose={closePreview}
-        />
-      )}
+        ))}
+      </div>
     </div>
   );
 };
 
-// Video Media Item Component
-interface VideoMediaItemProps {
-  media: MediaItem;
-  onMediaClick: (media: MediaItem) => void;
-  context: 'project' | 'participant' | 'partner' | 'media';
-  showPlayButton?: boolean;
-  showAddToQueue?: boolean;
-  showDownload?: boolean;
+// Individual media item component
+interface UnifiedMediaItemProps {
+  item: UnifiedMediaItem;
+  viewMode: 'grid' | 'list' | 'masonry';
+  showPreview: boolean;
+  showPlayButton: boolean;
+  showAddToQueue: boolean;
+  showDownloadButton: boolean;
+  showMetadata: boolean;
+  onPlay: (item: UnifiedMediaItem) => void;
 }
 
-const VideoMediaItem: React.FC<VideoMediaItemProps> = ({
-  media,
-  onMediaClick,
-  context,
+const UnifiedMediaItem: React.FC<UnifiedMediaItemProps> = React.memo(({
+  item,
+  viewMode,
+  showPreview,
   showPlayButton,
   showAddToQueue,
-  showDownload
+  showDownloadButton,
+  showMetadata,
+  onPlay
 }) => {
-  const { playMedia, addToQueue } = useMediaPlayer();
+  const { state, actions } = useUnifiedMedia();
 
-  const handlePlay = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    playMedia(media);
-  }, [playMedia, media]);
+  const handleAddToQueue = () => {
+    actions.toggleSelection(item.id);
+  };
 
-  const handleAddToQueue = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToQueue(media);
-  }, [addToQueue, media]);
-
-  const handleDownload = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    const url = resolveMediaUrl(media.url, media.type, context);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = media.title;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [media, context]);
-
-  return (
-    <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300" onClick={() => onMediaClick(media)}>
-      <CardContent className="p-0">
-        <div className="relative aspect-video rounded-t-lg overflow-hidden bg-muted">
-          <img
-            src={generateThumbnailUrl(media.url, media.type)}
-            alt={media.title}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-500"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = getPlaceholderAsset('video', context);
-            }}
-          />
-          <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            {showPlayButton && (
-              <Button
-                size="lg"
-                className="bg-white/20 hover:bg-white/40 text-white border-white/40 backdrop-blur-sm"
-                onClick={handlePlay}
-              >
-                <Play className="w-6 h-6" />
-              </Button>
+  if (viewMode === 'list') {
+    return (
+      <Card className="card-enhanced border-0 shadow-soft hover:shadow-elegant transition-all duration-300">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            {/* Preview */}
+            {showPreview && (
+              <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                {item.type === 'image' ? (
+                  <EnhancedImage
+                    src={getMediaPreviewUrl(item.url, item.type)}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    {getMediaIcon(item.type, 'w-6 h-6')}
+                  </div>
+                )}
+              </div>
             )}
-          </div>
-          {media.duration && (
-            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-              {formatDuration(media.duration)}
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm text-foreground truncate">
+                    {item.title}
+                  </h4>
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs", getMediaTypeColor(item.type))}
+                  >
+                    {getMediaIcon(item.type, 'w-3 h-3')}
+                    <span className="ml-1">{item.type}</span>
+                  </Badge>
+
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs", getCategoryColor(item.category))}
+                  >
+                    {getCategoryIcon(item.category, 'w-3 h-3')}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Metadata */}
+              {showMetadata && (
+                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                  {item.year && <span>År: {item.year}</span>}
+                  {item.size && <span>{formatFileSize(item.size)}</span>}
+                  {item.duration && <span>{formatDuration(item.duration)}</span>}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div className="p-4">
-          <h4 className="font-medium mb-1 line-clamp-2">{media.title}</h4>
-          {media.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">{media.description}</p>
-          )}
-          <div className="flex items-center justify-between mt-3">
-            <Badge variant="secondary" className={getMediaTypeColor(media.type)}>
-              {getMediaIcon(media.type, 'w-3 h-3')}
-              <span className="ml-1">{getMediaTypeName(media.type)}</span>
-            </Badge>
-            <div className="flex gap-2">
-              {showAddToQueue && (
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {showPlayButton && (
+                <Button
+                  size="sm"
+                  onClick={() => onPlay(item)}
+                  variant="outline"
+                >
+                  {getMediaIcon(item.type, 'w-4 h-4')}
+                  <span className="ml-2">
+                    {isPlayableMedia(item.type) ? 'Spela' : 'Öppna'}
+                  </span>
+                </Button>
+              )}
+
+              {showAddToQueue && isPlayableMedia(item.type) && (
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={handleAddToQueue}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="h-4 w-4" />
                 </Button>
               )}
-              {showDownload && (
+
+              {showDownloadButton && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={handleDownload}
+                  asChild
                 >
-                  <Download className="w-4 h-4" />
+                  <a
+                    href={item.url}
+                    download={item.title}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
                 </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Base media item component for individual items
-interface BaseMediaItemProps {
-  media: MediaItem;
-  viewMode: 'grid' | 'list';
-  showPreview?: boolean;
-  showPlayButton?: boolean;
-  showAddToQueue?: boolean;
-  context?: 'project' | 'participant' | 'partner' | 'media';
-  onMediaClick?: (media: MediaItem) => void;
-}
-
-const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
-  media,
-  viewMode,
-  showPreview = true,
-  showPlayButton = true, 
-  showAddToQueue = true,
-  context = 'media',
-  onMediaClick
-}) => {
-  const { playMedia, addToQueue } = useMediaPlayer();
-
-  const handleMediaClick = useCallback(() => {
-    if (onMediaClick) {
-      onMediaClick(media);
-    }
-  }, [onMediaClick, media]);
-
-  const handlePlay = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isPlayableMedia(media.type)) {
-      playMedia(media);
-    } else {
-      window.open(resolveMediaUrl(media.url, media.type, context), '_blank');
-    }
-  }, [playMedia, media, context]);
-
-  const handleAddToQueue = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToQueue(media);
-  }, [addToQueue, media]);
-
-  if (viewMode === 'grid') {
-    return (
-      <Card 
-        className="group cursor-pointer hover:shadow-lg transition-all duration-300 h-full"
-        onClick={handleMediaClick}
-      >
-        <CardContent className="p-0 h-full flex flex-col">
-          <div className="relative aspect-video rounded-t-lg overflow-hidden bg-muted flex-shrink-0">
-            <EnhancedImage
-              src={generateThumbnailUrl(media.url, media.type)}
-              alt={media.title}
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-            />
-            {showPlayButton && (
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
-                <Button
-                  size="lg"
-                  className="bg-white/20 hover:bg-white/40 text-white border-white/40 backdrop-blur-sm"
-                  onClick={handlePlay}
-                >
-                  {isPlayableMedia(media.type) ? <Play className="w-6 h-6" /> : getMediaIcon(media.type, 'w-6 h-6')}
-                </Button>
-              </div>
-            )}
-            {showAddToQueue && isPlayableMedia(media.type) && (
-              <Button
-                size="sm"
-                variant="secondary"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                onClick={handleAddToQueue}
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-          <div className="p-4 flex-grow flex flex-col">
-            <h4 className="font-medium mb-1 line-clamp-2 flex-grow">{media.title}</h4>
-            {media.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{media.description}</p>
-            )}
-            <div className="flex items-center justify-between mt-auto">
-              <Badge variant="secondary" className={getMediaTypeColor(media.type)}>
-                {getMediaIcon(media.type, 'w-3 h-3')}
-                <span className="ml-1">{getMediaTypeName(media.type)}</span>
-              </Badge>
-              {media.duration && (
-                <span className="text-xs text-muted-foreground">
-                  {formatDuration(media.duration)}
-                </span>
               )}
             </div>
           </div>
@@ -452,52 +366,123 @@ const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
     );
   }
 
-  // List view
+  // Grid/Masonry view
   return (
-    <Card 
-      className="group cursor-pointer hover:shadow-md transition-all duration-300"
-      onClick={handleMediaClick}
-    >
+    <Card className="card-enhanced border-0 shadow-soft hover:shadow-elegant transition-all duration-300 group overflow-hidden">
       <CardContent className="p-4">
-        <div className="flex items-center gap-4">
-          <div className="flex-shrink-0">
-            {getMediaIcon(media.type, 'w-8 h-8')}
-          </div>
-          <div className="flex-grow min-w-0">
-            <h4 className="font-medium truncate">{media.title}</h4>
-            {media.description && (
-              <p className="text-sm text-muted-foreground truncate">{media.description}</p>
-            )}
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="secondary" className={getMediaTypeColor(media.type)}>
-                {getMediaTypeName(media.type)}
-              </Badge>
-              {media.duration && (
-                <span className="text-xs text-muted-foreground">
-                  {formatDuration(media.duration)}
-                </span>
+        <div className="space-y-3">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                {item.title}
+              </h4>
+              {item.description && (
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                  {item.description}
+                </p>
               )}
             </div>
+
+            <Badge
+              variant="outline"
+              className={cn("flex-shrink-0", getMediaTypeColor(item.type))}
+            >
+              {getMediaIcon(item.type, 'w-3 h-3')}
+              <span className="ml-1 text-xs uppercase">{item.type}</span>
+            </Badge>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+
+          {/* Media Preview */}
+          {showPreview && (
+            <>
+              {item.type === 'image' && (
+                <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                  <EnhancedImage
+                    src={item.url}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              )}
+
+              {(item.type === 'video' || item.type === 'audio') && (
+                <div className="aspect-video bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Play className="h-6 w-6 text-primary ml-0.5" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Klicka för att spela</p>
+                  </div>
+                </div>
+              )}
+
+              {item.type === 'document' && (
+                <div className="aspect-video bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-green-500/10 flex items-center justify-center">
+                      <FileText className="h-6 w-6 text-green-600" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Dokument</p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Metadata */}
+          {showMetadata && (
+            <div className="text-xs text-muted-foreground space-y-1">
+              {item.year && <div>År: {item.year}</div>}
+              {item.size && <div>Storlek: {formatFileSize(item.size)}</div>}
+              {item.duration && <div>Längd: {formatDuration(item.duration)}</div>}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
             {showPlayButton && (
               <Button
                 size="sm"
-                variant="ghost"
-                className="opacity-60 group-hover:opacity-100 transition-opacity"
-                onClick={handlePlay}
+                onClick={() => onPlay(item)}
+                className="flex-1"
+                variant="outline"
               >
-                {isPlayableMedia(media.type) ? <Play className="w-4 h-4" /> : getMediaIcon(media.type, 'w-4 h-4')}
+                {getMediaIcon(item.type, 'w-4 h-4')}
+                <span className="ml-2">
+                  {isPlayableMedia(item.type) ? 'Spela' : 'Öppna'}
+                </span>
               </Button>
             )}
-            {showAddToQueue && isPlayableMedia(media.type) && (
+
+            {showAddToQueue && isPlayableMedia(item.type) && (
               <Button
                 size="sm"
                 variant="ghost"
-                className="opacity-60 group-hover:opacity-100 transition-opacity"
                 onClick={handleAddToQueue}
+                className="px-2"
+                title="Lägg till i kö"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="h-4 w-4" />
+              </Button>
+            )}
+
+            {showDownloadButton && (
+              <Button
+                size="sm"
+                variant="ghost"
+                asChild
+                className="px-2"
+                title="Ladda ner"
+              >
+                <a
+                  href={item.url}
+                  download={item.title}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Download className="h-4 w-4" />
+                </a>
               </Button>
             )}
           </div>
@@ -505,4 +490,6 @@ const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
       </CardContent>
     </Card>
   );
-};
+});
+
+UnifiedMediaItem.displayName = 'UnifiedMediaItem';
