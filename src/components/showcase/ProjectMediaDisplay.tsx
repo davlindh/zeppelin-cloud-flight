@@ -1,11 +1,11 @@
 import React from 'react';
 import { MediaFilters } from '../multimedia';
-import { UnifiedMediaGrid } from '../../src/components/multimedia/UnifiedMediaGrid';
-import { Button } from '../../src/components/ui/button';
-import type { ProjectMediaItem, MediaType } from '../../src/types/media';
-import { generateMediaId } from '../../src/utils/mediaHelpers';
-import { useMediaFiltering } from '../../src/hooks/useMediaFiltering';
-import { resolveMediaUrl } from '../../src/utils/assetHelpers';
+import { UnifiedMediaGrid } from '../multimedia/UnifiedMediaGrid';
+import { Button } from '../ui/button';
+import type { UnifiedMediaItem } from '../../types/unified-media';
+import { generateMediaId } from '../../utils/mediaHelpers';
+import { useMediaFiltering } from '../../hooks/useMediaFiltering';
+import { resolveMediaUrl } from '../../utils/assetHelpers';
 
 interface ProjectMediaDisplayProps {
   media?: Array<{
@@ -23,14 +23,13 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
   showPreview = true,
   allowCategorization = true 
 }) => {
-  // Convert to ProjectMediaItem format with centralized URL resolution
-  const mediaItems: ProjectMediaItem[] = media.map((item, index) => ({
-    id: generateMediaId(item),
-    type: item.type as MediaType,
-    url: resolveMediaUrl(item.url, item.type as MediaType, 'project'),
+  // Convert to UnifiedMediaItem format with centralized URL resolution
+  const mediaItems: UnifiedMediaItem[] = media.map((item, index) => ({
+    id: generateMediaId(item) || `project-media-${index}`,
+    type: item.type,
+    url: resolveMediaUrl(item.url, item.type, 'project'),
     title: item.title,
     description: item.description,
-    projectId: 'current-project'
   }));
 
   const {

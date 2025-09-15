@@ -11,7 +11,7 @@ import { PublicVoting } from '@/components/public';
 import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
 import type { UnifiedMediaItem } from '@/types/unified-media';
 import { generateMediaId } from '@/utils/mediaHelpers';
-import { MediaGrid } from '@/components/multimedia';
+
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
