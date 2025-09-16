@@ -135,7 +135,7 @@ export interface SponsorFormData {
 export interface FormField {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'url' | 'select' | 'file';
+  type: 'text' | 'textarea' | 'url' | 'select' | 'file' | 'email' | 'tel' | 'number' | 'date';
   required?: boolean;
   placeholder?: string;
   options?: { value: string; label: string }[];
