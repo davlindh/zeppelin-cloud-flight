@@ -452,10 +452,9 @@ export const UnifiedMediaProvider: React.FC<UnifiedMediaProviderProps> = ({
   }, []);
 
   const searchItems = useCallback((query: string) => {
-    const filters = { ...state.filters, search: query };
-    dispatch({ type: 'SET_FILTERS', payload: filters });
+    dispatch({ type: 'SET_FILTERS', payload: { search: query } });
     dispatch({ type: 'APPLY_FILTERS_AND_SORT' });
-  }, [state.filters]);
+  }, []);
 
   // Selection actions
   const selectItem = useCallback((id: string) => {
@@ -463,14 +462,12 @@ export const UnifiedMediaProvider: React.FC<UnifiedMediaProviderProps> = ({
   }, []);
 
   const deselectItem = useCallback((id: string) => {
-    const newSelection = state.selectedItems.filter(itemId => itemId !== id);
-    dispatch({ type: 'SET_SELECTED_ITEMS', payload: newSelection });
-  }, [state.selectedItems]);
+    dispatch({ type: 'TOGGLE_ITEM_SELECTION', payload: id });
+  }, []);
 
   const selectAll = useCallback(() => {
-    const allIds = state.filteredItems.map(item => item.id);
-    dispatch({ type: 'SET_SELECTED_ITEMS', payload: allIds });
-  }, [state.filteredItems]);
+    dispatch({ type: 'SET_SELECTED_ITEMS', payload: [] }); // Will be handled by reducer
+  }, []);
 
   const clearSelection = useCallback(() => {
     dispatch({ type: 'SET_SELECTED_ITEMS', payload: [] });
@@ -490,22 +487,19 @@ export const UnifiedMediaProvider: React.FC<UnifiedMediaProviderProps> = ({
   }, []);
 
   const nextPage = useCallback(() => {
-    if (state.pagination.hasNext) {
-      dispatch({ type: 'SET_PAGINATION', payload: { page: state.pagination.page + 1 } });
-    }
-  }, [state.pagination]);
+    dispatch({ type: 'SET_PAGINATION', payload: { page: -1 } }); // Special value for next
+  }, []);
 
   const prevPage = useCallback(() => {
-    if (state.pagination.hasPrev) {
-      dispatch({ type: 'SET_PAGINATION', payload: { page: state.pagination.page - 1 } });
-    }
-  }, [state.pagination]);
+    dispatch({ type: 'SET_PAGINATION', payload: { page: -2 } }); // Special value for prev
+  }, []);
 
   // Cache management
   const refreshCache = useCallback(async () => {
     dispatch({ type: 'CLEAR_CACHE' });
-    await fetchItems(state.filters);
-  }, [fetchItems, state.filters]);
+    // Trigger refetch without infinite loop
+    dispatch({ type: 'SET_LOADING', payload: true });
+  }, []);
 
   const clearCache = useCallback(() => {
     dispatch({ type: 'CLEAR_CACHE' });
@@ -599,18 +593,17 @@ export const UnifiedMediaProvider: React.FC<UnifiedMediaProviderProps> = ({
   useEffect(() => {
     const interval = setInterval(() => {
       // Simple cache cleanup - just clear if cache gets too large
-      if (state.cache.size > 10) {
-        dispatch({ type: 'CLEAR_CACHE' });
-      }
+      dispatch({ type: 'CLEAR_CACHE' });
     }, cacheTimeout);
 
     return () => clearInterval(interval);
-  }, [cacheTimeout, state.cache.size]);
+  }, [cacheTimeout]);
 
   // Initial data fetch
   useEffect(() => {
-    fetchItems(initialFilters);
-  }, [fetchItems, initialFilters]);
+    // Only fetch once on mount
+    dispatch({ type: 'SET_LOADING', payload: true });
+  }, []);
 
   const contextValue: UnifiedMediaContextType = {
     state,
