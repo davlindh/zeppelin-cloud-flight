@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { User, Calendar } from 'lucide-react';
 import { UnifiedMediaGrid } from '../multimedia/UnifiedMediaGrid';
 import { MediaFilters } from '../multimedia/MediaFilters';
-import { getCategoryIcon, getCategoryColor, getCategoryLabel , generateMediaId } from '@/utils/mediaHelpers';
-import type { MediaCategory, ParticipantMediaItem, UnifiedMediaItem } from '@/types/unified-media';
-import { generateMediaId } from '@/utils/mediaHelpers';
+import { getCategoryIcon, getCategoryColor, getCategoryLabel, generateMediaId } from '@/utils/mediaHelpers';
+import type { MediaCategory, UnifiedMediaItem } from '@/types/unified-media';
 
 interface ParticipantMediaProps {
   media?: Array<{

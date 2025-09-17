@@ -259,9 +259,9 @@ export const PartnersPage: React.FC = () => {
                       <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2">
                         {partner.name || partner.alt}
                       </h3>
-                      {partner.description && (
+                      {(partner as any)?.description && (
                         <p className="text-muted-foreground mt-2 text-sm line-clamp-3 leading-relaxed">
-                          {partner.description}
+                          {(partner as any).description}
                         </p>
                       )}
                     </div>
@@ -400,9 +400,9 @@ export const PartnersPage: React.FC = () => {
                   )}
                 </DialogTitle>
                 <DialogDescription>
-                  {selectedPartner?.description && (
+                  {(selectedPartner as any)?.description && (
                     <p className="text-muted-foreground mt-2 leading-relaxed">
-                      {selectedPartner.description}
+                      {(selectedPartner as any).description}
                     </p>
                   )}
                 </DialogDescription>
