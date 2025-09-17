@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Modal } from '../ui';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
@@ -166,13 +165,15 @@ export const HeroSection: React.FC = () => {
 
             {/* Enhanced Submission Form Modal */}
             {showSubmissionForm && (
-                <Modal open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
-                    <ComprehensiveSubmissionForm 
-                        onClose={() => setShowSubmissionForm(false)}
-                        initialType="participant"
-                    />
-                </DialogContent>
-            </Dialog>
+                <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
+                    <DialogContent>
+                        <ComprehensiveSubmissionForm 
+                            onClose={() => setShowSubmissionForm(false)}
+                            initialType="participant"
+                        />
+                    </DialogContent>
+                </Dialog>
+            )}
         </>
     );
 };
