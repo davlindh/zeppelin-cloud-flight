@@ -278,7 +278,7 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
                     value={selectedType}
                     onValueChange={(value: SubmissionFormData['type']) => setValue('type', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
