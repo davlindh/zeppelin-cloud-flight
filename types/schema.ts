@@ -35,6 +35,16 @@ export interface ProjectSchema {
   associations?: string[];
   created_at: string;
   updated_at: string;
+  budget?: {
+    amount?: number;
+    currency?: string;
+    breakdown?: Array<{ item: string; cost: number; }>;
+  };
+  timeline?: {
+    start_date?: string;
+    end_date?: string;
+    milestones?: Array<{ date: string; title: string; description?: string; }>;
+  };
 }
 
 export interface ProjectParticipantSchema {

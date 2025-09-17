@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { ArrowLeft, ExternalLink, MapPin, Clock, Star, Phone, Mail, Calendar, Globe, Info, MessageCircle, Award, Users, Heart, Zap, Target, Briefcase, Code, Palette, Camera, Music, BookOpen, Coffee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +12,7 @@ import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
 import { useToast } from '@/hooks/use-toast';
 import type { UnifiedMediaItem } from '@/types/unified-media';
 import { generateMediaId } from '@/utils/mediaHelpers';
-import { useParticipantData } from '../hooks/useParticipantData';
+import { useParticipantData } from '@/hooks/useParticipantData';
 import type { Participant } from '../types/unified';
 
 export const ParticipantDetailPage: React.FC = () => {
@@ -19,6 +20,10 @@ export const ParticipantDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
+
+  // Admin controls
+  const { isAdmin } = useAdminAuth();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { getParticipantBySlug, loading } = useParticipantData();
   const participant: Participant | undefined = getParticipantBySlug(slug || '');
@@ -137,7 +142,35 @@ export const ParticipantDetailPage: React.FC = () => {
                   </Badge>
                 )}
               </div>
-              
+
+              {/* Admin controls - only shown if user is admin */}
+              {isAdmin && (
+                <div className="flex gap-3 mt-4 mb-2">
+                  <Button
+                    onClick={() => {
+                      // Navigate to direct admin edit page
+                      navigate(`/admin/participants/${participant.id}/edit`, {
+                        state: {
+                          participantData: participant,
+                          returnPath: `/participants/${participant.id}`
+                        }
+                      });
+                    }}
+                    variant="secondary"
+                    className="bg-white/20 hover:bg-white/40 text-primary-foreground border-white/50 backdrop-blur-md"
+                  >
+                    🗑️ Edit Participant
+                  </Button>
+                  <Button
+                    onClick={() => setShowDeleteDialog(true)}
+                    variant="destructive"
+                    className="bg-red-500/90 hover:bg-red-600 text-white border-red-500/30 backdrop-blur-md"
+                  >
+                    🗑️ Delete Participant
+                  </Button>
+                </div>
+              )}
+
               <div className="space-y-2 text-primary-foreground/90">
                 <p>Medverkar i {participant.projects?.length || 0} projekt</p>
                 {participant.location && (
@@ -496,6 +529,42 @@ export const ParticipantDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background rounded-lg p-6 max-w-md w-full">
+            <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-4 mx-auto">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <h3 className="text-lg font-semibold text-center mb-2">Ta bort deltagare</h3>
+            <p className="text-muted-foreground text-center mb-6">
+              Är du säker på att du vill ta bort "<strong>{participant.name}</strong>"?
+              Detta kan inte ångras.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowDeleteDialog(false)}
+              >
+                Avbryt
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={() => {
+                  // Handle delete - will be implemented with actual mutation
+                  console.log('Delete confirmed for participant:', participant.id);
+                  setShowDeleteDialog(false);
+                }}
+              >
+                Ta bort
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

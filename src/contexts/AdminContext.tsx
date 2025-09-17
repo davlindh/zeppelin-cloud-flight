@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useAdminAuth } from './AdminAuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useParticipants as useApiParticipants, useProjects as useApiProjects, useSponsors as useApiSponsors, useCreateProject, useUpdateProject } from '@/hooks/useApi';
+import { useParticipants as useApiParticipants, useProjects as useApiProjects, useSponsors as useApiSponsors, useCreateProject, useUpdateProject , queryKeys } from '@/hooks/useApi';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/hooks/useApi';
+
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import {

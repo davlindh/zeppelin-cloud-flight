@@ -152,8 +152,30 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
         );
 
       case 'file':
+        const currentValue = watch(fieldName as Path<T>) as string;
+        const isImageField = field.name.includes('image') || field.name.includes('avatar') || field.name.includes('logo');
+
         return (
           <div className="space-y-3">
+            {/* Current file preview */}
+            {currentValue && isImageField && (
+              <div className="border rounded-lg p-4 bg-muted/20">
+                <Label className="text-sm font-medium mb-2 block">Current Image Preview</Label>
+                <div className="relative w-full max-w-sm mx-auto">
+                  <img
+                    src={currentValue}
+                    alt="Current file preview"
+                    className="w-full h-auto max-h-40 object-cover rounded-lg border"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      // Could add fallback text or icon here
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-4">
               <Button
                 type="button"
@@ -162,8 +184,21 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
                 disabled={isUploadingFile || fileUpload?.isUploading}
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {uploadedFileUrl ? 'Change File' : 'Upload File'}
+                {currentValue ? 'Replace File' : 'Upload File'}
               </Button>
+              {currentValue && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setValue(fieldName as Path<T>, '' as PathValue<T, Path<T>>);
+                    setUploadedFileUrl('');
+                  }}
+                >
+                  Remove
+                </Button>
+              )}
               <input
                 id={`${field.name}-input`}
                 type="file"
@@ -178,13 +213,25 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
                 <Progress value={fileUpload?.uploadProgress || 0} className="h-2" />
                 <p className="text-sm text-muted-foreground">Uploading...</p>
               </div>
-            ) : uploadedFileUrl ? (
+            ) : uploadedFileUrl || currentValue ? (
               <div className="flex items-center gap-2 p-3 border border-green-200 bg-green-50 rounded-lg">
                 <FileText className="h-4 w-4 text-green-600" />
-                <span className="text-sm text-green-600">File uploaded successfully</span>
+                <span className="text-sm text-green-600">
+                  {uploadedFileUrl ? 'File uploaded successfully' : 'Current file loaded'}
+                </span>
+                {currentValue && (
+                  <a
+                    href={uploadedFileUrl || currentValue}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 text-sm underline"
+                  >
+                    View {isImageField ? 'image' : 'file'}
+                  </a>
+                )}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No file uploaded</p>
+              <p className="text-sm text-muted-foreground">No file selected</p>
             )}
           </div>
         );

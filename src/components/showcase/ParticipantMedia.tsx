@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { User, Calendar } from 'lucide-react';
 import { MediaGrid } from '../multimedia/MediaGrid';
 import { MediaFilters } from '../multimedia/MediaFilters';
-import { getCategoryIcon, getCategoryColor, getCategoryLabel } from '@/utils/mediaHelpers';
+import { getCategoryIcon, getCategoryColor, getCategoryLabel , generateMediaId } from '@/utils/mediaHelpers';
 import type { ParticipantMediaItem, MediaCategory } from '@/types/media';
-import { generateMediaId } from '@/utils/mediaHelpers';
+
 
 interface ParticipantMediaProps {
   media?: Array<{

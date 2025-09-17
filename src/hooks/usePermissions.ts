@@ -195,7 +195,7 @@ export const usePermissions = () => {
   useEffect(() => {
     checkPermissions();
     checkStorageInfo();
-  }, [checkPermissions, checkStorageInfo]);
+  }, []); // Run only once on mount
 
   return {
     permissions,

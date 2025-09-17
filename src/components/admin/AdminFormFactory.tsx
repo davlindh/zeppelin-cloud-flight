@@ -1,6 +1,7 @@
 import React from 'react';
 import { GenericAdminForm } from './GenericAdminForm';
 import { AdminFormConfig } from '@/types/admin';
+import { supabase } from '@/integrations/supabase/client';
 import { generateSlug, parseSocialLinks } from '@/utils/formUtils';
 
 // Form configurations for all admin entities
@@ -99,6 +100,48 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
         name: 'imageFile',
         label: 'Project Image',
         type: 'file'
+      },
+      {
+        name: 'timeline_start_date',
+        label: 'Timeline - Start Date',
+        type: 'text',
+        placeholder: 'YYYY-MM-DD (e.g., 2024-01-15)'
+      },
+      {
+        name: 'timeline_end_date',
+        label: 'Timeline - End Date',
+        type: 'text',
+        placeholder: 'YYYY-MM-DD (e.g., 2024-12-31)'
+      },
+      {
+        name: 'timeline_milestones',
+        label: 'Timeline - Milestones',
+        type: 'textarea',
+        placeholder: 'Enter milestones as JSON array: [{"date": "2024-01-01", "title": "Start", "description": "..."}, ...]'
+      },
+      {
+        name: 'budget_amount',
+        label: 'Budget - Amount',
+        type: 'text',
+        placeholder: 'Enter amount (e.g., 50000)'
+      },
+      {
+        name: 'budget_currency',
+        label: 'Budget - Currency',
+        type: 'text',
+        placeholder: 'SEK'
+      },
+      {
+        name: 'budget_breakdown',
+        label: 'Budget - Breakdown',
+        type: 'textarea',
+        placeholder: 'Enter budget breakdown as JSON array: [{"item": "Materials", "cost": 1000}, ...]'
+      },
+      {
+        name: 'project_media',
+        label: 'Project Media Library',
+        type: 'textarea',
+        placeholder: 'Project media is managed separately through the media gallery. Use this space for media notes if needed.'
       }
     ]
   },
@@ -173,17 +216,38 @@ const dataTransformers = {
   },
 
   project: {
-    toForm: (data: Record<string, unknown> | undefined) => ({
-      title: (data?.title as string) || '',
-      description: (data?.description as string) || '',
-      full_description: (data?.full_description as string) || '',
-      purpose: (data?.purpose as string) || '',
-      expected_impact: (data?.expected_impact as string) || '',
-      associations: Array.isArray(data?.associations)
-        ? (data.associations as string[]).join(', ')
-        : '',
-      image_path: (data?.image_path as string) || ''
-    }),
+    toForm: (data: Record<string, unknown> | undefined) => {
+      const timeline = (data as any)?.timeline;
+      const budget = (data as any)?.budget;
+
+      // Extract timeline fields if they exist
+      const timelineStartDate = timeline?.start_date || '';
+      const timelineEndDate = timeline?.end_date || '';
+      const timelineMilestones = timeline?.milestones ? JSON.stringify(timeline.milestones, null, 2) : '';
+
+      // Extract budget fields if they exist
+      const budgetAmount = budget?.amount?.toString() || '';
+      const budgetCurrency = budget?.currency || '';
+      const budgetBreakdown = budget?.breakdown ? JSON.stringify(budget.breakdown, null, 2) : '';
+
+      return {
+        title: (data?.title as string) || '',
+        description: (data?.description as string) || '',
+        full_description: (data?.full_description as string) || '',
+        purpose: (data?.purpose as string) || '',
+        expected_impact: (data?.expected_impact as string) || '',
+        associations: Array.isArray(data?.associations)
+          ? (data.associations as string[]).join(', ')
+          : '',
+        image_path: (data?.image_path as string) || '',
+        timeline_start_date: timelineStartDate,
+        timeline_end_date: timelineEndDate,
+        timeline_milestones: timelineMilestones,
+        budget_amount: budgetAmount,
+        budget_currency: budgetCurrency,
+        budget_breakdown: budgetBreakdown,
+      };
+    },
     fromForm: (data: Record<string, unknown>) => ({
       title: data.title as string,
       description: data.description as string,
@@ -306,6 +370,3 @@ export const ProjectFormNew = (props: LegacyFormProps) => (
 export const SponsorFormNew = (props: LegacyFormProps) => (
   <AdminFormFactory entityType="sponsor" {...props} />
 );
-
-// Import supabase for the factory
-import { supabase } from '@/integrations/supabase/client';

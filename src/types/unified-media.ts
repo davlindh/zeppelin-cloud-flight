@@ -1,8 +1,10 @@
+import type { MediaType, MediaCategory, BaseMediaItem } from './media';
+
 // Unified Media Types - Clean implementation based on Supabase database schema
 // No legacy aliases - modern type system for first version
+// Re-exporting common types from media.ts to avoid duplication
 
-export type MediaType = 'video' | 'audio' | 'image' | 'document' | 'portfolio' | 'pdf' | 'presentation' | 'archive' | 'code' | '3d';
-export type MediaCategory = 'featured' | 'process' | 'archive' | 'collaboration' | 'promotional' | 'technical' | 'artistic';
+export type { MediaType, MediaCategory } from './media';
 
 /**
  * Unified MediaItem interface based on database schema

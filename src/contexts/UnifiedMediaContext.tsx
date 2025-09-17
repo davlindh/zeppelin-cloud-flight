@@ -607,10 +607,10 @@ export const UnifiedMediaProvider: React.FC<UnifiedMediaProviderProps> = ({
     return () => clearInterval(interval);
   }, [cacheTimeout, state.cache.size]);
 
-  // Initial data fetch
+  // Initial data fetch - run only once on mount
   useEffect(() => {
     fetchItems(initialFilters);
-  }, [fetchItems, initialFilters]);
+  }, []); // Remove dep array to break circular dependency
 
   const contextValue: UnifiedMediaContextType = {
     state,

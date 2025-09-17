@@ -20,11 +20,7 @@ export const Header: React.FC = () => {
 
     // Prevent background scroll when mobile menu is open
     useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
+        document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
         
         return () => {
             document.body.style.overflow = 'unset';

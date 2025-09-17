@@ -1,23 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fileCacheService, type CacheEntry, type CacheSettings } from '@/services/FileCacheService';
 
-// Check for user consent
-const getCacheConsent = (): boolean => {
-  try {
-    const consent = localStorage.getItem('file-cache-consent');
-    return consent === 'granted';
-  } catch {
-    return false;
-  }
-};
+  // Check for user consent
+  const getCacheConsent = (): boolean => {
+    try {
+      const consent = localStorage.getItem('file-cache-consent');
+      return consent === 'granted';
+    } catch {
+      return false;
+    }
+  };
 
-const setCacheConsent = (granted: boolean): void => {
-  try {
-    localStorage.setItem('file-cache-consent', granted ? 'granted' : 'denied');
-  } catch {
-    console.warn('Could not save cache consent to localStorage');
-  }
-};
+  const setCacheConsent = (granted: boolean): void => {
+    try {
+      localStorage.setItem('file-cache-consent', granted ? 'granted' : 'denied');
+    } catch {
+      console.warn('Could not save cache consent to localStorage');
+    }
+  };
 
 export interface UseCachedFileResult {
   cachedUrl: string | null;
@@ -101,15 +101,19 @@ export const useCachedFile = (url: string, metadata?: CacheEntry['metadata']): U
   }, [url, cachedUrl]);
 
   useEffect(() => {
-    checkCache();
+    if (url && hasConsent) {
+      checkCache();
+    }
+  }, [url, hasConsent]); // Remove checkCache and cachedUrl from dependencies
 
-    // Cleanup blob URL on unmount
+  // Separate cleanup effect
+  useEffect(() => {
     return () => {
       if (cachedUrl) {
         URL.revokeObjectURL(cachedUrl);
       }
     };
-  }, [checkCache, cachedUrl]);
+  }, [cachedUrl]);
 
   return {
     cachedUrl,
@@ -220,9 +224,10 @@ export const useCacheManager = (): UseCacheManagerResult => {
     }
   }, [refreshStats]);
 
+  // Initialize stats on mount
   useEffect(() => {
     refreshStats();
-  }, [refreshStats]);
+  }, []); // Empty dependency array - only run once on mount
 
   return {
     settings,

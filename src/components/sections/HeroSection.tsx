@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../ui';
-import { Modal } from '../ui';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
-import { ComprehensiveSubmissionForm } from '../../src/components/public/ComprehensiveSubmissionForm';
+import { useNavigate } from 'react-router-dom';
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 
 
 
 export const HeroSection: React.FC = () => {
     const [showSubmissionForm, setShowSubmissionForm] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => setIsVisible(true), 300);
@@ -17,6 +19,21 @@ export const HeroSection: React.FC = () => {
 
     const handleParticipantClick = () => {
         setShowSubmissionForm(true);
+    };
+
+    const handleShowcaseClick = () => {
+        navigate('/showcase');
+    };
+
+    const handlePartnersClick = () => {
+        navigate('/partners');
+    };
+
+    const handlePartnerScrollClick = () => {
+        const partnerSection = document.getElementById('partner');
+        if (partnerSection) {
+            partnerSection.scrollIntoView({ behavior: 'smooth' });
+        }
     };
 
     return (
@@ -65,7 +82,7 @@ export const HeroSection: React.FC = () => {
                             className="sm:mb-0 mb-4"
                         >
                             <Button
-                                variant="primary"
+                                variant="default"
                                 onClick={handleParticipantClick}
                                 className="hover:scale-105 transition-transform duration-300"
                             >
@@ -86,7 +103,7 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
-                                to="/showcase"
+                                onClick={handleShowcaseClick}
                                 className="hover:scale-105 transition-transform duration-300"
                             >
                                 Utforska Showcase
@@ -105,13 +122,13 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
-                                to="/partners"
+                                onClick={handlePartnersClick}
                                 className="hover:scale-105 transition-transform duration-300"
                             >
                                 Våra Partners
                             </Button>
                         </motion.div>
-                        
+
                         {/* Bli Partner CTA */}
                         <motion.div
                             initial={{ y: 30, opacity: 0, x: 30 }}
@@ -124,7 +141,7 @@ export const HeroSection: React.FC = () => {
                         >
                             <Button
                                 variant="secondary"
-                                href="#partner"
+                                onClick={handlePartnerScrollClick}
                                 className="hover:scale-105 transition-transform duration-300"
                             >
                                 Bli Partner
@@ -143,14 +160,14 @@ export const HeroSection: React.FC = () => {
             </section>
 
             {/* Enhanced Submission Form Modal */}
-            {showSubmissionForm && (
-                <Modal isOpen={showSubmissionForm} onClose={() => setShowSubmissionForm(false)}>
-                    <ComprehensiveSubmissionForm 
+            <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
+                <DialogContent>
+                    <ComprehensiveSubmissionForm
                         onClose={() => setShowSubmissionForm(false)}
                         initialType="participant"
                     />
-                </Modal>
-            )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 };

@@ -1,38 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useMediaPlayer } from '@/contexts/MediaContext';
 import { useProject } from '@/hooks/useApi';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { PublicVoting } from '@/components/public';
-import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
-import type { UnifiedMediaItem } from '@/types/unified-media';
-import { generateMediaId } from '@/utils/mediaHelpers';
-import { MediaGrid } from '@/components/multimedia';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Target, 
-  ExternalLink, 
-  Github, 
-  Globe, 
-  Play,
-  Eye,
-  Download,
-  DollarSign,
-  Clock,
-  Shield,
-  Vote,
-  Award,
-  Link as LinkIcon,
-  Hash
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { ProjectDetailLayout } from '@/components/showcase/projects/ProjectDetailLayout';
 
 interface ProjectDetail {
   id: string;
@@ -95,10 +79,14 @@ interface ProjectDetail {
   };
 }
 
-export const ProjectDetailPage: React.FC = () => {
+export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Admin check and controls
+  const { isAdmin } = useAdminAuth();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Use TanStack Query for data fetching - replaces all manual data fetching
   const { data: projectData, isLoading: loading, error } = useProject(slug || '');
@@ -130,36 +118,27 @@ export const ProjectDetailPage: React.FC = () => {
     };
   }, [projectData]);
 
-  const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return '/public/images/ui/placeholder-project.jpg';
-    
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-    
-    const { data } = supabase.storage
-      .from('project-images')
-      .getPublicUrl(imagePath);
-    
-    return data.publicUrl;
-  };
 
-  const getMediaIcon = (type: string) => {
-    switch (type) {
-      case 'video': return <Play className="h-4 w-4" />;
-      case 'audio': return <Play className="h-4 w-4" />;
-      case 'image': return <Eye className="h-4 w-4" />;
-      case 'document': return <Download className="h-4 w-4" />;
-      default: return <ExternalLink className="h-4 w-4" />;
-    }
-  };
 
-  const getLinkIcon = (type: string) => {
-    switch (type) {
-      case 'github': return <Github className="h-4 w-4" />;
-      case 'website': return <Globe className="h-4 w-4" />;
-      case 'demo': return <Play className="h-4 w-4" />;
-      default: return <ExternalLink className="h-4 w-4" />;
+  const handleDelete = async () => {
+    try {
+      const { error } = await supabase.from("projects").delete().eq("id", project.id);
+      if (error) throw error;
+
+      toast({
+        title: "Projekt raderat",
+        description: "Projektet har tagits bort permanent.",
+      });
+
+      navigate("/showcase");
+    } catch (err: any) {
+      toast({
+        title: "Fel vid borttagning",
+        description: err.message || "Något gick fel",
+        variant: "destructive",
+      });
+    } finally {
+      setShowDeleteDialog(false);
     }
   };
 
@@ -242,371 +221,43 @@ export const ProjectDetailPage: React.FC = () => {
       </div>
     );
   }
-
   return (
-    <div className="min-h-screen gradient-hero">
-      {/* Enhanced Hero Section */}
-      <div className="relative h-[32rem] md:h-[40rem] lg:h-[44rem] overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={getImageUrl(project.image_path)}
-            alt={project.title}
-            className="w-full h-full object-cover object-center scale-105 transition-transform duration-700 ease-out"
-            onError={(e) => {
-              e.currentTarget.src = '/public/images/ui/placeholder-project.jpg';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-background/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
-        </div>
-        
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 h-full flex items-end">
-          <div className="w-full max-w-6xl animate-fade-in">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/showcase')}
-              className="mb-6 md:mb-8 text-foreground/80 hover:text-foreground btn-glow backdrop-blur-md bg-background/30 border border-border/40 hover:bg-background/50 transition-all duration-300 shadow-elegant"
+    <>
+      <ProjectDetailLayout
+        project={project}
+        isAdmin={isAdmin}
+        onEdit={() => {
+          // Navigate to direct admin edit page
+          navigate(`/admin/projects/${project.id}/edit`, {
+            state: {
+              projectData: project,
+              returnPath: `/showcase/${project.id}`
+            }
+          });
+        }}
+        onDelete={() => setShowDeleteDialog(true)}
+      />
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Är du säker?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Detta kommer att ta bort projektet <strong>{project.title}</strong> permanent.
+              Åtgärden kan inte ångras.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Avbryt</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Tillbaka till showcase
-            </Button>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 md:mb-8 leading-[0.9] tracking-tight font-serif">
-              {project.title}
-            </h1>
-            
-            <p className="text-xl sm:text-2xl md:text-3xl text-foreground/90 mb-8 md:mb-10 max-w-5xl leading-relaxed font-light">
-              {project.description}
-            </p>
-
-            {/* Enhanced Tags */}
-            {(project.tags || project.associations) && (
-              <div className="flex flex-wrap gap-3 md:gap-4 animate-scale-in">
-                {project.tags?.map((tag, index) => (
-                  <Badge key={`tag-${index}`} variant="secondary" className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-medium shadow-elegant hover:shadow-glow transition-all duration-300 backdrop-blur-sm bg-secondary/80 hover:bg-secondary border border-border/20">
-                    {tag}
-                  </Badge>
-                ))}
-                {project.associations?.map((assoc, index) => (
-                  <Badge key={`assoc-${index}`} variant="outline" className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-medium bg-background/40 backdrop-blur-md border-border/50 hover:bg-background/60 transition-all duration-300 shadow-soft">
-                    {assoc}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Enhanced Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 max-w-8xl">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 md:gap-16 items-start">
-          
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-10 md:space-y-12">
-            
-            {/* Full Description */}
-            {project.full_description && (
-              <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500 group animate-fade-in">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">Om projektet</CardTitle>
-                </CardHeader>
-                <CardContent className="prose prose-gray prose-lg max-w-none">
-                  <p className="text-lg md:text-xl leading-relaxed text-muted-foreground whitespace-pre-wrap font-light">{project.full_description}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Purpose & Impact */}
-            {(project.purpose || project.expected_impact) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 animate-fade-in">
-                {project.purpose && (
-                  <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500 h-full group">
-                    <CardHeader className="pb-6">
-                      <CardTitle className="flex items-start gap-4 text-xl md:text-2xl">
-                        <div className="p-3 rounded-xl gradient-primary flex-shrink-0 shadow-soft group-hover:shadow-glow transition-all duration-300">
-                          <Target className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
-                        </div>
-                        <span className="leading-tight font-semibold group-hover:text-primary transition-colors duration-300">Syfte</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-muted-foreground leading-relaxed text-base md:text-lg font-light">{project.purpose}</p>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {project.expected_impact && (
-                  <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500 h-full group">
-                    <CardHeader className="pb-6">
-                      <CardTitle className="flex items-start gap-4 text-xl md:text-2xl">
-                        <div className="p-3 rounded-xl gradient-secondary flex-shrink-0 shadow-soft group-hover:shadow-glow transition-all duration-300">
-                          <Target className="h-5 w-5 md:h-6 md:w-6 text-secondary-foreground" />
-                        </div>
-                        <span className="leading-tight font-semibold group-hover:text-secondary transition-colors duration-300">Förväntad påverkan</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-muted-foreground leading-relaxed text-base md:text-lg font-light">{project.expected_impact}</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            )}
-
-            {/* Timeline & Budget */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {project.timeline && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5" />
-                      Tidsplan
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {project.timeline.start_date && (
-                        <p className="text-sm">
-                          <strong>Start:</strong> {new Date(project.timeline.start_date).toLocaleDateString('sv-SE')}
-                        </p>
-                      )}
-                      {project.timeline.end_date && (
-                        <p className="text-sm">
-                          <strong>Slut:</strong> {new Date(project.timeline.end_date).toLocaleDateString('sv-SE')}
-                        </p>
-                      )}
-                      {project.timeline.milestones && project.timeline.milestones.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-sm mt-4 mb-2">Milstolpar:</h4>
-                          <ul className="space-y-1">
-                            {project.timeline.milestones.map((milestone, index) => (
-                              <li key={index} className="text-sm text-muted-foreground">
-                                <strong>{new Date(milestone.date).toLocaleDateString('sv-SE')}:</strong> {milestone.title}
-                                {milestone.description && <span className="block ml-4">{milestone.description}</span>}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {project.budget && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Budget</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {project.budget.amount && (
-                        <p className="text-lg font-semibold">
-                          {project.budget.amount.toLocaleString('sv-SE')} {project.budget.currency || 'SEK'}
-                        </p>
-                      )}
-                      {project.budget.breakdown && project.budget.breakdown.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-sm mt-4 mb-2">Fördelning:</h4>
-                          <ul className="space-y-1">
-                            {project.budget.breakdown.map((item, index) => (
-                              <li key={index} className="text-sm text-muted-foreground flex justify-between">
-                                <span>{item.item}</span>
-                                <span>{item.cost.toLocaleString('sv-SE')} {project.budget?.currency || 'SEK'}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            {/* Media */}
-            {project.media && project.media.length > 0 && (
-              <Card className="card-glow reveal-up stagger-3">
-                <CardContent className="p-8">
-                  <UnifiedMediaGrid
-                    media={project.media.map((item, index): UnifiedMediaItem => ({
-                      id: generateMediaId(item),
-                      type: item.type as UnifiedMediaItem['type'],
-                      category: 'featured',
-                      url: item.url,
-                      title: item.title,
-                      description: item.description,
-                      projectId: project.id
-                    }))}
-                    viewMode="grid"
-                    showPreview
-                    showPlayButton
-                    showAddToQueue
-                    showDownloadButton
-                    showMetadata
-                    enableSearch
-                    enableFilters
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Enhanced Links */}
-            {project.links && project.links.length > 0 && (
-              <Card className="card-glow reveal-up stagger-4">
-                <CardHeader>
-                  <CardTitle className="text-xl">Projektlänkar</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {project.links.map((link, index) => (
-                      <Button key={index} variant="outline" asChild className="btn-glow h-auto p-4 justify-start">
-                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                          <div className="p-2 rounded-md bg-primary/10">
-                            {getLinkIcon(link.type)}
-                          </div>
-                          <span className="font-medium">
-                            {link.type === 'github' ? 'GitHub Repository' : 
-                             link.type === 'website' ? 'Projektwebbsida' : 
-                             link.type === 'demo' ? 'Live Demo' : 'Extern länk'}
-                          </span>
-                        </a>
-                      </Button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-          </div>
-
-          {/* Enhanced Sidebar */}
-          <div className="space-y-8">
-            
-            {/* Project Info */}
-            <Card className="card-glow reveal-up">
-              <CardHeader>
-                <CardTitle className="text-xl">Projektdetaljer</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Skapad</p>
-                    <p className="text-sm font-semibold">
-                      {new Date(project.created_at).toLocaleDateString('sv-SE')}
-                    </p>
-                  </div>
-                </div>
-                
-                {project.access && (
-                  <>
-                    {project.access.target_audience && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Målgrupp</p>
-                        <p className="text-sm font-medium">{project.access.target_audience}</p>
-                      </div>
-                    )}
-                    
-                    {project.access.capacity && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Kapacitet</p>
-                        <p className="text-sm font-medium">{project.access.capacity} deltagare</p>
-                      </div>
-                    )}
-                    
-                    {project.access.registration_required && (
-                      <div className="bg-muted p-3 rounded-lg">
-                        <p className="text-sm text-muted-foreground">Anmälan krävs</p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Participants */}
-            {project.participants && project.participants.length > 0 && (
-              <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500">
-                <CardHeader className="pb-6">
-                  <CardTitle className="flex items-center gap-3 text-xl md:text-2xl font-semibold">
-                    <div className="p-3 rounded-xl gradient-primary shadow-soft">
-                      <Users className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
-                    </div>
-                    Deltagare ({project.participants.length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-4 md:space-y-6">
-                    {project.participants.map((participant) => (
-                      <div key={participant.id} className="group p-4 rounded-xl bg-background/50 border border-border/30 hover:border-border/50 hover:bg-background/80 transition-all duration-300 hover:shadow-soft">
-                        <div className="flex items-start gap-4">
-                          <div className="relative flex-shrink-0">
-                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border/20 group-hover:border-primary/30 transition-all duration-300 shadow-soft">
-                              {participant.avatar_path ? (
-                                <img
-                                  src={participant.avatar_path}
-                                  alt={participant.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <span className="text-lg font-semibold text-muted-foreground">
-                                  {participant.name.charAt(0).toUpperCase()}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="font-semibold text-foreground text-base md:text-lg group-hover:text-primary transition-colors duration-300">{participant.name}</h3>
-                            <p className="text-sm text-muted-foreground font-medium mb-2">{participant.role}</p>
-                            {participant.bio && (
-                              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{participant.bio}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Sponsors */}
-            {project.sponsors && project.sponsors.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sponsorer & Partners</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {project.sponsors.map((sponsor) => (
-                      <div key={sponsor.id} className="flex items-center gap-3">
-                        {sponsor.logo_path && (
-                          <img
-                            src={sponsor.logo_path}
-                            alt={sponsor.name}
-                            className="w-8 h-8 object-contain"
-                          />
-                        )}
-                        <div>
-                          <p className="text-sm font-medium">{sponsor.name}</p>
-                          <Badge variant="outline" className="text-xs">
-                            {sponsor.type === 'main' ? 'Huvudsponsor' : 
-                             sponsor.type === 'partner' ? 'Partner' : 
-                             'Supporter'}
-                          </Badge>
-                        </div>
-                       </div>
-                     ))}
-                   </div>
-                 </CardContent>
-               </Card>
-             )}
-           </div>
-         </div>
-        </div>
-      </div>
-    );
-  };
+              Ta bort
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}

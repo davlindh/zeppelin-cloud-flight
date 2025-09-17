@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button'; // Corrected import for Button
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { usePartnerData } from '../../hooks/usePartnerData'; // Corrected import path
-import { EnhancedPartnerShowcase } from '../partners/EnhancedPartnerShowcase'; // Corrected import path
+import { usePartnerData } from '@/hooks/usePartnerData';
+import { EnhancedPartnerShowcase } from '@/components/partners/EnhancedPartnerShowcase';
 import { Loader2, AlertCircle } from 'lucide-react';
-import { ComprehensiveSubmissionForm } from '../public/ComprehensiveSubmissionForm'; // Corrected import path
-import { errorHandler } from '../../utils/errorHandler'; // Corrected import for errorHandler
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
+import { errorHandler } from '@/utils/errorHandler';
 
 interface PartnerShowcasePartner {
   id: string;
@@ -25,26 +25,55 @@ interface PartnerShowcasePartner {
     description?: string;
   }>;
   collaborationTypes?: string[];
+  // Legacy compatibility fields
+  alt?: string;
+  src?: string;
+  tagline?: string;
+  href?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const PartnerSection: React.FC = () => {
     const [componentError, setComponentError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
+    const [isRetrying, setIsRetrying] = useState(false);
 
     const { partners, loading, error, refetch } = usePartnerData({ enhanced: true });
     const [showSubmissionForm, setShowSubmissionForm] = useState(false);
 
-    // Handle errors from hook
+    // Handle errors from hook with proper recovery logic
     useEffect(() => {
         if (error) {
             const errorResult = errorHandler.handleError(new Error(error), {
                 component: 'PartnerSection',
                 action: 'fetching partner data'
             });
-            setComponentError(errorResult.userMessage);
+
+            // Only set error state for non-recoverable errors
+            // For recoverable errors, the hook should handle retries
+            if (!errorResult.shouldRetry) {
+                setComponentError(errorResult.userMessage);
+            } else {
+                // For recoverable errors, we don't show error UI - let the hook retry
+                setComponentError(null);
+                // Optionally trigger recovery action if available
+                errorResult.recoveryAction?.();
+            }
         } else {
             setComponentError(null);
         }
     }, [error]);
+
+    const handleRetry = async () => {
+        setIsRetrying(true);
+        setRetryCount(prev => prev + 1);
+        try {
+            await refetch();
+        } finally {
+            setIsRetrying(false);
+        }
+    };
 
     const handlePartnershipClick = () => {
         setShowSubmissionForm(true);
@@ -73,12 +102,23 @@ export const PartnerSection: React.FC = () => {
 <AlertCircle viewBox="0 0 24 24" className="h-12 w-12 text-red-400 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold text-white mb-2">Partners kunde inte laddas</h3>
                             <p className="text-gray-300 mb-4">{componentError}</p>
+                            {retryCount > 0 && (
+                                <p className="text-sm text-gray-400 mb-4">Tentativa {retryCount}/3</p>
+                            )}
                             <Button
                                 variant="secondary"
-                                onClick={refetch}
-                                className="border-gray-600 text-white hover:bg-gray-700"
+                                onClick={handleRetry}
+                                disabled={isRetrying}
+                                className="border-gray-600 text-white hover:bg-gray-700 disabled:opacity-50"
                             >
-                                Försök igen
+                                {isRetrying ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                        Försöker igen...
+                                    </>
+                                ) : (
+                                    'Försök igen'
+                                )}
                             </Button>
                         </div>
                     </div>

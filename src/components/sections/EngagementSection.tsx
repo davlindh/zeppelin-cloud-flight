@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '../ui/button'; // Corrected import for Button
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { ComprehensiveSubmissionForm } from '../public/ComprehensiveSubmissionForm';
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 
 export const EngagementSection: React.FC = () => {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);

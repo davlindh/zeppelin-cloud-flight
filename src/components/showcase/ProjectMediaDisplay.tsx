@@ -1,11 +1,12 @@
 import React from 'react';
 import { MediaFilters } from '../multimedia';
-import { UnifiedMediaGrid } from '../../src/components/multimedia/UnifiedMediaGrid';
-import { Button } from '../../src/components/ui/button';
-import type { ProjectMediaItem, MediaType } from '../../src/types/media';
-import { generateMediaId } from '../../src/utils/mediaHelpers';
-import { useMediaFiltering } from '../../src/hooks/useMediaFiltering';
-import { resolveMediaUrl } from '../../src/utils/assetHelpers';
+import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
+import { Button } from '@/components/ui/button';
+import type { ProjectMediaItem, MediaType } from '@/types/media';
+import type { UnifiedMediaItem } from '@/types/unified-media';
+import { generateMediaId } from '@/utils/mediaHelpers';
+import { useMediaFiltering } from '@/hooks/useMediaFiltering';
+import { resolveMediaUrl } from '@/utils/assetHelpers';
 
 interface ProjectMediaDisplayProps {
   media?: Array<{
@@ -73,7 +74,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
 
       {filteredMedia.length > 0 ? (
         <UnifiedMediaGrid
-          media={filteredMedia}
+          media={filteredMedia as UnifiedMediaItem[]}
           viewMode={gridViewMode}
           showPreview={showPreview}
           className="mt-4"

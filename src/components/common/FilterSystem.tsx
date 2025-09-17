@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
-import { SearchFilter, MultiSelectFilter, SingleSelectFilter, ActiveFiltersDisplay, ResultsSummary, FilterContainer } from './FilterComponents';
-import { FilterOption, ActiveFilters } from './FilterComponents';
+import { SearchFilter, MultiSelectFilter, SingleSelectFilter, ActiveFiltersDisplay, ResultsSummary, FilterContainer , FilterOption, ActiveFilters } from './FilterComponents';
+
 
 // Enhanced filter types for the unified system
 interface FilterConfigInternal {

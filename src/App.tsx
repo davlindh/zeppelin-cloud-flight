@@ -20,6 +20,9 @@ import { PartnersPage } from "./pages/PartnersPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
+import { ProjectEditPage } from "./pages/admin/ProjectEditPage";
+import { ParticipantEditPage } from "./pages/admin/ParticipantEditPage";
+import { SponsorEditPage } from "./pages/admin/SponsorEditPage";
 import { ComponentTest } from "./components/admin/ComponentTest";
 import NotFound from "./pages/NotFound";
 import { queryClient } from "./lib/queryClient";
@@ -56,6 +59,29 @@ const App = () => (
                   <AdminProvider>
                     <AdminRoute>
                       <AdminDashboardPage />
+                    </AdminRoute>
+                  </AdminProvider>
+                } />
+
+                {/* Direct Admin Edit Routes */}
+                <Route path="/admin/projects/:slug/edit" element={
+                  <AdminProvider>
+                    <AdminRoute>
+                      <ProjectEditPage />
+                    </AdminRoute>
+                  </AdminProvider>
+                } />
+                <Route path="/admin/participants/:slug/edit" element={
+                  <AdminProvider>
+                    <AdminRoute>
+                      <ParticipantEditPage />
+                    </AdminRoute>
+                  </AdminProvider>
+                } />
+                <Route path="/admin/sponsors/:slug/edit" element={
+                  <AdminProvider>
+                    <AdminRoute>
+                      <SponsorEditPage />
                     </AdminRoute>
                   </AdminProvider>
                 } />

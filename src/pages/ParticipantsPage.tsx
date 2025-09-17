@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { useParticipantData } from '../hooks/useParticipantData';
+import { useParticipantData } from '@/hooks/useParticipantData';
 import { EnhancedParticipantFilters } from '../components/participants/EnhancedParticipantFilters';
 import { ParticipantStats } from '../components/participants/ParticipantStats';
 import type { ParticipantEntity } from '../utils/participantHelpers';

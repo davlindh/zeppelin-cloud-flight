@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { Participant } from '@/types/unified';
 import type { MediaCategory, MediaType } from '@/types/media';
 import { PARTICIPANT_DATA } from '../../constants/data/participants';
-import { useParticipants, queryKeys } from './useApi';
+import { useParticipants } from './useApi';
 
 interface SocialLink {
   platform: string;
@@ -90,33 +90,19 @@ const transformParticipant = (dbParticipant: DbParticipant): Participant => {
   };
 
   // Add project relationships
-  if (dbParticipant.project_participants) {
-    participant.projects = dbParticipant.project_participants.map((pp: {
-      role: string;
-      projects: {
-        id: string;
-        title: string;
-        image_path?: string;
-      };
-    }) => ({
+  if (dbParticipant.project_participants && dbParticipant.project_participants.length > 0) {
+    participant.projects = dbParticipant.project_participants.map((pp: typeof dbParticipant.project_participants[0]) => ({
       id: pp.projects.id,
       title: pp.projects.title,
       role: pp.role,
       imageUrl: pp.projects.image_path ? `/images/${pp.projects.image_path}` : undefined
     }));
-    participant.roles = [...new Set(dbParticipant.project_participants.map((pp: {
-      role: string;
-      projects: {
-        id: string;
-        title: string;
-        image_path?: string;
-      };
-    }) => pp.role))] as string[];
+    participant.roles = [...new Set(dbParticipant.project_participants.map((pp: typeof dbParticipant.project_participants[0]) => pp.role))];
   }
 
   // Add media
-  if (dbParticipant.participant_media) {
-    participant.media = dbParticipant.participant_media.map((media: NonNullable<DbParticipant['participant_media']>[number]) => ({
+  if (dbParticipant.participant_media && dbParticipant.participant_media.length > 0) {
+    participant.media = dbParticipant.participant_media.map((media: typeof dbParticipant.participant_media[0]) => ({
       id: media.id,
       type: media.type as MediaType,
       category: media.category as MediaCategory,
@@ -155,12 +141,12 @@ export const useParticipantData = () => {
   const queryClient = useQueryClient();
   const staticParticipants = useMemo(() => PARTICIPANT_DATA.map(transformStaticParticipant), []);
 
-  // Use TanStack Query hook instead of useDataFetcher
+  // Use TanStack Query hook
   const { data: participantsData, isLoading: loading, error } = useParticipants();
 
   // Create refetch function for compatibility
   const refetch = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.participants });
+    queryClient.invalidateQueries({ queryKey: ['participants'] });
   };
 
   // Transform API data to match expected format
@@ -168,35 +154,56 @@ export const useParticipantData = () => {
     if (!participantsData) return staticParticipants;
 
     return participantsData.map(participant => {
-      const socialLinks = (participant.social_links as unknown as SocialLink[]) || [];
-      return {
-        id: participant.id,
-        name: participant.name,
-        slug: participant.slug,
-        bio: participant.bio,
-        avatar: participant.avatar_path,
-        website: participant.website,
-        socialLinks,
-        roles: [], // Will be populated when relationships are added
-        projects: [], // Will be populated when relationships are added
-        media: [], // Will be populated when relationships are added
-        personalLinks: socialLinks.map((link: SocialLink) => ({
-          type: link.platform.toLowerCase(),
-          url: link.url
-        })),
-        createdAt: participant.created_at,
-        updatedAt: participant.updated_at,
-        skills: participant.skills || [],
-        experienceLevel: participant.experience_level,
-        interests: participant.interests || [],
-        timeCommitment: participant.time_commitment,
-        contributions: participant.contributions || [],
-        location: participant.location,
-        contactEmail: participant.contact_email,
-        contactPhone: participant.contact_phone,
-        howFoundUs: participant.how_found_us,
-        availability: participant.availability
-      };
+      try {
+        // Convert Json types to expected types for transformation
+        const normalizedParticipant = {
+          ...participant,
+          social_links: Array.isArray(participant.social_links)
+            ? participant.social_links as unknown as SocialLink[]
+            : [],
+          // Handle participant_media year field conversion from string to number if needed
+          participant_media: participant.participant_media?.map((media: {
+            id: string;
+            type: string;
+            category: string;
+            url: string;
+            title: string;
+            description: string | null;
+            year: string | number | null;
+          }) => ({
+            ...media,
+            year: (typeof media.year === 'string') ? parseInt(media.year, 10) || undefined : media.year
+          }))
+        };
+        return transformParticipant(normalizedParticipant as DbParticipant);
+      } catch (error) {
+        console.error(`Error transforming participant ${participant.id}:`, error);
+        // Return fallback format if transformation fails
+        return {
+          id: participant.id,
+          name: participant.name,
+          slug: participant.slug,
+          bio: participant.bio,
+          avatar: participant.avatar_path,
+          socialLinks: [],
+          roles: [],
+          projects: [],
+          media: [],
+          personalLinks: [],
+          createdAt: participant.created_at,
+          updatedAt: participant.updated_at,
+          skills: participant.skills || [],
+          experienceLevel: participant.experience_level,
+          interests: participant.interests || [],
+          timeCommitment: participant.time_commitment,
+          contributions: participant.contributions || [],
+          location: participant.location,
+          contactEmail: participant.contact_email,
+          contactPhone: participant.contact_phone,
+          howFoundUs: participant.how_found_us,
+          availability: participant.availability
+        };
+      }
     });
   }, [participantsData, staticParticipants]);
 
@@ -211,10 +218,11 @@ export const useParticipantData = () => {
       participant.skills?.forEach(skill => skills.add(skill));
       if (participant.experienceLevel) experienceLevel.add(participant.experienceLevel);
       participant.contributions?.forEach(contribution => contributionTypes.add(contribution));
-      
-      if (participant.media?.length) contributionTypes.add('Media Creator');
-      if (participant.projects?.length) contributionTypes.add('Project Participant');
-      if (participant.personalLinks?.length) contributionTypes.add('Professional');
+
+      // Add contribution types based on media/project participation
+      if (participant.media && participant.media.length > 0) contributionTypes.add('Media Creator');
+      if (participant.projects && participant.projects.length > 0) contributionTypes.add('Project Participant');
+      if (participant.personalLinks && participant.personalLinks.length > 0) contributionTypes.add('Professional');
     });
 
     return {
@@ -232,10 +240,13 @@ export const useParticipantData = () => {
         const searchLower = filters.searchTerm.toLowerCase();
         const matchesName = participant.name.toLowerCase().includes(searchLower);
         const matchesBio = participant.bio?.toLowerCase().includes(searchLower);
-        const matchesRoles = participant.roles?.some(role => 
+        const matchesRoles = participant.roles?.some(role =>
           role.toLowerCase().includes(searchLower)
         );
-        if (!matchesName && !matchesBio && !matchesRoles) return false;
+        const matchesSkills = participant.skills?.some(skill =>
+          skill.toLowerCase().includes(searchLower)
+        );
+        if (!matchesName && !matchesBio && !matchesRoles && !matchesSkills) return false;
       }
 
       // Role filter
@@ -279,7 +290,7 @@ export const useParticipantData = () => {
       participants.flatMap(p => p.projects?.map(proj => proj.id) || [])
     ).size;
     const totalMedia = participants.reduce((sum, p) => sum + (p.media?.length || 0), 0);
-    
+
     return {
       totalParticipants,
       totalProjects,

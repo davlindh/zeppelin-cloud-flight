@@ -1,8 +1,7 @@
-import { useMemo, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Sponsor } from '@/types/unified';
 import { SPONSOR_DATA } from '../../constants/data/sponsors';
-import { useDataFetcher } from './useDataFetcher';
 import errorHandler from '../utils/errorHandler';
 
 interface EnhancedPartner extends Sponsor {
@@ -11,7 +10,6 @@ interface EnhancedPartner extends Sponsor {
   src?: string;
   tagline?: string;
   href?: string;
-
   // Enhanced fields
   description?: string;
   projects?: Array<{
@@ -52,82 +50,137 @@ interface DbSponsorWithProjects extends DbSponsor {
   }>;
 }
 
-const transformStaticSponsor = (staticSponsor: DbSponsor): EnhancedPartner => ({
-  id: staticSponsor.id,
-  name: staticSponsor.name,
-  type: staticSponsor.type,
-  logo: staticSponsor.logo_path ? `/images/${staticSponsor.logo_path}` : undefined,
-  website: staticSponsor.website,
-  createdAt: staticSponsor.created_at,
-  updatedAt: staticSponsor.updated_at,
-  // Legacy fields for backward compatibility with PartnersPage
-  alt: staticSponsor.name,
-  src: staticSponsor.logo_path ? `/images/${staticSponsor.logo_path}` : '',
+// Static partners as fallback
+const staticPartners = SPONSOR_DATA.map(sponsor => ({
+  id: sponsor.id,
+  name: sponsor.name,
+  type: sponsor.type,
+  logo: sponsor.logo_path ? `/images/${sponsor.logo_path}` : undefined,
+  website: sponsor.website,
+  createdAt: sponsor.created_at,
+  updatedAt: sponsor.updated_at,
+  // Legacy fields for backward compatibility
+  alt: sponsor.name,
+  src: sponsor.logo_path ? `/images/${sponsor.logo_path}` : '',
   tagline: '',
-  href: staticSponsor.website || '',
+  href: sponsor.website || '',
+}));
+
+// Transform function for database sponsors
+const transformStaticSponsor = (sponsor: DbSponsor): EnhancedPartner => ({
+  id: sponsor.id,
+  name: sponsor.name,
+  type: sponsor.type,
+  logo: sponsor.logo_path ? `/images/${sponsor.logo_path}` : undefined,
+  website: sponsor.website,
+  createdAt: sponsor.created_at,
+  updatedAt: sponsor.updated_at,
+  // Legacy fields for backward compatibility
+  alt: sponsor.name,
+  src: sponsor.logo_path ? `/images/${sponsor.logo_path}` : '',
+  tagline: '',
+  href: sponsor.website || '',
 });
 
+// Main hook using TanStack Query
 export const usePartnerData = ({ enhanced = false } = {}) => {
-  // Memoize the static partners computation to prevent re-creation
-  const staticPartners = useMemo(() => SPONSOR_DATA.map(transformStaticSponsor), []);
-
-  const query = useMemo(() => enhanced
-    ? `
-        *,
-        project_sponsors (
-          projects (
-            id,
-            title,
-            created_at
+  // Query function defined inside the hook to follow React rules
+  const fetchPartners = async (): Promise<EnhancedPartner[]> => {
+    const query = enhanced
+      ? `
+          *,
+          project_sponsors (
+            projects (
+              id,
+              title,
+              created_at
+            )
           )
-        )
-      `
-    : '*', [enhanced]);
+        `
+      : '*';
 
-  // Memoize the transform function to prevent re-creation and infinite loops
-  const transformDataFn = useCallback(async (data: unknown) => {
     try {
-      if (enhanced) {
-        // When enhanced, data comes with joined project_sponsors
-        const result = (data as DbSponsorWithProjects[]).map(dbSponsor => {
-          const sponsor = transformStaticSponsor(dbSponsor);
+      const { data: dbData, error: dbError } = await supabase
+        .from('sponsors')
+        .select(query)
+        .order('created_at', { ascending: false });
 
-          // Add projects from the joined data
-          if (dbSponsor.project_sponsors && Array.isArray(dbSponsor.project_sponsors)) {
-            sponsor.projects = dbSponsor.project_sponsors.map((ps) => ({
-              id: ps.projects.id,
-              title: ps.projects.title,
-              year: new Date(ps.projects.created_at).getFullYear().toString(),
-            }));
-          }
-          // Add additional enhanced fields
-          sponsor.description = 'Enhanced description';
-          sponsor.partnershipHistory = [{ year: '2023', milestone: 'Became a partner' }];
-          sponsor.collaborationTypes = ['Funding', 'Support'];
-          return sponsor;
-        });
-        return result;
-      } else {
-        // When not enhanced, simple transformation
-        const result = (data as DbSponsor[]).map(transformStaticSponsor);
-        return result;
+      if (dbError) throw dbError;
+
+      if (!dbData || dbData.length === 0) {
+        return staticPartners;
       }
-    } catch (error) {
-      const errorResult = errorHandler.handleError(error, {
-        component: 'usePartnerData',
-        action: 'transforming partner data',
-        technicalDetails: { enhanced, dataProvided: !!data }
+
+      // Transform the data with proper type handling
+      const transformedPartners: EnhancedPartner[] = (dbData as any[]).map((dbSponsor) => {
+        const partner = transformStaticSponsor(dbSponsor);
+
+        if (enhanced && dbSponsor.project_sponsors) {
+          partner.projects = dbSponsor.project_sponsors.map((ps: any) => ({
+            id: ps.projects.id,
+            title: ps.projects.title,
+            year: new Date(ps.projects.created_at).getFullYear().toString(),
+          }));
+          partner.description = 'Enhanced description';
+          partner.partnershipHistory = [{ year: '2023', milestone: 'Became a partner' }];
+          partner.collaborationTypes = ['Funding', 'Support'];
+        }
+
+        return partner;
       });
+
+      return transformedPartners;
+    } catch (error) {
+      // For errors, attempt to handle them
+      const result = errorHandler.handleError(error, {
+        component: 'usePartnerData',
+        action: 'fetching partner data',
+        technicalDetails: { enhanced }
+      });
+
+      // If it's recoverable, let React Query handle the retry
+      if (result.shouldRetry) {
+        throw error;
+      }
+
+      // Otherwise, silently fall back to static data
+      console.warn('[usePartnerData] Failed to fetch real data, using static fallback:', result.userMessage);
       return staticPartners;
     }
-  }, [enhanced, staticPartners]);
+  };
 
-  const { data: partners, loading, error, refetch } = useDataFetcher<EnhancedPartner, EnhancedPartner[]>({
-    tableName: 'sponsors',
-    query,
-    staticFallback: staticPartners,
-    transformData: transformDataFn,
+  const {
+    data: partners,
+    isLoading: loading,
+    error,
+    refetch,
+    isError
+  } = useQuery<EnhancedPartner[]>({
+    queryKey: ['partners', { enhanced }],
+    queryFn: fetchPartners,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    retry: (failureCount, err) => {
+      // Don't retry on 4xx errors (client errors)
+      if (err instanceof Error && 'status' in err) {
+        const status = (err as Error & { status: number }).status;
+        if (status >= 400 && status < 500) {
+          return false;
+        }
+      }
+      return failureCount < 3;
+    },
+    // Keep using static data as fallback
+    placeholderData: staticPartners,
   });
 
-  return { partners: partners || staticPartners, loading, error, refetch };
+  // Handle errors and provide fallback
+  const errorMessage = isError && error ? (error as Error).message : null;
+
+  return {
+    partners: partners || staticPartners,
+    loading,
+    error: errorMessage,
+    refetch
+  };
 };

@@ -91,14 +91,33 @@ export const useParticipants = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('participants')
-        .select('*')
+        .select(`
+          *,
+          project_participants (
+            role,
+            projects (
+              id,
+              title,
+              image_path
+            )
+          ),
+          participant_media (
+            id,
+            type,
+            category,
+            url,
+            title,
+            description,
+            year
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data || [];
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
