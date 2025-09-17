@@ -112,6 +112,46 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
           />
         );
 
+      case 'email':
+        return (
+          <Input
+            id={field.name}
+            {...register(fieldName as Path<T>)}
+            type="email"
+            placeholder={field.placeholder}
+          />
+        );
+
+      case 'tel':
+        return (
+          <Input
+            id={field.name}
+            {...register(fieldName as Path<T>)}
+            type="tel"
+            placeholder={field.placeholder}
+          />
+        );
+
+      case 'number':
+        return (
+          <Input
+            id={field.name}
+            {...register(fieldName as Path<T>)}
+            type="number"
+            placeholder={field.placeholder}
+          />
+        );
+
+      case 'date':
+        return (
+          <Input
+            id={field.name}
+            {...register(fieldName as Path<T>)}
+            type="date"
+            placeholder={field.placeholder}
+          />
+        );
+
       case 'textarea':
         return (
           <Textarea

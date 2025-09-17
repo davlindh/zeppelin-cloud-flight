@@ -33,8 +33,8 @@ export const ProjectLinks: React.FC<ProjectLinksProps> = ({ links }) => {
   };
 
   const getButtonVariant = (type: string) => {
-    const variants: Record<string, 'primary' | 'secondary'> = {
-      demo: 'primary',
+    const variants: Record<string, 'default' | 'secondary'> = {
+      demo: 'default',
       github: 'secondary',
       website: 'secondary',
       other: 'secondary'
@@ -53,14 +53,11 @@ export const ProjectLinks: React.FC<ProjectLinksProps> = ({ links }) => {
           <Button
             key={index}
             variant={getButtonVariant(link.type)}
-            href={link.url}
-            onClick={(e) => {
-              // Optional: Track analytics, external link warnings, etc.
-              e.currentTarget.setAttribute('target', '_blank');
-              e.currentTarget.setAttribute('rel', 'noopener noreferrer');
-            }}
+            asChild
           >
-            {getLinkLabel(link.type)}
+            <a href={link.url} target="_blank" rel="noopener noreferrer">
+              {getLinkLabel(link.type)}
+            </a>
           </Button>
         ))}
       </div>

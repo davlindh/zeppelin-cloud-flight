@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../ui';
 
 export const Footer: React.FC = () => {
@@ -14,7 +15,7 @@ export const Footer: React.FC = () => {
 
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-8">
                         <Button
-                            variant="primary"
+                            variant="default"
                             onClick={() => {
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                             }}
@@ -25,16 +26,16 @@ export const Footer: React.FC = () => {
 
                         <Button
                             variant="secondary"
-                            to="/showcase"
+                            asChild
                             className="hover:scale-105 transition-transform duration-300"
                         >
-                            Utforska Showcase
+                            <Link to="/showcase">Utforska Showcase</Link>
                         </Button>
 
                         <Button
                             variant="secondary"
                             onClick={() => {
-                                window.scrollTo({ top: 2200, behavior: 'smooth' });
+                                window.scrollTo({ top: 2200, behavior: 'smooth' });  
                             }}
                             className="hover:scale-105 transition-transform duration-300"
                         >

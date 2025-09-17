@@ -1,5 +1,4 @@
 export { BaseMediaItem } from './BaseMediaItem';
-export { MediaGrid } from './MediaGrid';
 export { MediaFilters } from './MediaFilters';
 export { MediaGallery } from './MediaGallery';
 export { MediaCardPreview } from './MediaCardPreview';

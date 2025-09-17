@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { User, Calendar } from 'lucide-react';
-import { MediaGrid } from '../multimedia/MediaGrid';
+import { UnifiedMediaGrid } from '../multimedia/UnifiedMediaGrid';
 import { MediaFilters } from '../multimedia/MediaFilters';
 import { getCategoryIcon, getCategoryColor, getCategoryLabel , generateMediaId } from '@/utils/mediaHelpers';
-import type { ParticipantMediaItem, MediaCategory } from '@/types/media';
-
+import type { MediaCategory, ParticipantMediaItem, UnifiedMediaItem } from '@/types/unified-media';
+import { generateMediaId } from '@/utils/mediaHelpers';
 
 interface ParticipantMediaProps {
   media?: Array<{
@@ -30,10 +30,15 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
     return null;
   }
 
-  // Convert to ParticipantMediaItem format
-  const mediaItems: ParticipantMediaItem[] = media.map((item, index) => ({
+  // Convert to unified media format
+  const mediaItems: UnifiedMediaItem[] = media.map((item, index) => ({
     id: generateMediaId(item),
-    ...item,
+    type: item.type,
+    url: item.url,
+    title: item.title,
+    description: item.description,
+    category: item.category,
+    year: item.year,
   }));
 
   // Filter media
@@ -49,12 +54,12 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
 
   // Group by category for better organization
   const groupedMedia = filteredMedia.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
+    if (!acc[item.category || 'other']) {
+      acc[item.category || 'other'] = [];
     }
-    acc[item.category].push(item);
+    acc[item.category || 'other'].push(item);
     return acc;
-  }, {} as Record<string, ParticipantMediaItem[]>);
+  }, {} as Record<string, UnifiedMediaItem[]>);
 
   return (
     <div className="space-y-6">
@@ -95,7 +100,7 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
             </span>
           </div>
           
-          <MediaGrid
+          <UnifiedMediaGrid
             media={items}
             viewMode={viewMode === 'gallery' ? 'grid' : viewMode}
           />

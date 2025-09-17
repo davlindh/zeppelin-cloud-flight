@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ShowcaseCard } from '../../types/index';
+import type { ShowcaseCard } from '@/types/unified';
 import { Button } from '../ui';
 
 interface ProjectDetailProps {
@@ -100,18 +100,24 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ card, onClose }) =
             <h2 className="text-2xl font-semibold text-gray-800">Länkar</h2>
             <div className="flex flex-wrap gap-3">
               {card.links.find(link => link.type === 'website') && (
-                <Button variant="secondary" href={card.links.find(link => link.type === 'website')?.url}>
-                  Besök hemsida
+                <Button variant="secondary" asChild>
+                  <a href={card.links.find(link => link.type === 'website')?.url} target="_blank" rel="noopener noreferrer">
+                    Besök hemsida
+                  </a>
                 </Button>
               )}
               {card.links.find(link => link.type === 'github') && (
-                <Button variant="secondary" href={card.links.find(link => link.type === 'github')?.url}>
-                  GitHub
+                <Button variant="secondary" asChild>
+                  <a href={card.links.find(link => link.type === 'github')?.url} target="_blank" rel="noopener noreferrer">
+                    GitHub
+                  </a>
                 </Button>
               )}
               {card.links.find(link => link.type === 'demo') && (
-                <Button variant="primary" href={card.links.find(link => link.type === 'demo')?.url}>
-                  Se demo
+                <Button variant="default" asChild>
+                  <a href={card.links.find(link => link.type === 'demo')?.url} target="_blank" rel="noopener noreferrer">
+                    Se demo
+                  </a>
                 </Button>
               )}
             </div>

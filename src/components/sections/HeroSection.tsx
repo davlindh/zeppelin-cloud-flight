@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Button, Modal } from '../ui';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
@@ -104,9 +106,10 @@ export const HeroSection: React.FC = () => {
                             <Button
                                 variant="secondary"
                                 onClick={handleShowcaseClick}
+                                asChild
                                 className="hover:scale-105 transition-transform duration-300"
                             >
-                                Utforska Showcase
+                                <Link to="/showcase">Utforska Showcase</Link>
                             </Button>
                         </motion.div>
 
@@ -123,9 +126,10 @@ export const HeroSection: React.FC = () => {
                             <Button
                                 variant="secondary"
                                 onClick={handlePartnersClick}
+                                asChild
                                 className="hover:scale-105 transition-transform duration-300"
                             >
-                                Våra Partners
+                                <Link to="/partners">Våra Partners</Link>
                             </Button>
                         </motion.div>
 
@@ -142,9 +146,10 @@ export const HeroSection: React.FC = () => {
                             <Button
                                 variant="secondary"
                                 onClick={handlePartnerScrollClick}
+                                asChild
                                 className="hover:scale-105 transition-transform duration-300"
                             >
-                                Bli Partner
+                                <a href="#partner">Bli Partner</a>
                             </Button>
                         </motion.div>
                     </div>
@@ -160,9 +165,9 @@ export const HeroSection: React.FC = () => {
             </section>
 
             {/* Enhanced Submission Form Modal */}
-            <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
-                <DialogContent>
-                    <ComprehensiveSubmissionForm
+            {showSubmissionForm && (
+                <Modal open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
+                    <ComprehensiveSubmissionForm 
                         onClose={() => setShowSubmissionForm(false)}
                         initialType="participant"
                     />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { GenericAdminForm } from './GenericAdminForm';
 import { AdminFormConfig } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,6 +33,24 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
         placeholder: 'Tell us about this participant...'
       },
       {
+        name: 'location',
+        label: 'Location',
+        type: 'text',
+        placeholder: 'City, Country'
+      },
+      {
+        name: 'contact_email',
+        label: 'Contact Email',
+        type: 'email',
+        placeholder: 'participant@example.com'
+      },
+      {
+        name: 'contact_phone',
+        label: 'Contact Phone',
+        type: 'tel',
+        placeholder: '+46 123 456 789'
+      },
+      {
         name: 'website',
         label: 'Website',
         type: 'url',
@@ -43,6 +61,58 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
         label: 'Social Media Links',
         type: 'textarea',
         placeholder: 'Enter links separated by commas (e.g., https://instagram.com/username, https://twitter.com/username)'
+      },
+      {
+        name: 'skills',
+        label: 'Skills',
+        type: 'textarea',
+        placeholder: 'Enter skills separated by commas (e.g., JavaScript, Design, Project Management)'
+      },
+      {
+        name: 'interests',
+        label: 'Interests',
+        type: 'textarea',
+        placeholder: 'Enter interests separated by commas (e.g., Sustainability, Art, Technology)'
+      },
+      {
+        name: 'contributions',
+        label: 'Contributions',
+        type: 'textarea',
+        placeholder: 'Enter contributions separated by commas (e.g., Development, Design, Research)'
+      },
+      {
+        name: 'experience_level',
+        label: 'Experience Level',
+        type: 'select',
+        options: [
+          { value: 'beginner', label: 'Beginner' },
+          { value: 'intermediate', label: 'Intermediate' },
+          { value: 'advanced', label: 'Advanced' },
+          { value: 'expert', label: 'Expert' }
+        ]
+      },
+      {
+        name: 'time_commitment',
+        label: 'Time Commitment',
+        type: 'select',
+        options: [
+          { value: 'part-time', label: 'Part-time' },
+          { value: 'full-time', label: 'Full-time' },
+          { value: 'volunteer', label: 'Volunteer' },
+          { value: 'project-based', label: 'Project-based' }
+        ]
+      },
+      {
+        name: 'availability',
+        label: 'Availability',
+        type: 'textarea',
+        placeholder: 'Describe your availability (e.g., Weekends, Evenings, Flexible)'
+      },
+      {
+        name: 'how_found_us',
+        label: 'How did you find us?',
+        type: 'textarea',
+        placeholder: 'Tell us how you discovered this project...'
       },
       {
         name: 'avatarFile',
@@ -199,19 +269,45 @@ const dataTransformers = {
       name: (data?.name as string) || '',
       slug: (data?.slug as string) || '',
       bio: (data?.bio as string) || '',
+      location: (data?.location as string) || '',
+      contact_email: (data?.contact_email as string) || '',
+      contact_phone: (data?.contact_phone as string) || '',
       website: (data?.website as string) || '',
       social_links: Array.isArray(data?.social_links)
-        ? (data.social_links as Array<{url: string}>).map(link => link.url).join(', ')
+        ? data.social_links.map((link: any) => typeof link === 'object' ? link.url : link).join(', ')
         : '',
+      skills: Array.isArray(data?.skills) 
+        ? data.skills.join(', ')
+        : '',
+      interests: Array.isArray(data?.interests)
+        ? data.interests.join(', ')
+        : '',
+      contributions: Array.isArray(data?.contributions)
+        ? data.contributions.join(', ')
+        : '',
+      experience_level: (data?.experience_level as string) || '',
+      time_commitment: (data?.time_commitment as string) || '',
+      availability: (data?.availability as string) || '',
+      how_found_us: (data?.how_found_us as string) || '',
       avatar_path: (data?.avatar_path as string) || ''
     }),
     fromForm: (data: Record<string, unknown>) => ({
       name: data.name as string,
-      slug: data.slug as string,
+      slug: data.slug as string || generateSlug(data.name as string),
       bio: data.bio as string,
+      location: data.location as string,
+      contact_email: data.contact_email as string,
+      contact_phone: data.contact_phone as string,
       website: data.website as string,
-      social_links: parseSocialLinks(data.social_links as string),
-      avatar_path: (data.avatar_path as string)
+      social_links: parseSocialLinks((data.social_links as string) || ''),
+      skills: (data.skills as string)?.split(',').map(s => s.trim()).filter(Boolean) || [],
+      interests: (data.interests as string)?.split(',').map(s => s.trim()).filter(Boolean) || [],
+      contributions: (data.contributions as string)?.split(',').map(s => s.trim()).filter(Boolean) || [],
+      experience_level: data.experience_level as string,
+      time_commitment: data.time_commitment as string,
+      availability: data.availability as string,
+      how_found_us: data.how_found_us as string,
+      avatar_path: (data.avatar_path as string) || (data.avatarFile as string)
     })
   },
 
@@ -297,12 +393,43 @@ export const AdminFormFactory: React.FC<AdminFormFactoryProps> = ({
   initialData,
   onSuccess
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [entityData, setEntityData] = useState<Record<string, unknown> | undefined>(initialData);
+  
   const config = adminFormConfigs[entityType];
   const transformer = dataTransformers[entityType];
 
   if (!config || !transformer) {
     throw new Error(`Unsupported entity type: ${entityType}`);
   }
+
+  // Fetch data when entityId is provided but no initialData
+  useEffect(() => {
+    if (entityId && !initialData) {
+      const fetchEntityData = async () => {
+        setIsLoading(true);
+        try {
+          const tableName = config.submitEndpoint as 'participants' | 'projects' | 'sponsors';
+          const { data, error } = await supabase
+            .from(tableName)
+            .select('*')
+            .eq('id', entityId)
+            .maybeSingle();
+
+          if (error) throw error;
+          
+          setEntityData(data || {});
+        } catch (error) {
+          console.error(`Error fetching ${entityType}:`, error);
+          setEntityData({});
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchEntityData();
+    }
+  }, [entityId, initialData, entityType, config.submitEndpoint]);
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     const transformedData = transformer.fromForm(data);
@@ -324,7 +451,15 @@ export const AdminFormFactory: React.FC<AdminFormFactoryProps> = ({
     onSuccess?.();
   };
 
-  const formData = transformer.toForm(initialData);
+  const formData = transformer.toForm(entityData);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <GenericAdminForm

@@ -22,13 +22,16 @@ import { useNavigate } from 'react-router-dom';
 export const AdminDashboardPage = () => {
   const { adminEmail, logout } = useAdminAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const [editingShowcaseId, setEditingShowcaseId] = useState<string | null>(null);
+  const [editingParticipantId, setEditingParticipantId] = useState<string | null>(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const handleFormClose = () => {
     setActiveForm(null);
     setEditingShowcaseId(null);
+    setEditingParticipantId(null);
   };
 
   const handleEditShowcase = (showcaseId: string) => {
@@ -45,6 +48,23 @@ export const AdminDashboardPage = () => {
     toast({
       title: "Öppnar projekt",
       description: "Projektet öppnas i ett nytt fönster.",
+    });
+  };
+
+  const handleEditParticipant = (id: string) => {
+    setEditingParticipantId(id);
+    setActiveForm('participant');
+    toast({
+      title: "Redigerar deltagare",
+      description: "Öppnar redigeringsformulär för vald deltagare.",
+    });
+  };
+
+  const handleViewParticipant = (slug: string) => {
+    navigate(`/participants/${slug}`);
+    toast({
+      title: "Öppnar deltagare",
+      description: "Navigerar till deltagarens profilsida.",
     });
   };
 
@@ -240,11 +260,11 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="participants">
-            <ParticipantManagementList onAddParticipant={() => setActiveForm('participant')} onEditParticipant={function (id: string): void {
-              throw new Error('Function not implemented.');
-            } } onViewParticipant={function (slug: string): void {
-              throw new Error('Function not implemented.');
-            } } />
+            <ParticipantManagementList 
+              onAddParticipant={() => setActiveForm('participant')}
+              onEditParticipant={handleEditParticipant}
+              onViewParticipant={handleViewParticipant}
+            />
           </TabsContent>
 
           <TabsContent value="sponsors">
@@ -277,6 +297,7 @@ export const AdminDashboardPage = () => {
         {activeForm === 'participant' && (
           <AdminFormFactory
             entityType="participant"
+            entityId={editingParticipantId}
             onClose={handleFormClose}
             onSuccess={handleFormClose}
           />

@@ -24,14 +24,13 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
   showPreview = true,
   allowCategorization = true 
 }) => {
-  // Convert to ProjectMediaItem format with centralized URL resolution
-  const mediaItems: ProjectMediaItem[] = media.map((item, index) => ({
-    id: generateMediaId(item),
-    type: item.type as MediaType,
-    url: resolveMediaUrl(item.url, item.type as MediaType, 'project'),
+  // Convert to UnifiedMediaItem format with centralized URL resolution
+  const mediaItems: UnifiedMediaItem[] = media.map((item, index) => ({
+    id: generateMediaId(item) || `project-media-${index}`,
+    type: item.type,
+    url: resolveMediaUrl(item.url, item.type, 'project'),
     title: item.title,
     description: item.description,
-    projectId: 'current-project'
   }));
 
   const {

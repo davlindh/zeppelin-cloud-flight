@@ -4,6 +4,14 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useProject } from '@/hooks/useApi';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { PublicVoting } from '@/components/public';
+import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
+import type { UnifiedMediaItem } from '@/types/unified-media';
+import { generateMediaId } from '@/utils/mediaHelpers';
+
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import {
