@@ -6,7 +6,7 @@ import { Badge, BadgeSuccess, BadgeWarning, BadgeInfo } from '@/components/ui/ba
 import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
+import { ParticipantApplicationForm } from '@/components/public/forms';
 // Import section components - Swedish content
 import { motion } from 'framer-motion';
 import { Users, FolderOpen, Building, Calendar, ChevronDown, ChevronUp, Sparkles, Zap, Shield, Heart } from 'lucide-react';
@@ -347,10 +347,9 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
 
       {/* Submission Form Dialog */}
       <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
-        <DialogContent size="xl">
-          <ComprehensiveSubmissionForm
+        <DialogContent>
+          <ParticipantApplicationForm
             onClose={() => setShowSubmissionForm(false)}
-            initialType="participant"
           />
         </DialogContent>
       </Dialog>

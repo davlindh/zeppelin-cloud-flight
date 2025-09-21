@@ -63,6 +63,14 @@ export const STORAGE_BUCKETS = {
   }
 } as const;
 
+// Placeholder asset paths - Export for assetHelpers.ts
+export const PLACEHOLDER_ASSETS = {
+  participant: '/images/participants/placeholder-avatar.svg',
+  project: '/images/projects/placeholder-project.svg',
+  partner: '/images/partners/placeholder-logo.svg',
+  ui: '/images/ui/placeholder.svg'
+} as const;
+
 // Helper functions for storage operations
 export const getStoragePath = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
   const bucketConfig = STORAGE_BUCKETS[bucket];
@@ -78,11 +86,3 @@ export const validateFileType = (bucket: keyof typeof STORAGE_BUCKETS, filename:
   const extension = filename.split('.').pop()?.toLowerCase();
   return extension ? (bucketConfig.allowedTypes as readonly string[]).includes(extension) : false;
 };
-
-// Placeholder asset paths
-export const PLACEHOLDER_ASSETS = {
-  participant: '/images/participants/placeholder-avatar.svg',
-  project: '/images/projects/placeholder-project.svg', 
-  partner: '/images/partners/placeholder-logo.svg',
-  ui: '/images/ui/placeholder.svg'
-} as const;

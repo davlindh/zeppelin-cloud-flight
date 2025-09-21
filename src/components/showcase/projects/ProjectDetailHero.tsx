@@ -27,7 +27,7 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
   const navigate = useNavigate();
 
   const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return '/public/images/ui/placeholder-project.jpg';
+    if (!imagePath) return '/images/ui/placeholder-project.jpg';
 
     if (imagePath.startsWith('http')) {
       return imagePath;
@@ -48,7 +48,7 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
           alt={project.title}
           className="w-full h-full object-cover object-center scale-105 transition-transform duration-700 ease-out"
           onError={(e) => {
-            e.currentTarget.src = '/public/images/ui/placeholder-project.jpg';
+            e.currentTarget.src = '/images/ui/placeholder-project.jpg';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-background/40" />

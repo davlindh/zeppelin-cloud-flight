@@ -1,0 +1,478 @@
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FileUpload } from '@/components/admin/FileUpload';
+import { BaseSubmissionForm, BaseSubmissionData } from './BaseSubmissionForm';
+import { useSubmission, FileSubmission } from '@/hooks/useSubmission';
+
+export interface ProjectFormData extends BaseSubmissionData {
+  // Project-specific fields
+  projectTitle: string;
+  projectDescription: string;
+  projectCategory: string;
+  expectedImpact: string;
+  timeline: string;
+  budget: string;
+  portfolio?: File;
+  references?: File;
+}
+
+interface ProjectProposalFormProps {
+  onClose: () => void;
+  className?: string;
+}
+
+export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
+  onClose,
+  className,
+}) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [uploadedFiles, setUploadedFiles] = useState<{ portfolio?: File; references?: File }>({});
+
+  const { register, handleSubmit, formState: { errors }, trigger, setValue, watch } = useForm<ProjectFormData>({
+    defaultValues: {
+      acceptTerms: false,
+      acceptPrivacy: false,
+    }
+  });
+
+  const { isSubmitting, error, submitForm } = useSubmission();
+
+  const totalSteps = 4;
+
+  // File upload handlers
+  const handleFileUpload = (fieldName: keyof typeof uploadedFiles, file: File) => {
+    setUploadedFiles(prev => ({ ...prev, [fieldName]: file }));
+  };
+
+  // Step navigation
+  const nextStep = async () => {
+    const isValid = await trigger();
+    if (isValid) {
+      setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  // Form submission
+  const onSubmit = async (data: ProjectFormData) => {
+    const userId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`; // Temporary ID until we have proper user auth
+    const submissionId = `project-${Date.now()}`;
+
+    const files: FileSubmission[] = [];
+
+    if (uploadedFiles.portfolio) {
+      files.push({
+        fieldName: 'portfolio',
+        file: uploadedFiles.portfolio,
+        bucketName: 'documents',
+        uploadContext: {
+          uploader: 'project-owner',
+          userId,
+          submissionId
+        }
+      });
+    }
+    if (uploadedFiles.references) {
+      files.push({
+        fieldName: 'references',
+        file: uploadedFiles.references,
+        bucketName: 'documents',
+        uploadContext: {
+          uploader: 'project-owner',
+          userId,
+          submissionId
+        }
+      });
+    }
+
+    const payload = {
+      type: 'project' as const,
+      title: data.projectTitle,
+      content: {
+        contact_info: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          organization: data.organization,
+          website: data.website,
+        },
+        project_info: {
+          title: data.projectTitle,
+          description: data.projectDescription,
+          category: data.projectCategory,
+          expectedImpact: data.expectedImpact,
+          timeline: data.timeline,
+          budget: data.budget,
+        },
+        additional_info: {
+          motivation: data.motivation,
+          experience: data.experience,
+          availability: data.availability,
+        },
+        consent: {
+          terms: data.acceptTerms,
+          privacy: data.acceptPrivacy,
+          marketing: data.acceptMarketing,
+          newsletter: data.newsletterSubscription,
+        },
+      },
+      contact_email: data.email,
+      contact_phone: data.phone,
+    };
+
+    await submitForm('project', payload, files);
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address *</Label>
+              <Input
+                id="email"
+                type="email"
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^\S+@\S+$/i,
+                    message: 'Invalid email address'
+                  }
+                })}
+                placeholder="your.email@example.com"
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name *</Label>
+                <Input
+                  id="firstName"
+                  {...register('firstName', { required: 'First name is required' })}
+                  placeholder="John"
+                />
+                {errors.firstName && (
+                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name *</Label>
+                <Input
+                  id="lastName"
+                  {...register('lastName', { required: 'Last name is required' })}
+                  placeholder="Doe"
+                />
+                {errors.lastName && (
+                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                {...register('phone')}
+                placeholder="+46 123 456 789"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="organization">Organization/Institution</Label>
+              <Input
+                id="organization"
+                {...register('organization')}
+                placeholder="Your organization"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website/Social Media</Label>
+              <Input
+                id="website"
+                {...register('website')}
+                placeholder="https://your-website.com"
+              />
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectTitle">Project Title *</Label>
+              <Input
+                id="projectTitle"
+                {...register('projectTitle', { required: 'Project title is required' })}
+                placeholder="Enter your project title"
+              />
+              {errors.projectTitle && (
+                <p className="text-sm text-destructive">{errors.projectTitle.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectDescription">Project Description *</Label>
+              <Textarea
+                id="projectDescription"
+                {...register('projectDescription', { required: 'Project description is required' })}
+                placeholder="Describe your project in detail..."
+                rows={5}
+              />
+              {errors.projectDescription && (
+                <p className="text-sm text-destructive">{errors.projectDescription.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="projectCategory">Project Category *</Label>
+                <Select
+                  value={watch('projectCategory')}
+                  onValueChange={(value) => setValue('projectCategory', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="art">Art & Culture</SelectItem>
+                    <SelectItem value="technology">Technology</SelectItem>
+                    <SelectItem value="sustainability">Sustainability</SelectItem>
+                    <SelectItem value="education">Education</SelectItem>
+                    <SelectItem value="community">Community</SelectItem>
+                    <SelectItem value="research">Research</SelectItem>
+                    <SelectItem value="innovation">Innovation</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="timeline">Timeline *</Label>
+                <Input
+                  id="timeline"
+                  {...register('timeline', { required: 'Timeline is required' })}
+                  placeholder="e.g., 3-6 months"
+                />
+                {errors.timeline && (
+                  <p className="text-sm text-destructive">{errors.timeline.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="budget">Budget Estimate</Label>
+                <Input
+                  id="budget"
+                  {...register('budget')}
+                  placeholder="e.g., €50,000"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="expectedImpact">Expected Impact</Label>
+                <Input
+                  id="expectedImpact"
+                  {...register('expectedImpact')}
+                  placeholder="Impact on community/regions"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="motivation">Project Motivation *</Label>
+              <Textarea
+                id="motivation"
+                {...register('motivation', { required: 'Motivation is required' })}
+                placeholder="Why do you want to develop this project at Zeppel Inn?"
+                rows={3}
+              />
+              {errors.motivation && (
+                <p className="text-sm text-destructive">{errors.motivation.message}</p>
+              )}
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="experience">Relevant Experience</Label>
+              <Textarea
+                id="experience"
+                {...register('experience')}
+                placeholder="Describe your relevant experience..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="availability">Team/Project Availability</Label>
+              <Textarea
+                id="availability"
+                {...register('availability')}
+                placeholder="When is your team available to participate?"
+                rows={2}
+              />
+            </div>
+
+            {/* File Uploads */}
+            <div className="space-y-4">
+              <Label>Supporting Documents</Label>
+
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Project Portfolio/Examples</Label>
+                <FileUpload
+                  onFileSelect={(file) => handleFileUpload('portfolio', file)}
+                  bucketName="documents"
+                  acceptedTypes="image/*,.pdf"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Supporting Documents/References</Label>
+                <FileUpload
+                  onFileSelect={(file) => handleFileUpload('references', file)}
+                  bucketName="documents"
+                  acceptedTypes=".pdf,.doc,.docx"
+                />
+              </div>
+            </div>
+
+            {/* Terms and Consent */}
+            <div className="space-y-3 border-t pt-4">
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="acceptTerms"
+                  {...register('acceptTerms', { required: 'You must accept the terms' })}
+                  className="mt-1"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="acceptTerms" className="text-sm font-medium leading-none">
+                    I accept the Terms and Conditions *
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    I agree to the terms of participation and code of conduct.
+                  </p>
+                </div>
+              </div>
+              {errors.acceptTerms && (
+                <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>
+              )}
+
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="acceptPrivacy"
+                  {...register('acceptPrivacy', { required: 'You must accept the privacy policy' })}
+                  className="mt-1"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="acceptPrivacy" className="text-sm font-medium leading-none">
+                    I accept the Privacy Policy *
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    I consent to the collection and processing of my personal data.
+                  </p>
+                </div>
+              </div>
+              {errors.acceptPrivacy && (
+                <p className="text-sm text-destructive">{errors.acceptPrivacy.message}</p>
+              )}
+
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="acceptMarketing"
+                  {...register('acceptMarketing')}
+                  className="mt-1"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <Label htmlFor="acceptMarketing" className="text-sm font-medium leading-none">
+                    I agree to receive marketing communications
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Optional: Receive updates about future events and opportunities.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <BaseSubmissionForm
+      onClose={onClose}
+      title="Submit Project Proposal"
+      currentStep={currentStep}
+      totalSteps={totalSteps}
+      icon="project"
+      className={className}
+      onSubmit={handleSubmit(onSubmit)}
+      isSubmitting={isSubmitting}
+      error={error}
+    >
+      {renderStep()}
+
+      {/* Navigation buttons */}
+      <div className="flex justify-between items-center mt-6 pt-6 border-t">
+        <div>
+          {currentStep > 1 && (
+            <button
+              type="button"
+              onClick={prevStep}
+              className="text-sm text-muted-foreground hover:text-foreground"
+              disabled={isSubmitting}
+            >
+              ← Previous
+            </button>
+          )}
+        </div>
+
+        <div className="text-sm text-muted-foreground">
+          Step {currentStep} of {totalSteps}
+        </div>
+
+        <div>
+          {currentStep < totalSteps && (
+            <button
+              type="button"
+              onClick={nextStep}
+              className="text-sm text-primary hover:text-primary/80 font-medium"
+              disabled={isSubmitting}
+            >
+              Next →
+            </button>
+          )}
+        </div>
+      </div>
+    </BaseSubmissionForm>
+  );
+};

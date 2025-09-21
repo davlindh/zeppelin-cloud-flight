@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Sponsor } from '@/types/unified';
-import { SPONSOR_DATA } from '../../constants/data/sponsors';
 import errorHandler from '../utils/errorHandler';
 
 interface EnhancedPartner extends Sponsor {
@@ -50,21 +49,8 @@ interface DbSponsorWithProjects extends DbSponsor {
   }>;
 }
 
-// Static partners as fallback
-const staticPartners = SPONSOR_DATA.map(sponsor => ({
-  id: sponsor.id,
-  name: sponsor.name,
-  type: sponsor.type,
-  logo: sponsor.logo_path ? `/images/${sponsor.logo_path}` : undefined,
-  website: sponsor.website,
-  createdAt: sponsor.created_at,
-  updatedAt: sponsor.updated_at,
-  // Legacy fields for backward compatibility
-  alt: sponsor.name,
-  src: sponsor.logo_path ? `/images/${sponsor.logo_path}` : '',
-  tagline: '',
-  href: sponsor.website || '',
-}));
+// Database-only - removed static fallback
+const emptyPartners: EnhancedPartner[] = [];
 
 // Transform function for database sponsors
 const transformStaticSponsor = (sponsor: DbSponsor): EnhancedPartner => ({
@@ -108,7 +94,7 @@ export const usePartnerData = ({ enhanced = false } = {}) => {
       if (dbError) throw dbError;
 
       if (!dbData || dbData.length === 0) {
-        return staticPartners;
+        return emptyPartners;
       }
 
       // Transform the data with proper type handling
@@ -144,8 +130,8 @@ export const usePartnerData = ({ enhanced = false } = {}) => {
       }
 
       // Otherwise, silently fall back to static data
-      console.warn('[usePartnerData] Failed to fetch real data, using static fallback:', result.userMessage);
-      return staticPartners;
+      console.warn('[usePartnerData] Failed to fetch real data, using empty array:', result.userMessage);
+      return emptyPartners;
     }
   };
 
@@ -170,15 +156,15 @@ export const usePartnerData = ({ enhanced = false } = {}) => {
       }
       return failureCount < 3;
     },
-    // Keep using static data as fallback
-    placeholderData: staticPartners,
+    // Keep using empty array as fallback
+    placeholderData: emptyPartners,
   });
 
   // Handle errors and provide fallback
   const errorMessage = isError && error ? (error as Error).message : null;
 
   return {
-    partners: partners || staticPartners,
+    partners: partners || emptyPartners,
     loading,
     error: errorMessage,
     refetch

@@ -53,7 +53,32 @@ export const useProjects = () => {
 };
 
 /**
- * Fetch a single project by slug - Basic implementation
+ * Unified Media Fetching System - Single Source for All Media Operations
+ */
+export const useUnifiedMedia = () => {
+  return useQuery({
+    queryKey: ['unified-media'],
+    queryFn: async () => {
+      // Fetch all media from database
+      const { data, error } = await supabase
+        .from('project_media')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return {
+        all: data || [],
+        totalCount: data?.length || 0
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
+/**
+ * Fetch a single project by slug with relationships
  */
 export const useProject = (slug: string) => {
   return useQuery({
@@ -61,7 +86,49 @@ export const useProject = (slug: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select(`
+          *,
+          project_participants (
+            role,
+            participants!inner (
+              id,
+              name,
+              bio,
+              avatar_path,
+              slug
+            )
+          ),
+          project_sponsors (
+            sponsors!inner (
+              id,
+              name,
+              logo_path,
+              website,
+              type
+            )
+          ),
+          project_links (type, url),
+          project_media (
+            id,
+            type,
+            url,
+            title,
+            description
+          ),
+          project_tags (tag),
+          project_budget!inner (amount, currency, breakdown),
+          project_timeline!inner (
+            start_date,
+            end_date,
+            milestones
+          ),
+          project_access!inner (
+            requirements,
+            target_audience,
+            capacity,
+            registration_required
+          )
+        `)
         .eq('slug', slug)
         .single();
 

@@ -1,6 +1,4 @@
-import { ANASTASIYA_EXTRA_PROJECTS } from './anastasiyaProjects';
-import { buildShowcaseCards } from '../src/data/builders';
-
+// Navigation links - keep these as they are functional and not static data
 export const NAV_LINKS = [
     { href: '#vision', label: 'Vision' },
     { href: '#systematik', label: 'Systematik' },
@@ -10,6 +8,3 @@ export const NAV_LINKS = [
     { href: '/participants', label: 'Deltagare' },
     { href: '/partners', label: 'Partners' },
 ];
-
-// Build showcase cards from normalized data
-export const INITIAL_CARDS = buildShowcaseCards();

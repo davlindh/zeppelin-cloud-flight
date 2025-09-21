@@ -8,6 +8,7 @@ import { ProjectInfoSidebar } from './ProjectInfoSidebar';
 
 interface ProjectDetailLayoutProps {
   project: {
+    // Basic project data
     id: string;
     title: string;
     description: string;
@@ -16,15 +17,18 @@ interface ProjectDetailLayoutProps {
     purpose?: string;
     expected_impact?: string;
     associations?: string[];
-    tags?: string[];
     created_at: string;
     updated_at: string;
+
+    // Backwards compatibility (transformed data)
+    tags?: string[];
     participants?: Array<{
       id: string;
       name: string;
       role: string;
       avatar_path?: string;
       bio?: string;
+      slug?: string;
     }>;
     sponsors?: Array<{
       id: string;
@@ -43,22 +47,20 @@ interface ProjectDetailLayoutProps {
       title: string;
       description?: string;
     }>;
-    budget?: {
-      amount?: number;
-      currency?: string;
-      breakdown?: Array<{ item: string; cost: number; }>;
-    };
-    timeline?: {
-      start_date?: string;
-      end_date?: string;
-      milestones?: Array<{ date: string; title: string; description?: string; }>;
-    };
-    access?: {
-      requirements?: string[];
-      target_audience?: string;
-      capacity?: number;
-      registration_required?: boolean;
-    };
+    budget?: any; // Now can be array or object for full flexibility
+    timeline?: any; // Now can be array or object for full flexibility
+    access?: any; // Now can be array or object for full flexibility
+
+    // Raw database relationships (showing ALL available data)
+    project_tags?: any[];
+    project_participants?: any[];
+    project_sponsors?: any[];
+    project_links?: any[];
+    project_media?: any[]; // Complete media data with ALL metadata
+    project_budget?: any[]; // Full budget records
+    project_timeline?: any[]; // Full timeline records
+    project_access?: any[]; // Full access records
+    project_voting?: any[]; // Full voting data if available
   };
   isAdmin: boolean;
   onEdit?: () => void;
@@ -105,10 +107,13 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
               budget={project.budget}
             />
 
-            {/* Media Gallery */}
+            {/* Media Gallery - NOW SHOWING ALL DATABASE DATA */}
             <ProjectMediaSection
               media={project.media}
               projectId={project.id}
+              rawData={{
+                project_media: project.project_media // Raw database media data
+              }}
             />
 
             {/* Project Links */}

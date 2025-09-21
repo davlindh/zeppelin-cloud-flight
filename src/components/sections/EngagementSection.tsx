@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
+import { ParticipantApplicationForm } from '@/components/public/forms';
 
 export const EngagementSection: React.FC = () => {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
@@ -83,10 +83,9 @@ export const EngagementSection: React.FC = () => {
       </section>
 
       <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
-        <DialogContent size="xl">
-          <ComprehensiveSubmissionForm
+        <DialogContent>
+          <ParticipantApplicationForm
             onClose={() => setShowSubmissionForm(false)}
-            initialType="participant"
           />
         </DialogContent>
       </Dialog>

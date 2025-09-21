@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
+import { ParticipantApplicationForm } from '@/components/public/forms';
 
 
 
@@ -167,9 +167,8 @@ export const HeroSection: React.FC = () => {
             {showSubmissionForm && (
                 <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
                     <DialogContent>
-                        <ComprehensiveSubmissionForm 
+                        <ParticipantApplicationForm
                             onClose={() => setShowSubmissionForm(false)}
-                            initialType="participant"
                         />
                     </DialogContent>
                 </Dialog>

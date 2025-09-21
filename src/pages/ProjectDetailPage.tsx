@@ -4,14 +4,6 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useProject } from '@/hooks/useApi';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { PublicVoting } from '@/components/public';
-import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
-import type { UnifiedMediaItem } from '@/types/unified-media';
-import { generateMediaId } from '@/utils/mediaHelpers';
-
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import {
@@ -87,6 +79,98 @@ interface ProjectDetail {
   };
 }
 
+// Extract helper functions to reduce complexity
+const transformTags = (projectTags: unknown): string[] => {
+  if (!Array.isArray(projectTags)) return [];
+
+  return projectTags.map(tag =>
+    typeof tag === 'string'
+      ? tag
+      : (tag as { tag?: string })?.tag
+  ).filter(Boolean) as string[];
+};
+
+const transformParticipants = (projectParticipants: unknown) => {
+  if (!Array.isArray(projectParticipants)) return [];
+
+  return projectParticipants.map(junction => {
+    const participant = (junction as { participants?: any; role?: string })?.participants;
+    const role = (junction as { participants?: any; role?: string })?.role;
+    return participant ? {
+      id: participant.id,
+      name: participant.name,
+      role: role || 'participant',
+      avatar_path: participant.avatar_path,
+      bio: participant.bio
+    } : null;
+  }).filter(Boolean);
+};
+
+const transformSponsors = (projectSponsors: unknown) => {
+  if (!Array.isArray(projectSponsors)) return [];
+
+  return projectSponsors.map(junction => {
+    const sponsor = (junction as { sponsors?: any; type?: string })?.sponsors;
+    const type = (junction as { sponsors?: any; type?: string })?.type;
+    return sponsor ? {
+      id: sponsor.id || sponsor.name,
+      name: sponsor.name,
+      type: type || 'sponsor',
+      logo_path: sponsor.logo_path,
+      website: sponsor.website
+    } : null;
+  }).filter(Boolean);
+};
+
+const transformBudget = (projectBudget: unknown) => {
+  if (!Array.isArray(projectBudget) || projectBudget.length === 0) return;
+
+  const budget = projectBudget[0] as any;
+  if (typeof budget !== 'object' || budget === null) return;
+
+  return {
+    amount: typeof budget.amount === 'number' ? budget.amount : undefined,
+    currency: typeof budget.currency === 'string' ? budget.currency : 'SEK',
+    breakdown: Array.isArray(budget.breakdown)
+      ? budget.breakdown.filter((item: unknown) =>
+          item && typeof (item as any).item === 'string' && typeof (item as any).cost === 'number'
+        )
+      : undefined
+  };
+};
+
+const transformTimeline = (projectTimeline: unknown) => {
+  if (!Array.isArray(projectTimeline) || projectTimeline.length === 0) return;
+
+  const timeline = projectTimeline[0] as any;
+  if (typeof timeline !== 'object' || timeline === null) return;
+
+  return {
+    start_date: timeline.start_date,
+    end_date: timeline.end_date,
+    milestones: Array.isArray(timeline.milestones)
+      ? timeline.milestones.filter((milestone: unknown) =>
+          milestone && typeof (milestone as any).date === 'string' &&
+          typeof (milestone as any).title === 'string'
+        )
+      : undefined
+  };
+};
+
+const transformAccess = (projectAccess: unknown) => {
+  if (!Array.isArray(projectAccess) || projectAccess.length === 0) return;
+
+  const access = projectAccess[0] as any;
+  if (typeof access !== 'object' || access === null) return;
+
+  return {
+    requirements: Array.isArray(access.requirements) ? access.requirements : [],
+    target_audience: access.target_audience,
+    capacity: access.capacity,
+    registration_required: access.registration_required
+  };
+};
+
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -99,11 +183,12 @@ export function ProjectDetailPage() {
   // Use TanStack Query for data fetching - replaces all manual data fetching
   const { data: projectData, isLoading: loading, error } = useProject(slug || '');
 
-  // Transform API data to match our local interface
+  // Simplified transformation using extracted helpers
   const project: ProjectDetail | null = useMemo(() => {
     if (!projectData) return null;
 
     return {
+      // Basic project data
       id: projectData.id,
       title: projectData.title,
       description: projectData.description,
@@ -114,21 +199,23 @@ export function ProjectDetailPage() {
       associations: projectData.associations || [],
       created_at: projectData.created_at,
       updated_at: projectData.updated_at,
-      tags: [], // Will be populated when relationships are added
-      participants: [], // Will be populated when relationships are added
-      sponsors: [], // Will be populated when relationships are added
-      links: [], // Will be populated when relationships are added
-      media: [], // Will be populated when relationships are added
-      budget: undefined, // Will be populated when relationships are added
-      timeline: undefined, // Will be populated when relationships are added
-      access: undefined, // Will be populated when relationships are added
-      voting: undefined // Will be populated when relationships are added
+
+      // Safe relationship data
+      tags: transformTags(projectData.project_tags),
+      participants: transformParticipants(projectData.project_participants),
+      sponsors: transformSponsors(projectData.project_sponsors),
+      links: projectData.project_links || [],
+      media: projectData.project_media || [],
+      budget: transformBudget(projectData.project_budget),
+      timeline: transformTimeline(projectData.project_timeline),
+      access: transformAccess(projectData.project_access),
+      voting: undefined,
     };
   }, [projectData]);
 
-
-
   const handleDelete = async () => {
+    if (!project?.id) return;
+
     try {
       const { error } = await supabase.from("projects").delete().eq("id", project.id);
       if (error) throw error;
@@ -139,10 +226,11 @@ export function ProjectDetailPage() {
       });
 
       navigate("/showcase");
-    } catch (err: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Något gick fel";
       toast({
         title: "Fel vid borttagning",
-        description: err.message || "Något gick fel",
+        description: message,
         variant: "destructive",
       });
     } finally {

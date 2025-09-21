@@ -4,7 +4,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { EnhancedPartnerShowcase } from '@/components/partners/EnhancedPartnerShowcase';
 import { Loader2, AlertCircle } from 'lucide-react';
-import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
+import { CollaborationInquiryForm } from '@/components/public/forms';
 import { errorHandler } from '@/utils/errorHandler';
 
 interface PartnerShowcasePartner {
@@ -163,10 +163,9 @@ export const PartnerSection: React.FC = () => {
 
         {/* Enhanced Submission Form Modal */}
         <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
-            <DialogContent size="xl">
-                <ComprehensiveSubmissionForm
+            <DialogContent>
+                <CollaborationInquiryForm
                     onClose={() => setShowSubmissionForm(false)}
-                    initialType="collaboration"
                 />
             </DialogContent>
         </Dialog>
