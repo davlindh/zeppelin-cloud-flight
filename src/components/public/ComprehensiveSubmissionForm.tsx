@@ -18,7 +18,7 @@ import { X, Plus, Upload, User, Building, Lightbulb } from 'lucide-react';
 // Features: Multi-step form, validation, file uploads, accessibility, progress tracking
 
 interface SubmissionFormData {
-  type: 'participant' | 'project' | 'sponsor' | 'collaboration';
+  type: 'participant' | 'project' | 'sponsor' | 'collaboration' | 'media';
   // Personal/Contact Information
   firstName?: string;
   lastName?: string;
@@ -51,7 +51,7 @@ interface SubmissionFormData {
 
 interface ComprehensiveSubmissionFormProps {
   onClose: () => void;
-  initialType?: 'participant' | 'project' | 'sponsor' | 'collaboration';
+  initialType?: 'participant' | 'project' | 'sponsor' | 'collaboration' | 'media';
   className?: string;
 }
 
@@ -304,6 +304,12 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
                         <div className="flex items-center gap-2">
                           <Plus className="h-4 w-4" />
                           Propose Collaboration
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="media">
+                        <div className="flex items-center gap-2">
+                          <Upload className="h-4 w-4" />
+                          Share Event Media
                         </div>
                       </SelectItem>
                     </SelectContent>

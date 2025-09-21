@@ -14,6 +14,7 @@ import { VisionSection } from '@/components/sections/VisionSection';
 import { SystematicsSection } from '@/components/sections/SystematicsSection';
 import { EngagementSection } from '@/components/sections/EngagementSection';
 import { PartnerSection } from '@/components/sections/PartnerSection';
+import { EventMediaSection } from '@/components/sections/EventMediaSection';
 
 // Stats Card Component
 interface StatsCardProps {
@@ -244,6 +245,9 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
 
             {/* Vision Section - Swedish Content */}
             <VisionSection />
+
+            {/* Event Media Upload Section */}
+            <EventMediaSection />
 
             {/* Swedish Sections */}
             <SystematicsSection />
