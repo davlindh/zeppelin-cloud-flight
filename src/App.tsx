@@ -17,6 +17,7 @@ import { ProjectDetailPage } from "./pages/ProjectDetailPage";
 import { ParticipantsPage } from "./pages/ParticipantsPage";
 import { ParticipantDetailPage } from "./pages/ParticipantDetailPage";
 import { PartnersPage } from "./pages/PartnersPage";
+import MediaGalleryPage from "./pages/MediaGalleryPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
@@ -51,6 +52,7 @@ const App = () => (
                   <Route path="participants" element={<ParticipantsPage />} />
                   <Route path="participants/:slug" element={<ParticipantDetailPage />} />
                   <Route path="partners" element={<PartnersPage />} />
+                  <Route path="media" element={<MediaGalleryPage />} />
                 </Route>
                 
                 {/* Admin Routes */}

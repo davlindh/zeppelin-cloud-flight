@@ -95,6 +95,78 @@ export type Database = {
         }
         Relationships: []
       }
+      media_items: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          filename: string
+          id: string
+          is_public: boolean | null
+          metadata: Json | null
+          mime_type: string
+          original_name: string | null
+          participant_id: string | null
+          project_id: string | null
+          size: number
+          tags: string[] | null
+          thumbnail_url: string | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          filename: string
+          id?: string
+          is_public?: boolean | null
+          metadata?: Json | null
+          mime_type: string
+          original_name?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          size: number
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          filename?: string
+          id?: string
+          is_public?: boolean | null
+          metadata?: Json | null
+          mime_type?: string
+          original_name?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          size?: number
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_items_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participant_media: {
         Row: {
           category: string

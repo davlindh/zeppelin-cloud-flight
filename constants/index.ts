@@ -9,6 +9,7 @@ export const NAV_LINKS = [
     { href: '/showcase', label: 'Showcase' },
     { href: '/participants', label: 'Deltagare' },
     { href: '/partners', label: 'Partners' },
+    { href: '/media', label: 'Mediagalleri' },
 ];
 
 // Build showcase cards from normalized data

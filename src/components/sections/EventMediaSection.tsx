@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PublicMediaUpload } from '@/components/public/PublicMediaUpload';
 import { Upload, Camera, Video, Music, FileText, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export const EventMediaSection: React.FC = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
@@ -114,13 +115,15 @@ export const EventMediaSection: React.FC = () => {
                   Ladda upp material
                 </Button>
                 
-                <Button
-                  variant="outline"
-                  className="border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 px-8 py-3 rounded-full font-semibold transition-all duration-200"
-                >
-                  <Share2 className="w-5 h-5 mr-2" />
-                  Se galleri
-                </Button>
+                <Link to="/media">
+                  <Button
+                    variant="outline"
+                    className="border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 px-8 py-3 rounded-full font-semibold transition-all duration-200"
+                  >
+                    <Share2 className="w-5 h-5 mr-2" />
+                    Se galleri
+                  </Button>
+                </Link>
               </div>
 
               {/* Quick Info */}
