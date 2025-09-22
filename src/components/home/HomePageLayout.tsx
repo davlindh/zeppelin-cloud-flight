@@ -33,17 +33,17 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, description, 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="hover:shadow-lg transition-shadow">
-        <CardContent className="p-6">
+      <Card className="hover:shadow-lg transition-shadow h-full">
+        <CardContent className="p-3 sm:p-4 md:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">{title}</p>
-              <p className="text-2xl font-bold">{value.toLocaleString()}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold">{value.toLocaleString()}</p>
               {description && (
-                <p className="text-xs text-muted-foreground mt-1">{description}</p>
+                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">{description}</p>
               )}
             </div>
-            <div className="text-primary/60">
+            <div className="text-primary/60 flex-shrink-0 ml-2">
               {icon}
             </div>
           </div>
@@ -203,82 +203,91 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
       {/* Main Content */}
       <div className="relative">
         {children || (
-          <div className="space-y-24">
+          <div className="space-y-8 sm:space-y-12 lg:space-y-16">
             {/* Hero Section */}
-            <section id="hero" className="py-16 sm:py-24 md:py-32 text-white min-h-screen flex items-center bg-cover bg-center relative overflow-hidden"
+            <section id="hero" className="py-8 sm:py-12 md:py-16 text-white min-h-[80vh] flex items-center bg-cover bg-center relative overflow-hidden"
               style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/media-files/media/1758057034630-b24da01qzrd.jpg')" }}>
-              <div className="container mx-auto px-6 text-center md:text-left md:w-2/3 lg:w-1/2 relative z-10">
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.7 }}
-                >
-                  <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-2 font-serif">
-                    Zeppel Inn
-                  </h1>
-                  <h2 className="text-2xl md:text-3xl font-light mb-6 opacity-90">
-                    Där historiens själ möter framtidens vision
-                  </h2>
-                  <p className="text-lg md:text-xl font-light mb-4 opacity-90 leading-relaxed">
-                    I hjärtat av Karlskronas skärgård väcks drömmar till liv. Här, där barockens prakt möter digital innovation, skapar vi berättelser som överbryggar generationer och discipliner.
-                  </p>
-                  <p className="text-base md:text-lg font-light mb-8 opacity-80 leading-relaxed">
-                    Välkommen till en plats där konstnärer, teknologer och visionärer tillsammans utforskar vad som händer när tradition möter transformation.
-                  </p>
-                  <Button
-                    onClick={() => handleSectionClick('partner')}
-                    className="hover:scale-105 transition-transform duration-300"
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left relative z-10">
+                <div className="max-w-4xl mx-auto md:mx-0">
+                  <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.7 }}
                   >
-                    Se våra partners
-                  </Button>
-                </motion.div>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-3 sm:mb-4 font-serif">
+                      Zeppel Inn
+                    </h1>
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-light mb-4 sm:mb-6 opacity-90">
+                      Där historiens själ möter framtidens vision
+                    </h2>
+                    <p className="text-base sm:text-lg md:text-xl font-light mb-3 sm:mb-4 opacity-90 leading-relaxed max-w-3xl">
+                      I hjärtat av Karlskronas skärgård väcks drömmar till liv. Här, där barockens prakt möter digital innovation, skapar vi berättelser som överbryggar generationer och discipliner.
+                    </p>
+                    <p className="text-sm sm:text-base md:text-lg font-light mb-6 sm:mb-8 opacity-80 leading-relaxed max-w-2xl">
+                      Välkommen till en plats där konstnärer, teknologer och visionärer tillsammans utforskar vad som händer när tradition möter transformation.
+                    </p>
+                    <Button
+                      onClick={() => handleSectionClick('partner')}
+                      className="hover:scale-105 transition-transform duration-300 px-6 py-3 text-base sm:text-lg"
+                      size="lg"
+                    >
+                      Se våra partners
+                    </Button>
+                  </motion.div>
+                </div>
               </div>
             </section>
 
-            {/* Compact Media Upload Section - Moved up for engagement */}
-            <section id="media-upload" className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100">
-              <div className="container mx-auto px-4 sm:px-6">
-                <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-md border border-purple-200 rounded-2xl shadow-xl p-6 sm:p-8 md:p-10">
-                  <div className="text-center">
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-serif text-gray-800 mb-3 sm:mb-4 leading-tight">
+            {/* Engagement Section - Streamlined */}
+            <section id="media-upload" className="py-6 sm:py-8 md:py-12 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-md border border-purple-200 rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
+                  <div className="text-center space-y-4">
+                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold font-serif text-gray-800 leading-tight">
                       Bli en del av vår gemensamma berättelse
                     </h2>
-                    <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-4 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed max-w-2xl mx-auto">
                       Varje ögonblick, varje upptäckt, varje möte vid Zeppel Inn är en del av en större berättelse om innovation och kreativitet.
                     </p>
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-4">
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
                       <Button
                         onClick={() => setShowSubmissionForm(true)}
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
+                        size="lg"
                       >
                         Bli en del av Zeppel Inn idag
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setShowUploadForm(true)}
-                        className="border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 px-6 py-2 rounded-full font-semibold transition-all duration-200"
+                        className="border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-full font-semibold transition-all duration-200 w-full sm:w-auto"
+                        size="lg"
                       >
                         Ladda upp material
                       </Button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </section>
 
-                    {/* Donation Button */}
-                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl p-4 border border-pink-200 shadow-sm">
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <Button
-                          onClick={() => window.open('https://revolut.me/davidxt0s', '_blank')}
-                          className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
-                          </svg>
-                          Stöd Zeppel Inn
-                        </Button>
-                        <p className="text-sm text-pink-700 font-medium text-center sm:text-left">
-                          Märk "zeppel" och ditt namn vid donation
-                        </p>
-                      </div>
-                    </div>
+            {/* Support Section - Separated for better UX */}
+            <section className="py-4 sm:py-6 bg-gradient-to-r from-pink-50 to-rose-50">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm border border-pink-200 rounded-xl shadow-sm p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Button
+                      onClick={() => window.open('https://revolut.me/davidxt0s', '_blank')}
+                      className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 w-full sm:w-auto"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                      </svg>
+                      Stöd Zeppel Inn
+                    </Button>
+                    <p className="text-sm text-pink-700 font-medium text-center">
+                      Märk "zeppel" och ditt namn vid donation
+                    </p>
                   </div>
                 </div>
               </div>
@@ -287,33 +296,33 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
             {/* Partner + Stats Section - Moved up for credibility */}
             <PartnerSection />
 
-            {/* Stats Section - Integrated with partners for social proof */}
+            {/* Stats Section - Compact social proof */}
             {showStats && (
-              <section className="py-12 bg-muted/30">
-                <div className="container mx-auto px-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <section className="py-6 sm:py-8 bg-muted/20">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
                     <StatsCard
                       title="Participants"
                       value={stats.totalParticipants}
-                      icon={<Users className="h-6 w-6" />}
+                      icon={<Users className="h-5 w-5 sm:h-6 sm:w-6" />}
                       description="Active contributors"
                     />
                     <StatsCard
                       title="Projects"
                       value={stats.totalProjects}
-                      icon={<FolderOpen className="h-6 w-6" />}
+                      icon={<FolderOpen className="h-5 w-5 sm:h-6 sm:w-6" />}
                       description="Showcase items"
                     />
                     <StatsCard
                       title="Partners"
                       value={stats.totalPartners}
-                      icon={<Building className="h-6 w-6" />}
+                      icon={<Building className="h-5 w-5 sm:h-6 sm:w-6" />}
                       description="Supporting organizations"
                     />
                     <StatsCard
                       title="Events"
                       value={stats.upcomingEvents}
-                      icon={<Calendar className="h-6 w-6" />}
+                      icon={<Calendar className="h-5 w-5 sm:h-6 sm:w-6" />}
                       description="Upcoming activities"
                     />
                   </div>
