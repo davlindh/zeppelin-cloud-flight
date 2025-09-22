@@ -81,7 +81,7 @@ export const PartnerSection: React.FC = () => {
 
     if (loading) {
         return (
-            <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+        <section id="partner" className="py-16 sm:py-24 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
                 <div className="container mx-auto px-4 sm:px-6">
                     <div className="flex items-center justify-center py-16">
 <Loader2 viewBox="0 0 24 24" className="h-8 w-8 animate-spin text-white" />
@@ -95,7 +95,7 @@ export const PartnerSection: React.FC = () => {
     // Error state
     if (componentError) {
         return (
-            <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+            <section id="partner" className="py-16 sm:py-24 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
                 <div className="container mx-auto px-4 sm:px-6">
                     <div className="flex items-center justify-center py-16">
                         <div className="text-center">
@@ -129,17 +129,24 @@ export const PartnerSection: React.FC = () => {
 
     return (
         <>
-        <section id="partner" className="py-12 sm:py-20 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-            <div className="container mx-auto px-4 sm:px-6">
-                <div className="text-center mb-8 sm:mb-12">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 font-serif">
-                        Partnerskap som driver konst, teknik och samhällsutveckling framåt
+        <section id="partner" className="py-16 sm:py-24 md:py-32 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('/images/projects/cooking-potato.jpg')] bg-cover bg-center opacity-10"></div>
+            <div className="container mx-auto px-4 sm:px-6 relative z-10">
+                <div className="text-center mb-16 sm:mb-20">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 sm:mb-10 font-serif text-white">
+                        Tillsammans bygger vi Karlskronas kreativa framtid
                     </h2>
-                    <p className="text-base sm:text-lg text-gray-300 max-w-3xl mx-auto px-4">
-                        Zeppel Inn bygger på samarbete med regionala organisationer som delar vår vision att skapa nya möjligheter genom konst och teknologi.
-                        Varje partner bidrar med unik kompetens som tar vårt arbete till nästa nivå.
-                    </p>
-
+                    <div className="max-w-4xl mx-auto px-4">
+                        <p className="text-lg sm:text-xl text-gray-200 mb-8 leading-relaxed">
+                            Våra partners är inte bara stödjare – de är medskapare av den vision vi förverkligar tillsammans.
+                            Varje organisation bidrar med sin unika expertis och sitt engagemang för att omvandla Karlskrona till en ledande knutpunkt för konstnärlig och teknologisk innovation.
+                        </p>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <p className="text-base text-gray-100 italic font-medium">
+                                "I skärningspunkten mellan kulturarv och framtidsteknologi finner vi de mest spännande möjligheterna för samhällsutveckling."
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 
                 <EnhancedPartnerShowcase
@@ -150,13 +157,13 @@ export const PartnerSection: React.FC = () => {
                 />
                 
                 <div className="text-center mt-12 sm:mt-16">
-                <Button
-                    variant="default" // Changed from "primary" to "default" as "primary" is not a supported variant
-                    onClick={handlePartnershipClick}
-                    className="hover:scale-105 transition-transform duration-300"
-                >
-                    Ansök om partnerskap
-                </Button>
+                    <Button
+                        variant="default"
+                        onClick={handlePartnershipClick}
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                        Ansök om partnerskap
+                    </Button>
                 </div>
             </div>
         </section>

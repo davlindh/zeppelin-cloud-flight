@@ -7,6 +7,7 @@ import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { ParticipantApplicationForm } from '@/components/public/forms';
+import { PublicMediaUpload } from '@/components/public/PublicMediaUpload';
 // Import section components - Swedish content
 import { motion } from 'framer-motion';
 import { Users, FolderOpen, Building, Calendar, ChevronDown, ChevronUp, Sparkles, Zap, Shield, Heart } from 'lucide-react';
@@ -64,6 +65,18 @@ const SectionNavigation: React.FC<SectionNavigationProps> = ({
   currentSection,
   onSectionClick,
 }) => {
+  const getStoryTitle = (sectionId: string) => {
+    const storyMap: Record<string, string> = {
+      'hero': '🏠 Start',
+      'partner': '🤝 Våra Partners',
+      'engagement': '💫 Bli Delaktig',
+      'vision': '🌟 Vår Vision',
+      'media-upload': '📸 Dela Upplevelser',
+      'systematics': '🔄 Resan från tanke till transformation'
+    };
+    return storyMap[sectionId] || sectionId;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -71,21 +84,28 @@ const SectionNavigation: React.FC<SectionNavigationProps> = ({
       transition={{ duration: 0.5, delay: 0.2 }}
       className="fixed left-4 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block"
     >
-      <Card className="p-2">
-        <div className="space-y-2">
+      <Card className="p-3 bg-white/95 backdrop-blur-sm border-2 border-blue-200 shadow-xl">
+        <div className="mb-3 text-center">
+          <h3 className="text-sm font-bold text-gray-800">Resan genom Zeppel Inn</h3>
+          <div className="w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mt-1"></div>
+        </div>
+        <div className="space-y-1">
           {sections
             .filter(section => section.isVisible)
-            .map((section) => (
+            .map((section, index) => (
               <button
                 key={section.id}
                 onClick={() => onSectionClick(section.id)}
-                className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   currentSection === section.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md transform scale-105'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm'
                 }`}
               >
-                {section.title}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs opacity-60">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="text-xs">{getStoryTitle(section.id)}</span>
+                </div>
               </button>
             ))}
         </div>
@@ -134,6 +154,7 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
   const stats = useHomePageStats();
   const { sections, currentSection, setCurrentSection } = useHomePageSections();
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+  const [showUploadForm, setShowUploadForm] = useState(false);
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
   const { toast } = useToast();
 
@@ -177,48 +198,16 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
         />
       )}
 
-      {/* Stats Section */}
-      {showStats && (
-        <section className="py-12 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatsCard
-                title="Participants"
-                value={stats.totalParticipants}
-                icon={<Users className="h-6 w-6" />}
-                description="Active contributors"
-              />
-              <StatsCard
-                title="Projects"
-                value={stats.totalProjects}
-                icon={<FolderOpen className="h-6 w-6" />}
-                description="Showcase items"
-              />
-              <StatsCard
-                title="Partners"
-                value={stats.totalPartners}
-                icon={<Building className="h-6 w-6" />}
-                description="Supporting organizations"
-              />
-              <StatsCard
-                title="Events"
-                value={stats.upcomingEvents}
-                icon={<Calendar className="h-6 w-6" />}
-                description="Upcoming activities"
-              />
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* Main Content */}
       <div className="relative">
         {children || (
           <div className="space-y-24">
             {/* Hero Section */}
-            <section id="hero" className="py-12 sm:py-20 md:py-32 text-white min-h-screen flex items-center bg-cover bg-center relative overflow-hidden"
-              style={{ backgroundImage: "linear-gradient(rgba(20, 30, 40, 0.8), rgba(20, 30, 40, 0.6)), url('/images/projects/fanga-fantasi-loyko.jpg')" }}>
-              <div className="container mx-auto px-6 text-left md:w-2/3 lg:w-1/2 relative z-10">
+            <section id="hero" className="py-16 sm:py-24 md:py-32 text-white min-h-screen flex items-center bg-cover bg-center relative overflow-hidden"
+              style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/media-files/media/1758057034630-b24da01qzrd.jpg')" }}>
+              <div className="container mx-auto px-6 text-center md:text-left md:w-2/3 lg:w-1/2 relative z-10">
                 <motion.div
                   initial={{ y: 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -228,31 +217,103 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
                     Zeppel Inn
                   </h1>
                   <h2 className="text-2xl md:text-3xl font-light mb-6 opacity-90">
-                    En kreativ mötesplats för konst, teknik och innovation
+                    Där historiens själ möter framtidens vision
                   </h2>
-                  <p className="text-lg md:text-xl font-light mb-8 opacity-90 leading-relaxed">
-                    Utforska skärningspunkten mellan kulturarv, skärgårdsnatur och framtidens teknologier i Karlskrona.
+                  <p className="text-lg md:text-xl font-light mb-4 opacity-90 leading-relaxed">
+                    I hjärtat av Karlskronas skärgård väcks drömmar till liv. Här, där barockens prakt möter digital innovation, skapar vi berättelser som överbryggar generationer och discipliner.
+                  </p>
+                  <p className="text-base md:text-lg font-light mb-8 opacity-80 leading-relaxed">
+                    Välkommen till en plats där konstnärer, teknologer och visionärer tillsammans utforskar vad som händer när tradition möter transformation.
                   </p>
                   <Button
-                    onClick={() => handleSectionClick('vision')}
+                    onClick={() => handleSectionClick('partner')}
                     className="hover:scale-105 transition-transform duration-300"
                   >
-                    Upptäck vår vision
+                    Se våra partners
                   </Button>
                 </motion.div>
               </div>
             </section>
 
-            {/* Vision Section - Swedish Content */}
+            {/* Compact Media Upload Section - Moved up for engagement */}
+            <section id="media-upload" className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100">
+              <div className="container mx-auto px-4 sm:px-6">
+                <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-md border border-purple-200 rounded-2xl shadow-xl p-6 sm:p-8 md:p-10">
+                  <div className="text-center">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-serif text-gray-800 mb-3 sm:mb-4 leading-tight">
+                      Bli en del av vår gemensamma berättelse
+                    </h2>
+                    <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-4 leading-relaxed">
+                      Varje ögonblick, varje upptäckt, varje möte vid Zeppel Inn är en del av en större berättelse om innovation och kreativitet.
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-4">
+                      <Button
+                        onClick={() => setShowSubmissionForm(true)}
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                      >
+                        Bli en del av Zeppel Inn idag
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowUploadForm(true)}
+                        className="border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 px-6 py-2 rounded-full font-semibold transition-all duration-200"
+                      >
+                        Ladda upp material
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Partner + Stats Section - Moved up for credibility */}
+            <PartnerSection />
+
+            {/* Stats Section - Integrated with partners for social proof */}
+            {showStats && (
+              <section className="py-12 bg-muted/30">
+                <div className="container mx-auto px-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <StatsCard
+                      title="Participants"
+                      value={stats.totalParticipants}
+                      icon={<Users className="h-6 w-6" />}
+                      description="Active contributors"
+                    />
+                    <StatsCard
+                      title="Projects"
+                      value={stats.totalProjects}
+                      icon={<FolderOpen className="h-6 w-6" />}
+                      description="Showcase items"
+                    />
+                    <StatsCard
+                      title="Partners"
+                      value={stats.totalPartners}
+                      icon={<Building className="h-6 w-6" />}
+                      description="Supporting organizations"
+                    />
+                    <StatsCard
+                      title="Events"
+                      value={stats.upcomingEvents}
+                      icon={<Calendar className="h-6 w-6" />}
+                      description="Upcoming activities"
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* Systematics Section - Methodology before engagement */}
+            <SystematicsSection />
+
+            {/* Engagement Section - Call to action after methodology */}
+            <EngagementSection />
+
+            {/* Vision Section - Deeper storytelling */}
             <VisionSection />
 
             {/* Event Media Upload Section */}
             <EventMediaSection />
-
-            {/* Swedish Sections */}
-            <SystematicsSection />
-            <EngagementSection />
-            <PartnerSection />
           </div>
         )}
       </div>
@@ -260,13 +321,6 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
       {/* Feature Dialog */}
       <Dialog open={showFeatureDialog} onOpenChange={setShowFeatureDialog}>
         <DialogContent size="lg">
-          <DialogHeader>
-            <DialogTitle>Context7 Component Features</DialogTitle>
-            <DialogDescription>
-              Discover the powerful features of our Context7-compliant components
-            </DialogDescription>
-          </DialogHeader>
-
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
@@ -354,6 +408,15 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
         <DialogContent>
           <ParticipantApplicationForm
             onClose={() => setShowSubmissionForm(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Form Dialog */}
+      <Dialog open={showUploadForm} onOpenChange={setShowUploadForm}>
+        <DialogContent size="xl" className="max-h-[90vh] overflow-y-auto">
+          <PublicMediaUpload
+            onClose={() => setShowUploadForm(false)}
           />
         </DialogContent>
       </Dialog>

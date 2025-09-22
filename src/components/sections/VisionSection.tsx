@@ -5,16 +5,19 @@ import { Lightbulb, Ship, Atom } from 'lucide-react';
 
 export const VisionSection: React.FC = () => {
     return (
-        <section id="vision" className="py-20 md:py-32 bg-white">
+        <section id="vision" className="py-16 md:py-24 bg-white">
             <div className="container mx-auto px-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">En Vision för Karlskrona</h2>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4">
-                        Zeppel Inn är mer än ett evenemang – det är en levande manifestation av vår metodik att omvandla djup kunskap till meningsfull, praktisk handling. Vi etablerar Karlskrona som en internationell knutpunkt för konst, teknologi och hållbar innovation. Kärnan är en två veckor lång residensverksamhet där vi utforskar skärningspunkten mellan vårt kulturarv, den unika skärgårdsnaturen och framtidens teknologier.
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">Framtiden börjar i Karlskronas skärgård</h2>
+                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4 mb-6">
+                        Föreställ dig en plats där historiens vingslag möter framtidens innovationer. Där barockens praktfulla byggnader och den vidsträckta skärgården blir scenen för konstnärer, teknologer och visionärer som tillsammans utforskar vad som händer när tradition möter transformation.
+                    </p>
+                    <p className="text-base text-gray-700 max-w-2xl mx-auto">
+                        Zeppel Inn är inte bara ett evenemang – det är en rörelse. En två veckor lång resa där vi omvandlar djup kunskap till meningsfull handling och etablerar Karlskrona som en internationell ledstjärna för hållbar, konstnärlig och teknologisk utveckling.
                     </p>
                     <div className="flex justify-center gap-4 mt-8">
                         <Badge variant="secondary" className="flex items-center gap-2">

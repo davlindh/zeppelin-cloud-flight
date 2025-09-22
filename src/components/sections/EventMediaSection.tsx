@@ -13,25 +13,25 @@ export const EventMediaSection: React.FC = () => {
     {
       icon: Camera,
       title: 'Foton',
-      description: 'Bilder från eventet, workshops och presentationer',
+      description: 'Ögonblicksbilder som fångar magin i mötet mellan konst och teknologi',
       color: 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800'
     },
     {
       icon: Video,
       title: 'Videor',
-      description: 'Inspelningar från föreläsningar och aktiviteter',
+      description: 'Rörliga berättelser som visar transformationen från idé till verklighet',
       color: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800'
     },
     {
       icon: Music,
       title: 'Ljud',
-      description: 'Ljudinspelningar och podcastavsnitt',
+      description: 'Ljudlandskap som förmedlar stämningen och energin från våra sammankomster',
       color: 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950 dark:text-purple-400 dark:border-purple-800'
     },
     {
       icon: FileText,
       title: 'Dokument',
-      description: 'Presentationer, rapport er och skrifter',
+      description: 'Skriftliga reflektioner och presentationer som fördjupar vår gemensamma förståelse',
       color: 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800'
     }
   ];
@@ -56,11 +56,14 @@ export const EventMediaSection: React.FC = () => {
                   id="media-upload-title"
                   className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif text-gray-800 mb-6 leading-tight"
                 >
-                  Dela dina minnen från eventet
+                  Bli en del av vår gemensamma berättelse
                 </h2>
-                <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-                  Har du foton, videor eller andra material från Zeppel Inn-eventet? 
-                  Dela med dig av dina upplevelser och hjälp oss bygga en gemensam berättelse.
+                <p className="text-base sm:text-lg md:text-xl text-gray-700 mb-4 max-w-3xl mx-auto leading-relaxed">
+                  Varje ögonblick, varje upptäckt, varje möte vid Zeppel Inn är en del av en större berättelse om innovation och kreativitet.
+                  Dina foton, videor och berättelser hjälper oss att väva samman dessa trådar till en kollektiv upplevelse som inspirerar andra.
+                </p>
+                <p className="text-sm sm:text-base text-indigo-600 font-medium max-w-2xl mx-auto">
+                  "Genom att dela dina upplevelser blir du medskapare av den berättelse som definierar Karlskronas kreativa framtid."
                 </p>
               </motion.div>
             </div>
@@ -98,12 +101,12 @@ export const EventMediaSection: React.FC = () => {
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
-                Ladda upp ditt material
+                Låt dina minnen bli en del av historien
               </h3>
-              
+
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                Dina bidrag granskas av vårt team innan de publiceras. Vi accepterar bilder, videor, 
-                ljudfiler och dokument upp till 50MB per fil.
+                Varje bidrag du delar blir en byggsten i den kollektiva berättelse som definierar Zeppel Inn.
+                Dina upplevelser hjälper oss att inspirera nästa generation av kreatörer och innovatörer.
               </p>
 
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">

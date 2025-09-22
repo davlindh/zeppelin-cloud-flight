@@ -64,10 +64,10 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'main': return 'bg-primary/10 text-primary border-primary/20';
-      case 'partner': return 'bg-secondary/10 text-secondary-foreground border-secondary/20';
-      case 'supporter': return 'bg-accent/10 text-accent-foreground border-accent/20';
-      default: return 'bg-muted/10 text-muted-foreground border-muted/20';
+      case 'main': return 'bg-blue-600/20 text-blue-100 border-blue-400/30';
+      case 'partner': return 'bg-green-600/20 text-green-100 border-green-400/30';
+      case 'supporter': return 'bg-purple-600/20 text-purple-100 border-purple-400/30';
+      default: return 'bg-gray-600/20 text-gray-100 border-gray-400/30';
     }
   };
 
@@ -103,36 +103,36 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
 
   const PartnerCard: React.FC<{ partner: EnhancedPartner }> = ({ partner }) => {
     const isExpanded = expandedPartners.has(partner.id);
-    
+
     return (
-      <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-200">
-        <CardHeader>
+      <Card className="group hover:shadow-2xl hover:border-white/30 transition-all duration-300 bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 w-full max-w-sm mx-auto">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {partner.logo && (
-                <div className="w-12 h-12 flex-shrink-0">
+                <div className="w-16 h-16 flex-shrink-0 bg-white/10 rounded-xl p-2 backdrop-blur-sm">
                   <ImageWithFallback
                     src={partner.logo}
                     alt={`${partner.name} logo`}
-                    className="w-full h-full object-contain rounded"
+                    className="w-full h-full object-contain"
                     fallbackSrc="/images/ui/placeholder-project.jpg"
                   />
                 </div>
               )}
               <div>
-                <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                <CardTitle className="text-xl group-hover:text-white transition-colors font-bold">
                   {partner.name}
                 </CardTitle>
-                <Badge className={`text-xs ${getTypeColor(partner.type)}`}>
+                <Badge className={`text-sm mt-2 ${getTypeColor(partner.type)} font-medium`}>
                   {getTypeIcon(partner.type)}
-                  <span className="ml-1">{getTypeLabel(partner.type)}</span>
+                  <span className="ml-2">{getTypeLabel(partner.type)}</span>
                 </Badge>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {partner.website && (
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/30 text-white hover:bg-white/20">
                   <a
                     href={partner.website}
                     target="_blank"
@@ -143,13 +143,13 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
                   </a>
                 </Button>
               )}
-              
+
               {(partner.projects?.length || partner.partnershipHistory?.length) && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => toggleExpanded(partner.id)}
-                  className="ml-2"
+                  className="ml-2 text-white hover:bg-white/10"
                 >
                   <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                 </Button>
@@ -158,10 +158,10 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="pt-0">
           {/* Description */}
           {partner.description && (
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-gray-300 mb-4 leading-relaxed">
               {partner.description}
             </p>
           )}
@@ -171,7 +171,7 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
             <div className="mb-4">
               <div className="flex flex-wrap gap-2">
                 {partner.collaborationTypes.map((type) => (
-                  <Badge key={type} variant="outline" className="text-xs">
+                  <Badge key={type} variant="outline" className="text-xs bg-white/10 text-white border-white/30">
                     {type}
                   </Badge>
                 ))}
@@ -185,15 +185,15 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
               {/* Projects */}
               {showProjects && partner.projects && partner.projects.length > 0 && (
                 <div>
-                  <h5 className="font-medium text-sm mb-2 flex items-center gap-2">
+                  <h5 className="font-medium text-sm mb-2 flex items-center gap-2 text-white">
                     <Briefcase className="w-4 h-4" />
                     Projekt ({partner.projects.length})
                   </h5>
                   <div className="space-y-2">
                     {partner.projects.map((project) => (
-                      <div key={project.id} className="flex items-center justify-between text-sm p-2 bg-muted/50 rounded">
-                        <span className="font-medium">{project.title}</span>
-                        <Badge variant="secondary" className="text-xs">
+                      <div key={project.id} className="flex items-center justify-between text-sm p-3 bg-white/5 rounded-lg border border-white/10">
+                        <span className="font-medium text-white">{project.title}</span>
+                        <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
                           {project.year}
                         </Badge>
                       </div>
@@ -205,20 +205,20 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
               {/* Partnership History */}
               {showHistory && partner.partnershipHistory && partner.partnershipHistory.length > 0 && (
                 <div>
-                  <h5 className="font-medium text-sm mb-2 flex items-center gap-2">
+                  <h5 className="font-medium text-sm mb-2 flex items-center gap-2 text-white">
                     <Calendar className="w-4 h-4" />
                     Partnerskapshistorik
                   </h5>
                   <div className="space-y-2">
                     {partner.partnershipHistory.map((event, index) => (
-                      <div key={index} className="flex gap-3 text-sm">
-                        <Badge variant="outline" className="text-xs min-w-fit">
+                      <div key={index} className="flex gap-3 text-sm p-3 bg-white/5 rounded-lg border border-white/10">
+                        <Badge variant="outline" className="text-xs min-w-fit bg-white/20 text-white border-white/30">
                           {event.year}
                         </Badge>
                         <div>
-                          <div className="font-medium">{event.milestone}</div>
+                          <div className="font-medium text-white">{event.milestone}</div>
                           {event.description && (
-                            <div className="text-muted-foreground text-xs mt-1">
+                            <div className="text-gray-300 text-xs mt-1">
                               {event.description}
                             </div>
                           )}
@@ -236,33 +236,37 @@ export const EnhancedPartnerShowcase: React.FC<EnhancedPartnerShowcaseProps> = (
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <Building2 className="w-6 h-6 text-primary" />
-        <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-        <Badge variant="secondary" className="ml-2">
-          {partners.length} partners
-        </Badge>
+      <div className="text-center">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Building2 className="w-8 h-8 text-blue-400" />
+          <h2 className="text-3xl font-bold text-white">{title}</h2>
+          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            {partners.length} partners
+          </Badge>
+        </div>
       </div>
 
       {/* Partner Groups */}
       {orderedTypes.map(type => (
-        <div key={type} className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-md border ${getTypeColor(type)}`}>
-              {getTypeIcon(type)}
+        <div key={type} className="space-y-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <div className={`p-3 rounded-xl border-2 ${getTypeColor(type)} bg-white/5 backdrop-blur-sm`}>
+                {getTypeIcon(type)}
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                {getTypeLabel(type)}
+              </h3>
+              <Badge variant="outline" className="bg-white/10 text-white border-white/30 text-base px-3 py-1">
+                {groupedPartners[type].length}
+              </Badge>
             </div>
-            <h3 className="text-lg font-semibold text-foreground">
-              {getTypeLabel(type)}
-            </h3>
-            <Badge variant="outline" className="text-sm">
-              {groupedPartners[type].length}
-            </Badge>
           </div>
 
-          <div className={layout === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+          <div className={layout === 'grid'
+            ? 'flex flex-wrap justify-center gap-8 max-w-7xl mx-auto'
             : 'space-y-4'
           }>
             {groupedPartners[type].map((partner) => (

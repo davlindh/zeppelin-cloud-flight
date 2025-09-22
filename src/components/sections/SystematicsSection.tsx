@@ -13,30 +13,34 @@ const SystemStep: React.FC<{ icon: React.ReactNode; title: string; children: Rea
 
 export const SystematicsSection: React.FC = () => {
     return (
-        <section id="systematik" className="py-20 md:py-32 bg-gray-100">
+        <section id="systematik" className="py-16 md:py-24 bg-gray-100">
             <div className="container mx-auto px-6">
                 <div className="text-center mb-12 md:mb-20">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">Vår Systematik: Från Forskning till Handling</h2>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4">Vår styrka ligger i hur vi tänker. Vi använder en rigorös trestegsmodell för att omvandla komplex kunskap till mätbar, meningsfull handling. Zeppel Inn är den levande arenan där denna systematik blir verklighet.</p>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">Resan från tanke till transformation</h2>
+                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4 mb-4">Varje stor förändring börjar med en metod. Vår trestegsmodell är inte bara en process – den är en filosofi som vägleder oss från abstrakta idéer till konkreta resultat som förändrar samhällen.</p>
+                    <p className="text-base text-gray-700 max-w-2xl mx-auto">I Zeppel Inn blir denna systematik levande konst, där varje steg i processen bidrar till att skapa något större än summan av dess delar.</p>
                 </div>
                 <div className="grid md:grid-cols-3 gap-10">
                     <SystemStep
                         icon={<Book className="h-10 w-10 text-gray-700" />}
                         title="1. Kunskapsdomänen"
                     >
-                        Allt börjar med en grund av verifierad kunskap. Vi analyserar och utvärderar information – från akademisk forskning till lokala berättelser – för att säkerställa dess noggrannhet, relevans och trovärdighet.
+                        <p className="mb-3">Allt börjar med en grund av verifierad kunskap.</p>
+                        <p className="text-sm">Vi analyserar och utvärderar information – från akademisk forskning till lokala berättelser – för att säkerställa dess noggrannhet, relevans och trovärdighet.</p>
                     </SystemStep>
                     <SystemStep
                         icon={<Beaker className="h-10 w-10 text-gray-700" />}
                         title="2. Operationella Domänen"
                     >
-                        Här översätter vi den validerade kunskapen till konkreta, testbara modeller och strategier. Vi utvecklar handlingskraftiga ramverk som kan appliceras i verkliga scenarier.
+                        <p className="mb-3">Här översätter vi den validerade kunskapen till konkreta, testbara modeller och strategier.</p>
+                        <p className="text-sm">Vi utvecklar handlingskraftiga ramverk som kan appliceras i verkliga scenarier.</p>
                     </SystemStep>
                     <SystemStep
                         icon={<Megaphone className="h-10 w-10 text-gray-700" />}
                         title="3. Kommunikationsdomänen"
                     >
-                        För att verklig förändring ska ske måste den kommuniceras. Vi skapar tydliga, övertygande narrativ som överbryggar klyftan mellan experter, beslutsfattare och allmänhet.
+                        <p className="mb-3">För att verklig förändring ska ske måste den kommuniceras.</p>
+                        <p className="text-sm">Vi skapar tydliga, övertygande narrativ som överbryggar klyftan mellan experter, beslutsfattare och allmänhet.</p>
                     </SystemStep>
                 </div>
             </div>
