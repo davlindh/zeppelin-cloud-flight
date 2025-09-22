@@ -67,6 +67,10 @@ export const CollaborationInquiryForm: React.FC<CollaborationInquiryFormProps> =
       type: 'collaboration' as const,
       title: `${data.collaborationTitle} - ${data.collaborationType} Collaboration`,
       content: {
+        // Required fields for database constraint
+        collaboration_type: data.collaborationType,
+        availability: data.availability,
+        // Contact info
         contact_info: {
           firstName: data.firstName,
           lastName: data.lastName,

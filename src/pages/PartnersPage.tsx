@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
 import { useToast } from '@/hooks/use-toast';
+import { CollaborationInquiryForm } from '@/components/public/forms/CollaborationInquiryForm';
 import {
   Users,
   ExternalLink,
@@ -36,6 +37,7 @@ export const PartnersPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedPartner, setSelectedPartner] = useState<typeof partners[0] | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCollaborationFormOpen, setIsCollaborationFormOpen] = useState(false);
 
   // Prevent infinite re-renders by stabilizing dependencies
   const lowerSearchTerm = useMemo(() =>
@@ -349,7 +351,11 @@ export const PartnersPage: React.FC = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" className="shadow-elegant hover:shadow-glow">
+                  <Button
+                    size="lg"
+                    className="shadow-elegant hover:shadow-glow"
+                    onClick={() => setIsCollaborationFormOpen(true)}
+                  >
                     <Mail className="mr-2 h-5 w-5" />
                     Kontakta oss
                   </Button>
@@ -507,6 +513,31 @@ export const PartnersPage: React.FC = () => {
                   </Button>
                 )}
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Collaboration Form Dialog */}
+          <Dialog open={isCollaborationFormOpen} onOpenChange={setIsCollaborationFormOpen}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-50">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl gradient-primary shadow-glow">
+                    <HandHeart className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">Propose Collaboration</h2>
+                    <p className="text-sm text-muted-foreground">Become our partner</p>
+                  </div>
+                </DialogTitle>
+                <DialogDescription>
+                  Are you interested in supporting creative projects and innovation?
+                  We welcome new partners who share our vision for the future.
+                </DialogDescription>
+              </DialogHeader>
+
+              <CollaborationInquiryForm
+                onClose={() => setIsCollaborationFormOpen(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>

@@ -602,8 +602,8 @@ export const UnifiedMediaProvider: React.FC<UnifiedMediaProviderProps> = ({
   // Initial data fetch - run only once on mount
   useEffect(() => {
     // Only fetch once on mount
-    dispatch({ type: 'SET_LOADING', payload: true });
-  }, []);
+    fetchItems();
+  }, [fetchItems]);
 
   const contextValue: UnifiedMediaContextType = {
     state,

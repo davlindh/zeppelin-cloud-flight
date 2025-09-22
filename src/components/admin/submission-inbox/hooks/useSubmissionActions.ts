@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useUpdateSubmissionStatus, useDeleteSubmission } from '@/hooks/useApi';
+import { supabase } from '@/integrations/supabase/client';
 import type { EnhancedSubmission } from './useSubmissionData';
 
 /**
@@ -230,6 +231,73 @@ export const useSubmissionActions = () => {
   };
 
   /**
+   * Convert approved collaboration submission to sponsor record
+   */
+  const convertToSponsor = async (submission: EnhancedSubmission) => {
+    try {
+      // Type guard to ensure content has the expected structure
+      if (!submission.content || typeof submission.content !== 'object') {
+        throw new Error('Invalid submission content structure');
+      }
+
+      const content = submission.content as Record<string, any>;
+
+      // Extract sponsor data from submission content
+      const contactInfo = content.contact_info;
+      const collaborationType = content.collaboration_type || 'partner';
+
+      if (!contactInfo || typeof contactInfo !== 'object') {
+        throw new Error('Missing or invalid contact information');
+      }
+
+      // Map collaboration type to sponsor type
+      const sponsorTypeMap: Record<string, string> = {
+        'artist': 'partner',
+        'researcher': 'partner',
+        'community': 'supporter',
+        'business': 'main',
+        'other': 'partner'
+      };
+
+      const sponsorType = sponsorTypeMap[collaborationType] || 'partner';
+
+      // Create sponsor record
+      const sponsorData = {
+        name: `${contactInfo.firstName} ${contactInfo.lastName}`,
+        type: sponsorType,
+        website: contactInfo.website || null,
+        logo_path: null, // Will be updated if logo is uploaded later
+      };
+
+      const { data: sponsor, error: sponsorError } = await supabase
+        .from('sponsors')
+        .insert([sponsorData])
+        .select()
+        .single();
+
+      if (sponsorError) throw sponsorError;
+
+      // Mark submission as processed
+      await updateStatus(submission.id, 'approved');
+
+      toast({
+        title: 'Sponsor skapad',
+        description: `${sponsorData.name} har lagts till som sponsor och kommer att visas på partnersidan.`
+      });
+
+      return sponsor;
+    } catch (error) {
+      toast({
+        title: 'Fel vid konvertering',
+        description: 'Kunde inte konvertera inlämningen till sponsor.',
+        variant: 'destructive'
+      });
+
+      throw error;
+    }
+  };
+
+  /**
    * Bulk delete submissions
    */
   const batchDelete = async (ids: string[]) => {
@@ -280,6 +348,7 @@ export const useSubmissionActions = () => {
     exportToCSV,
     exportToJSON,
     batchDelete,
+    convertToSponsor,
 
     // State
     isExporting,

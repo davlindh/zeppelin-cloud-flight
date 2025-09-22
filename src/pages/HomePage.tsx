@@ -2,11 +2,9 @@ import React, { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HomePageProvider } from '@/contexts/HomePageContext';
 import { HomePageLayout } from '@/components/home/HomePageLayout';
-import { useUnifiedMedia } from '@/contexts/UnifiedMediaContext';
 
 const HomePageContent: React.FC = () => {
     const location = useLocation();
-    const { state, actions } = useUnifiedMedia();
 
     useLayoutEffect(() => {
         if (location.hash) {
@@ -17,12 +15,6 @@ const HomePageContent: React.FC = () => {
             }
         }
     }, [location]);
-
-    // Trigger media fetching on component mount
-    useLayoutEffect(() => {
-        console.log('🔍 HomePage: Triggering media fetch');
-        actions.fetchItems();
-    }, [actions]);
 
     return (
         <HomePageLayout>

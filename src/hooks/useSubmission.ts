@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface FileSubmission {
   fieldName: string;
@@ -30,7 +31,7 @@ export interface SubmissionContent {
   consent: {
     terms: boolean;
     privacy: boolean;
-    marketing?: boolean;
+    acceptMarketing?: boolean;
     newsletter?: boolean;
   };
   [key: string]: unknown;
@@ -51,6 +52,7 @@ export interface BaseSubmissionPayload {
 export const useSubmission = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
+  const queryClient = useQueryClient();
 
   const uploadFile = async (
     file: File,
@@ -133,30 +135,55 @@ export const useSubmission = () => {
 
       // Prepare submission data according to Supabase schema
       const submissionData = {
-        ...basePayload,
-        session_id: sessionStorage.getItem('session_id'),
-        language_preference: navigator.language,
-        how_found_us: 'website',
-        publication_permission: basePayload.content.consent.marketing || false,
-        // Group files by field name
+        type: basePayload.type,
+        title: basePayload.title,
+        content: basePayload.content,
+        contact_email: basePayload.contact_email,
+        contact_phone: basePayload.contact_phone,
+        // Group files by field name - convert to array format expected by admin inbox
         files: fileUploads.reduce((acc, { file, bucketName, url }, index) => {
           if (url) {
             // Use the original field name from FileSubmission
             const fileSubmission = files[index];
             if (fileSubmission) {
-              acc[fileSubmission.fieldName] = url;
+              acc.push({
+                fieldName: fileSubmission.fieldName,
+                url: url,
+                fileName: file.name,
+                bucketName: bucketName
+              });
             }
           }
           return acc;
-        }, {} as Record<string, string>),
+        }, [] as Array<{ fieldName: string; url: string; fileName: string; bucketName: string }>),
+        status: 'pending',
+        submitted_by: sessionStorage.getItem('session_id') || `session-${Date.now()}`,
+        how_found_us: 'website',
+        language_preference: navigator.language,
+        publication_permission: basePayload.content.consent.acceptMarketing || false,
       };
 
       // Submit to Supabase
-      const { error: submitError } = await supabase
-        .from('submissions')
-        .insert(submissionData as any);
+      console.log('🔍 Submitting collaboration form data:', submissionData);
 
-      if (submitError) throw submitError;
+      const { data: insertedData, error: submitError } = await supabase
+        .from('submissions')
+        .insert(submissionData as any)
+        .select()
+        .single();
+
+      if (submitError) {
+        console.error('🔍 Submission error:', submitError);
+        throw submitError;
+      }
+
+      console.log('✅ Collaboration form submitted successfully:', insertedData);
+
+      // Invalidate and refetch submissions to update admin inbox
+      queryClient.invalidateQueries({ queryKey: ['submissions'] });
+
+      // Also invalidate sponsors query since collaboration submissions should become sponsors
+      queryClient.invalidateQueries({ queryKey: ['sponsors'] });
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to submit form';
       setError(errorMessage);
