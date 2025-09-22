@@ -324,10 +324,10 @@ export function ProjectDetailPage() {
         isAdmin={isAdmin}
         onEdit={() => {
           // Navigate to direct admin edit page
-          navigate(`/admin/projects/${project.id}/edit`, {
+          navigate(`/admin/projects/${slug}/edit`, {
             state: {
               projectData: project,
-              returnPath: `/showcase/${project.id}`
+              returnPath: `/showcase/${slug}`
             }
           });
         }}

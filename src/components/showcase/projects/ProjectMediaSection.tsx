@@ -23,12 +23,24 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
   projectId,
   rawData
 }) => {
+  // Debug: Log all incoming props
+  console.log('🔍 ProjectMediaSection: Received props:', {
+    media,
+    projectId,
+    rawData,
+    rawDataProjectMedia: rawData?.project_media,
+    rawDataProjectMediaLength: rawData?.project_media?.length
+  });
+
   // Prioritize raw database data for complete information display
   const fullMediaData = rawData?.project_media?.length ?
     rawData.project_media :
     media;
 
+  console.log('🔍 ProjectMediaSection: fullMediaData:', fullMediaData);
+
   if (!fullMediaData || fullMediaData.length === 0) {
+    console.log('🔍 ProjectMediaSection: No media data, returning null');
     return null;
   }
 
@@ -37,10 +49,10 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
 
   // Show ALL available data from the database
   return (
-    <Card className="card-glow reveal-up stagger-3">
+    <Card className="card-glow border-2 border-border bg-card/50">
       <CardHeader>
         <CardTitle className="text-xl">
-          Projekt Media ({fullMediaData.length}uppgit)
+          Projekt Media ({fullMediaData.length} items)
         </CardTitle>
         <div className="text-sm text-muted-foreground">
           Displaying complete media data from database with all available metadata

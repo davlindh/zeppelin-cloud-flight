@@ -31,8 +31,13 @@ import {
 } from '@/utils/mediaHelpers';
 
 // Local fallback EnhancedImage component used when external module is not available
-const EnhancedImage: React.FC<{ src: string; alt?: string; className?: string }> = ({ src, alt, className }) => {
-  return <img src={src} alt={alt || ''} className={className} loading="lazy" />;
+const EnhancedImage: React.FC<{
+  src: string;
+  alt?: string;
+  className?: string;
+  onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+}> = ({ src, alt, className, onError }) => {
+  return <img src={src} alt={alt || ''} className={className} loading="lazy" onError={onError} />;
 };
 
 // Constants
@@ -267,6 +272,10 @@ const UnifiedMediaItem: React.FC<UnifiedMediaItemProps> = React.memo(({
                     src={getMediaPreviewUrl(item.url, item.type)}
                     alt={item.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Failed to load media preview:', item.url);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">

@@ -36,7 +36,7 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
   return (
     <div className="space-y-8">
       {/* Project Info */}
-      <Card className="card-glow reveal-up">
+      <Card className="card-glow border-2 border-border bg-card/50">
         <CardHeader>
           <CardTitle className="text-xl">Projektdetaljer</CardTitle>
         </CardHeader>
@@ -100,6 +100,10 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
                             src={participant.avatar_path}
                             alt={participant.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Failed to load participant avatar:', participant.avatar_path);
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         ) : (
                           <span className="text-lg font-semibold text-muted-foreground">
@@ -138,6 +142,10 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
                       src={sponsor.logo_path}
                       alt={sponsor.name}
                       className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        console.error('Failed to load sponsor logo:', sponsor.logo_path);
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                   )}
                   <div>

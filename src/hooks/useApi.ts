@@ -59,13 +59,21 @@ export const useUnifiedMedia = () => {
   return useQuery({
     queryKey: ['unified-media'],
     queryFn: async () => {
+      console.log('🔍 useUnifiedMedia: Fetching all media from database');
+
       // Fetch all media from database
       const { data, error } = await supabase
         .from('project_media')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('🔍 useUnifiedMedia: Error fetching media:', error);
+        throw error;
+      }
+
+      console.log('🔍 useUnifiedMedia: Raw media data:', data);
+      console.log('🔍 useUnifiedMedia: Media count:', data?.length || 0);
 
       return {
         all: data || [],
@@ -84,6 +92,8 @@ export const useProject = (slug: string) => {
   return useQuery({
     queryKey: queryKeys.projectDetail(slug),
     queryFn: async () => {
+      console.log('🔍 useProject: Fetching project with slug:', slug);
+
       const { data, error } = await supabase
         .from('projects')
         .select(`
@@ -116,13 +126,13 @@ export const useProject = (slug: string) => {
             description
           ),
           project_tags (tag),
-          project_budget!inner (amount, currency, breakdown),
-          project_timeline!inner (
+          project_budget (amount, currency, breakdown),
+          project_timeline (
             start_date,
             end_date,
             milestones
           ),
-          project_access!inner (
+          project_access (
             requirements,
             target_audience,
             capacity,
@@ -133,9 +143,17 @@ export const useProject = (slug: string) => {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') return null; // Not found
+        if (error.code === 'PGRST116') {
+          console.log('🔍 useProject: Project not found');
+          return null; // Not found
+        }
+        console.error('🔍 useProject: Error fetching project:', error);
         throw error;
       }
+
+      console.log('🔍 useProject: Raw data received:', data);
+      console.log('🔍 useProject: project_media:', data?.project_media);
+      console.log('🔍 useProject: project_media length:', data?.project_media?.length);
 
       return data;
     },

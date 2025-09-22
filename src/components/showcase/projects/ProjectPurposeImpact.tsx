@@ -17,7 +17,7 @@ export const ProjectPurposeImpact: React.FC<ProjectPurposeImpactProps> = ({
     <>
       {/* Full Description */}
       {full_description && (
-        <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500 group animate-fade-in">
+        <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500 group bg-card/50 border border-border">
           <CardHeader className="pb-6">
             <CardTitle className="text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">Om projektet</CardTitle>
           </CardHeader>
@@ -29,7 +29,7 @@ export const ProjectPurposeImpact: React.FC<ProjectPurposeImpactProps> = ({
 
       {/* Purpose & Impact */}
       {(purpose || expected_impact) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
           {purpose && (
             <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500 h-full group">
               <CardHeader className="pb-6">

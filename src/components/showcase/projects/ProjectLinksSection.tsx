@@ -34,7 +34,7 @@ export const ProjectLinksSection: React.FC<ProjectLinksSectionProps> = ({
   };
 
   return (
-    <Card className="card-glow reveal-up stagger-4">
+    <Card className="card-glow border-2 border-border bg-card/50">
       <CardHeader>
         <CardTitle className="text-xl">Projektlänkar</CardTitle>
       </CardHeader>
