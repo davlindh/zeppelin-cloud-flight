@@ -79,9 +79,14 @@ export const Footer: React.FC = () => {
                     </div>
 
                     <div className="mt-6">
-                        <a href="mailto:info@zeppelinn.se" className="text-amber-400 hover:text-amber-300 underline transition-colors duration-300">
-                            info@zeppelinn.se
-                        </a>
+                        <div className="space-y-2">
+                            <a href="mailto:lindhdavid2@gmail.com" className="text-amber-400 hover:text-amber-300 underline transition-colors duration-300 block">
+                                David L - lindhdavid2@gmail.com
+                            </a>
+                            <a href="mailto:artzebs@gmail.com" className="text-amber-400 hover:text-amber-300 underline transition-colors duration-300 block">
+                                Anastasiya L - artzebs@gmail.com
+                            </a>
+                        </div>
                     </div>
                 </div>
 

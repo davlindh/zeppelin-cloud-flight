@@ -261,6 +261,24 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
                         Ladda upp material
                       </Button>
                     </div>
+
+                    {/* Donation Button */}
+                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl p-4 border border-pink-200 shadow-sm">
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <Button
+                          onClick={() => window.open('https://revolut.me/davidxt0s', '_blank')}
+                          className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+                          </svg>
+                          Stöd Zeppel Inn
+                        </Button>
+                        <p className="text-sm text-pink-700 font-medium text-center sm:text-left">
+                          Märk "zeppel" och ditt namn vid donation
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
