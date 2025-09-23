@@ -24,6 +24,15 @@ interface EnhancedPartner {
     description?: string;
   }>;
   collaborationTypes?: string[];
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  // Contact fields
+  contactEmail?: string;
+  contactPhone?: string;
+  contactPerson?: string;
 }
 
 interface EnhancedPartnerShowcaseProps {

@@ -25,6 +25,15 @@ interface PartnerShowcasePartner {
     description?: string;
   }>;
   collaborationTypes?: string[];
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  // Contact fields
+  contactEmail?: string;
+  contactPhone?: string;
+  contactPerson?: string;
   // Legacy compatibility fields
   alt?: string;
   src?: string;

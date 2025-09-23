@@ -498,9 +498,10 @@ export const PartnersPage: React.FC = () => {
                         </Button>
                       )}
                       {!selectedPartner?.contactEmail && !selectedPartner?.contactPhone && !selectedPartner?.href && (
-                        <p className="text-sm text-muted-foreground italic">
-                          Kontaktinformation ej tillgänglig
-                        </p>
+                        <div className="p-3 text-center text-sm text-muted-foreground bg-muted/20 rounded-lg border border-muted/30">
+                          <Mail className="h-5 w-5 mx-auto mb-2 opacity-50" />
+                          <p>Kontaktinformation kommer snart</p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -542,12 +543,10 @@ export const PartnersPage: React.FC = () => {
               </div>
 
               <DialogFooter className="flex gap-2">
-                <DialogClose>
-                  <Button variant="outline">
-                    <X className="h-4 w-4 mr-2" />
-                    Stäng
-                  </Button>
-                </DialogClose>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <X className="h-4 w-4 mr-2" />
+                  Stäng
+                </Button>
                 {selectedPartner?.href && (
                   <Button onClick={() => handleWebsiteClick(selectedPartner.href)}>
                     <Globe className="h-4 w-4 mr-2" />
