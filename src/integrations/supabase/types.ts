@@ -638,6 +638,9 @@ export type Database = {
       }
       sponsors: {
         Row: {
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
           created_at: string
           id: string
           logo_path: string | null
@@ -647,6 +650,9 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           logo_path?: string | null
@@ -656,6 +662,9 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           logo_path?: string | null

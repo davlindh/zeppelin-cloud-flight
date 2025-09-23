@@ -27,7 +27,8 @@ import {
   X,
   Star,
   Award,
-  Shield
+  Shield,
+  User
 } from 'lucide-react';
 
 export const PartnersPage: React.FC = () => {
@@ -115,6 +116,22 @@ export const PartnersPage: React.FC = () => {
     toast({
       title: "Öppnar webbplats",
       description: "Partnerns webbplats öppnas i ett nytt fönster.",
+    });
+  };
+
+  const handleEmailClick = (email: string) => {
+    window.open(`mailto:${email}`, '_blank', 'noopener,noreferrer');
+    toast({
+      title: "Öppnar e-post",
+      description: "E-postklient öppnas för att skicka meddelande.",
+    });
+  };
+
+  const handlePhoneClick = (phone: string) => {
+    window.open(`tel:${phone}`, '_blank', 'noopener,noreferrer');
+    toast({
+      title: "Ringer telefonnummer",
+      description: "Telefonapp öppnas för att ringa numret.",
     });
   };
 
@@ -440,6 +457,34 @@ export const PartnersPage: React.FC = () => {
                       Kontakt
                     </h3>
                     <div className="space-y-2">
+                      {selectedPartner?.contactEmail && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEmailClick(selectedPartner.contactEmail!)}
+                          className="w-full justify-start"
+                        >
+                          <Mail className="h-4 w-4 mr-2" />
+                          {selectedPartner.contactEmail}
+                        </Button>
+                      )}
+                      {selectedPartner?.contactPhone && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePhoneClick(selectedPartner.contactPhone!)}
+                          className="w-full justify-start"
+                        >
+                          <Phone className="h-4 w-4 mr-2" />
+                          {selectedPartner.contactPhone}
+                        </Button>
+                      )}
+                      {selectedPartner?.contactPerson && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-muted/30 rounded">
+                          <User className="h-4 w-4" />
+                          <span>Kontaktperson: {selectedPartner.contactPerson}</span>
+                        </div>
+                      )}
                       {selectedPartner?.href && (
                         <Button
                           variant="outline"
@@ -452,14 +497,11 @@ export const PartnersPage: React.FC = () => {
                           <ExternalLink className="h-3 w-3 ml-2" />
                         </Button>
                       )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full justify-start"
-                      >
-                        <Mail className="h-4 w-4 mr-2" />
-                        Skicka e-post
-                      </Button>
+                      {!selectedPartner?.contactEmail && !selectedPartner?.contactPhone && !selectedPartner?.href && (
+                        <p className="text-sm text-muted-foreground italic">
+                          Kontaktinformation ej tillgänglig
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

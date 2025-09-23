@@ -15,6 +15,9 @@ interface SponsorFormData {
   name: string;
   type: 'main' | 'partner' | 'supporter';
   website?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  contactPerson?: string;
 }
 
 interface SponsorFormProps {
@@ -34,6 +37,9 @@ export const SponsorForm = ({ onClose, sponsorId }: SponsorFormProps) => {
       name: '',
       type: 'partner',
       website: '',
+      contactEmail: '',
+      contactPhone: '',
+      contactPerson: '',
     }
   });
 
@@ -79,6 +85,9 @@ export const SponsorForm = ({ onClose, sponsorId }: SponsorFormProps) => {
         type: sponsorType,
         logo_path: logoUrl,
         website: data.website,
+        contact_email: data.contactEmail,
+        contact_phone: data.contactPhone,
+        contact_person: data.contactPerson,
       };
 
       const { error } = await supabase
@@ -166,6 +175,41 @@ export const SponsorForm = ({ onClose, sponsorId }: SponsorFormProps) => {
                 type="url"
                 placeholder="https://sponsor-website.com"
               />
+            </div>
+
+            {/* Contact Information Section */}
+            <div className="bg-muted/50 p-4 rounded-lg space-y-4">
+              <h4 className="font-medium text-foreground">Kontaktinformation</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="contactEmail">Kontakt e-post</Label>
+                  <Input
+                    id="contactEmail"
+                    {...register('contactEmail')}
+                    type="email"
+                    placeholder="partner@foretag.se"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contactPhone">Kontakt telefon</Label>
+                  <Input
+                    id="contactPhone"
+                    {...register('contactPhone')}
+                    type="tel"
+                    placeholder="+46 123 456 789"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="contactPerson">Kontaktperson</Label>
+                <Input
+                  id="contactPerson"
+                  {...register('contactPerson')}
+                  placeholder="Anna Andersson"
+                />
+              </div>
             </div>
 
             <div className="bg-muted p-4 rounded-lg">

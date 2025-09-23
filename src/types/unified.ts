@@ -141,6 +141,10 @@ export interface Sponsor {
   website?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Contact fields
+  contactEmail?: string;
+  contactPhone?: string;
+  contactPerson?: string;
 }
 
 // ============= RELATIONSHIP TYPES =============

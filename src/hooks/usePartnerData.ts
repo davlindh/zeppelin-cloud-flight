@@ -35,6 +35,9 @@ interface DbSponsor {
   type: 'main' | 'partner' | 'supporter';
   logo_path?: string | null;
   website?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  contact_person?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
 }
@@ -59,6 +62,9 @@ const transformStaticSponsor = (sponsor: DbSponsor): EnhancedPartner => ({
   type: sponsor.type,
   logo: sponsor.logo_path ? `/images/${sponsor.logo_path}` : undefined,
   website: sponsor.website,
+  contactEmail: sponsor.contact_email,
+  contactPhone: sponsor.contact_phone,
+  contactPerson: sponsor.contact_person,
   createdAt: sponsor.created_at,
   updatedAt: sponsor.updated_at,
   // Legacy fields for backward compatibility
