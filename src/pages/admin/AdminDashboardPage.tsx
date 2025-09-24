@@ -13,10 +13,12 @@ import { ShowcaseManagementList } from '@/components/admin/ShowcaseManagementLis
 import { ParticipantManagementList } from '@/components/admin/ParticipantManagementList';
 import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
 import { SubmissionInbox } from '@/components/admin/submission-inbox';
+import { EnhancedSubmissionInbox } from '@/components/admin/EnhancedSubmissionInbox';
+import { AdminMediaManager } from '@/components/admin/AdminMediaManager';
 import { RecentActivity, AdminStats } from '@/components/admin';
 import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminSettings } from '@/components/admin/AdminSettings';
-import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap } from 'lucide-react';
+import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const AdminDashboardPage = () => {
@@ -272,7 +274,26 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="submissions">
-            <SubmissionInbox />
+            <Tabs defaultValue="submissions" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="submissions">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Inlämningar
+                </TabsTrigger>
+                <TabsTrigger value="media">
+                  <Folder className="h-4 w-4 mr-2" />
+                  Media Manager
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="submissions">
+                <EnhancedSubmissionInbox />
+              </TabsContent>
+              
+              <TabsContent value="media">
+                <AdminMediaManager />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="settings">

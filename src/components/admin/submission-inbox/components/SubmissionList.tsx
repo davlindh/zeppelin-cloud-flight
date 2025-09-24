@@ -23,7 +23,10 @@ import { getStatusColor, getStatusIcon, getTypeColor, getTypeLabel, hasFiles, fo
 interface SubmissionListProps {
   submissions: EnhancedSubmission[];
   selectedSubmission: EnhancedSubmission | null;
+  selectedSubmissions?: string[];
+  viewMode?: 'table' | 'cards';
   onSelect: (submission: EnhancedSubmission) => void;
+  onToggleSelect?: (id: string) => void;
   onEdit: (submission: EnhancedSubmission) => void;
   onConvert: (submission: EnhancedSubmission) => void;
   onApprove: (id: string) => void;
@@ -36,7 +39,10 @@ interface SubmissionListProps {
 export const SubmissionList: React.FC<SubmissionListProps> = ({
   submissions,
   selectedSubmission,
+  selectedSubmissions = [],
+  viewMode = 'cards',
   onSelect,
+  onToggleSelect,
   onEdit,
   onConvert,
   onApprove,

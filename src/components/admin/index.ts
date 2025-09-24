@@ -3,6 +3,8 @@ export { AdminSettings } from './AdminSettings';
 export { AdminStats } from './AdminStats';
 export { FileUpload, type UploadedFileItem } from './FileUpload';
 export { SubmissionInbox } from './submission-inbox';
+export { EnhancedSubmissionInbox } from './EnhancedSubmissionInbox';
+export { AdminMediaManager } from './AdminMediaManager';
 export { RecentActivity } from './RecentActivity';
 export { ShowcaseManagementList } from './ShowcaseManagementList';
 export { default as ShowcaseForm } from './ShowcaseForm';
