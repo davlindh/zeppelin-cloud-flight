@@ -79,6 +79,9 @@ export interface Sponsor extends BaseEntity {
   type: 'main' | 'partner' | 'supporter';
   logo_path?: string;
   website?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  contact_person?: string;
 }
 
 // Relationship interfaces
@@ -129,6 +132,9 @@ export interface SponsorFormData {
   name: string;
   type: 'main' | 'partner' | 'supporter';
   website?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  contact_person?: string;
 }
 
 // Generic form configuration

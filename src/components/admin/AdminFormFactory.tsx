@@ -230,10 +230,15 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
         placeholder: 'Enter organization name'
       },
       {
-        name: 'description',
-        label: 'Description',
-        type: 'textarea',
-        placeholder: 'Brief description of the organization...'
+        name: 'type',
+        label: 'Sponsor Type',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'main', label: 'Main Sponsor' },
+          { value: 'partner', label: 'Partner' },
+          { value: 'supporter', label: 'Supporter' }
+        ]
       },
       {
         name: 'website',
@@ -244,8 +249,14 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
       {
         name: 'contact_email',
         label: 'Contact Email',
-        type: 'text',
+        type: 'email',
         placeholder: 'contact@organization.com'
+      },
+      {
+        name: 'contact_phone',
+        label: 'Contact Phone',
+        type: 'tel',
+        placeholder: '+46 123 456 789'
       },
       {
         name: 'contact_person',
@@ -359,20 +370,21 @@ const dataTransformers = {
   sponsor: {
     toForm: (data: Record<string, unknown> | undefined) => ({
       name: (data?.name as string) || '',
-      description: (data?.description as string) || '',
+      type: (data?.type as string) || 'partner',
       website: (data?.website as string) || '',
       contact_email: (data?.contact_email as string) || '',
+      contact_phone: (data?.contact_phone as string) || '',
       contact_person: (data?.contact_person as string) || '',
       logo_path: (data?.logo_path as string) || ''
     }),
     fromForm: (data: Record<string, unknown>) => ({
       name: data.name as string,
-      description: data.description as string,
+      type: data.type as string,
       website: data.website as string,
       contact_email: data.contact_email as string,
+      contact_phone: data.contact_phone as string,
       contact_person: data.contact_person as string,
-      logo_path: (data.logo_path as string),
-      type: 'organization' // Required field for sponsors table
+      logo_path: (data.logo_path as string) || (data.logoFile as string)
     })
   }
 };
