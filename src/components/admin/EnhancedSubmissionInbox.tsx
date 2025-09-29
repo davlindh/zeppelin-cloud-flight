@@ -29,6 +29,7 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 import { SubmissionList } from './submission-inbox/components/SubmissionList';
+import { SubmissionMediaManager } from './SubmissionMediaManager';
 import { useSubmissionData } from './submission-inbox/hooks/useSubmissionData';
 import { useSubmissionActions } from './submission-inbox/hooks/useSubmissionActions';
 import { SubmissionEditModal } from './SubmissionEditModal';
@@ -229,29 +230,27 @@ export const EnhancedSubmissionInbox: React.FC = () => {
     setSelectedSubmissions([]);
   };
 
-  // Extract media from submissions for media view
-  const submissionMedia = useMemo(() => {
-    const mediaItems: any[] = [];
-    
-    filteredAndSortedSubmissions.forEach(submission => {
-      if (submission.files && submission.files.length > 0) {
-        submission.files.forEach((file: any) => {
-          mediaItems.push({
-            id: `${submission.id}-${file.name}`,
-            title: file.name || submission.title,
-            url: file.url,
-            type: file.type?.startsWith('image/') ? 'image' : 
-                  file.type?.startsWith('video/') ? 'video' : 
-                  file.type?.startsWith('audio/') ? 'audio' : 'document',
-            description: `From: ${submission.title} (${submission.type})`,
-            submission: submission
-          });
-        });
-      }
-    });
-    
-    return mediaItems;
-  }, [filteredAndSortedSubmissions]);
+  // Handle media approval and conversion
+  const handleApproveMedia = async (mediaItem: any) => {
+    // In real implementation, this would update the submission status
+    // and potentially convert to media_items table
+    console.log('Approving media:', mediaItem);
+    // Could call updateStatus or a specific media approval endpoint
+  };
+
+  const handleRejectMedia = async (mediaItem: any) => {
+    console.log('Rejecting media:', mediaItem);
+    // In real implementation, mark media as rejected
+  };
+
+  const handleConvertToMediaLibrary = async (mediaItems: any[]) => {
+    console.log('Converting to media library:', mediaItems);
+    // In real implementation, this would:
+    // 1. Create entries in media_items table
+    // 2. Copy files to proper media storage buckets
+    // 3. Generate thumbnails
+    // 4. Set proper categories and metadata
+  };
 
   return (
     <div className="space-y-6">
@@ -504,13 +503,12 @@ export const EnhancedSubmissionInbox: React.FC = () => {
 
             <TabsContent value={currentTab} className="mt-6">
               {viewMode === 'media' ? (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Media från inlämningar</h3>
-                    <Badge variant="secondary">{submissionMedia.length} filer</Badge>
-                  </div>
-                  <MediaGallery media={submissionMedia} viewMode="grid" />
-                </div>
+                <SubmissionMediaManager
+                  submissions={filteredAndSortedSubmissions}
+                  onApproveMedia={handleApproveMedia}
+                  onRejectMedia={handleRejectMedia}
+                  onConvertToMediaLibrary={handleConvertToMediaLibrary}
+                />
               ) : (
                 <SubmissionList
                   submissions={filteredAndSortedSubmissions}
