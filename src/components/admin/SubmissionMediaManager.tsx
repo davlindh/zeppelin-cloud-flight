@@ -177,22 +177,22 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
     <div className={cn("space-y-6", className)}>
       {/* Header */}
       <Card className="border-0 shadow-elegant bg-gradient-to-r from-blue-50/50 to-purple-50/50">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <ImageIcon className="h-5 w-5 text-blue-600" />
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-blue-100">
+                <ImageIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Media från Inlämningar</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold">Media från Inlämningar</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                   Granska och hantera media-filer från inlämningar
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary">{stats.total} filer</Badge>
-              <Badge variant="outline" className="border-orange-200 text-orange-700">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              <Badge variant="secondary" className="text-xs sm:text-sm">{stats.total} filer</Badge>
+              <Badge variant="outline" className="border-orange-200 text-orange-700 text-xs sm:text-sm">
                 {stats.pending} väntande
               </Badge>
             </div>
@@ -202,10 +202,10 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
 
       {/* Controls */}
       <Card>
-        <CardContent className="p-6 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
+        <CardContent className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
+          <div className="flex flex-col gap-3">
+            {/* Search - Full width on mobile */}
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Sök i media-filer..."
@@ -215,63 +215,68 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
               />
             </div>
             
-            {/* Filters */}
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alla typer</SelectItem>
-                <SelectItem value="image">Bilder</SelectItem>
-                <SelectItem value="video">Videor</SelectItem>
-                <SelectItem value="audio">Ljud</SelectItem>
-                <SelectItem value="document">Dokument</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alla status</SelectItem>
-                <SelectItem value="pending">Väntande</SelectItem>
-                <SelectItem value="approved">Godkända</SelectItem>
-                <SelectItem value="converted">Konverterade</SelectItem>
-                <SelectItem value="not-converted">Ej konverterade</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            {/* View Mode */}
-            <div className="flex border rounded-lg">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="border-0"
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="border-0"
-              >
-                <List className="h-4 w-4" />
-              </Button>
+            {/* Filters - Stacked on mobile, row on desktop */}
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-full sm:w-[140px]">
+                  <SelectValue placeholder="Typ" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alla typer</SelectItem>
+                  <SelectItem value="image">Bilder</SelectItem>
+                  <SelectItem value="video">Videor</SelectItem>
+                  <SelectItem value="audio">Ljud</SelectItem>
+                  <SelectItem value="document">Dokument</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[140px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alla status</SelectItem>
+                  <SelectItem value="pending">Väntande</SelectItem>
+                  <SelectItem value="approved">Godkända</SelectItem>
+                  <SelectItem value="converted">Konverterade</SelectItem>
+                  <SelectItem value="not-converted">Ej konverterade</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              {/* View Mode - Take remaining space on mobile */}
+              <div className="flex border rounded-lg w-full sm:w-auto sm:ml-auto">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="border-0 flex-1 sm:flex-initial"
+                >
+                  <Grid className="h-4 w-4" />
+                  <span className="ml-2 sm:hidden">Rutnät</span>
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="border-0 flex-1 sm:flex-initial"
+                >
+                  <List className="h-4 w-4" />
+                  <span className="ml-2 sm:hidden">Lista</span>
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Bulk Actions */}
           {selectedItems.length > 0 && (
-            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-muted/50 rounded-lg gap-3">
               <span className="text-sm font-medium">{selectedItems.length} objekt valda</span>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleBulkAction('approve')}
+                  className="w-full sm:w-auto"
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Godkänn
@@ -280,6 +285,7 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => handleBulkAction('reject')}
+                  className="w-full sm:w-auto"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
                   Avvisa
@@ -288,11 +294,21 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => handleBulkAction('convert')}
+                  className="w-full sm:w-auto hidden sm:flex"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  Konvertera till bibliotek
+                  Konvertera
                 </Button>
-                <Button variant="outline" size="sm" onClick={clearSelection}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBulkAction('convert')}
+                  className="w-full sm:hidden"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Till bibliotek
+                </Button>
+                <Button variant="outline" size="sm" onClick={clearSelection} className="w-full sm:w-auto">
                   Rensa
                 </Button>
               </div>
@@ -300,21 +316,21 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
           )}
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-3">
-              <div className="text-2xl font-bold text-blue-600">{stats.images}</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+            <Card className="p-2 sm:p-3">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">{stats.images}</div>
               <div className="text-xs text-muted-foreground">Bilder</div>
             </Card>
-            <Card className="p-3">
-              <div className="text-2xl font-bold text-purple-600">{stats.videos}</div>
+            <Card className="p-2 sm:p-3">
+              <div className="text-xl sm:text-2xl font-bold text-purple-600">{stats.videos}</div>
               <div className="text-xs text-muted-foreground">Videor</div>
             </Card>
-            <Card className="p-3">
-              <div className="text-2xl font-bold text-green-600">{stats.audio}</div>
+            <Card className="p-2 sm:p-3">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">{stats.audio}</div>
               <div className="text-xs text-muted-foreground">Ljud</div>
             </Card>
-            <Card className="p-3">
-              <div className="text-2xl font-bold text-orange-600">{stats.documents}</div>
+            <Card className="p-2 sm:p-3">
+              <div className="text-xl sm:text-2xl font-bold text-orange-600">{stats.documents}</div>
               <div className="text-xs text-muted-foreground">Dokument</div>
             </Card>
           </div>
@@ -323,7 +339,7 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
 
       {/* Media Grid/List */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-3 sm:p-4 md:p-6">
           {filteredItems.length === 0 ? (
             <div className="text-center py-12">
               <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -348,8 +364,8 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
 
               <div className={cn(
                 viewMode === 'grid' 
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-                  : "space-y-3"
+                  ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
+                  : "space-y-2 sm:space-y-3"
               )}>
                 {filteredItems.map((item) => (
                   <MediaItemCard

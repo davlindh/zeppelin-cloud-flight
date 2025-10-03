@@ -96,31 +96,32 @@ export const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-2 sm:p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
         {/* Enhanced Header */}
         <Card className="card-enhanced border-0 shadow-elegant bg-gradient-to-r from-primary/5 to-secondary/5">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
+          <CardContent className="p-3 sm:p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
-                    <Shield className="h-6 w-6 text-primary-foreground" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
+                    <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background shadow-sm">
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-background shadow-sm">
                     <div className="w-full h-full bg-green-400 rounded-full animate-pulse"></div>
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                     Admin Dashboard
                   </h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="shadow-soft">
+                  <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+                    <Badge variant="secondary" className="shadow-soft text-xs">
                       <User className="h-3 w-3 mr-1" />
-                      {adminEmail}
+                      <span className="hidden sm:inline">{adminEmail}</span>
+                      <span className="sm:hidden">{adminEmail?.split('@')[0]}</span>
                     </Badge>
-                    <Badge variant="outline" className="shadow-soft border-green-200 text-green-700">
+                    <Badge variant="outline" className="shadow-soft border-green-200 text-green-700 text-xs">
                       <CheckCircle className="h-3 w-3 mr-1" />
                       Online
                     </Badge>
@@ -130,7 +131,8 @@ export const AdminDashboardPage = () => {
               <Button
                 onClick={handleLogout}
                 variant="outline"
-                className="shadow-soft hover:shadow-elegant transition-all duration-300 border-red-200 hover:border-red-300 hover:bg-red-50"
+                size="sm"
+                className="shadow-soft hover:shadow-elegant transition-all duration-300 border-red-200 hover:border-red-300 hover:bg-red-50 w-full sm:w-auto"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logga ut
@@ -144,7 +146,8 @@ export const AdminDashboardPage = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          {/* Desktop Navigation */}
+          <TabsList className="hidden lg:grid w-full grid-cols-7">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
@@ -174,6 +177,40 @@ export const AdminDashboardPage = () => {
               Settings
             </TabsTrigger>
           </TabsList>
+
+          {/* Mobile Navigation - Scrollable */}
+          <div className="lg:hidden">
+            <TabsList className="w-full inline-flex overflow-x-auto scrollbar-thin p-1">
+              <TabsTrigger value="overview" className="whitespace-nowrap px-4">
+                <BarChart3 className="h-4 w-4" />
+                <span className="ml-2">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="whitespace-nowrap px-4">
+                <BarChart3 className="h-4 w-4" />
+                <span className="ml-2">Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="whitespace-nowrap px-4">
+                <FolderOpen className="h-4 w-4" />
+                <span className="ml-2">Showcase</span>
+              </TabsTrigger>
+              <TabsTrigger value="participants" className="whitespace-nowrap px-4">
+                <Users className="h-4 w-4" />
+                <span className="ml-2">Participants</span>
+              </TabsTrigger>
+              <TabsTrigger value="sponsors" className="whitespace-nowrap px-4">
+                <Building className="h-4 w-4" />
+                <span className="ml-2">Sponsors</span>
+              </TabsTrigger>
+              <TabsTrigger value="submissions" className="whitespace-nowrap px-4">
+                <Inbox className="h-4 w-4" />
+                <span className="ml-2">Submissions</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="whitespace-nowrap px-4">
+                <Settings className="h-4 w-4" />
+                <span className="ml-2">Settings</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-3">
@@ -275,14 +312,14 @@ export const AdminDashboardPage = () => {
 
           <TabsContent value="submissions">
             <Tabs defaultValue="submissions" className="space-y-4">
-              <TabsList>
-                <TabsTrigger value="submissions">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Inlämningar
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="submissions" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Inlämningar</span>
                 </TabsTrigger>
-                <TabsTrigger value="media">
-                  <Folder className="h-4 w-4 mr-2" />
-                  Media Manager
+                <TabsTrigger value="media" className="flex items-center gap-2">
+                  <Folder className="h-4 w-4" />
+                  <span>Media Manager</span>
                 </TabsTrigger>
               </TabsList>
               
