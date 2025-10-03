@@ -4,7 +4,9 @@ import { useAdminContext } from '@/contexts/AdminContext';
 import { Button, Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
 import { useToast } from '@/hooks/use-toast';
 import ShowcaseForm from '@/components/admin/ShowcaseForm';
@@ -18,8 +20,9 @@ import { AdminMediaManager } from '@/components/admin/AdminMediaManager';
 import { RecentActivity, AdminStats } from '@/components/admin';
 import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminSettings } from '@/components/admin/AdminSettings';
-import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder } from 'lucide-react';
+import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder, Menu, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 export const AdminDashboardPage = () => {
   const { adminEmail, logout } = useAdminAuth();
@@ -29,6 +32,8 @@ export const AdminDashboardPage = () => {
   const [editingShowcaseId, setEditingShowcaseId] = useState<string | null>(null);
   const [editingParticipantId, setEditingParticipantId] = useState<string | null>(null);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleFormClose = () => {
     setActiveForm(null);
@@ -101,9 +106,82 @@ export const AdminDashboardPage = () => {
         {/* Enhanced Header */}
         <Card className="card-enhanced border-0 shadow-elegant bg-gradient-to-r from-primary/5 to-secondary/5">
           <CardContent className="p-3 sm:p-4 md:p-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <div className="flex items-center gap-3">
-                <div className="relative">
+            <div className="flex items-center justify-between gap-3">
+              {/* Mobile Menu Button */}
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild className="lg:hidden">
+                  <Button variant="outline" size="sm" className="mr-2">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-72 p-0">
+                  <SheetHeader className="p-6 pb-4">
+                    <SheetTitle className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                        <Shield className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                      <span>Admin Panel</span>
+                    </SheetTitle>
+                  </SheetHeader>
+                  
+                  <Separator />
+                  
+                  <nav className="flex flex-col gap-1 p-4">
+                    {[
+                      { value: 'overview', icon: BarChart3, label: 'Overview', color: 'text-primary' },
+                      { value: 'analytics', icon: TrendingUp, label: 'Analytics', color: 'text-blue-600' },
+                      { value: 'projects', icon: FolderOpen, label: 'Showcase', color: 'text-purple-600' },
+                      { value: 'participants', icon: Users, label: 'Participants', color: 'text-green-600' },
+                      { value: 'sponsors', icon: Building, label: 'Sponsors', color: 'text-orange-600' },
+                      { value: 'submissions', icon: Inbox, label: 'Submissions', color: 'text-pink-600' },
+                      { value: 'settings', icon: Settings, label: 'Settings', color: 'text-gray-600' },
+                    ].map((item) => (
+                      <Button
+                        key={item.value}
+                        variant={activeTab === item.value ? 'secondary' : 'ghost'}
+                        className={cn(
+                          "w-full justify-start text-base h-12",
+                          activeTab === item.value && "bg-primary/10 font-medium"
+                        )}
+                        onClick={() => {
+                          setActiveTab(item.value);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <item.icon className={cn("h-5 w-5 mr-3", item.color)} />
+                        <span className="flex-1 text-left">{item.label}</span>
+                        {activeTab === item.value && (
+                          <ChevronRight className="h-4 w-4 text-primary" />
+                        )}
+                      </Button>
+                    ))}
+                  </nav>
+                  
+                  <Separator className="my-4" />
+                  
+                  <div className="p-4">
+                    <div className="bg-muted/50 rounded-lg p-3 mb-3">
+                      <div className="text-xs text-muted-foreground mb-1">Inloggad som</div>
+                      <div className="text-sm font-medium truncate">{adminEmail}</div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      variant="outline"
+                      className="w-full border-red-200 hover:border-red-300 hover:bg-red-50"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logga ut
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              
+              {/* Header Info */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <div className="relative hidden lg:block">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
                     <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
                   </div>
@@ -111,15 +189,15 @@ export const AdminDashboardPage = () => {
                     <div className="w-full h-full bg-green-400 rounded-full animate-pulse"></div>
                   </div>
                 </div>
-                <div>
-                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent truncate">
                     Admin Dashboard
                   </h1>
-                  <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
+                  <div className="hidden sm:flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
                     <Badge variant="secondary" className="shadow-soft text-xs">
                       <User className="h-3 w-3 mr-1" />
-                      <span className="hidden sm:inline">{adminEmail}</span>
-                      <span className="sm:hidden">{adminEmail?.split('@')[0]}</span>
+                      <span className="hidden md:inline">{adminEmail}</span>
+                      <span className="md:hidden">{adminEmail?.split('@')[0]}</span>
                     </Badge>
                     <Badge variant="outline" className="shadow-soft border-green-200 text-green-700 text-xs">
                       <CheckCircle className="h-3 w-3 mr-1" />
@@ -128,11 +206,13 @@ export const AdminDashboardPage = () => {
                   </div>
                 </div>
               </div>
+              
+              {/* Logout Button - Desktop only */}
               <Button
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="shadow-soft hover:shadow-elegant transition-all duration-300 border-red-200 hover:border-red-300 hover:bg-red-50 w-full sm:w-auto"
+                className="hidden lg:flex shadow-soft hover:shadow-elegant transition-all duration-300 border-red-200 hover:border-red-300 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logga ut
@@ -145,15 +225,15 @@ export const AdminDashboardPage = () => {
         <AdminStats />
 
         {/* Main Content */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          {/* Desktop Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          {/* Desktop Navigation Only */}
           <TabsList className="hidden lg:grid w-full grid-cols-7">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
             </TabsTrigger>
             <TabsTrigger value="analytics">
-              <BarChart3 className="h-4 w-4 mr-2" />
+              <TrendingUp className="h-4 w-4 mr-2" />
               Analytics
             </TabsTrigger>
             <TabsTrigger value="projects">
@@ -177,40 +257,33 @@ export const AdminDashboardPage = () => {
               Settings
             </TabsTrigger>
           </TabsList>
-
-          {/* Mobile Navigation - Scrollable */}
-          <div className="lg:hidden">
-            <TabsList className="w-full inline-flex overflow-x-auto scrollbar-thin p-1">
-              <TabsTrigger value="overview" className="whitespace-nowrap px-4">
-                <BarChart3 className="h-4 w-4" />
-                <span className="ml-2">Overview</span>
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="whitespace-nowrap px-4">
-                <BarChart3 className="h-4 w-4" />
-                <span className="ml-2">Analytics</span>
-              </TabsTrigger>
-              <TabsTrigger value="projects" className="whitespace-nowrap px-4">
-                <FolderOpen className="h-4 w-4" />
-                <span className="ml-2">Showcase</span>
-              </TabsTrigger>
-              <TabsTrigger value="participants" className="whitespace-nowrap px-4">
-                <Users className="h-4 w-4" />
-                <span className="ml-2">Participants</span>
-              </TabsTrigger>
-              <TabsTrigger value="sponsors" className="whitespace-nowrap px-4">
-                <Building className="h-4 w-4" />
-                <span className="ml-2">Sponsors</span>
-              </TabsTrigger>
-              <TabsTrigger value="submissions" className="whitespace-nowrap px-4">
-                <Inbox className="h-4 w-4" />
-                <span className="ml-2">Submissions</span>
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="whitespace-nowrap px-4">
-                <Settings className="h-4 w-4" />
-                <span className="ml-2">Settings</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          
+          {/* Mobile: Current section indicator */}
+          <Card className="lg:hidden">
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {activeTab === 'overview' && <BarChart3 className="h-5 w-5 text-primary" />}
+                  {activeTab === 'analytics' && <TrendingUp className="h-5 w-5 text-blue-600" />}
+                  {activeTab === 'projects' && <FolderOpen className="h-5 w-5 text-purple-600" />}
+                  {activeTab === 'participants' && <Users className="h-5 w-5 text-green-600" />}
+                  {activeTab === 'sponsors' && <Building className="h-5 w-5 text-orange-600" />}
+                  {activeTab === 'submissions' && <Inbox className="h-5 w-5 text-pink-600" />}
+                  {activeTab === 'settings' && <Settings className="h-5 w-5 text-gray-600" />}
+                  <span className="font-semibold">
+                    {activeTab === 'overview' && 'Overview'}
+                    {activeTab === 'analytics' && 'Analytics'}
+                    {activeTab === 'projects' && 'Showcase'}
+                    {activeTab === 'participants' && 'Participants'}
+                    {activeTab === 'sponsors' && 'Sponsors'}
+                    {activeTab === 'submissions' && 'Submissions'}
+                    {activeTab === 'settings' && 'Settings'}
+                  </span>
+                </div>
+                <Badge variant="secondary" className="text-xs">Aktiv sektion</Badge>
+              </div>
+            </CardContent>
+          </Card>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-3">
