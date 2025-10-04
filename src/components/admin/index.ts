@@ -21,3 +21,4 @@ export { ComponentTest } from './ComponentTest';
 export { default as MediaStorageManager } from './MediaStorageManager';
 export { default as StorageCleanupManager } from './StorageCleanupManager';
 export { default as UnifiedMediaDashboard } from './UnifiedMediaDashboard';
+export { SubmissionMediaGallery } from './SubmissionMediaGallery';

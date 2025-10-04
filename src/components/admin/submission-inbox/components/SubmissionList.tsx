@@ -21,7 +21,7 @@ import {
   X
 } from 'lucide-react';
 import type { EnhancedSubmission } from '../hooks/useSubmissionData';
-import { getStatusColor, getStatusIcon, getTypeColor, getTypeLabel, hasFiles, formatFileSize } from '../utils/submissionContentUtils';
+import { getStatusColor, getStatusIcon, getTypeColor, getTypeLabel, hasFiles, getFileCount, formatFileSize } from '../utils/submissionContentUtils';
 
 interface SubmissionListProps {
   submissions: EnhancedSubmission[];
@@ -101,9 +101,9 @@ export const SubmissionList: React.FC<SubmissionListProps> = ({
                     </div>
                   </Badge>
                   {hasFiles(submission) && (
-                    <Badge variant="outline" className="text-xs">
-                      <FileIcon className="h-3 w-3 mr-1" />
-                      {submission.files?.length} {submission.files?.length === 1 ? 'fil' : 'filer'}
+                    <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200">
+                      <Image className="h-3 w-3 mr-1" />
+                      {getFileCount(submission)} {getFileCount(submission) === 1 ? 'fil' : 'filer'}
                     </Badge>
                   )}
                   {submission.media_status && submission.media_status !== 'pending' && (

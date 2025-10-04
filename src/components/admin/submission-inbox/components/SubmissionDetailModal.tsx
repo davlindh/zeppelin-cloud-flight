@@ -194,12 +194,82 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
   const renderFiles = () => {
     if (!hasFiles(submission) || !submission.files) return null;
 
+    // Handle both array and object formats
+    const filesArray = Array.isArray(submission.files) 
+      ? submission.files 
+      : Object.values(submission.files).filter((f): f is any => f && typeof f === 'object' && 'url' in f);
+
+    if (filesArray.length === 0) return null;
+
+    // Check if all files are images
+    const allImages = filesArray.every((file: any) => getFileType(file.name || '') === 'image');
+    const hasMultipleFiles = filesArray.length > 1;
+
     return (
       <div className="space-y-3">
-        <label className="text-sm font-medium text-muted-foreground">Media-filer</label>
-        <div className="grid gap-3">
-          {submission.files.map((file: any, index: number) => renderSingleFile(file, index))}
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-muted-foreground">
+            Media-filer ({filesArray.length})
+          </label>
+          {allImages && hasMultipleFiles && (
+            <Badge variant="outline" className="text-xs">
+              <ImageIcon className="h-3 w-3 mr-1" />
+              Bildgalleri
+            </Badge>
+          )}
         </div>
+        
+        {/* Image Gallery View for multiple images */}
+        {allImages && hasMultipleFiles ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
+            {filesArray.map((file: any, index: number) => (
+              <Card key={index} className="group relative overflow-hidden hover:shadow-lg transition-all duration-300">
+                <div className="aspect-square relative bg-muted">
+                  <img
+                    src={file.url}
+                    alt={file.name || `Image ${index + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  {/* Overlay with actions */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => window.open(file.url, '_blank')}
+                    >
+                      <Eye className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => downloadFile(file.url, file.name)}
+                    >
+                      <Download className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  {/* Image number badge */}
+                  <Badge className="absolute top-2 left-2 text-xs bg-black/70">
+                    {index + 1}
+                  </Badge>
+                </div>
+                <div className="p-2">
+                  <p className="text-xs truncate font-medium">{file.name || `Bild ${index + 1}`}</p>
+                  {file.size && (
+                    <p className="text-xs text-muted-foreground">{Math.round(file.size / 1024)} KB</p>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          /* Individual file cards for mixed types or single files */
+          <div className="grid gap-3">
+            {filesArray.map((file: any, index: number) => renderSingleFile(file, index))}
+          </div>
+        )}
       </div>
     );
   };
