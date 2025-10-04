@@ -156,6 +156,35 @@
   }
 }
 
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 3px;
+  }
+  
+  /* Improve touch targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Smooth scrolling for mobile tabs */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
 @layer components {
   /* Enhanced card styles */
   .card-enhanced {

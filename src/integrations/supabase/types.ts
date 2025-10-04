@@ -691,6 +691,9 @@ export type Database = {
           media_approved_at: string | null
           media_converted_at: string | null
           media_status: string | null
+          media_approved_at: string | null
+          media_converted_at: string | null
+          media_status: string | null
           processed_at: string | null
           publication_permission: boolean | null
           session_id: string | null
@@ -759,6 +762,13 @@ export type Database = {
       convert_submission_media_to_library: {
         Args: { submission_id: string; media_urls: string[]; target_project_id?: string | null }
         Returns: { created_media_id: string; media_url: string }[]
+      }
+      convert_submission_media_to_library: {
+        Args: { media_urls: string[]; submission_id: string }
+        Returns: {
+          created_media_id: string
+          media_url: string
+        }[]
       }
       generate_session_id: {
         Args: Record<PropertyKey, never>
