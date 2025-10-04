@@ -189,6 +189,7 @@ export const useParticipants = () => {
             role,
             projects (
               id,
+              slug,
               title,
               image_path
             )

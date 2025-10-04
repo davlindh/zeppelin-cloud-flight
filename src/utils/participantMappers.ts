@@ -5,6 +5,7 @@ type DbParticipant = Database['public']['Tables']['participants']['Row'] & {
   project_participants?: Array<{
     projects: {
       id: string;
+      slug: string;
       title: string;
       image_path?: string;
     };
@@ -44,6 +45,7 @@ const mapProjectParticipants = (
 
   const projects = projectParticipants.map((pp) => ({
     id: pp.projects.id,
+    slug: pp.projects.slug,
     title: pp.projects.title,
     role: pp.role,
     imageUrl: pp.projects.image_path ? `/images/${pp.projects.image_path}` : undefined

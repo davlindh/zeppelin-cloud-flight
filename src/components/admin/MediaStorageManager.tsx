@@ -241,31 +241,8 @@ const MediaStorageManager: React.FC = () => {
           }
         } catch (error) {
           console.error(`Error processing bucket ${bucketName}:`, error);
-          // Add empty bucket info
-          allFiles.push({
-            file: {
-              name: '',
-              id: '',
-              updated_at: '',
-              created_at: '',
-              last_accessed_at: '',
-              metadata: {
-                eTag: '',
-                size: 0,
-                mimetype: '',
-                cacheControl: '',
-                lastModified: '',
-                contentLength: 0,
-                httpStatusCode: 0
-              }
-            } as FileObject,
-            bucketName,
-            url: '',
-            isWorking: false,
-            fileType: 'unknown',
-            size: '0 B',
-            lastModified: ''
-          });
+          // Skip adding empty entries for failed buckets
+          // allFiles will simply not include this bucket's data
         }
       }
 

@@ -26,30 +26,29 @@ export const resolveMediaUrl = (
     project: 'projects',
     participant: 'participants', 
     partner: 'partners',
-    media: getMediaBucket(type)
+    media: 'ui' // Media files use ui bucket as fallback
   };
   
-  const bucket = bucketMap[context] || 'media';
+  const bucket = bucketMap[context] || 'ui';
   return getFullAssetUrl(bucket, url);
 };
 
 export const getMediaBucket = (type: MediaType): keyof typeof STORAGE_BUCKETS => {
+  // Since we only have specific buckets, map all media types to appropriate buckets
   switch (type) {
     case 'video':
-      return 'videos';
     case 'audio':
-      return 'audio';
     case 'document':
     case 'pdf':
     case 'presentation':
     case 'archive':
     case 'code':
-      return 'documents';
     case 'image':
     case 'portfolio':
     case '3d':
     default:
-      return 'media';
+      // All media files go to 'ui' bucket as a fallback since specific media buckets don't exist
+      return 'ui';
   }
 };
 

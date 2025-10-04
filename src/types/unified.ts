@@ -7,6 +7,7 @@ import type { MediaCategory, MediaType, BaseMediaItem, ParticipantMediaItem } fr
 
 export interface ShowcaseCard {
   id: string;
+  slug: string;
   title: string;
   description: string;
   imageUrl: string;
