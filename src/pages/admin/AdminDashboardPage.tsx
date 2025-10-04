@@ -129,16 +129,17 @@ export const AdminDashboardPage = () => {
                   
                   <Separator />
                   
-                  <nav className="flex flex-col gap-1 p-4">
-                    {[
-                      { value: 'overview', icon: BarChart3, label: 'Overview', color: 'text-primary' },
-                      { value: 'analytics', icon: TrendingUp, label: 'Analytics', color: 'text-blue-600' },
-                      { value: 'projects', icon: FolderOpen, label: 'Showcase', color: 'text-purple-600' },
-                      { value: 'participants', icon: Users, label: 'Participants', color: 'text-green-600' },
-                      { value: 'sponsors', icon: Building, label: 'Sponsors', color: 'text-orange-600' },
-                      { value: 'submissions', icon: Inbox, label: 'Submissions', color: 'text-pink-600' },
-                      { value: 'settings', icon: Settings, label: 'Settings', color: 'text-gray-600' },
-                    ].map((item) => (
+                   <nav className="flex flex-col gap-1 p-4">
+                     {[
+                       { value: 'overview', icon: BarChart3, label: 'Overview', color: 'text-primary' },
+                       { value: 'analytics', icon: TrendingUp, label: 'Analytics', color: 'text-blue-600' },
+                       { value: 'projects', icon: FolderOpen, label: 'Showcase', color: 'text-purple-600' },
+                       { value: 'participants', icon: Users, label: 'Participants', color: 'text-green-600' },
+                       { value: 'sponsors', icon: Building, label: 'Sponsors', color: 'text-orange-600' },
+                       { value: 'submissions', icon: Inbox, label: 'Submissions', color: 'text-pink-600' },
+                       { value: 'storage', icon: HardDrive, label: 'Media & Storage', color: 'text-cyan-600' },
+                       { value: 'settings', icon: Settings, label: 'Settings', color: 'text-gray-600' },
+                     ].map((item) => (
                       <Button
                         key={item.value}
                         variant={activeTab === item.value ? 'secondary' : 'ghost'}
@@ -228,11 +229,9 @@ export const AdminDashboardPage = () => {
         <AdminStats />
 
         {/* Main Content */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Desktop Navigation Only */}
-          <TabsList className="hidden lg:grid w-full grid-cols-7">
+          <TabsList className="hidden lg:grid w-full grid-cols-8">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
@@ -278,6 +277,7 @@ export const AdminDashboardPage = () => {
                   {activeTab === 'participants' && <Users className="h-5 w-5 text-green-600" />}
                   {activeTab === 'sponsors' && <Building className="h-5 w-5 text-orange-600" />}
                   {activeTab === 'submissions' && <Inbox className="h-5 w-5 text-pink-600" />}
+                  {activeTab === 'storage' && <HardDrive className="h-5 w-5 text-cyan-600" />}
                   {activeTab === 'settings' && <Settings className="h-5 w-5 text-gray-600" />}
                   <span className="font-semibold">
                     {activeTab === 'overview' && 'Overview'}
@@ -286,6 +286,7 @@ export const AdminDashboardPage = () => {
                     {activeTab === 'participants' && 'Participants'}
                     {activeTab === 'sponsors' && 'Sponsors'}
                     {activeTab === 'submissions' && 'Submissions'}
+                    {activeTab === 'storage' && 'Media & Storage'}
                     {activeTab === 'settings' && 'Settings'}
                   </span>
                 </div>
