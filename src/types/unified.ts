@@ -79,6 +79,7 @@ export interface Participant {
   roles?: string[]; // Aggregated from projects
   projects?: Array<{
     id: string;
+    slug: string;
     title: string;
     role: string;
     imageUrl?: string;
@@ -120,6 +121,7 @@ export type ParticipantEntity = Participant;
 
 export interface Project {
   id: string;
+  slug: string;
   title: string;
   description: string;
   fullDescription?: string;

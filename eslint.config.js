@@ -76,5 +76,11 @@ export default tseslint.config(
       "max-lines-per-function": ["warn", 120], // Allow longer functions for db operations
       "@typescript-eslint/no-explicit-any": "off", // Allow any for database operations
     },
+  },
+  {
+    files: ["src/components/admin/submission-inbox/components/SubmissionDetailModal.tsx"],
+    rules: {
+      "complexity": ["error", 25], // Higher complexity allowance for file type detection
+    },
   }
 );

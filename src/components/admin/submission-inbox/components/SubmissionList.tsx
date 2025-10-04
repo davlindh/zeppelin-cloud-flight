@@ -15,7 +15,10 @@ import {
   User,
   Mail,
   MapPin,
-  Calendar
+  Calendar,
+  Image,
+  Check,
+  X
 } from 'lucide-react';
 import type { EnhancedSubmission } from '../hooks/useSubmissionData';
 import { getStatusColor, getStatusIcon, getTypeColor, getTypeLabel, hasFiles, formatFileSize } from '../utils/submissionContentUtils';
@@ -103,6 +106,19 @@ export const SubmissionList: React.FC<SubmissionListProps> = ({
                       {submission.files?.length} {submission.files?.length === 1 ? 'fil' : 'filer'}
                     </Badge>
                   )}
+                  {submission.media_status && submission.media_status !== 'pending' && (
+                    <Badge
+                      variant="outline"
+                      className={`text-xs ${
+                        submission.media_status === 'approved' ? 'border-green-500 text-green-700' :
+                        submission.media_status === 'rejected' ? 'border-red-500 text-red-700' :
+                        submission.media_status === 'converted' ? 'border-blue-500 text-blue-700' :
+                        'border-gray-500 text-gray-700'
+                      }`}
+                    >
+                      📷 {submission.media_status}
+                    </Badge>
+                  )}
                 </div>
 
                 <h4 className="font-medium mb-1">{submission.title}</h4>
@@ -146,7 +162,9 @@ export const SubmissionList: React.FC<SubmissionListProps> = ({
                   size="sm"
                   variant="outline"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
+                    console.log('Se Detaljer clicked for submission:', submission.id);
                     onSelect(submission);
                   }}
                   title="Se detaljer"

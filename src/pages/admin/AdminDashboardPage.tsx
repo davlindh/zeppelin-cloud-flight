@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import ShowcaseForm from '@/components/admin/ShowcaseForm';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
 import { ShowcaseManagementList } from '@/components/admin/ShowcaseManagementList';
-import { ParticipantManagementList } from '@/components/admin/ParticipantManagementList';
+import { ParticipantManagementListNew } from '@/components/admin/ParticipantManagementListNew';
 import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
 import { SubmissionInbox } from '@/components/admin/submission-inbox';
 import { EnhancedSubmissionInbox } from '@/components/admin/EnhancedSubmissionInbox';
@@ -18,7 +18,10 @@ import { AdminMediaManager } from '@/components/admin/AdminMediaManager';
 import { RecentActivity, AdminStats } from '@/components/admin';
 import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminSettings } from '@/components/admin/AdminSettings';
-import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder } from 'lucide-react';
+import MediaStorageManager from '@/components/admin/MediaStorageManager';
+import StorageCleanupManager from '@/components/admin/StorageCleanupManager';
+import UnifiedMediaDashboard from '@/components/admin/UnifiedMediaDashboard';
+import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder, HardDrive, Archive, Workflow } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const AdminDashboardPage = () => {
@@ -144,7 +147,7 @@ export const AdminDashboardPage = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
@@ -168,6 +171,10 @@ export const AdminDashboardPage = () => {
             <TabsTrigger value="submissions">
               <Inbox className="h-4 w-4 mr-2" />
               Submissions
+            </TabsTrigger>
+            <TabsTrigger value="storage">
+              <HardDrive className="h-4 w-4 mr-2" />
+              Storage
             </TabsTrigger>
             <TabsTrigger value="settings">
               <Settings className="h-4 w-4 mr-2" />
@@ -262,7 +269,7 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="participants">
-            <ParticipantManagementList 
+            <ParticipantManagementListNew
               onAddParticipant={() => setActiveForm('participant')}
               onEditParticipant={handleEditParticipant}
               onViewParticipant={handleViewParticipant}
@@ -292,6 +299,37 @@ export const AdminDashboardPage = () => {
               
               <TabsContent value="media">
                 <AdminMediaManager />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="storage">
+            <Tabs defaultValue="unified" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="unified">
+                  <Workflow className="h-4 w-4 mr-2" />
+                  Media Workflow
+                </TabsTrigger>
+                <TabsTrigger value="manager">
+                  <HardDrive className="h-4 w-4 mr-2" />
+                  Storage Manager
+                </TabsTrigger>
+                <TabsTrigger value="cleanup">
+                  <Archive className="h-4 w-4 mr-2" />
+                  Cleanup Tools
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="unified">
+                <UnifiedMediaDashboard />
+              </TabsContent>
+
+              <TabsContent value="manager">
+                <MediaStorageManager />
+              </TabsContent>
+
+              <TabsContent value="cleanup">
+                <StorageCleanupManager />
               </TabsContent>
             </Tabs>
           </TabsContent>

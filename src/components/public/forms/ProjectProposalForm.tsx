@@ -1,29 +1,55 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileUpload } from '@/components/admin/FileUpload';
-import { BaseSubmissionForm, BaseSubmissionData } from './BaseSubmissionForm';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { FormWrapper } from '@/components/ui/form-wrapper';
+import { StandardFormField, FieldOption } from '@/components/ui/standard-form-field';
 import { useSubmission, FileSubmission } from '@/hooks/useSubmission';
 
-export interface ProjectFormData extends BaseSubmissionData {
-  // Project-specific fields
-  projectTitle: string;
-  projectDescription: string;
-  projectCategory: string;
-  expectedImpact: string;
-  timeline: string;
-  budget: string;
-  portfolio?: File;
-  references?: File;
-}
+const projectFormSchema = z.object({
+  // Contact Information
+  email: z.string().email('Invalid email address'),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  phone: z.string().optional(),
+  organization: z.string().optional(),
+  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
+
+  // Project Information
+  projectTitle: z.string().min(1, 'Project title is required'),
+  projectDescription: z.string().min(1, 'Project description is required'),
+  projectCategory: z.string().min(1, 'Project category is required'),
+  expectedImpact: z.string().optional(),
+  timeline: z.string().min(1, 'Timeline is required'),
+  budget: z.string().optional(),
+
+  // Additional Information
+  motivation: z.string().min(1, 'Motivation is required'),
+  experience: z.string().optional(),
+  availability: z.string().optional(),
+
+  // Consent
+  acceptTerms: z.boolean().refine(val => val === true, 'You must accept the terms'),
+  acceptPrivacy: z.boolean().refine(val => val === true, 'You must accept the privacy policy'),
+  acceptMarketing: z.boolean().optional(),
+  newsletterSubscription: z.boolean().optional(),
+});
+
+export type ProjectFormData = z.infer<typeof projectFormSchema>;
 
 interface ProjectProposalFormProps {
   onClose: () => void;
   className?: string;
 }
+
+const projectCategoryOptions: FieldOption[] = [
+  { value: 'art', label: 'Art & Culture' },
+  { value: 'technology', label: 'Technology' },
+  { value: 'sustainability', label: 'Sustainability' },
+  { value: 'education', label: 'Education' },
+  { value: 'community', label: 'Community' },
+  { value: 'research', label: 'Research' },
+  { value: 'innovation', label: 'Innovation' },
+];
 
 export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
   onClose,
@@ -31,13 +57,6 @@ export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedFiles, setUploadedFiles] = useState<{ portfolio?: File; references?: File }>({});
-
-  const { register, handleSubmit, formState: { errors }, trigger, setValue, watch } = useForm<ProjectFormData>({
-    defaultValues: {
-      acceptTerms: false,
-      acceptPrivacy: false,
-    }
-  });
 
   const { isSubmitting, error, submitForm } = useSubmission();
 
@@ -49,8 +68,8 @@ export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
   };
 
   // Step navigation
-  const nextStep = async () => {
-    const isValid = await trigger();
+  const nextStep = async (form: any) => {
+    const isValid = await form.trigger();
     if (isValid) {
       setCurrentStep(prev => Math.min(prev + 1, totalSteps));
     }
@@ -131,29 +150,19 @@ export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
     await submitForm('project', payload, files);
   };
 
-  const renderStep = () => {
+  const renderStepContent = (form: any) => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address *</Label>
-              <Input
-                id="email"
-                type="email"
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: 'Invalid email address'
-                  }
-                })}
-                placeholder="your.email@example.com"
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
-            </div>
+            <StandardFormField
+              form={form}
+              name="email"
+              label="Email Address"
+              type="email"
+              placeholder="your.email@example.com"
+              required
+            />
           </div>
         );
 
@@ -161,263 +170,172 @@ export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name *</Label>
-                <Input
-                  id="firstName"
-                  {...register('firstName', { required: 'First name is required' })}
-                  placeholder="John"
-                />
-                {errors.firstName && (
-                  <p className="text-sm text-destructive">{errors.firstName.message}</p>
-                )}
-              </div>
+              <StandardFormField
+                form={form}
+                name="firstName"
+                label="First Name"
+                type="text"
+                placeholder="John"
+                required
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  {...register('lastName', { required: 'Last name is required' })}
-                  placeholder="Doe"
-                />
-                {errors.lastName && (
-                  <p className="text-sm text-destructive">{errors.lastName.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                {...register('phone')}
-                placeholder="+46 123 456 789"
+              <StandardFormField
+                form={form}
+                name="lastName"
+                label="Last Name"
+                type="text"
+                placeholder="Doe"
+                required
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="organization">Organization/Institution</Label>
-              <Input
-                id="organization"
-                {...register('organization')}
-                placeholder="Your organization"
-              />
-            </div>
+            <StandardFormField
+              form={form}
+              name="phone"
+              label="Phone Number"
+              type="tel"
+              placeholder="+46 123 456 789"
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="website">Website/Social Media</Label>
-              <Input
-                id="website"
-                {...register('website')}
-                placeholder="https://your-website.com"
-              />
-            </div>
+            <StandardFormField
+              form={form}
+              name="organization"
+              label="Organization/Institution"
+              type="text"
+              placeholder="Your organization"
+            />
+
+            <StandardFormField
+              form={form}
+              name="website"
+              label="Website/Social Media"
+              type="url"
+              placeholder="https://your-website.com"
+            />
           </div>
         );
 
       case 3:
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="projectTitle">Project Title *</Label>
-              <Input
-                id="projectTitle"
-                {...register('projectTitle', { required: 'Project title is required' })}
-                placeholder="Enter your project title"
-              />
-              {errors.projectTitle && (
-                <p className="text-sm text-destructive">{errors.projectTitle.message}</p>
-              )}
-            </div>
+            <StandardFormField
+              form={form}
+              name="projectTitle"
+              label="Project Title"
+              type="text"
+              placeholder="Enter your project title"
+              required
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="projectDescription">Project Description *</Label>
-              <Textarea
-                id="projectDescription"
-                {...register('projectDescription', { required: 'Project description is required' })}
-                placeholder="Describe your project in detail..."
-                rows={5}
+            <StandardFormField
+              form={form}
+              name="projectDescription"
+              label="Project Description"
+              type="textarea"
+              placeholder="Describe your project in detail..."
+              rows={5}
+              required
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <StandardFormField
+                form={form}
+                name="projectCategory"
+                label="Project Category"
+                type="select"
+                placeholder="Select category"
+                options={projectCategoryOptions}
+                required
               />
-              {errors.projectDescription && (
-                <p className="text-sm text-destructive">{errors.projectDescription.message}</p>
-              )}
+
+              <StandardFormField
+                form={form}
+                name="timeline"
+                label="Timeline"
+                type="text"
+                placeholder="e.g., 3-6 months"
+                required
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="projectCategory">Project Category *</Label>
-                <Select
-                  value={watch('projectCategory')}
-                  onValueChange={(value) => setValue('projectCategory', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="art">Art & Culture</SelectItem>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="sustainability">Sustainability</SelectItem>
-                    <SelectItem value="education">Education</SelectItem>
-                    <SelectItem value="community">Community</SelectItem>
-                    <SelectItem value="research">Research</SelectItem>
-                    <SelectItem value="innovation">Innovation</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="timeline">Timeline *</Label>
-                <Input
-                  id="timeline"
-                  {...register('timeline', { required: 'Timeline is required' })}
-                  placeholder="e.g., 3-6 months"
-                />
-                {errors.timeline && (
-                  <p className="text-sm text-destructive">{errors.timeline.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="budget">Budget Estimate</Label>
-                <Input
-                  id="budget"
-                  {...register('budget')}
-                  placeholder="e.g., €50,000"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="expectedImpact">Expected Impact</Label>
-                <Input
-                  id="expectedImpact"
-                  {...register('expectedImpact')}
-                  placeholder="Impact on community/regions"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="motivation">Project Motivation *</Label>
-              <Textarea
-                id="motivation"
-                {...register('motivation', { required: 'Motivation is required' })}
-                placeholder="Why do you want to develop this project at Zeppel Inn?"
-                rows={3}
+              <StandardFormField
+                form={form}
+                name="budget"
+                label="Budget Estimate"
+                type="text"
+                placeholder="e.g., €50,000"
               />
-              {errors.motivation && (
-                <p className="text-sm text-destructive">{errors.motivation.message}</p>
-              )}
+
+              <StandardFormField
+                form={form}
+                name="expectedImpact"
+                label="Expected Impact"
+                type="text"
+                placeholder="Impact on community/regions"
+              />
             </div>
+
+            <StandardFormField
+              form={form}
+              name="motivation"
+              label="Project Motivation"
+              type="textarea"
+              placeholder="Why do you want to develop this project at Zeppel Inn?"
+              rows={3}
+              required
+            />
           </div>
         );
 
       case 4:
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="experience">Relevant Experience</Label>
-              <Textarea
-                id="experience"
-                {...register('experience')}
-                placeholder="Describe your relevant experience..."
-                rows={3}
-              />
-            </div>
+            <StandardFormField
+              form={form}
+              name="experience"
+              label="Relevant Experience"
+              type="textarea"
+              placeholder="Describe your relevant experience..."
+              rows={3}
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="availability">Team/Project Availability</Label>
-              <Textarea
-                id="availability"
-                {...register('availability')}
-                placeholder="When is your team available to participate?"
-                rows={2}
-              />
-            </div>
-
-            {/* File Uploads */}
-            <div className="space-y-4">
-              <Label>Supporting Documents</Label>
-
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Project Portfolio/Examples</Label>
-                <FileUpload
-                  onFileSelect={(file) => handleFileUpload('portfolio', file)}
-                  bucketName="documents"
-                  acceptedTypes="image/*,.pdf"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Supporting Documents/References</Label>
-                <FileUpload
-                  onFileSelect={(file) => handleFileUpload('references', file)}
-                  bucketName="documents"
-                  acceptedTypes=".pdf,.doc,.docx"
-                />
-              </div>
-            </div>
+            <StandardFormField
+              form={form}
+              name="availability"
+              label="Team/Project Availability"
+              type="textarea"
+              placeholder="When is your team available to participate?"
+              rows={2}
+            />
 
             {/* Terms and Consent */}
             <div className="space-y-3 border-t pt-4">
-              <div className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  id="acceptTerms"
-                  {...register('acceptTerms', { required: 'You must accept the terms' })}
-                  className="mt-1"
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <Label htmlFor="acceptTerms" className="text-sm font-medium leading-none">
-                    I accept the Terms and Conditions *
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    I agree to the terms of participation and code of conduct.
-                  </p>
-                </div>
-              </div>
-              {errors.acceptTerms && (
-                <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>
-              )}
+              <StandardFormField
+                form={form}
+                name="acceptTerms"
+                label="I accept the Terms and Conditions"
+                type="checkbox"
+                placeholder="I agree to the terms of participation and code of conduct."
+                required
+              />
 
-              <div className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  id="acceptPrivacy"
-                  {...register('acceptPrivacy', { required: 'You must accept the privacy policy' })}
-                  className="mt-1"
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <Label htmlFor="acceptPrivacy" className="text-sm font-medium leading-none">
-                    I accept the Privacy Policy *
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    I consent to the collection and processing of my personal data.
-                  </p>
-                </div>
-              </div>
-              {errors.acceptPrivacy && (
-                <p className="text-sm text-destructive">{errors.acceptPrivacy.message}</p>
-              )}
+              <StandardFormField
+                form={form}
+                name="acceptPrivacy"
+                label="I accept the Privacy Policy"
+                type="checkbox"
+                placeholder="I consent to the collection and processing of my personal data."
+                required
+              />
 
-              <div className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  id="acceptMarketing"
-                  {...register('acceptMarketing')}
-                  className="mt-1"
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <Label htmlFor="acceptMarketing" className="text-sm font-medium leading-none">
-                    I agree to receive marketing communications
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Optional: Receive updates about future events and opportunities.
-                  </p>
-                </div>
-              </div>
+              <StandardFormField
+                form={form}
+                name="acceptMarketing"
+                label="I agree to receive marketing communications"
+                type="checkbox"
+                placeholder="Optional: Receive updates about future events and opportunities."
+              />
             </div>
           </div>
         );
@@ -428,51 +346,60 @@ export const ProjectProposalForm: React.FC<ProjectProposalFormProps> = ({
   };
 
   return (
-    <BaseSubmissionForm
-      onClose={onClose}
+    <FormWrapper
       title="Submit Project Proposal"
-      currentStep={currentStep}
-      totalSteps={totalSteps}
       icon="project"
+      onSubmit={onSubmit}
+      onClose={onClose}
+      schema={projectFormSchema}
       className={className}
-      onSubmit={handleSubmit(onSubmit)}
       isSubmitting={isSubmitting}
       error={error}
+      currentStep={currentStep}
+      totalSteps={totalSteps}
+      defaultValues={{
+        acceptTerms: false,
+        acceptPrivacy: false,
+      }}
     >
-      {renderStep()}
+      {(form) => (
+        <>
+          {renderStepContent(form)}
 
-      {/* Navigation buttons */}
-      <div className="flex justify-between items-center mt-6 pt-6 border-t">
-        <div>
-          {currentStep > 1 && (
-            <button
-              type="button"
-              onClick={prevStep}
-              className="text-sm text-muted-foreground hover:text-foreground"
-              disabled={isSubmitting}
-            >
-              ← Previous
-            </button>
-          )}
-        </div>
+          {/* Navigation buttons */}
+          <div className="flex justify-between items-center mt-6 pt-6 border-t">
+            <div>
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                  disabled={isSubmitting}
+                >
+                  ← Previous
+                </button>
+              )}
+            </div>
 
-        <div className="text-sm text-muted-foreground">
-          Step {currentStep} of {totalSteps}
-        </div>
+            <div className="text-sm text-muted-foreground">
+              Step {currentStep} of {totalSteps}
+            </div>
 
-        <div>
-          {currentStep < totalSteps && (
-            <button
-              type="button"
-              onClick={nextStep}
-              className="text-sm text-primary hover:text-primary/80 font-medium"
-              disabled={isSubmitting}
-            >
-              Next →
-            </button>
-          )}
-        </div>
-      </div>
-    </BaseSubmissionForm>
+            <div>
+              {currentStep < totalSteps && (
+                <button
+                  type="button"
+                  onClick={() => nextStep(form)}
+                  className="text-sm text-primary hover:text-primary/80 font-medium"
+                  disabled={isSubmitting}
+                >
+                  Next →
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </FormWrapper>
   );
 };

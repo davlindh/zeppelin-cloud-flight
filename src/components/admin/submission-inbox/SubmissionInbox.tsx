@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, ArrowUpDown } from 'lucide-react';
 import { SubmissionList } from './components/SubmissionList';
+import { SubmissionDetailModal } from './components/SubmissionDetailModal';
 import { useSubmissionData } from './hooks/useSubmissionData';
 import { useSubmissionActions } from './hooks/useSubmissionActions';
 import { SubmissionEditModal } from '../SubmissionEditModal';
@@ -32,7 +33,10 @@ export const SubmissionInbox: React.FC = () => {
     updateStatus,
     deleteSubmission,
     exportToCSV,
-    exportToJSON
+    exportToJSON,
+    approveMedia,
+    rejectMedia,
+    convertMediaToLibrary
   } = useSubmissionActions();
 
   // Filter submissions based on current tab
@@ -179,6 +183,28 @@ export const SubmissionInbox: React.FC = () => {
           onSuccess={() => setConvertingSubmission(null)}
         />
       )}
+
+      {/* Submission Detail Modal */}
+      <SubmissionDetailModal
+        submission={selectedSubmission}
+        isOpen={!!selectedSubmission}
+        onClose={() => {
+          console.log('Closing modal, selectedSubmission was:', selectedSubmission?.id);
+          setSelectedSubmission(null);
+        }}
+        onApproveMedia={(submissionId) => {
+          console.log('Approving media for submission:', submissionId);
+          approveMedia(submissionId);
+        }}
+        onRejectMedia={(submissionId) => {
+          console.log('Rejecting media for submission:', submissionId);
+          rejectMedia(submissionId);
+        }}
+        onConvertMedia={(submission) => {
+          console.log('Converting media for submission:', submission.id);
+          convertMediaToLibrary(submission);
+        }}
+      />
     </div>
   );
 };

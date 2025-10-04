@@ -82,6 +82,116 @@ export const exportSubmissionToJSON = (submission: EnhancedSubmission) => {
 };
 
 /**
+ * Extract media URLs from submission files
+ */
+const extractMediaUrls = (submission: EnhancedSubmission): string[] => {
+  const mediaUrls: string[] = [];
+  if (submission.files && Array.isArray(submission.files)) {
+    submission.files.forEach((file: any) => {
+      if (file.url && typeof file.url === 'string') {
+        mediaUrls.push(file.url);
+      }
+    });
+  }
+  return mediaUrls;
+};
+
+/**
+ * Validate submission for media conversion
+ */
+const validateSubmissionForConversion = (submission: EnhancedSubmission, toast: any): boolean => {
+  if (submission.media_status !== 'approved') {
+    toast({
+      title: 'Media måste godkännas först',
+      description: 'Endast godkänd media kan konverteras till mediabiblioteket.',
+      variant: 'destructive'
+    });
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Validate media URLs exist
+ */
+const validateMediaUrls = (mediaUrls: string[], toast: any): boolean => {
+  if (mediaUrls.length === 0) {
+    toast({
+      title: 'Inga mediafiler hittades',
+      description: 'Inlämningen innehåller inga mediafiler att konvertera.',
+      variant: 'destructive'
+    });
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Call database function to convert media
+ */
+const callConversionFunction = async (submissionId: string, mediaUrls: string[]) => {
+  const { data, error } = await supabase.rpc('convert_submission_media_to_library', {
+    submission_id: submissionId,
+    media_urls: mediaUrls,
+    target_project_id: null // For now, let the function decide the project_id
+  });
+
+  if (error) {
+    console.error('Database function error:', error);
+    throw new Error(`Database error: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error('No response from database function');
+  }
+
+  return data;
+};
+
+/**
+ * Parse database response
+ */
+const parseConversionResult = (data: any) => {
+  let result;
+  try {
+    result = typeof data === 'string' ? JSON.parse(data) : data;
+  } catch (parseError) {
+    console.error('Failed to parse database response:', parseError);
+    throw new Error('Invalid response from database function');
+  }
+
+  if (!result.success) {
+    throw new Error(result.message || 'Conversion failed');
+  }
+
+  return result;
+};
+
+/**
+ * Show success message
+ */
+const showConversionSuccess = (convertedCount: number, toast: any) => {
+  toast({
+    title: 'Media konverterat framgångsrikt',
+    description: `${convertedCount} mediafiler har lagts till i mediabiblioteket.`,
+  });
+};
+
+/**
+ * Show error message
+ */
+const showConversionError = (error: unknown, toast: any) => {
+  console.error('Media conversion error:', error);
+  const errorMessage = error instanceof Error ? error.message : 'Okänt fel';
+
+  toast({
+    title: 'Fel vid konvertering',
+    description: `Kunde inte konvertera media till biblioteket: ${errorMessage}`,
+    variant: 'destructive'
+  });
+};
+
+/**
  * Custom hook for managing submission actions (CRUD operations)
  * Reduces complexity by centralizing business logic
  */
@@ -231,6 +341,104 @@ export const useSubmissionActions = () => {
   };
 
   /**
+   * Approve media in submission
+   */
+  const approveMedia = async (submissionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          media_status: 'approved',
+          media_approved_at: new Date().toISOString()
+        })
+        .eq('id', submissionId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Media godkänd',
+        description: 'Mediefilerna i inlämningen har godkänts och kan nu konverteras till mediabiblioteket.'
+      });
+
+      return true;
+    } catch (error) {
+      toast({
+        title: 'Fel vid godkännande',
+        description: 'Kunde inte godkänna media.',
+        variant: 'destructive'
+      });
+
+      return false;
+    }
+  };
+
+  /**
+   * Reject media in submission
+   */
+  const rejectMedia = async (submissionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('submissions')
+        .update({
+          media_status: 'rejected',
+          media_approved_at: new Date().toISOString()
+        })
+        .eq('id', submissionId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Media avvisad',
+        description: 'Mediefilerna i inlämningen har avvisats.'
+      });
+
+      return true;
+    } catch (error) {
+      toast({
+        title: 'Fel vid avvisande',
+        description: 'Kunde inte avvisa media.',
+        variant: 'destructive'
+      });
+
+      return false;
+    }
+  };
+
+
+
+  /**
+   * Convert approved media to media library
+   */
+  const convertMediaToLibrary = async (submission: EnhancedSubmission) => {
+    try {
+      // Validation checks
+      if (!validateSubmissionForConversion(submission, toast)) {
+        return false;
+      }
+
+      const mediaUrls = extractMediaUrls(submission);
+
+      if (!validateMediaUrls(mediaUrls, toast)) {
+        return false;
+      }
+
+      // Call database function
+      const data = await callConversionFunction(submission.id, mediaUrls);
+
+      // Parse response
+      const result = parseConversionResult(data);
+
+      // Show success message
+      showConversionSuccess(result.converted_count || mediaUrls.length, toast);
+
+      return true;
+    } catch (error) {
+      showConversionError(error, toast);
+      return false;
+    }
+  };
+
+  /**
    * Convert approved collaboration submission to sponsor record
    */
   const convertToSponsor = async (submission: EnhancedSubmission) => {
@@ -349,6 +557,9 @@ export const useSubmissionActions = () => {
     exportToJSON,
     batchDelete,
     convertToSponsor,
+    approveMedia,
+    rejectMedia,
+    convertMediaToLibrary,
 
     // State
     isExporting,

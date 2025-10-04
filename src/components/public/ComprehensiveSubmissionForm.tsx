@@ -1,24 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { FileUpload } from '../admin/FileUpload';
+import { useSubmission, FileSubmission } from '@/hooks/useSubmission';
 import { X, Plus, Upload, User, Building, Lightbulb } from 'lucide-react';
 
-// Comprehensive Submission Form Component with Context7 Best Practices
-// Features: Multi-step form, validation, file uploads, accessibility, progress tracking
-
 interface SubmissionFormData {
-  type: 'participant' | 'project' | 'sponsor' | 'collaboration' | 'media';
+  type: 'participant' | 'project' | 'sponsor' | 'collaboration';
   // Personal/Contact Information
   firstName?: string;
   lastName?: string;
@@ -38,10 +34,6 @@ interface SubmissionFormData {
   experience?: string;
   availability?: string;
   specialRequirements?: string;
-  // Media and Files
-  portfolio?: string;
-  cv?: string;
-  references?: string;
   // Terms and Consent
   acceptTerms: boolean;
   acceptPrivacy: boolean;
@@ -51,7 +43,7 @@ interface SubmissionFormData {
 
 interface ComprehensiveSubmissionFormProps {
   onClose: () => void;
-  initialType?: 'participant' | 'project' | 'sponsor' | 'collaboration' | 'media';
+  initialType?: 'participant' | 'project' | 'sponsor' | 'collaboration';
   className?: string;
 }
 
@@ -61,9 +53,8 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
   className,
 }) => {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
+  const [uploadedFiles, setUploadedFiles] = useState<{ cv?: File; portfolio?: File; references?: File }>({});
   const [error, setError] = useState('');
 
   const { register, handleSubmit, formState: { errors }, watch, setValue, trigger } = useForm<SubmissionFormData>({
@@ -74,35 +65,13 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
     }
   });
 
+  const { isSubmitting, submitForm } = useSubmission();
   const selectedType = watch('type');
   const totalSteps = selectedType === 'participant' ? 4 : selectedType === 'project' ? 5 : 3;
 
   // File upload handlers
-  const handleFileUpload = (fieldName: string, file: File) => {
+  const handleFileUpload = (fieldName: keyof typeof uploadedFiles, file: File) => {
     setUploadedFiles(prev => ({ ...prev, [fieldName]: file }));
-  };
-
-  const uploadFile = async (file: File, bucketName: string): Promise<string | null> => {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `submissions/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filePath);
-
-      return data.publicUrl;
-    } catch (error) {
-      console.error('File upload error:', error);
-      return null;
-    }
   };
 
   // Step navigation
@@ -117,25 +86,63 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
-  // Form submission
+  // Form submission using centralized system
   const onSubmit = async (data: SubmissionFormData) => {
     try {
-      setIsSubmitting(true);
       setError('');
 
-      // Upload files
-      const fileUploads = await Promise.all(
-        Object.entries(uploadedFiles).map(async ([fieldName, file]) => {
-          const bucketName = fieldName === 'cv' ? 'cvs' : fieldName === 'portfolio' ? 'portfolios' : 'documents';
-          const url = await uploadFile(file, bucketName);
-          return { fieldName, url };
-        })
-      );
+      // Generate unique IDs for this submission
+      const userId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+      const submissionId = `${data.type}-${Date.now()}`;
 
-      // Prepare submission data according to Supabase schema
-      const submissionData = {
+      // Prepare files for submission
+      const files: FileSubmission[] = [];
+
+      if (uploadedFiles.cv && (data.type === 'participant')) {
+        files.push({
+          fieldName: 'cv',
+          file: uploadedFiles.cv,
+          bucketName: 'documents',
+          uploadContext: {
+            uploader: 'participant',
+            userId,
+            submissionId
+          }
+        });
+      }
+
+      if (uploadedFiles.portfolio && (data.type === 'participant' || data.type === 'project')) {
+        files.push({
+          fieldName: 'portfolio',
+          file: uploadedFiles.portfolio,
+          bucketName: 'documents',
+          uploadContext: {
+            uploader: data.type === 'participant' ? 'participant' : 'project-owner',
+            userId,
+            submissionId
+          }
+        });
+      }
+
+      if (uploadedFiles.references && data.type === 'collaboration') {
+        files.push({
+          fieldName: 'references',
+          file: uploadedFiles.references,
+          bucketName: 'documents',
+          uploadContext: {
+            uploader: 'user',
+            userId,
+            submissionId
+          }
+        });
+      }
+
+      // Prepare payload for centralized submission system
+      const payload = {
         type: data.type,
-        title: data.type === 'project' ? data.projectTitle : `${data.type} submission`,
+        title: data.type === 'project' && data.projectTitle
+          ? data.projectTitle
+          : `${data.firstName} ${data.lastName} - ${data.type} Application`,
         content: {
           contact_info: {
             firstName: data.firstName,
@@ -152,7 +159,7 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
             expectedImpact: data.expectedImpact,
             timeline: data.timeline,
             budget: data.budget,
-          } : null,
+          } : undefined,
           additional_info: {
             motivation: data.motivation,
             experience: data.experience,
@@ -167,24 +174,11 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
           },
         },
         contact_email: data.email,
-        contact_phone: data.phone || null,
-        session_id: sessionStorage.getItem('session_id'),
-        user_agent: navigator.userAgent,
-        language_preference: navigator.language,
-        how_found_us: 'website',
-        publication_permission: data.acceptMarketing || false,
-        files: fileUploads.reduce((acc, { fieldName, url }) => {
-          if (url) acc[fieldName] = url;
-          return acc;
-        }, {} as Record<string, string>),
+        contact_phone: data.phone,
       };
 
-      // Submit to Supabase
-      const { error: submitError } = await supabase
-        .from('submissions')
-        .insert(submissionData);
-
-      if (submitError) throw submitError;
+      // Use centralized submission system
+      await submitForm(data.type, payload, files);
 
       toast({
         title: 'Submission Successful!',
@@ -202,8 +196,6 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
         description: errorMessage,
         variant: 'destructive',
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -306,12 +298,7 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
                           Propose Collaboration
                         </div>
                       </SelectItem>
-                      <SelectItem value="media">
-                        <div className="flex items-center gap-2">
-                          <Upload className="h-4 w-4" />
-                          Share Event Media
-                        </div>
-                      </SelectItem>
+
                     </SelectContent>
                   </Select>
                 </div>

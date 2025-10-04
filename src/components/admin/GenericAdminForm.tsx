@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import { useForm, SubmitHandler, Path, PathValue, DefaultValues } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { X, Upload, FileText } from 'lucide-react';
-import { FormField, AdminFormConfig, FileUploadResult } from '@/types/admin';
+import { X } from 'lucide-react';
+import { AdminFormConfig, FileUploadResult } from '@/types/admin';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { logError } from '@/utils/adminApi';
+import { StandardFormField, FieldOption } from '@/components/ui/standard-form-field';
 
 interface GenericAdminFormProps<T extends Record<string, unknown>> {
   config: AdminFormConfig;
@@ -98,187 +95,30 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
     }
   };
 
-  const renderField = (field: FormField) => {
+  const renderField = (field: any) => {
     const fieldName = field.name as keyof T;
 
-    switch (field.type) {
-      case 'text':
-        return (
-          <Input
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            type="text"
-            placeholder={field.placeholder}
-          />
-        );
+    // Convert admin field config to StandardFormField props
+    const fieldOptions: FieldOption[] = field.options?.map((option: any) => ({
+      value: option.value,
+      label: option.label,
+    })) || [];
 
-      case 'email':
-        return (
-          <Input
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            type="email"
-            placeholder={field.placeholder}
-          />
-        );
+    const isImageField = field.name.includes('image') || field.name.includes('avatar') || field.name.includes('logo');
 
-      case 'tel':
-        return (
-          <Input
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            type="tel"
-            placeholder={field.placeholder}
-          />
-        );
-
-      case 'number':
-        return (
-          <Input
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            type="number"
-            placeholder={field.placeholder}
-          />
-        );
-
-      case 'date':
-        return (
-          <Input
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            type="date"
-            placeholder={field.placeholder}
-          />
-        );
-
-      case 'textarea':
-        return (
-          <Textarea
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            placeholder={field.placeholder}
-            rows={4}
-          />
-        );
-
-      case 'url':
-        return (
-          <Input
-            id={field.name}
-            {...register(fieldName as Path<T>)}
-            type="url"
-            placeholder={field.placeholder}
-          />
-        );
-
-      case 'select':
-        return (
-          <Select
-            value={String(watch(fieldName as Path<T>) || '')}
-            onValueChange={(value) => setValue(fieldName as Path<T>, value as PathValue<T, Path<T>>)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={field.placeholder || 'Select an option'} />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options?.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-
-      case 'file':
-        const currentValue = watch(fieldName as Path<T>) as string;
-        const isImageField = field.name.includes('image') || field.name.includes('avatar') || field.name.includes('logo');
-
-        return (
-          <div className="space-y-3">
-            {/* Current file preview */}
-            {currentValue && isImageField && (
-              <div className="border rounded-lg p-4 bg-muted/20">
-                <Label className="text-sm font-medium mb-2 block">Current Image Preview</Label>
-                <div className="relative w-full max-w-sm mx-auto">
-                  <img
-                    src={currentValue}
-                    alt="Current file preview"
-                    className="w-full h-auto max-h-40 object-cover rounded-lg border"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      // Could add fallback text or icon here
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => document.getElementById(`${field.name}-input`)?.click()}
-                disabled={isUploadingFile || fileUpload?.isUploading}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                {currentValue ? 'Replace File' : 'Upload File'}
-              </Button>
-              {currentValue && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setValue(fieldName as Path<T>, '' as PathValue<T, Path<T>>);
-                    setUploadedFileUrl('');
-                  }}
-                >
-                  Remove
-                </Button>
-              )}
-              <input
-                id={`${field.name}-input`}
-                type="file"
-                className="hidden"
-                onChange={handleFileChange}
-                accept="image/*,video/*,audio/*,.pdf,.doc,.docx"
-              />
-            </div>
-
-            {isUploadingFile || fileUpload?.isUploading ? (
-              <div className="space-y-2">
-                <Progress value={fileUpload?.uploadProgress || 0} className="h-2" />
-                <p className="text-sm text-muted-foreground">Uploading...</p>
-              </div>
-            ) : uploadedFileUrl || currentValue ? (
-              <div className="flex items-center gap-2 p-3 border border-green-200 bg-green-50 rounded-lg">
-                <FileText className="h-4 w-4 text-green-600" />
-                <span className="text-sm text-green-600">
-                  {uploadedFileUrl ? 'File uploaded successfully' : 'Current file loaded'}
-                </span>
-                {currentValue && (
-                  <a
-                    href={uploadedFileUrl || currentValue}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 text-sm underline"
-                  >
-                    View {isImageField ? 'image' : 'file'}
-                  </a>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No file selected</p>
-            )}
-          </div>
-        );
-
-      default:
-        return <Input {...register(fieldName as Path<T>)} />;
-    }
+    return (
+      <StandardFormField
+        form={{ register, formState: { errors }, setValue, watch } as any}
+        name={fieldName as any}
+        label={field.label}
+        type={field.type}
+        placeholder={field.placeholder}
+        required={field.required}
+        options={fieldOptions}
+        accept={isImageField ? 'image/*' : field.type === 'file' ? 'image/*,video/*,audio/*,.pdf,.doc,.docx' : undefined}
+        bucketName={field.type === 'file' ? config.bucketName : undefined}
+      />
+    );
   };
 
   return (

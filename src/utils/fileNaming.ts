@@ -169,7 +169,13 @@ export const getBucketForContext = (context: FileNamingContext): string => {
  * Generate folder structure for organization
  */
 export const generateFolderPath = (context: FileNamingContext): string => {
-  // Start with date-based folder structure (YYYY/MM)
+  // For media-files bucket, use flat structure to match Supabase storage
+  // The media-files bucket doesn't have nested folders, so return empty string
+  if (getBucketForContext(context) === 'media-files') {
+    return '';
+  }
+
+  // For other buckets, use date-based folder structure (YYYY/MM)
   const date = new Date();
   const datePath = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}`;
 
@@ -184,6 +190,70 @@ export const generateFolderPath = (context: FileNamingContext): string => {
   }
 
   return parts.join('/');
+};
+
+/**
+ * Generate multiple possible URLs for a file (for backward compatibility)
+ * This handles both old nested paths and new flat paths
+ */
+export const generatePossibleUrls = (bucketName: string, fileName: string): string[] => {
+  const urls: string[] = [];
+
+  // Add the current flat structure URL
+  urls.push(fileName);
+
+  // Add possible old nested structure URLs
+  if (bucketName === 'media-files') {
+    // Old structure might have had media/ prefix
+    urls.push(`media/${fileName}`);
+    urls.push(`submissions/${fileName}`);
+  }
+
+  return urls;
+};
+
+/**
+ * Try to find a working URL from multiple possible URLs
+ */
+export const findWorkingUrl = async (bucketName: string, fileName: string): Promise<string | null> => {
+  const possibleUrls = generatePossibleUrls(bucketName, fileName);
+
+  for (const url of possibleUrls) {
+    try {
+      // Try to check if the file exists by making a HEAD request
+      const response = await fetch(`https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketName}/${url}`, {
+        method: 'HEAD'
+      });
+      if (response.ok) {
+        return url;
+      }
+    } catch (error) {
+      // Continue to next URL
+      continue;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Get the correct public URL for a file, handling both old and new path structures
+ */
+export const getCorrectedFileUrl = (bucketName: string, filePath: string): string => {
+  // If it's already a full URL, return as is
+  if (filePath.startsWith('http')) {
+    return filePath;
+  }
+
+  // For media-files bucket, ensure flat structure
+  if (bucketName === 'media-files') {
+    // Remove any folder prefixes that might have been added incorrectly
+    const cleanPath = filePath.replace(/^media\//, '').replace(/^submissions\//, '');
+    return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketName}/${cleanPath}`;
+  }
+
+  // For other buckets, use the path as is
+  return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketName}/${filePath}`;
 };
 
 /**

@@ -688,6 +688,9 @@ export type Database = {
           ip_address: unknown | null
           language_preference: string | null
           location: string | null
+          media_approved_at: string | null
+          media_converted_at: string | null
+          media_status: string | null
           processed_at: string | null
           publication_permission: boolean | null
           session_id: string | null
@@ -708,6 +711,9 @@ export type Database = {
           ip_address?: unknown | null
           language_preference?: string | null
           location?: string | null
+          media_approved_at?: string | null
+          media_converted_at?: string | null
+          media_status?: string | null
           processed_at?: string | null
           publication_permission?: boolean | null
           session_id?: string | null
@@ -728,6 +734,9 @@ export type Database = {
           ip_address?: unknown | null
           language_preference?: string | null
           location?: string | null
+          media_approved_at?: string | null
+          media_converted_at?: string | null
+          media_status?: string | null
           processed_at?: string | null
           publication_permission?: boolean | null
           session_id?: string | null
@@ -746,6 +755,10 @@ export type Database = {
       cleanup_old_drafts: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      convert_submission_media_to_library: {
+        Args: { submission_id: string; media_urls: string[]; target_project_id?: string | null }
+        Returns: { created_media_id: string; media_url: string }[]
       }
       generate_session_id: {
         Args: Record<PropertyKey, never>

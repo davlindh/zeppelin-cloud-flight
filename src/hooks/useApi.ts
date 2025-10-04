@@ -86,15 +86,19 @@ export const useUnifiedMedia = () => {
 };
 
 /**
- * Fetch a single project by slug with relationships
+ * Fetch a single project by slug or UUID with relationships
+ * Handles both slug-based URLs and legacy UUID-based URLs
  */
-export const useProject = (slug: string) => {
+export const useProject = (slugOrId: string) => {
   return useQuery({
-    queryKey: queryKeys.projectDetail(slug),
+    queryKey: queryKeys.projectDetail(slugOrId),
     queryFn: async () => {
-      console.log('🔍 useProject: Fetching project with slug:', slug);
+      console.log('🔍 useProject: Fetching project with slugOrId:', slugOrId);
 
-      const { data, error } = await supabase
+      // Check if the parameter looks like a UUID (36 characters with hyphens)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+
+      let query = supabase
         .from('projects')
         .select(`
           *,
@@ -138,9 +142,12 @@ export const useProject = (slug: string) => {
             capacity,
             registration_required
           )
-        `)
-        .eq('slug', slug)
-        .single();
+        `);
+
+      // Use appropriate query based on parameter type
+      query = isUUID ? query.eq('id', slugOrId) : query.eq('slug', slugOrId);
+
+      const { data, error } = await query.single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -157,7 +164,7 @@ export const useProject = (slug: string) => {
 
       return data;
     },
-    enabled: !!slug,
+    enabled: !!slugOrId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });

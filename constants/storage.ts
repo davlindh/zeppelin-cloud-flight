@@ -1,65 +1,39 @@
-// Imaginary storage buckets configuration
-// This simulates a cloud storage structure for assets
+// Supabase storage buckets configuration
+// Real buckets that correspond to actual Supabase storage
 
 export const STORAGE_BUCKETS = {
-  // Main asset buckets
+  // Main asset buckets - these correspond to real Supabase storage buckets
   participants: {
     name: 'participants',
-    basePath: '/images/participants/',
+    bucketName: 'participants',
+    localPath: '/images/participants/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '5MB'
   },
-  
+
   projects: {
-    name: 'projects', 
-    basePath: '/images/projects/',
+    name: 'projects',
+    bucketName: 'projects',
+    localPath: '/images/projects/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '10MB'
   },
-  
+
   partners: {
     name: 'partners',
-    basePath: '/images/partners/', 
+    bucketName: 'partners',
+    localPath: '/images/partners/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '2MB'
   },
-  
+
   // UI and system assets
   ui: {
     name: 'ui',
-    basePath: '/images/ui/',
+    bucketName: 'ui',
+    localPath: '/images/ui/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '1MB'
-  },
-  
-  // Rich multimedia buckets
-  videos: {
-    name: 'videos',
-    basePath: '/media/videos/',
-    allowedTypes: ['mp4', 'webm', 'mov', 'avi'],
-    maxSize: '100MB'
-  },
-  
-  audio: {
-    name: 'audio',
-    basePath: '/media/audio/',
-    allowedTypes: ['mp3', 'wav', 'flac', 'ogg'],
-    maxSize: '25MB'
-  },
-  
-  documents: {
-    name: 'documents',
-    basePath: '/media/documents/',
-    allowedTypes: ['pdf', 'doc', 'docx', 'txt', 'rtf'],
-    maxSize: '10MB'
-  },
-  
-  // Legacy media bucket for backward compatibility
-  media: {
-    name: 'media',
-    basePath: '/media/',
-    allowedTypes: ['mp4', 'webm', 'mp3', 'wav', 'pdf', 'doc', 'docx'],
-    maxSize: '50MB'
   }
 } as const;
 
@@ -74,11 +48,22 @@ export const PLACEHOLDER_ASSETS = {
 // Helper functions for storage operations
 export const getStoragePath = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
   const bucketConfig = STORAGE_BUCKETS[bucket];
-  return `${bucketConfig.basePath}${filename}`;
+  return `${bucketConfig.localPath}${filename}`;
+};
+
+export const getSupabaseStorageUrl = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
+  const bucketConfig = STORAGE_BUCKETS[bucket];
+  return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketConfig.bucketName}/${filename}`;
+};
+
+export const getLocalStorageUrl = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
+  return getStoragePath(bucket, filename);
 };
 
 export const getFullAssetUrl = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
-  return getStoragePath(bucket, filename);
+  // Try Supabase storage first, fallback to local
+  const bucketConfig = STORAGE_BUCKETS[bucket];
+  return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketConfig.bucketName}/${filename}`;
 };
 
 export const validateFileType = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): boolean => {

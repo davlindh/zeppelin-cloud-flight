@@ -55,53 +55,66 @@ interface ParticipantFormProps {
   initialData?: Partial<Participant>;
 }
 
+// Auto-generate slug from name
+const generateSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[åä]/g, 'a')
+    .replace(/ö/g, 'o')
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+};
+
+const parseSocialLinks = (linksString: string) => {
+  if (!linksString?.trim()) return [];
+
+  return linksString.split(',').map(link => {
+    const trimmed = link.trim();
+    let platform: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'github' | 'other' = 'other';
+
+    if (trimmed.includes('instagram')) platform = 'instagram';
+    else if (trimmed.includes('twitter') || trimmed.includes('x.com')) platform = 'twitter';
+    else if (trimmed.includes('linkedin')) platform = 'linkedin';
+    else if (trimmed.includes('facebook')) platform = 'facebook';
+    else if (trimmed.includes('github')) platform = 'github';
+
+    return { platform, url: trimmed };
+  }).filter(link => link.url);
+};
+
 export const ParticipantFormNew = ({ onClose, participantId, initialData }: ParticipantFormProps) => {
-  // Auto-generate slug from name
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[åä]/g, 'a')
-      .replace(/ö/g, 'o')
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  };
-
-  const parseSocialLinks = (linksString: string) => {
-    if (!linksString?.trim()) return [];
-
-    return linksString.split(',').map(link => {
-      const trimmed = link.trim();
-      let platform: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'github' | 'other' = 'other';
-
-      if (trimmed.includes('instagram')) platform = 'instagram';
-      else if (trimmed.includes('twitter') || trimmed.includes('x.com')) platform = 'twitter';
-      else if (trimmed.includes('linkedin')) platform = 'linkedin';
-      else if (trimmed.includes('facebook')) platform = 'facebook';
-      else if (trimmed.includes('github')) platform = 'github';
-
-      return { platform, url: trimmed };
-    }).filter(link => link.url);
-  };
-
+  // eslint-disable-next-line complexity
   const onSubmit = async (data: Record<string, unknown>) => {
+    const name = data.name as string;
+    const slug = (data.slug as string) || (name ? generateSlug(name) : '');
+    const bio = data.bio as string;
+    const website = data.website as string;
+    const socialLinks = data.social_links as string;
+    const avatarPath = (data.avatar_path as string) || initialData?.avatar_path;
+
     const participantData = {
-      name: data.name as string,
-      slug: data.slug as string,
-      bio: data.bio as string,
-      website: data.website as string,
-      social_links: parseSocialLinks(data.social_links as string),
-      avatar_path: (data.avatar_path as string) || initialData?.avatar_path,
+      name,
+      slug,
+      bio,
+      website,
+      social_links: parseSocialLinks(socialLinks),
+      avatar_path: avatarPath,
     };
 
-    const { error } = participantId
-      ? await supabase
-          .from('participants')
-          .update(participantData)
-          .eq('id', participantId)
-      : await supabase
-          .from('participants')
-          .insert(participantData);
+    let error;
+    if (participantId) {
+      const result = await supabase
+        .from('participants')
+        .update(participantData)
+        .eq('id', participantId);
+      error = result.error;
+    } else {
+      const result = await supabase
+        .from('participants')
+        .insert(participantData);
+      error = result.error;
+    }
 
     if (error) throw error;
   };

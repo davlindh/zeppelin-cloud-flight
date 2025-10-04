@@ -183,6 +183,21 @@ export function ProjectDetailPage() {
   // Use TanStack Query for data fetching - replaces all manual data fetching
   const { data: projectData, isLoading: loading, error } = useProject(slug || '');
 
+  // Handle UUID-to-slug redirect
+  React.useEffect(() => {
+    if (projectData && slug) {
+      // Check if the slug parameter is actually a UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+
+      // If it's a UUID but we found a project, redirect to the slug URL
+      if (isUUID && projectData.slug && projectData.slug !== slug) {
+        console.log(`🔄 Redirecting from UUID ${slug} to slug ${projectData.slug}`);
+        navigate(`/showcase/${projectData.slug}`, { replace: true });
+        return;
+      }
+    }
+  }, [projectData, slug, navigate]);
+
   // Simplified transformation using extracted helpers
   const project: ProjectDetail | null = useMemo(() => {
     if (!projectData) return null;

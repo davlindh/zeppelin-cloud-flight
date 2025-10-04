@@ -401,7 +401,7 @@ export const ParticipantDetailPage: React.FC = () => {
                 {participant.projects?.map((project) => (
                   <Link
                     key={project.id}
-                    to={`/showcase/${project.id}`}
+                    to={`/showcase/${project.slug}`}
                     className="group block p-6 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:shadow-elegant hover:border-primary/20 transition-all duration-300"
                   >
                     <div className="flex items-start justify-between">
