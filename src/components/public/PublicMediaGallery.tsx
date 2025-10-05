@@ -17,14 +17,16 @@ import {
   Calendar,
   User,
   Tag,
-  Image,
+  Image as ImageIcon,
   Video,
   Music,
   FileText,
   AlertCircle,
-  Loader2
+  Loader2,
+  X
 } from 'lucide-react';
 import { getMediaIcon, getMediaTypeColor, getCategoryColor, formatFileSize } from '@/utils/mediaHelpers';
+import { MediaGridSkeleton } from '@/components/multimedia/MediaGridSkeleton';
 
 interface MediaItem {
   id: string;
@@ -356,11 +358,22 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
     </Card>
   );
 
-  if (loading) {
+  if (loading && currentPage === 1) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin" />
-        <span className="ml-2">Laddar mediagalleri...</span>
+      <div className="space-y-6">
+        <Card className="border-0 shadow-sm">
+          <CardHeader>
+            <div className="h-8 bg-muted animate-pulse rounded" />
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="flex-1 h-10 bg-muted animate-pulse rounded-lg" />
+              <div className="w-32 h-10 bg-muted animate-pulse rounded-lg" />
+              <div className="w-36 h-10 bg-muted animate-pulse rounded-lg" />
+            </div>
+          </CardContent>
+        </Card>
+        <MediaGridSkeleton count={12} viewMode={viewMode} />
       </div>
     );
   }
@@ -375,26 +388,30 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-8 ${className}`}>
       {/* Header and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Mediagalleri från eventet</span>
-            <div className="flex items-center gap-2">
+      <Card className="border-0 shadow-sm bg-card/50 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <span className="text-2xl font-bold">Mediagalleri från eventet</span>
+            <div className="flex bg-muted/50 rounded-lg p-1 border border-border/50">
               <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
+                className={viewMode === 'grid' ? 'shadow-sm' : ''}
               >
-                <Grid className="w-4 h-4" />
+                <Grid className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Rutnät</span>
               </Button>
               <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('list')}
+                className={viewMode === 'list' ? 'shadow-sm' : ''}
               >
-                <List className="w-4 h-4" />
+                <List className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Lista</span>
               </Button>
             </div>
           </CardTitle>
@@ -403,32 +420,61 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
                 <Input
-                  placeholder="Sök i media..."
+                  placeholder="Sök bland bilder, videor och dokument..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 pr-10 py-6 text-base border-2 rounded-xl hover:border-primary/30 focus:border-primary transition-colors"
                 />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    aria-label="Rensa sökning"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-3">
               <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-36 border-2 rounded-lg hover:border-primary/50 transition-colors">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alla typer</SelectItem>
-                  <SelectItem value="image">Bilder</SelectItem>
-                  <SelectItem value="video">Videos</SelectItem>
-                  <SelectItem value="audio">Ljud</SelectItem>
-                  <SelectItem value="document">Dokument</SelectItem>
+                  <SelectItem value="image">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4" />
+                      Bilder
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="video">
+                    <div className="flex items-center gap-2">
+                      <Video className="w-4 h-4" />
+                      Videos
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="audio">
+                    <div className="flex items-center gap-2">
+                      <Music className="w-4 h-4" />
+                      Ljud
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="document">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Dokument
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-36">
+                <SelectTrigger className="w-40 border-2 rounded-lg hover:border-primary/50 transition-colors">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -444,12 +490,21 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
             </div>
           </div>
           
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-            <span>
-              Visar {filteredItems.length} av {mediaItems.length} mediafiler
-            </span>
-            <span>
-              Sortering: Senast först
+          <div className="mt-6 flex items-center justify-between">
+            <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
+              {filteredItems.length !== mediaItems.length ? (
+                <>
+                  <span className="text-primary font-semibold">{filteredItems.length}</span>
+                  <span className="text-muted-foreground mx-1.5">av</span>
+                  <span>{mediaItems.length}</span>
+                </>
+              ) : (
+                <span>{mediaItems.length} mediafiler</span>
+              )}
+            </Badge>
+            <span className="text-sm text-muted-foreground flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Senast först
             </span>
           </div>
         </CardContent>
@@ -462,26 +517,62 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
             ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
             : 'space-y-4'
         }>
-          {filteredItems.map(item => 
-            viewMode === 'grid' ? renderGridItem(item) : renderListItem(item)
-          )}
+          {filteredItems.map((item, index) => (
+            <div 
+              key={item.id}
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              {viewMode === 'grid' ? renderGridItem(item) : renderListItem(item)}
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          <Image className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Inga mediafiler hittades med de valda filtren.</p>
+        <div className="text-center py-20 px-4">
+          <div className="max-w-md mx-auto">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-muted/50 flex items-center justify-center">
+              <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
+            </div>
+            <h3 className="text-2xl font-semibold text-foreground mb-3">
+              {searchTerm || selectedType !== 'all' || selectedCategory !== 'all' 
+                ? 'Inga resultat' 
+                : 'Inga mediafiler ännu'}
+            </h3>
+            <p className="text-muted-foreground text-lg mb-6">
+              {searchTerm 
+                ? `Inga mediafiler matchade din sökning "${searchTerm}"`
+                : selectedType !== 'all' || selectedCategory !== 'all'
+                ? 'Prova att ändra dina filter för att se fler resultat'
+                : 'Det finns inga mediafiler att visa just nu. Kom tillbaka senare!'}
+            </p>
+            {(searchTerm || selectedType !== 'all' || selectedCategory !== 'all') && (
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedType('all');
+                  setSelectedCategory('all');
+                }}
+                className="gap-2"
+              >
+                <X className="w-4 h-4" />
+                Rensa alla filter
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
       {/* Load More Button */}
       {hasMore && filteredItems.length > 0 && (
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-12">
           <Button
+            size="lg"
+            variant="outline"
+            className="px-8 py-6 text-base hover:shadow-lg transition-all min-w-[200px]"
             onClick={() => setCurrentPage(prev => prev + 1)}
             disabled={loading}
-            variant="outline"
-            size="lg"
-            className="min-w-[200px]"
           >
             {loading ? (
               <>

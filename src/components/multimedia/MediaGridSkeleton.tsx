@@ -24,19 +24,23 @@ export const MediaGridSkeleton: React.FC<MediaGridSkeletonProps> = ({
     return (
       <div className={containerClass}>
         {Array.from({ length: count }).map((_, index) => (
-          <div key={index} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card">
-            <Skeleton className="w-12 h-12 rounded-lg flex-shrink-0" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-3 w-12" />
-                <Skeleton className="h-3 w-16" />
+          <div 
+            key={index} 
+            className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card shadow-sm animate-pulse"
+            style={{ animationDelay: `${index * 0.05}s` }}
+          >
+            <Skeleton className="w-16 h-16 rounded-lg flex-shrink-0" />
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-24 rounded-full" />
               </div>
             </div>
-            <div className="flex gap-1">
-              <Skeleton className="h-8 w-16 rounded-md" />
-              <Skeleton className="h-8 w-8 rounded-md" />
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-20 rounded-lg" />
+              <Skeleton className="h-9 w-9 rounded-lg" />
             </div>
           </div>
         ))}
@@ -47,29 +51,36 @@ export const MediaGridSkeleton: React.FC<MediaGridSkeletonProps> = ({
   return (
     <div className={containerClass}>
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="rounded-lg border border-border overflow-hidden bg-card">
-          {/* Preview skeleton */}
-          <Skeleton className="w-full aspect-video" />
+        <div 
+          key={index} 
+          className="rounded-xl border border-border overflow-hidden bg-card shadow-sm hover:shadow-md transition-shadow animate-pulse"
+          style={{ animationDelay: `${index * 0.05}s` }}
+        >
+          {/* Preview skeleton with gradient */}
+          <div className="relative">
+            <Skeleton className="w-full aspect-video" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+          </div>
           
           {/* Content skeleton */}
-          <div className="p-5 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <Skeleton className="w-12 h-12 rounded-lg" />
-              <div className="flex gap-1">
-                <Skeleton className="w-8 h-8 rounded-lg" />
-                <Skeleton className="w-8 h-8 rounded-lg" />
+          <div className="p-5 space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5 w-4/5" />
+                <Skeleton className="h-4 w-full" />
               </div>
+              <Skeleton className="h-6 w-16 rounded-full flex-shrink-0" />
             </div>
             
             <div className="space-y-2">
-              <Skeleton className="h-5 w-4/5" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-2/3" />
+              <Skeleton className="h-3 w-1/2" />
             </div>
             
-            <div className="flex items-center justify-between pt-2">
-              <Skeleton className="h-6 w-16 rounded-full" />
-              <Skeleton className="h-8 w-20 rounded-lg" />
+            <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+              <Skeleton className="h-9 flex-1 rounded-lg" />
+              <Skeleton className="h-9 w-9 rounded-lg" />
+              <Skeleton className="h-9 w-9 rounded-lg" />
             </div>
           </div>
         </div>
