@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, Plus } from 'lucide-react';
 import { getMediaIcon, getMediaTypeColor, isPlayableMedia } from '@/utils/mediaHelpers';
+import { getThumbnailUrl } from '@/utils/thumbnailHelpers';
 import { useMediaPlayer, useCurrentMedia } from '@/hooks/useMediaPlayer';
 import { EnhancedImage } from './EnhancedImage';
 import type { MediaItem } from '@/types/media';
@@ -53,16 +54,21 @@ export const BaseMediaItem: React.FC<BaseMediaItemProps> = ({
   );
   
   if (viewMode === 'grid') {
+    // Use thumbnail for preview if available, fall back to optimized original
+    const previewSrc = (media as any).thumbnail_url || getThumbnailUrl(media.url, { width: 400 });
+    
     return (
       <div className={containerClass}>
         {/* Enhanced preview section for grid view */}
         {showPreview && (media.type === 'image' || media.type === 'portfolio') && (
           <div className="aspect-video bg-muted overflow-hidden relative group">
             <EnhancedImage
-              src={media.url}
+              src={previewSrc}
               alt={media.title}
               className="w-full h-full"
               aspectRatio="video"
+              placeholder="blur"
+              loading="lazy"
             />
             {isPlayable && showPlayButton && (
               <button

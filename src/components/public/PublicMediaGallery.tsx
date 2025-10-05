@@ -53,35 +53,53 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(12);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     fetchApprovedMedia();
-  }, []);
+  }, [currentPage]);
+
+  // Debounce search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     filterItems();
-  }, [mediaItems, searchTerm, selectedType, selectedCategory]);
+  }, [mediaItems, debouncedSearch, selectedType, selectedCategory]);
 
   const fetchApprovedMedia = async () => {
     try {
       setLoading(true);
       
-      // Fetch approved media submissions
-      const { data: submissions, error: submissionError } = await supabase
+      const from = (currentPage - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+      
+      // Optimized query: only select needed fields, use pagination
+      const { data: submissions, error: submissionError, count } = await supabase
         .from('submissions')
-        .select('*')
+        .select('id, title, content, thumbnail_url, created_at', { count: 'exact' })
         .eq('type', 'media')
         .eq('status', 'approved')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (submissionError) throw submissionError;
 
       // Transform submissions to MediaItem format
-      const transformedItems: MediaItem[] = submissions
+      const transformedItems: MediaItem[] = (submissions || [])
         .filter(sub => (sub.content as any)?.publication_permission === true)
         .map(sub => ({
           id: sub.id,
@@ -96,7 +114,8 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
         }))
         .filter(item => item.files.length > 0);
 
-      setMediaItems(transformedItems);
+      setMediaItems(prev => currentPage === 1 ? transformedItems : [...prev, ...transformedItems]);
+      setHasMore((count || 0) > currentPage * itemsPerPage);
     } catch (err) {
       console.error('Error fetching media:', err);
       setError('Kunde inte ladda mediagalleri');
@@ -108,9 +127,9 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
   const filterItems = () => {
     let filtered = [...mediaItems];
 
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    // Search filter (debounced)
+    if (debouncedSearch) {
+      const term = debouncedSearch.toLowerCase();
       filtered = filtered.filter(item =>
         item.title.toLowerCase().includes(term) ||
         item.description?.toLowerCase().includes(term) ||
@@ -152,7 +171,11 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
             <img
               src={primaryFile.url}
               alt={item.title}
+              loading="lazy"
               className="w-full h-48 object-cover rounded-lg group-hover:opacity-75 transition-opacity"
+              onError={(e) => {
+                e.currentTarget.src = '/images/ui/placeholder-project.jpg';
+              }}
             />
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <Button size="sm" variant="secondary" className="bg-black/70 text-white">
@@ -165,15 +188,11 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
 
       case 'video':
         return (
-          <div className="relative">
-            <video
-              src={primaryFile.url}
-              className="w-full h-48 object-cover rounded-lg"
-              preload="metadata"
-              controls
-            />
-            <div className="absolute top-2 right-2">
-              <Badge className="bg-red-100 text-red-800">
+          <div className="relative bg-muted rounded-lg h-48 flex items-center justify-center group cursor-pointer" onClick={() => setSelectedItem(item)}>
+            <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-950 dark:to-red-900 rounded-lg opacity-50" />
+            <Play className="w-12 h-12 text-red-600 dark:text-red-400 relative z-10 group-hover:scale-110 transition-transform" />
+            <div className="absolute top-2 right-2 z-10">
+              <Badge className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400">
                 <Video className="w-3 h-3 mr-1" />
                 Video
               </Badge>
@@ -271,7 +290,11 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
               <img
                 src={item.files[0]?.url}
                 alt={item.title}
+                loading="lazy"
                 className="w-full h-full object-cover rounded-lg"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/ui/placeholder-project.jpg';
+                }}
               />
             ) : (
               <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
@@ -447,6 +470,28 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
         <div className="text-center py-12 text-muted-foreground">
           <Image className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>Inga mediafiler hittades med de valda filtren.</p>
+        </div>
+      )}
+
+      {/* Load More Button */}
+      {hasMore && filteredItems.length > 0 && (
+        <div className="flex justify-center mt-8">
+          <Button
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={loading}
+            variant="outline"
+            size="lg"
+            className="min-w-[200px]"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Laddar...
+              </>
+            ) : (
+              'Ladda fler mediafiler'
+            )}
+          </Button>
         </div>
       )}
 

@@ -227,6 +227,22 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
     </div>
   );
 
+  // Generate srcSet for responsive images
+  const generateSrcSet = useMemo(() => {
+    if (!src) return undefined;
+    
+    // For Supabase storage URLs, generate responsive sizes
+    if (src.includes('supabase') && (width || height)) {
+      const sizes = [640, 750, 828, 1080, 1200, 1920];
+      return sizes
+        .filter(size => !width || size <= width)
+        .map(size => `${src}?width=${size} ${size}w`)
+        .join(', ');
+    }
+    
+    return undefined;
+  }, [src, width, height]);
+
   return (
     <figure className={containerClasses} ref={containerRef}>
       {/* Main Image */}
@@ -239,6 +255,7 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
             width={width}
             height={height}
             sizes={sizes}
+            srcSet={generateSrcSet}
             loading={loading}
             decoding={decoding}
             onLoad={handleLoad}
