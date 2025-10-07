@@ -36,7 +36,7 @@ export const EnhancedGuestCommunication: React.FC<EnhancedGuestCommunicationProp
   const { submitCommunicationRequest } = useCommunicationTracking();
 
   // If we have a serviceId, try to get the real provider info
-  const { data: serviceData } = useServiceProvider(serviceContext?.serviceId || ');
+  const { data: serviceData } = useServiceProvider(serviceContext?.serviceId || '');
   
   // Use provider data from service if available, otherwise use props
   const actualProviderId = serviceData?.provider?.id || providerId;

@@ -26,9 +26,9 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
   isSubmitting,
   endTime
 }) => {
-  const [email, setEmail] = useState(');
+  const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [bidAmount, setBidAmount] = useState(');
+  const [bidAmount, setBidAmount] = useState('');
   const [error, setError] = useState('');
 
   // Load saved email from localStorage
@@ -45,7 +45,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(');
+    setError('');
 
     // Check if auction has ended
     if (isAuctionEnded) {
@@ -84,7 +84,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
       });
       
       // Reset form on success
-      setBidAmount(');
+      setBidAmount('');
       setError('');
       onClose();
     } catch (error) {
@@ -94,7 +94,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
   };
 
   const handleClose = () => {
-    setError(');
+    setError('');
     onClose();
   };
 

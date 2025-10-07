@@ -30,11 +30,11 @@ export const DirectMessageForm: React.FC<DirectMessageFormProps> = ({
   const { customerInfo, saveCustomerInfo } = useCustomerInfo();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    customerName: ',
+    customerName: '',
     customerEmail: '',
-    customerPhone: ',
+    customerPhone: '',
     subject: serviceContext?.serviceName ? `Question about ${serviceContext.serviceName}` : '',
-    message: ',
+    message: '',
     preferredContact: 'email' as 'email' | 'phone'
   });
 
@@ -42,9 +42,9 @@ export const DirectMessageForm: React.FC<DirectMessageFormProps> = ({
     // Auto-fill from customer info
     setFormData(prev => ({
       ...prev,
-      customerName: customerInfo.name || ',
+      customerName: customerInfo.name || '',
       customerEmail: customerInfo.email || '',
-      customerPhone: customerInfo.phone || '
+      customerPhone: customerInfo.phone || ''
     }));
   }, [customerInfo]);
 

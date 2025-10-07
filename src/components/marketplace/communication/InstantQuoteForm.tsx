@@ -32,13 +32,13 @@ export const InstantQuoteForm: React.FC<InstantQuoteFormProps> = ({
 }) => {
   const { customerInfo, saveCustomerInfo } = useCustomerInfo();
   const [formData, setFormData] = useState({
-    name: ',
+    name: '',
     email: '',
-    phone: ',
+    phone: '',
     projectDescription: '',
-    budget: ',
+    budget: '',
     timeline: '',
-    additionalRequirements: ',
+    additionalRequirements: '',
     preferredContact: 'email' as 'email' | 'phone'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);

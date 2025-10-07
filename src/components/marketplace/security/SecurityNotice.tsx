@@ -7,7 +7,7 @@ interface SecurityNoticeProps {
   className?: string;
 }
 
-export const SecurityNotice: React.FC<SecurityNoticeProps> = ({ type, className = ' }) => {
+export const SecurityNotice: React.FC<SecurityNoticeProps> = ({ type, className = '' }) => {
   const getNoticeContent = () => {
     switch (type) {
       case 'bidding':

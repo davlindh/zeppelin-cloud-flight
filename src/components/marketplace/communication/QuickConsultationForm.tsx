@@ -23,13 +23,13 @@ export const QuickConsultationForm: React.FC<QuickConsultationFormProps> = ({
 }) => {
   const { customerInfo, saveCustomerInfo } = useCustomerInfo();
   const [formData, setFormData] = useState({
-    name: ',
+    name: '',
     email: '',
-    phone: ',
+    phone: '',
     preferredDate: '',
-    preferredTime: ',
+    preferredTime: '',
     consultationType: 'phone' as 'phone' | 'video' | 'in-person',
-    description: ',
+    description: '',
     urgency: 'normal' as 'urgent' | 'normal' | 'flexible'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);

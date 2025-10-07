@@ -43,7 +43,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({
     rating: 5,
-    title: ',
+    title: '',
     content: ''
   });
 
@@ -77,7 +77,7 @@ export const ProductReviewsSection: React.FC<ProductReviewsSectionProps> = ({
   const handleSubmitReview = () => {
     if (onSubmitReview && newReview.title && newReview.content) {
       onSubmitReview(newReview);
-      setNewReview({ rating: 5, title: ', content: '' });
+      setNewReview({ rating: 5, title: '', content: '' });
       setShowReviewForm(false);
     }
   };

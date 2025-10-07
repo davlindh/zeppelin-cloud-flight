@@ -69,19 +69,14 @@ export const Header: React.FC = () => {
                             </Button>
                         </div>
                     ) : (
-                        <>
-                            <Link to="/marketplace" onClick={closeMenu} className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition hidden sm:inline-flex items-center">
-                                Marketplace
-                            </Link>
-                        </>
-                    )}
-                            <Link to="/marketplace" onClick={closeMenu} className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition hidden sm:inline-flex items-center">
-                                Marketplace
-                            </Link>
-                        </>
+                        <Link to="/marketplace" onClick={closeMenu} className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition hidden sm:inline-flex items-center">
+                            Marketplace
+                        </Link>
                     )}
                     </div>
-                    <nav aria-label="Primary navigation" className="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wider uppercase">
+                    {!isAdminPage && (
+                        <>
+                            <nav aria-label="Primary navigation" className="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wider uppercase">
                                 {NAV_LINKS.map(link => (
                                     link.href.startsWith('/') ?
                                     <NavLink key={link.href} to={link.href} className={navLinkClasses}>{link.label}</NavLink> :
@@ -109,7 +104,7 @@ export const Header: React.FC = () => {
                         </>
                     )}
                     
-<button onClick={toggleMenu} id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded={isMenuOpen} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100" aria-label="Toggle menu">
+                    <button onClick={toggleMenu} id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded={isMenuOpen} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100" aria-label="Toggle menu">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </button>
                 </div>

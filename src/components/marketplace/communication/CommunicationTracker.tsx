@@ -11,7 +11,7 @@ export const CommunicationTracker: React.FC = () => {
   const { getCommunicationHistory } = useCommunicationTracking();
   const [requests, setRequests] = useState<CommunicationRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<CommunicationRequest[]>([]);
-  const [searchTerm, setSearchTerm] = useState(');
+  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [loading, setLoading] = useState(true);
