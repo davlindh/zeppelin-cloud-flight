@@ -53,7 +53,40 @@ export const getTypeLabel = (type: string) => {
  * Check if submission has files
  */
 export const hasFiles = (submission: any): boolean => {
-  return submission.files && Array.isArray(submission.files) && submission.files.length > 0;
+  if (!submission.files) return false;
+  
+  // Handle both array and object formats
+  if (Array.isArray(submission.files)) {
+    return submission.files.length > 0;
+  }
+  
+  // For object format (file_0, file_1, etc.)
+  if (typeof submission.files === 'object') {
+    const fileValues = Object.values(submission.files);
+    return fileValues.some((f: any) => f && typeof f === 'object' && 'url' in f);
+  }
+  
+  return false;
+};
+
+/**
+ * Get file count from submission
+ */
+export const getFileCount = (submission: any): number => {
+  if (!submission.files) return 0;
+  
+  // Handle both array and object formats
+  if (Array.isArray(submission.files)) {
+    return submission.files.length;
+  }
+  
+  // For object format (file_0, file_1, etc.)
+  if (typeof submission.files === 'object') {
+    const fileValues = Object.values(submission.files);
+    return fileValues.filter((f: any) => f && typeof f === 'object' && 'url' in f).length;
+  }
+  
+  return 0;
 };
 
 /**

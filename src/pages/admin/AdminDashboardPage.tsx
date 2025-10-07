@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import ShowcaseForm from '@/components/admin/ShowcaseForm';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
 import { ShowcaseManagementList } from '@/components/admin/ShowcaseManagementList';
-import { ParticipantManagementList } from '@/components/admin/ParticipantManagementList';
+import { ParticipantManagementListNew } from '@/components/admin/ParticipantManagementListNew';
 import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
 import { SubmissionInbox } from '@/components/admin/submission-inbox';
 import { EnhancedSubmissionInbox } from '@/components/admin/EnhancedSubmissionInbox';
@@ -20,7 +20,10 @@ import { AdminMediaManager } from '@/components/admin/AdminMediaManager';
 import { RecentActivity, AdminStats } from '@/components/admin';
 import { AdminAnalytics } from '@/components/admin/AdminAnalytics';
 import { AdminSettings } from '@/components/admin/AdminSettings';
-import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder, Menu, ChevronRight } from 'lucide-react';
+import MediaStorageManager from '@/components/admin/MediaStorageManager';
+import StorageCleanupManager from '@/components/admin/StorageCleanupManager';
+import UnifiedMediaDashboard from '@/components/admin/UnifiedMediaDashboard';
+import { LogOut, Plus, Inbox, BarChart3, Users, Building, FolderOpen, Settings, Edit, Trash2, Shield, User, Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap, FileText, Folder, HardDrive, Archive, Workflow, Menu, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -126,16 +129,17 @@ export const AdminDashboardPage = () => {
                   
                   <Separator />
                   
-                  <nav className="flex flex-col gap-1 p-4">
-                    {[
-                      { value: 'overview', icon: BarChart3, label: 'Overview', color: 'text-primary' },
-                      { value: 'analytics', icon: TrendingUp, label: 'Analytics', color: 'text-blue-600' },
-                      { value: 'projects', icon: FolderOpen, label: 'Showcase', color: 'text-purple-600' },
-                      { value: 'participants', icon: Users, label: 'Participants', color: 'text-green-600' },
-                      { value: 'sponsors', icon: Building, label: 'Sponsors', color: 'text-orange-600' },
-                      { value: 'submissions', icon: Inbox, label: 'Submissions', color: 'text-pink-600' },
-                      { value: 'settings', icon: Settings, label: 'Settings', color: 'text-gray-600' },
-                    ].map((item) => (
+                   <nav className="flex flex-col gap-1 p-4">
+                     {[
+                       { value: 'overview', icon: BarChart3, label: 'Overview', color: 'text-primary' },
+                       { value: 'analytics', icon: TrendingUp, label: 'Analytics', color: 'text-blue-600' },
+                       { value: 'projects', icon: FolderOpen, label: 'Showcase', color: 'text-purple-600' },
+                       { value: 'participants', icon: Users, label: 'Participants', color: 'text-green-600' },
+                       { value: 'sponsors', icon: Building, label: 'Sponsors', color: 'text-orange-600' },
+                       { value: 'submissions', icon: Inbox, label: 'Submissions', color: 'text-pink-600' },
+                       { value: 'storage', icon: HardDrive, label: 'Media & Storage', color: 'text-cyan-600' },
+                       { value: 'settings', icon: Settings, label: 'Settings', color: 'text-gray-600' },
+                     ].map((item) => (
                       <Button
                         key={item.value}
                         variant={activeTab === item.value ? 'secondary' : 'ghost'}
@@ -227,7 +231,7 @@ export const AdminDashboardPage = () => {
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Desktop Navigation Only */}
-          <TabsList className="hidden lg:grid w-full grid-cols-7">
+          <TabsList className="hidden lg:grid w-full grid-cols-8">
             <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4 mr-2" />
               Overview
@@ -252,6 +256,10 @@ export const AdminDashboardPage = () => {
               <Inbox className="h-4 w-4 mr-2" />
               Submissions
             </TabsTrigger>
+            <TabsTrigger value="storage">
+              <HardDrive className="h-4 w-4 mr-2" />
+              Storage
+            </TabsTrigger>
             <TabsTrigger value="settings">
               <Settings className="h-4 w-4 mr-2" />
               Settings
@@ -269,6 +277,7 @@ export const AdminDashboardPage = () => {
                   {activeTab === 'participants' && <Users className="h-5 w-5 text-green-600" />}
                   {activeTab === 'sponsors' && <Building className="h-5 w-5 text-orange-600" />}
                   {activeTab === 'submissions' && <Inbox className="h-5 w-5 text-pink-600" />}
+                  {activeTab === 'storage' && <HardDrive className="h-5 w-5 text-cyan-600" />}
                   {activeTab === 'settings' && <Settings className="h-5 w-5 text-gray-600" />}
                   <span className="font-semibold">
                     {activeTab === 'overview' && 'Overview'}
@@ -277,6 +286,7 @@ export const AdminDashboardPage = () => {
                     {activeTab === 'participants' && 'Participants'}
                     {activeTab === 'sponsors' && 'Sponsors'}
                     {activeTab === 'submissions' && 'Submissions'}
+                    {activeTab === 'storage' && 'Media & Storage'}
                     {activeTab === 'settings' && 'Settings'}
                   </span>
                 </div>
@@ -372,7 +382,7 @@ export const AdminDashboardPage = () => {
           </TabsContent>
 
           <TabsContent value="participants">
-            <ParticipantManagementList 
+            <ParticipantManagementListNew
               onAddParticipant={() => setActiveForm('participant')}
               onEditParticipant={handleEditParticipant}
               onViewParticipant={handleViewParticipant}
@@ -402,6 +412,37 @@ export const AdminDashboardPage = () => {
               
               <TabsContent value="media">
                 <AdminMediaManager />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="storage">
+            <Tabs defaultValue="unified" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="unified">
+                  <Workflow className="h-4 w-4 mr-2" />
+                  Media Workflow
+                </TabsTrigger>
+                <TabsTrigger value="manager">
+                  <HardDrive className="h-4 w-4 mr-2" />
+                  Storage Manager
+                </TabsTrigger>
+                <TabsTrigger value="cleanup">
+                  <Archive className="h-4 w-4 mr-2" />
+                  Cleanup Tools
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="unified">
+                <UnifiedMediaDashboard />
+              </TabsContent>
+
+              <TabsContent value="manager">
+                <MediaStorageManager />
+              </TabsContent>
+
+              <TabsContent value="cleanup">
+                <StorageCleanupManager />
               </TabsContent>
             </Tabs>
           </TabsContent>

@@ -76,24 +76,33 @@ export const SubmissionMediaManager: React.FC<SubmissionMediaManagerProps> = ({
     const items: SubmissionMediaItem[] = [];
     
     submissions.forEach(submission => {
-      if (submission.files && Array.isArray(submission.files) && submission.files.length > 0) {
-        submission.files.forEach((file: any, index: number) => {
-          const mediaType = getMediaTypeFromMime(file.type);
-          
-          items.push({
-            id: `${submission.id}-${index}`,
-            title: file.name || `Media från ${submission.title}`,
-            url: file.url,
-            type: mediaType,
-            size: file.size,
-            mimeType: file.type,
-            thumbnail: file.thumbnail || (mediaType === 'image' ? file.url : undefined),
-            submission,
-            file,
-            approved: submission.status === 'approved',
-            convertedToMedia: false // This would come from database in real implementation
+      if (submission.files) {
+        // Handle both array and object formats
+        const filesArray = Array.isArray(submission.files) 
+          ? submission.files 
+          : Object.values(submission.files).filter((f): f is any => f && typeof f === 'object' && 'url' in f);
+        
+        if (filesArray.length > 0) {
+          filesArray.forEach((file: any, index: number) => {
+            if (file && file.url) {
+              const mediaType = getMediaTypeFromMime(file.type || file.mimeType || '');
+              
+              items.push({
+                id: `${submission.id}-${index}`,
+                title: file.name || `Media ${index + 1} från ${submission.title}`,
+                url: file.url,
+                type: mediaType,
+                size: file.size,
+                mimeType: file.type || file.mimeType || 'unknown',
+                thumbnail: file.thumbnail || (mediaType === 'image' ? file.url : undefined),
+                submission,
+                file,
+                approved: submission.media_status === 'approved',
+                convertedToMedia: submission.media_status === 'converted'
+              });
+            }
           });
-        });
+        }
       }
     });
     

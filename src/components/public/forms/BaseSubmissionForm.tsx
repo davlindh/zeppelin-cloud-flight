@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
-import { X, User, Building, Lightbulb, Users } from 'lucide-react';
+import React from 'react';
+import { FormWrapper } from '@/components/ui/form-wrapper';
+import { FieldValues } from 'react-hook-form';
 
 export interface BaseSubmissionData {
   email: string;
@@ -21,7 +18,7 @@ export interface BaseSubmissionData {
   newsletterSubscription?: boolean;
 }
 
-export interface SubmissionFormProps {
+export interface SubmissionFormProps<T extends FieldValues> {
   onClose: () => void;
   children: React.ReactNode;
   title: string;
@@ -29,12 +26,17 @@ export interface SubmissionFormProps {
   totalSteps?: number;
   icon?: 'participant' | 'project' | 'sponsor' | 'collaboration';
   className?: string;
-  onSubmit: () => Promise<void>;
-  isSubmitting: boolean;
+  onSubmit: (data: T) => Promise<void>;
+  isSubmitting?: boolean;
   error?: string;
 }
 
-export const BaseSubmissionForm: React.FC<SubmissionFormProps> = ({
+/**
+ * @deprecated Use FormWrapper directly instead of BaseSubmissionForm.
+ * This component is kept for backward compatibility but should be replaced
+ * with FormWrapper for new implementations.
+ */
+export const BaseSubmissionForm = <T extends FieldValues>({
   onClose,
   children,
   title,
@@ -43,83 +45,63 @@ export const BaseSubmissionForm: React.FC<SubmissionFormProps> = ({
   icon,
   className,
   onSubmit,
-  isSubmitting,
+  isSubmitting = false,
   error,
-}) => {
-  const { toast } = useToast();
-
-  const getIcon = () => {
-    switch (icon) {
-      case 'participant':
-        return <User className="h-5 w-5" />;
-      case 'project':
-        return <Lightbulb className="h-5 w-5" />;
-      case 'sponsor':
-        return <Building className="h-5 w-5" />;
-      case 'collaboration':
-        return <Users className="h-5 w-5" />;
-      default:
-        return null;
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await onSubmit();
-      toast({
-        title: 'Submission Successful!',
-        description: 'Thank you for your submission. We will review it and get back to you soon.',
-        variant: 'success',
-      });
-      onClose();
-    } catch (err) {
-      // Error handled by individual form
-    }
-  };
-
+}: SubmissionFormProps<T>) => {
+  // For backward compatibility, we'll create a simple wrapper
+  // that renders children directly without form management
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className={`w-full max-w-2xl max-h-[90vh] overflow-auto ${className}`}>
-        <CardHeader className="flex flex-row items-center justify-between">
+      <div className={`w-full max-w-2xl max-h-[90vh] overflow-auto bg-background rounded-lg border ${className}`}>
+        <div className="flex flex-row items-center justify-between p-6 border-b">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              {getIcon()}
-              {title}
-            </CardTitle>
+            <h2 className="text-lg font-semibold">{title}</h2>
             {totalSteps > 1 && (
               <p className="text-sm text-muted-foreground mt-1">
                 Step {currentStep} of {totalSteps}
               </p>
             )}
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} disabled={isSubmitting}>
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
+          <button
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="text-muted-foreground hover:text-foreground disabled:opacity-50"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         {totalSteps > 1 && <ProgressIndicator currentStep={currentStep} totalSteps={totalSteps} />}
 
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            {children}
-          </CardContent>
+        <div className="p-6 space-y-6">
+          {error && (
+            <div className="p-4 border border-destructive/50 text-destructive bg-destructive/10 rounded-md">
+              {error}
+            </div>
+          )}
+          {children}
+        </div>
 
-          <CardFooter className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+        <div className="flex justify-end gap-2 p-6 border-t">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-muted-foreground bg-background border border-input hover:bg-accent hover:text-accent-foreground disabled:opacity-50 rounded-md"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-md"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

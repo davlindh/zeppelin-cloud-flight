@@ -174,6 +174,7 @@ export type Database = {
           description: string | null
           id: string
           participant_id: string
+          thumbnail_url: string | null
           title: string
           type: string
           url: string
@@ -185,6 +186,7 @@ export type Database = {
           description?: string | null
           id?: string
           participant_id: string
+          thumbnail_url?: string | null
           title: string
           type: string
           url: string
@@ -196,6 +198,7 @@ export type Database = {
           description?: string | null
           id?: string
           participant_id?: string
+          thumbnail_url?: string | null
           title?: string
           type?: string
           url?: string
@@ -388,6 +391,7 @@ export type Database = {
           description: string | null
           id: string
           project_id: string
+          thumbnail_url: string | null
           title: string
           type: string
           url: string
@@ -397,6 +401,7 @@ export type Database = {
           description?: string | null
           id?: string
           project_id: string
+          thumbnail_url?: string | null
           title: string
           type: string
           url: string
@@ -406,6 +411,7 @@ export type Database = {
           description?: string | null
           id?: string
           project_id?: string
+          thumbnail_url?: string | null
           title?: string
           type?: string
           url?: string
@@ -696,6 +702,7 @@ export type Database = {
           session_id: string | null
           status: string
           submitted_by: string | null
+          thumbnail_url: string | null
           title: string
           type: string
         }
@@ -719,6 +726,7 @@ export type Database = {
           session_id?: string | null
           status?: string
           submitted_by?: string | null
+          thumbnail_url?: string | null
           title: string
           type: string
         }
@@ -742,6 +750,7 @@ export type Database = {
           session_id?: string | null
           status?: string
           submitted_by?: string | null
+          thumbnail_url?: string | null
           title?: string
           type?: string
         }
@@ -757,11 +766,12 @@ export type Database = {
         Returns: undefined
       }
       convert_submission_media_to_library: {
-        Args: { media_urls: string[]; submission_id: string }
-        Returns: {
-          created_media_id: string
-          media_url: string
-        }[]
+        Args: {
+          media_urls: string[]
+          submission_id: string
+          target_project_id?: string
+        }
+        Returns: Json
       }
       generate_session_id: {
         Args: Record<PropertyKey, never>

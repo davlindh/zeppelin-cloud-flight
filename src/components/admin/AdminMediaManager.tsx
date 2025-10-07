@@ -180,7 +180,7 @@ export const AdminMediaManager: React.FC = () => {
 
   // Filtered and sorted media
   const filteredMediaItems = useMemo(() => {
-    let filtered = mediaItems.filter(item => {
+    const filtered = mediaItems.filter(item => {
       // Search filter
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();

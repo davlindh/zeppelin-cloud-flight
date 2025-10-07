@@ -57,6 +57,7 @@ export function aggregateParticipants(cards: ShowcaseCard[]): Participant[] {
           if (!existingParticipant.projects) existingParticipant.projects = [];
           existingParticipant.projects.push({
             id: card.id,
+            slug: card.slug || card.id,
             title: card.title,
             role: participant.role,
             imageUrl: card.imageUrl
@@ -106,6 +107,7 @@ export function aggregateParticipants(cards: ShowcaseCard[]): Participant[] {
           avatar: participant.avatar,
           projects: [{
             id: card.id,
+            slug: card.slug || card.id,
             title: card.title,
             role: participant.role,
             imageUrl: card.imageUrl

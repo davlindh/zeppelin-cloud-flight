@@ -28,6 +28,9 @@ export interface EnhancedSubmission {
   session_id?: string;
   device_fingerprint?: string;
   ip_address?: string;
+  media_status?: 'pending' | 'approved' | 'rejected' | 'converted';
+  media_approved_at?: string;
+  media_converted_at?: string;
 }
 
 const defaultFilters: SubmissionFilters = {
@@ -70,7 +73,10 @@ export const useSubmissionData = () => {
       processed_at: sub.processed_at || '',
       session_id: sub.session_id || '',
       device_fingerprint: sub.device_fingerprint || '',
-      ip_address: ''
+      ip_address: '',
+      media_status: sub.media_status as EnhancedSubmission['media_status'],
+      media_approved_at: sub.media_approved_at || '',
+      media_converted_at: sub.media_converted_at || ''
     }));
   }, [apiSubmissions]);
 

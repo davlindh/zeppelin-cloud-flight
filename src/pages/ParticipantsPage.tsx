@@ -131,11 +131,11 @@ export const ParticipantsPage: React.FC = () => {
               Deltagare
             </h1>
             <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
-              Upptäck de kreativa människorna bakom Zeppel Inn-projekten
+              Upptäck alla fantastiska människor som bidrar till Zeppel Inn-projekten!
             </p>
             <Badge variant="secondary" className="mt-4 shadow-soft">
               <Sparkles className="w-3 h-3 mr-1" />
-              Context7 Components Showcase
+              Upptäck de kreativa människorna bakom Zeppel Inn-projekten
             </Badge>
           </div>
         </div>

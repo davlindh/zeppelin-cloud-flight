@@ -1,42 +1,68 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BaseSubmissionForm, BaseSubmissionData } from './BaseSubmissionForm';
+import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { FormWrapper } from '@/components/ui/form-wrapper';
+import { StandardFormField, FieldOption } from '@/components/ui/standard-form-field';
 import { useSubmission, FileSubmission } from '@/hooks/useSubmission';
 
-export interface CollaborationFormData extends BaseSubmissionData {
-  // Collaboration-specific fields
-  collaborationType: 'artist' | 'researcher' | 'community' | 'business' | 'other';
-  collaborationTitle: string;
-  collaborationDescription: string;
-  expectedDuration: string;
-  proposedCollaboration?: string;
-  resourcesNeeded?: string;
-  outcomes?: string;
-  references?: File;
-}
+const collaborationFormSchema = z.object({
+  // Contact Information
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().optional(),
+  organization: z.string().optional(),
+  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
+
+  // Collaboration Details
+  collaborationType: z.enum(['artist', 'researcher', 'community', 'business', 'other']),
+  collaborationTitle: z.string().min(1, 'Collaboration title is required'),
+  collaborationDescription: z.string().min(1, 'Collaboration description is required'),
+  expectedDuration: z.string().min(1, 'Expected duration is required'),
+  proposedCollaboration: z.string().optional(),
+  resourcesNeeded: z.string().optional(),
+  outcomes: z.string().optional(),
+  motivation: z.string().min(1, 'Motivation is required'),
+  experience: z.string().optional(),
+  availability: z.string().optional(),
+
+  // Consent
+  acceptTerms: z.boolean().refine(val => val === true, 'You must accept the terms'),
+  acceptPrivacy: z.boolean().refine(val => val === true, 'You must accept the privacy policy'),
+  acceptMarketing: z.boolean().optional(),
+  newsletterSubscription: z.boolean().optional(),
+});
+
+export type CollaborationFormData = z.infer<typeof collaborationFormSchema>;
 
 interface CollaborationInquiryFormProps {
   onClose: () => void;
   className?: string;
 }
 
+const collaborationTypeOptions: FieldOption[] = [
+  { value: 'artist', label: 'Artist/Artistic Project' },
+  { value: 'researcher', label: 'Research/Academic' },
+  { value: 'community', label: 'Community Project' },
+  { value: 'business', label: 'Business/Commercial' },
+  { value: 'other', label: 'Other' },
+];
+
+const expectedDurationOptions: FieldOption[] = [
+  { value: '1-3 months', label: '1-3 months' },
+  { value: '3-6 months', label: '3-6 months' },
+  { value: '6-12 months', label: '6-12 months' },
+  { value: '1-2 years', label: '1-2 years' },
+  { value: 'long-term', label: 'Long-term partnership' },
+  { value: 'flexible', label: 'Flexible' },
+];
+
 export const CollaborationInquiryForm: React.FC<CollaborationInquiryFormProps> = ({
   onClose,
   className,
 }) => {
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CollaborationFormData>({
-    defaultValues: {
-      acceptTerms: false,
-      acceptPrivacy: false,
-    }
-  });
-
   const { isSubmitting, error, submitForm } = useSubmission();
-  const [uploadedFiles, setUploadedFiles] = React.useState<{ references?: File }>({});
+  const [uploadedFiles, setUploadedFiles] = useState<{ references?: File }>({});
 
   // File upload handlers
   const handleFileUpload = (fieldName: keyof typeof uploadedFiles, file: File) => {
@@ -108,303 +134,217 @@ export const CollaborationInquiryForm: React.FC<CollaborationInquiryFormProps> =
   };
 
   return (
-    <BaseSubmissionForm
-      onClose={onClose}
+    <FormWrapper
       title="Propose Collaboration"
       icon="collaboration"
+      onSubmit={onSubmit}
+      onClose={onClose}
+      schema={collaborationFormSchema}
       className={className}
-      onSubmit={handleSubmit(onSubmit)}
       isSubmitting={isSubmitting}
       error={error}
+      defaultValues={{
+        acceptTerms: false,
+        acceptPrivacy: false,
+      }}
     >
-      <div className="space-y-6">
-        {/* Contact Information */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name *</Label>
-              <Input
-                id="firstName"
-                {...register('firstName', { required: 'First name is required' })}
+      {(form) => (
+        <div className="space-y-6">
+          {/* Contact Information */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <StandardFormField
+                form={form}
+                name="firstName"
+                label="First Name"
+                type="text"
                 placeholder="John"
+                required
               />
-              {errors.firstName && (
-                <p className="text-sm text-destructive">{errors.firstName.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name *</Label>
-              <Input
-                id="lastName"
-                {...register('lastName', { required: 'Last name is required' })}
+              <StandardFormField
+                form={form}
+                name="lastName"
+                label="Last Name"
+                type="text"
                 placeholder="Doe"
+                required
               />
-              {errors.lastName && (
-                <p className="text-sm text-destructive">{errors.lastName.message}</p>
-              )}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address *</Label>
-            <Input
-              id="email"
+            <StandardFormField
+              form={form}
+              name="email"
+              label="Email Address"
               type="email"
-              {...register('email', {
-                required: 'Email is required',
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Invalid email address'
-                }
-              })}
               placeholder="your.email@example.com"
+              required
             />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <StandardFormField
+                form={form}
+                name="phone"
+                label="Phone Number"
                 type="tel"
-                {...register('phone')}
                 placeholder="+46 123 456 789"
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="organization">Organization/Institution</Label>
-              <Input
-                id="organization"
-                {...register('organization')}
+              <StandardFormField
+                form={form}
+                name="organization"
+                label="Organization/Institution"
+                type="text"
                 placeholder="Your organization"
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="website">Website/Social Media</Label>
-            <Input
-              id="website"
-              {...register('website')}
+            <StandardFormField
+              form={form}
+              name="website"
+              label="Website/Social Media"
+              type="url"
               placeholder="https://your-website.com"
             />
           </div>
-        </div>
 
-        {/* Collaboration Details */}
-        <div className="space-y-4 border-t pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="collaborationType">Collaboration Type *</Label>
-            <Select
-              value={watch('collaborationType')}
-              onValueChange={(value: CollaborationFormData['collaborationType']) => setValue('collaborationType', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select collaboration type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="artist">Artist/Artistic Project</SelectItem>
-                <SelectItem value="researcher">Research/Academic</SelectItem>
-                <SelectItem value="community">Community Project</SelectItem>
-                <SelectItem value="business">Business/Commercial</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="collaborationTitle">Collaboration Title *</Label>
-            <Input
-              id="collaborationTitle"
-              {...register('collaborationTitle', { required: 'Title is required' })}
-              placeholder="Enter collaboration title"
+          {/* Collaboration Details */}
+          <div className="space-y-4 border-t pt-4">
+            <StandardFormField
+              form={form}
+              name="collaborationType"
+              label="Collaboration Type"
+              type="select"
+              placeholder="Select collaboration type"
+              options={collaborationTypeOptions}
+              required
             />
-            {errors.collaborationTitle && (
-              <p className="text-sm text-destructive">{errors.collaborationTitle.message}</p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="collaborationDescription">Collaboration Description *</Label>
-            <Textarea
-              id="collaborationDescription"
-              {...register('collaborationDescription', { required: 'Description is required' })}
+            <StandardFormField
+              form={form}
+              name="collaborationTitle"
+              label="Collaboration Title"
+              type="text"
+              placeholder="Enter collaboration title"
+              required
+            />
+
+            <StandardFormField
+              form={form}
+              name="collaborationDescription"
+              label="Collaboration Description"
+              type="textarea"
               placeholder="Describe your proposed collaboration..."
               rows={4}
+              required
             />
-            {errors.collaborationDescription && (
-              <p className="text-sm text-destructive">{errors.collaborationDescription.message}</p>
-            )}
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="expectedDuration">Expected Duration</Label>
-              <Select
-                value={watch('expectedDuration')}
-                onValueChange={(value) => setValue('expectedDuration', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select duration" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1-3 months">1-3 months</SelectItem>
-                  <SelectItem value="3-6 months">3-6 months</SelectItem>
-                  <SelectItem value="6-12 months">6-12 months</SelectItem>
-                  <SelectItem value="1-2 years">1-2 years</SelectItem>
-                  <SelectItem value="long-term">Long-term partnership</SelectItem>
-                  <SelectItem value="flexible">Flexible</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <StandardFormField
+                form={form}
+                name="expectedDuration"
+                label="Expected Duration"
+                type="select"
+                placeholder="Select duration"
+                options={expectedDurationOptions}
+                required
+              />
 
-            <div className="space-y-2">
-              <Label htmlFor="experience">Your Relevant Experience</Label>
-              <Textarea
-                id="experience"
-                {...register('experience')}
+              <StandardFormField
+                form={form}
+                name="experience"
+                label="Your Relevant Experience"
+                type="textarea"
                 placeholder="Relevant experience or background..."
                 rows={2}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="motivation">Why do you want to collaborate with Zeppel Inn? *</Label>
-            <Textarea
-              id="motivation"
-              {...register('motivation', { required: 'Motivation is required' })}
+            <StandardFormField
+              form={form}
+              name="motivation"
+              label="Why do you want to collaborate with Zeppel Inn?"
+              type="textarea"
               placeholder="What interests you about collaborating with us?"
               rows={3}
+              required
             />
-            {errors.motivation && (
-              <p className="text-sm text-destructive">{errors.motivation.message}</p>
-            )}
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="proposedCollaboration">Proposed Collaboration Details</Label>
-            <Textarea
-              id="proposedCollaboration"
-              {...register('proposedCollaboration')}
+            <StandardFormField
+              form={form}
+              name="proposedCollaboration"
+              label="Proposed Collaboration Details"
+              type="textarea"
               placeholder="Specific ideas for how we might collaborate..."
               rows={3}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="resourcesNeeded">Resources/Support Needed</Label>
-            <Textarea
-              id="resourcesNeeded"
-              {...register('resourcesNeeded')}
+            <StandardFormField
+              form={form}
+              name="resourcesNeeded"
+              label="Resources/Support Needed"
+              type="textarea"
               placeholder="What resources or support do you need?"
               rows={2}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="outcomes">Expected Outcomes</Label>
-            <Textarea
-              id="outcomes"
-              {...register('outcomes')}
+            <StandardFormField
+              form={form}
+              name="outcomes"
+              label="Expected Outcomes"
+              type="textarea"
               placeholder="What outcomes do you hope to achieve?"
               rows={2}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="availability">Availability</Label>
-            <Textarea
-              id="availability"
-              {...register('availability')}
+            <StandardFormField
+              form={form}
+              name="availability"
+              label="Availability"
+              type="textarea"
               placeholder="When are you available to begin and participate?"
               rows={2}
             />
           </div>
-        </div>
 
-        {/* Terms and Consent */}
-        <div className="space-y-3 border-t pt-4">
-          <div className="flex items-start space-x-2">
-            <input
+          {/* Terms and Consent */}
+          <div className="space-y-3 border-t pt-4">
+            <StandardFormField
+              form={form}
+              name="acceptTerms"
+              label="I accept the Terms and Conditions"
               type="checkbox"
-              id="acceptTerms"
-              {...register('acceptTerms', { required: 'You must accept the terms' })}
-              className="mt-1"
+              placeholder="I agree to the terms of collaboration and partnership."
+              required
             />
-            <div className="grid gap-1.5 leading-none">
-              <Label htmlFor="acceptTerms" className="text-sm font-medium leading-none">
-                I accept the Terms and Conditions *
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                I agree to the terms of collaboration and partnership.
-              </p>
-            </div>
-          </div>
-          {errors.acceptTerms && (
-            <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>
-          )}
 
-          <div className="flex items-start space-x-2">
-            <input
+            <StandardFormField
+              form={form}
+              name="acceptPrivacy"
+              label="I accept the Privacy Policy"
               type="checkbox"
-              id="acceptPrivacy"
-              {...register('acceptPrivacy', { required: 'You must accept the privacy policy' })}
-              className="mt-1"
+              placeholder="I consent to the collection and processing of my personal data."
+              required
             />
-            <div className="grid gap-1.5 leading-none">
-              <Label htmlFor="acceptPrivacy" className="text-sm font-medium leading-none">
-                I accept the Privacy Policy *
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                I consent to the collection and processing of my personal data.
-              </p>
-            </div>
-          </div>
-          {errors.acceptPrivacy && (
-            <p className="text-sm text-destructive">{errors.acceptPrivacy.message}</p>
-          )}
 
-          <div className="flex items-start space-x-2">
-            <input
+            <StandardFormField
+              form={form}
+              name="acceptMarketing"
+              label="I agree to receive marketing communications"
               type="checkbox"
-              id="acceptMarketing"
-              {...register('acceptMarketing')}
-              className="mt-1"
+              placeholder="Optional: Receive updates about Zeppel Inn activities."
             />
-            <div className="grid gap-1.5 leading-none">
-              <Label htmlFor="acceptMarketing" className="text-sm font-medium leading-none">
-                I agree to receive marketing communications
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Optional: Receive updates about Zeppel Inn activities.
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-start space-x-2">
-            <input
+            <StandardFormField
+              form={form}
+              name="newsletterSubscription"
+              label="Subscribe to our newsletter"
               type="checkbox"
-              id="newsletterSubscription"
-              {...register('newsletterSubscription')}
-              className="mt-1"
+              placeholder="Optional: Stay updated with our latest news and announcements."
             />
-            <div className="grid gap-1.5 leading-none">
-              <Label htmlFor="newsletterSubscription" className="text-sm font-medium leading-none">
-                Subscribe to our newsletter
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Optional: Stay updated with our latest news and announcements.
-              </p>
-            </div>
           </div>
         </div>
-      </div>
-    </BaseSubmissionForm>
+      )}
+    </FormWrapper>
   );
 };

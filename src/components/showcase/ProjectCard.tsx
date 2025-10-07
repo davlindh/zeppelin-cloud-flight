@@ -21,10 +21,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ card, isModal = false 
     const handleClick = () => {
         if (isModal) {
             // In modal view, clicking should navigate to individual page
-            navigate(`/showcase/${card.id}`);
+            navigate(`/showcase/${card.slug}`);
         } else {
             // From grid view, navigate directly to detail
-            navigate(`/showcase/${card.id}`);
+            navigate(`/showcase/${card.slug}`);
         }
     };
 
