@@ -27,6 +27,17 @@ import { SponsorEditPage } from "./pages/admin/SponsorEditPage";
 import { ComponentTest } from "./components/admin/ComponentTest";
 import NotFound from "./pages/NotFound";
 import { queryClient } from "./lib/queryClient";
+import MarketplaceLayout from "./components/marketplace/MarketplaceLayout";
+import MarketplaceIndex from "./pages/marketplace/MarketplaceIndex";
+import Auctions from "./pages/marketplace/Auctions";
+import AuctionDetail from "./pages/marketplace/AuctionDetail";
+import Shop from "./pages/marketplace/Shop";
+import ProductDetail from "./pages/marketplace/ProductDetail";
+import Services from "./pages/marketplace/Services";
+import ServiceDetail from "./pages/marketplace/ServiceDetail";
+import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
+import { CartProvider } from "./contexts/marketplace/CartProvider";
+import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -53,6 +64,28 @@ const App = () => (
                   <Route path="participants/:slug" element={<ParticipantDetailPage />} />
                   <Route path="partners" element={<PartnersPage />} />
                   <Route path="media" element={<MediaGalleryPage />} />
+                </Route>
+
+                {/* Marketplace Routes */}
+                <Route path="/marketplace" element={
+                  <WishlistProvider>
+                    <CartProvider>
+                      <NotificationProvider>
+                        <MarketplaceLayout />
+                      </NotificationProvider>
+                    </CartProvider>
+                  </WishlistProvider>
+                }>
+                  <Route index element={<MarketplaceIndex />} />
+                  <Route path="auctions" element={<Auctions />} />
+                  <Route path="auctions/:id" element={<AuctionDetail />} />
+                  <Route path="shop" element={<Shop />} />
+                  <Route path="shop/:id" element={<ProductDetail />} />
+                  <Route path="services" element={<Services />} />
+                  <Route path="services/:id" element={<ServiceDetail />} />
+                  <Route path="cart" element={<div>Cart - Coming Soon</div>} />
+                  <Route path="wishlist" element={<div>Wishlist - Coming Soon</div>} />
+                  <Route path="notifications" element={<div>Notifications - Coming Soon</div>} />
                 </Route>
                 
                 {/* Admin Routes */}

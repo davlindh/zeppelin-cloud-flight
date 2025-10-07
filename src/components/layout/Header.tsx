@@ -39,7 +39,12 @@ export const Header: React.FC = () => {
         <header className="bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm safe-area-inset-top">
             <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
                 <div className="flex justify-between items-center">
-                    <Link to="/home" onClick={closeMenu} className="text-2xl sm:text-3xl font-bold font-serif">Zeppel <span className="text-amber-500">Inn</span></Link>
+                    <div className="flex items-center space-x-4">
+                        <Link to="/home" onClick={closeMenu} className="text-2xl sm:text-3xl font-bold font-serif">Zeppel <span className="text-amber-500">Inn</span></Link>
+                        <Link to="/marketplace" onClick={closeMenu} className="text-sm font-semibold text-gray-600 hover:text-amber-500 transition hidden sm:inline-flex items-center">
+                            Marketplace
+                        </Link>
+                    </div>
                     <nav aria-label="Primary navigation" className="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wider uppercase">
                         {NAV_LINKS.map(link => (
                             link.href.startsWith('/') ?
