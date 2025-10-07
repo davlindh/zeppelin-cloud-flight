@@ -1,18 +1,18 @@
 
 
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import { PageHeader } from '@/components/ui/page-header';
-import { ServiceImageGallery } from '@/components/services/ServiceImageGallery';
-import { ServiceDetailsCard } from '@/components/services/ServiceDetailsCard';
-import { ServiceProviderProfile } from '@/components/services/ServiceProviderProfile';
-import { ServiceBookingCard } from '@/components/services/ServiceBookingCard';
-import { EnhancedGuestCommunication } from '@/components/communication/EnhancedGuestCommunication';
-import { ServiceLoading } from '@/components/ui/service-loading';
-import { ServiceError } from '@/components/ui/service-error';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { PageHeader } from '@/components/marketplace/ui/page-header';
+import { ServiceImageGallery } from '@/components/marketplace/services/ServiceImageGallery';
+import { ServiceDetailsCard } from '@/components/marketplace/services/ServiceDetailsCard';
+import { ServiceProviderProfile } from '@/components/marketplace/services/ServiceProviderProfile';
+import { ServiceBookingCard } from '@/components/marketplace/services/ServiceBookingCard';
+import { EnhancedGuestCommunication } from '@/components/marketplace/communication/EnhancedGuestCommunication';
+import { ServiceLoading } from '@/components/marketplace/ui/service-loading';
+import { ServiceError } from '@/components/marketplace/ui/service-error';
 
-import { useService } from '@/hooks/useService';
+import { useService } from '@/hooks/marketplace/useService';
 
 const ServiceDetail = () => {
   const { id } = useParams();

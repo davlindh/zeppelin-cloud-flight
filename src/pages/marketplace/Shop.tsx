@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import { OptimizedUnifiedSearchBar } from '@/components/shop/OptimizedUnifiedSearchBar';
-import { SearchErrorBoundary } from '@/components/shop/SearchErrorBoundary';
-import { ShopFilters } from '@/components/shop/ShopFilters';
-import { MobileFilterBar } from '@/components/shop/MobileFilterBar';
-import { ShopContent as ShopContentComponent } from '@/components/shop/ShopContent';
-import { BrandShowcase } from '@/components/shop/BrandShowcase';
-import { FeaturedProducts } from '@/components/shop/FeaturedProducts';
-import { RecentlyViewedProducts } from '@/components/shop/RecentlyViewedProducts';
-import { QuickViewModal } from '@/components/shop/QuickViewModal';
-import { ProductComparison } from '@/components/shop/ProductComparison';
-import { BackToTop } from '@/components/ui/back-to-top';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { OptimizedUnifiedSearchBar } from '@/components/marketplace/shop/OptimizedUnifiedSearchBar';
+import { SearchErrorBoundary } from '@/components/marketplace/shop/SearchErrorBoundary';
+import { ShopFilters } from '@/components/marketplace/shop/ShopFilters';
+import { MobileFilterBar } from '@/components/marketplace/shop/MobileFilterBar';
+import { ShopContent as ShopContentComponent } from '@/components/marketplace/shop/ShopContent';
+import { BrandShowcase } from '@/components/marketplace/shop/BrandShowcase';
+import { FeaturedProducts } from '@/components/marketplace/shop/FeaturedProducts';
+import { RecentlyViewedProducts } from '@/components/marketplace/shop/RecentlyViewedProducts';
+import { QuickViewModal } from '@/components/marketplace/shop/QuickViewModal';
+import { ProductComparison } from '@/components/marketplace/shop/ProductComparison';
+import { BackToTop } from '@/components/marketplace/ui/back-to-top';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useProducts } from '@/hooks/useProducts';
-import { useProductComparison } from '@/hooks/useProductComparison';
-import { ShopProvider } from '@/contexts/ShopContext';
+import { useProducts } from '@/hooks/marketplace/useProducts';
+import { useProductComparison } from '@/hooks/marketplace/useProductComparison';
+import { ShopProvider } from '@/contexts/marketplace/ShopContext';
 import { Eye, BarChart3, Truck, Shield, Zap, X } from 'lucide-react';
 
 // Inner component that uses the shop context

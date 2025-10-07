@@ -56,7 +56,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
       }
     )),
     defaultValues: {
-      email: '',
+      email: ',
       name: '',
       amount: minimumBid
     }

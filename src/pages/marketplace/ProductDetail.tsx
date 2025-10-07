@@ -1,27 +1,27 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { ShoppingCart, Heart, Star, Share2, Minus, Plus, Eye } from 'lucide-react';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 import { Badge } from '@/components/ui/badge';
-import { ProductSkeleton } from '@/components/ui/product-skeleton';
-import { ProductReviewsSection } from '@/components/reviews/ProductReviewsSection';
+import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
+import { ProductReviewsSection } from '@/components/marketplace/reviews/ProductReviewsSection';
 import { featureConfig } from '@/config/features.config';
-import { ProductImageZoom } from '@/components/ui/product-image-zoom';
-import { BackToTop } from '@/components/ui/back-to-top';
-import { StockAlerts } from '@/components/shop/StockAlerts';
-import { EnhancedBreadcrumb } from '@/components/ui/enhanced-breadcrumb';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
-import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { ProductImageZoom } from '@/components/marketplace/ui/product-image-zoom';
+import { BackToTop } from '@/components/marketplace/ui/back-to-top';
+import { StockAlerts } from '@/components/marketplace/shop/StockAlerts';
+import { EnhancedBreadcrumb } from '@/components/marketplace/ui/enhanced-breadcrumb';
+import { useCart } from '@/contexts/marketplace/CartContext';
+import { useWishlist } from '@/contexts/marketplace/WishlistContext';
+import { useRecentlyViewed } from '@/hooks/marketplace/useRecentlyViewed';
 import { useToast } from '@/hooks/use-toast';
-import { useProduct } from '@/hooks/useProducts';
-import { useProductVariants } from '@/hooks/useProductVariants';
-import { LightboxModal } from '@/components/ui/lightbox-modal';
-import { usePresenceCount } from '@/hooks/usePresenceCount';
-import { RelatedProducts } from '@/components/shop/RelatedProducts';
-import { RecentlyViewedProducts } from '@/components/shop/RecentlyViewedProducts';
+import { useProduct } from '@/hooks/marketplace/useProducts';
+import { useProductVariants } from '@/hooks/marketplace/useProductVariants';
+import { LightboxModal } from '@/components/marketplace/ui/lightbox-modal';
+import { usePresenceCount } from '@/hooks/marketplace/usePresenceCount';
+import { RelatedProducts } from '@/components/marketplace/shop/RelatedProducts';
+import { RecentlyViewedProducts } from '@/components/marketplace/shop/RecentlyViewedProducts';
 
 const ProductDetail = () => {
   const { id } = useParams();

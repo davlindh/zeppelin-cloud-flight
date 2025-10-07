@@ -32,8 +32,8 @@ const useDebounce = (value: string, delay: number) => {
 };
 
 export const OptimizedUnifiedSearchBar: React.FC<OptimizedUnifiedSearchBarProps> = ({
-  placeholder = "Search products, brands, categories...",
-  className = ""
+  placeholder = "Search products, brands, categories..."`,
+  className = "
 }) => {
   const { state, dispatch } = useShop();
   const [isOpen, setIsOpen] = useState(false);
@@ -115,8 +115,8 @@ export const OptimizedUnifiedSearchBar: React.FC<OptimizedUnifiedSearchBarProps>
   }, []);
 
   const handleClear = useCallback(() => {
-    setLocalSearchTerm('');
-    dispatch({ type: 'SET_SEARCH_TERM', payload: '' });
+    setLocalSearchTerm(');
+    dispatch({ type: 'SET_SEARCH_TERM', payload: ' });
     inputRef.current?.focus();
   }, [dispatch]);
 

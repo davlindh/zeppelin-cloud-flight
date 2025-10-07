@@ -25,7 +25,7 @@ interface ServiceProviderCardProps {
 export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
   name = 'Unknown Provider',
   title = 'Service Provider',
-  image = '',
+  image = ',
   rating = 0,
   reviewCount = 0,
   reviews = 0,

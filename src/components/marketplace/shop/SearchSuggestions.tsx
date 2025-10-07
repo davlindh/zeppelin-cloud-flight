@@ -29,7 +29,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
     .slice(0, 5);
 
   const recentSearches = searchHistory
-    .filter(item => searchTerm === '' || item.query.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(item => searchTerm === ' || item.query.toLowerCase().includes(searchTerm.toLowerCase()))
     .slice(0, 5);
 
   const highlightText = (text: string, highlight: string) => {

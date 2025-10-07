@@ -128,7 +128,7 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
           case 'rating':
             return b.rating - a.rating;
           default:
-            return new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime();
+            return new Date(b.created_at ?? ').getTime() - new Date(a.created_at ?? '').getTime();
         }
       });
     }

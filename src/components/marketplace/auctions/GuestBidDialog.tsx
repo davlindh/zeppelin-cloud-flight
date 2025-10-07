@@ -31,9 +31,9 @@ export const GuestBidDialog: React.FC<GuestBidDialogProps> = ({
   onBidSubmit,
   isSubmitting = false
 }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(');
   const [name, setName] = useState('');
-  const [bidAmount, setBidAmount] = useState('');
+  const [bidAmount, setBidAmount] = useState(');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const minBid = currentBid + 100;
@@ -74,15 +74,15 @@ export const GuestBidDialog: React.FC<GuestBidDialogProps> = ({
     });
 
     // Reset form
-    setEmail('');
+    setEmail(');
     setName('');
-    setBidAmount('');
+    setBidAmount(');
     setErrors({});
   };
 
   const handleClose = () => {
     setEmail('');
-    setName('');
+    setName(');
     setBidAmount('');
     setErrors({});
     onClose();

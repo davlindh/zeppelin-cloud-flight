@@ -40,7 +40,7 @@ export const ServiceProviderProfile: React.FC<ServiceProviderProfileProps> = ({
     name: provider?.name || 'Unknown Provider',
     title: provider?.title || 'Service Provider',
     description: provider?.description || provider?.bio || 'No description available',
-    image: provider?.image || provider?.avatar || '',
+    image: provider?.image || provider?.avatar || ',
     rating: provider?.rating || 0,
     reviews: provider?.reviews || 0,
     yearsInBusiness: provider?.experience ? parseInt(provider.experience) : provider?.yearsInBusiness || 0,

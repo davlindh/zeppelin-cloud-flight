@@ -33,11 +33,11 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   const [bookingData, setBookingData] = useState<BookingFormData>({
-    selectedDate: '',
+    selectedDate: ',
     selectedTime: '',
-    customerName: '',
+    customerName: ',
     customerEmail: '',
-    customerPhone: '',
+    customerPhone: ',
     customerMessage: '',
     customizations: {},
     agreedToTerms: false
@@ -55,9 +55,9 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
       console.log('Auto-filling user information:', authenticatedUser);
       setBookingData(prev => ({
         ...prev,
-        customerName: authenticatedUser.full_name || '',
+        customerName: authenticatedUser.full_name || ',
         customerEmail: authenticatedUser.email || '',
-        customerPhone: authenticatedUser.phone || ''
+        customerPhone: authenticatedUser.phone || '
       }));
     }
   }, [authenticatedUser, bookingData.customerName, bookingData.customerEmail]);
@@ -68,7 +68,7 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
       const isTimeStillAvailable = availableTimes.includes(bookingData.selectedTime);
       if (!isTimeStillAvailable) {
         console.log('Previously selected time no longer available, clearing selection');
-        setBookingData(prev => ({ ...prev, selectedTime: '' }));
+        setBookingData(prev => ({ ...prev, selectedTime: ' }));
       }
     }
   }, [availableTimes, bookingData.selectedTime]);
@@ -169,7 +169,7 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
           customer_name: validatedData.customerName,
           customer_email: validatedData.customerEmail,
           customer_phone: validatedData.customerPhone,
-          customer_message: validatedData.customerMessage || '',
+          customer_message: validatedData.customerMessage || ',
           customizations: validatedData.customizations || {},
           agreed_to_terms: validatedData.agreedToTerms,
           status: 'pending'
@@ -186,11 +186,11 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
 
       // Reset form
       setBookingData({
-        selectedDate: '',
+        selectedDate: ',
         selectedTime: '',
-        customerName: authenticatedUser?.full_name || '',
+        customerName: authenticatedUser?.full_name || ',
         customerEmail: authenticatedUser?.email || '',
-        customerPhone: authenticatedUser?.phone || '',
+        customerPhone: authenticatedUser?.phone || ',
         customerMessage: '',
         customizations: {},
         agreedToTerms: false
@@ -277,7 +277,7 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
               name: bookingData.customerName,
               email: bookingData.customerEmail,
               phone: bookingData.customerPhone,
-              message: bookingData.customerMessage || ''
+              message: bookingData.customerMessage || '
             }}
             onContactInfoChange={(field, value) => {
               const fieldMap = {
@@ -317,12 +317,12 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
               name: bookingData.customerName,
               email: bookingData.customerEmail,
               phone: bookingData.customerPhone,
-              message: bookingData.customerMessage || ''
+              message: bookingData.customerMessage || '
             }}
             agreedToTerms={bookingData.agreedToTerms}
             onTermsChange={(agreed) => handleInputChange('agreedToTerms', agreed)}
             errors={{
-              agreedToTerms: validationErrors.agreedToTerms || ''
+              agreedToTerms: validationErrors.agreedToTerms || '
             }}
           />
         );

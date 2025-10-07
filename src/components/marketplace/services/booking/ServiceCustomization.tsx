@@ -39,7 +39,7 @@ export const ServiceCustomization: React.FC<ServiceCustomizationProps> = ({
             
             {option.type === 'select' && option.options && (
               <Select 
-                value={customizations[option.name] || ''} 
+                value={customizations[option.name] || '} 
                 onValueChange={(value) => onCustomizationChange(option.name, value)}
               >
                 <SelectTrigger>
@@ -55,7 +55,7 @@ export const ServiceCustomization: React.FC<ServiceCustomizationProps> = ({
             
             {option.type === 'input' && (
               <Input
-                value={customizations[option.name] || ''}
+                value={customizations[option.name] || '}
                 onChange={(e) => onCustomizationChange(option.name, e.target.value)}
                 placeholder={`Enter ${option.name}`}
               />
@@ -63,7 +63,7 @@ export const ServiceCustomization: React.FC<ServiceCustomizationProps> = ({
             
             {option.type === 'textarea' && (
               <Textarea
-                value={customizations[option.name] || ''}
+                value={customizations[option.name] || '}
                 onChange={(e) => onCustomizationChange(option.name, e.target.value)}
                 placeholder={`Describe ${option.name}`}
                 rows={3}

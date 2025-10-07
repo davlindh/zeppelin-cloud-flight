@@ -2,17 +2,17 @@
 import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { ArrowLeft, Eye } from 'lucide-react';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import { AuctionImageGallery } from '@/components/auctions/AuctionImageGallery';
-import { AuctionInfo } from '@/components/auctions/AuctionInfo';
-import { BidSection } from '@/components/auctions/BidSection';
-import { BidHistorySection } from '@/components/auctions/BidHistorySection';
-import { AuctionAnalyticsDisplay } from '@/components/auctions/AuctionAnalyticsDisplay';
-import { useAuctionDetail } from '@/hooks/useAuctionDetail';
-import { useCountdown } from '@/hooks/useCountdown';
-import { usePresenceCount } from '@/hooks/usePresenceCount';
-import { calculateAuctionAnalytics } from '@/utils/auctionUtils';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { AuctionImageGallery } from '@/components/marketplace/auctions/AuctionImageGallery';
+import { AuctionInfo } from '@/components/marketplace/auctions/AuctionInfo';
+import { BidSection } from '@/components/marketplace/auctions/BidSection';
+import { BidHistorySection } from '@/components/marketplace/auctions/BidHistorySection';
+import { AuctionAnalyticsDisplay } from '@/components/marketplace/auctions/AuctionAnalyticsDisplay';
+import { useAuctionDetail } from '@/hooks/marketplace/useAuctionDetail';
+import { useCountdown } from '@/hooks/marketplace/useCountdown';
+import { usePresenceCount } from '@/hooks/marketplace/usePresenceCount';
+import { calculateAuctionAnalytics } from '@/utils/marketplace/auctionUtils';
 import { Badge } from '@/components/ui/badge';
 import { featureConfig } from '@/config/features.config';
 

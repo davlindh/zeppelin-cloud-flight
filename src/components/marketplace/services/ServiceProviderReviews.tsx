@@ -41,7 +41,7 @@ export const ServiceProviderReviews: React.FC<ServiceProviderReviewsProps> = ({
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center">
                     <span className="text-xs font-medium text-slate-600">
-                      {review.clientName.split(' ').map(n => n[0]).join('')}
+                      {review.clientName.split(' ').map(n => n[0]).join(')}
                     </span>
                   </div>
                   <div>

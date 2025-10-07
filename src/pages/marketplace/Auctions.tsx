@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import { PageHeader } from '@/components/ui/page-header';
-import { SearchFilterBar } from '@/components/ui/search-filter-bar';
-import { AuctionCard } from '@/components/ui/auction-card';
-import { useAuctionNotifications } from '@/hooks/useAuctionNotifications';
-import { useAuctions } from '@/hooks/useAuctions';
-import { useDynamicCategoryNames } from '@/hooks/useDynamicCategories';
-import { getSafeCategoryList } from '@/utils/dynamicCategoryUtils';
-import { LoadingGrid } from '@/components/ui/loading-grid';
-import { calculateAuctionAnalytics } from '@/utils/auctionUtils';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { PageHeader } from '@/components/marketplace/ui/page-header';
+import { SearchFilterBar } from '@/components/marketplace/ui/search-filter-bar';
+import { AuctionCard } from '@/components/marketplace/ui/auction-card';
+import { useAuctionNotifications } from '@/hooks/marketplace/useAuctionNotifications';
+import { useAuctions } from '@/hooks/marketplace/useAuctions';
+import { useDynamicCategoryNames } from '@/hooks/marketplace/useDynamicCategories';
+import { getSafeCategoryList } from '@/utils/marketplace/dynamicCategoryUtils';
+import { LoadingGrid } from '@/components/marketplace/ui/loading-grid';
+import { calculateAuctionAnalytics } from '@/utils/marketplace/auctionUtils';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 

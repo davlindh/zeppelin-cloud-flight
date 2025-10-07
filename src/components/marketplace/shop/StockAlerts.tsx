@@ -11,7 +11,7 @@ interface StockAlertsProps {
 }
 
 export const StockAlerts: React.FC<StockAlertsProps> = ({ productId, productName }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(');
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isAlertSet, setIsAlertSet] = useState(false);
 

@@ -1,16 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
-import { PageHeader } from '@/components/ui/page-header';
-import { SearchFilterBar } from '@/components/ui/search-filter-bar';
-import { UnifiedServiceCard } from '@/components/ui/unified-service-card';
-import { ServiceLoading } from '@/components/ui/service-loading';
-import { ServiceError } from '@/components/ui/service-error';
-import { useServices, type ServiceFilters } from '@/hooks/useServices';
-import { useServiceCategories } from '@/hooks/useServiceCategories';
+import { PageHeader } from '@/components/marketplace/ui/page-header';
+import { SearchFilterBar } from '@/components/marketplace/ui/search-filter-bar';
+import { UnifiedServiceCard } from '@/components/marketplace/ui/unified-service-card';
+import { ServiceLoading } from '@/components/marketplace/ui/service-loading';
+import { ServiceError } from '@/components/marketplace/ui/service-error';
+import { useServices, type ServiceFilters } from '@/hooks/marketplace/useServices';
+import { useServiceCategories } from '@/hooks/marketplace/useServiceCategories';
 
 const Services = () => {
   const [searchParams, setSearchParams] = useSearchParams();

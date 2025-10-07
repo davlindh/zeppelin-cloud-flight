@@ -152,7 +152,7 @@ export const MobileFilterBar: React.FC<MobileFilterBarProps> = ({ availableBrand
               "{state.searchTerm}"
               <X 
                 className="h-3 w-3 cursor-pointer" 
-                onClick={() => dispatch({ type: 'SET_SEARCH_TERM', payload: '' })}
+                onClick={() => dispatch({ type: 'SET_SEARCH_TERM', payload: ' })}
               />
             </Badge>
           )}

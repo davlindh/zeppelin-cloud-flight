@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { UnifiedProductCard } from '@/components/ui/unified-product-card';
-import { useProducts } from '@/hooks/useProducts';
+import { UnifiedProductCard } from '@/components/marketplace/ui/unified-product-card';
+import { useProducts } from '@/hooks/marketplace/useProducts';
 import type { Product } from '@/types/unified';
-import { getImageUrl } from '@/utils/imageUtils';
+import { getImageUrl } from '@/utils/marketplace/imageUtils';
 
 interface RelatedProductsProps {
   currentProduct: Product;

@@ -24,7 +24,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
   
-  const { data: product, isLoading } = useProduct(productId ?? '');
+  const { data: product, isLoading } = useProduct(productId ?? ');
 
   const handleAddToCart = () => {
     if (!product) return;
