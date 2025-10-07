@@ -324,72 +324,73 @@ ALTER TABLE public.communication_requests ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- RLS POLICIES (Public read, Admin write)
+-- Note: Uses existing is_admin() function from main Zeppelin database
 -- ============================================================================
 
 -- Categories policies
 CREATE POLICY "Public read access for categories" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Admins can manage categories" ON public.categories FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage categories" ON public.categories FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for category_metadata" ON public.category_metadata FOR SELECT USING (true);
-CREATE POLICY "Admins can manage category_metadata" ON public.category_metadata FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage category_metadata" ON public.category_metadata FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 -- Products policies
 CREATE POLICY "Public read access for products" ON public.products FOR SELECT USING (true);
-CREATE POLICY "Admins can manage products" ON public.products FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage products" ON public.products FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for product_variants" ON public.product_variants FOR SELECT USING (true);
-CREATE POLICY "Admins can manage product_variants" ON public.product_variants FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage product_variants" ON public.product_variants FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for product_reviews" ON public.product_reviews FOR SELECT USING (true);
-CREATE POLICY "Guests can create product_reviews" ON public.product_reviews FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can manage product_reviews" ON public.product_reviews FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Guests can create product_reviews" ON product_reviews FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can manage product_reviews" ON public.product_reviews FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 -- Auctions policies
 CREATE POLICY "Public read access for auctions" ON public.auctions FOR SELECT USING (true);
-CREATE POLICY "Admins can manage auctions" ON public.auctions FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage auctions" ON public.auctions FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for bid_history" ON public.bid_history FOR SELECT USING (true);
 CREATE POLICY "Guests can place bids" ON public.bid_history FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can manage bid_history" ON public.bid_history FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage bid_history" ON public.bid_history FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 -- Services policies
 CREATE POLICY "Public read access for service_providers" ON public.service_providers FOR SELECT USING (true);
-CREATE POLICY "Admins can manage service_providers" ON public.service_providers FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage service_providers" ON public.service_providers FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for services" ON public.services FOR SELECT USING (true);
-CREATE POLICY "Admins can manage services" ON public.services FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage services" ON public.services FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for bookings" ON public.bookings FOR SELECT USING (true);
 CREATE POLICY "Guests can create bookings" ON public.bookings FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can manage bookings" ON public.bookings FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage bookings" ON public.bookings FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for service_reviews" ON public.service_reviews FOR SELECT USING (true);
 CREATE POLICY "Guests can create service_reviews" ON public.service_reviews FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can manage service_reviews" ON public.service_reviews FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage service_reviews" ON public.service_reviews FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public read access for service_portfolio_items" ON public.service_portfolio_items FOR SELECT USING (true);
-CREATE POLICY "Admins can manage service_portfolio_items" ON public.service_portfolio_items FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage service_portfolio_items" ON public.service_portfolio_items FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 -- Communication policies
 CREATE POLICY "Public read access for communication_requests" ON public.communication_requests FOR SELECT USING (true);
 CREATE POLICY "Guests can create communication_requests" ON public.communication_requests FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admins can manage communication_requests" ON public.communication_requests FOR ALL USING (public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can manage communication_requests" ON public.communication_requests FOR ALL USING (public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 -- ============================================================================
 -- STORAGE POLICIES
 -- ============================================================================
 
 CREATE POLICY "Public can view product images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');
-CREATE POLICY "Admins can upload product images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images' AND public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can upload product images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images' AND public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public can view auction images" ON storage.objects FOR SELECT USING (bucket_id = 'auction-images');
-CREATE POLICY "Admins can upload auction images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'auction-images' AND public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can upload auction images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'auction-images' AND public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public can view service images" ON storage.objects FOR SELECT USING (bucket_id = 'service-images');
-CREATE POLICY "Admins can upload service images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'service-images' AND public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can upload service images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'service-images' AND public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 CREATE POLICY "Public can view provider avatars" ON storage.objects FOR SELECT USING (bucket_id = 'provider-avatars');
-CREATE POLICY "Admins can upload provider avatars" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'provider-avatars' AND public.is_admin(current_setting('request.jwt.claims', true)::json->>'email'));
+CREATE POLICY "Admins can upload provider avatars" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'provider-avatars' AND public.is_admin((current_setting('request.jwt.claims', true)::json->>'email')::text));
 
 -- ============================================================================
 -- TRIGGERS FOR AUTOMATIC TIMESTAMP UPDATES
