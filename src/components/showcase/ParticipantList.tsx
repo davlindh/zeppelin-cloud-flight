@@ -1,15 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-// Simple slugify function
-const slugify = (text: string): string => {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
-};
+import { slugify } from '@/utils/participantHelpers';
 
 interface Participant {
   name: string;

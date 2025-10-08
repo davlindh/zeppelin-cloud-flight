@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { HomePageProvider } from '@/contexts/HomePageContext';
-import { HeroSection, EngagementSection, VisionSection, SystematicsSection } from '@/components/sections';
+import { HomePageLayout } from '@/components/home/HomePageLayout';
 
 const HomePageContent: React.FC = () => {
     const location = useLocation();
@@ -17,12 +17,9 @@ const HomePageContent: React.FC = () => {
     }, [location]);
 
     return (
-        <div className="flex flex-col">
-            <HeroSection />
-            <EngagementSection />
-            <VisionSection />
-            <SystematicsSection />
-        </div>
+        <HomePageLayout>
+            {/* Custom content can be passed here, or default sections will be used */}
+        </HomePageLayout>
     );
 };
 
