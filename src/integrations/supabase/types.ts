@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_access_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_settings: {
         Row: {
           created_at: string
@@ -554,6 +581,7 @@ export type Database = {
       }
       participants: {
         Row: {
+          auth_user_id: string | null
           availability: string | null
           avatar_path: string | null
           bio: string | null
@@ -575,6 +603,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          auth_user_id?: string | null
           availability?: string | null
           avatar_path?: string | null
           bio?: string | null
@@ -596,6 +625,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          auth_user_id?: string | null
           availability?: string | null
           avatar_path?: string | null
           bio?: string | null
@@ -1547,11 +1577,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_edit_participant: {
+        Args: { _participant_id: string }
+        Returns: boolean
+      }
       cleanup_old_drafts: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -1571,6 +1629,13 @@ export type Database = {
       generate_slug: {
         Args: { title: string }
         Returns: string
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       hash_device_fingerprint: {
         Args: { fingerprint: string }
@@ -1599,6 +1664,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "participant" | "customer"
       auction_category:
         | "electronics"
         | "fashion"
@@ -1769,6 +1835,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "participant", "customer"],
       auction_category: [
         "electronics",
         "fashion",

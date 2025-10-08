@@ -24,7 +24,7 @@ export const useAdminAuth = () => {
       try {
         console.log('[Admin Auth] Checking admin status for user:', uid);
         const { data: isAdminUser, error: adminCheckError } = await supabase
-          .rpc('is_admin_user', { _user_id: uid });
+          .rpc('has_role', { _user_id: uid, _role: 'admin' });
 
         if (!isMounted) return;
 
