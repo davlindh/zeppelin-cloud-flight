@@ -18,13 +18,13 @@ const STORAGE_KEY = 'customer_info';
 
 export const useCustomerInfo = () => {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
-    name: ',
+    name: '',
     email: '',
-    phone: ',
+    phone: '',
     address: '',
-    city: ',
+    city: '',
     postalCode: '',
-    country: ',
+    country: '',
     message: '',
     agreedToTerms: false,
   });
@@ -36,9 +36,9 @@ export const useCustomerInfo = () => {
       // For authenticated users, populate from profile
       setCustomerInfo(prev => ({
         ...prev,
-        name: profile.full_name || ',
+        name: profile.full_name || '',
         email: profile.email || '',
-        phone: profile.phone || ',
+        phone: profile.phone || '',
         address: profile.address || '',
         // Keep other fields from localStorage if available
       }));
@@ -82,14 +82,14 @@ export const useCustomerInfo = () => {
 
   // Get auto-fill data for forms
   const getFormData = () => ({
-    firstName: customerInfo.name.split(' ')[0] || ',
-    lastName: customerInfo.name.split(' ').slice(1).join(' ') || ',
+    firstName: customerInfo.name.split(' ')[0] || '',
+    lastName: customerInfo.name.split(' ').slice(1).join(' ') || '',
     email: customerInfo.email,
     phone: customerInfo.phone,
     address: customerInfo.address || '',
-    city: customerInfo.city || ',
+    city: customerInfo.city || '',
     postalCode: customerInfo.postalCode || '',
-    country: customerInfo.country || ',
+    country: customerInfo.country || '',
     message: customerInfo.message || '',
     agreedToTerms: customerInfo.agreedToTerms || false,
   });
@@ -97,13 +97,13 @@ export const useCustomerInfo = () => {
   // Clear all customer info
   const clearCustomerInfo = () => {
     const empty: CustomerInfo = {
-      name: ',
+      name: '',
       email: '',
-      phone: ',
+      phone: '',
       address: '',
-      city: ',
+      city: '',
       postalCode: '',
-      country: ',
+      country: '',
       message: '',
       agreedToTerms: false,
     };

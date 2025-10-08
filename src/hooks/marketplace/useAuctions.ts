@@ -30,7 +30,7 @@ export const useAuctions = () => {
         const auctions: Auction[] = auctionsData.map((auction) => {
           // Ensure all required fields have fallbacks
           const safeAuction: Auction = {
-            id: auction.id ?? ',
+            id: auction.id ?? '',
             title: auction.title || 'Untitled Auction',
             currentBid: Number(auction.current_bid) || 0,
             startingBid: Number(auction.starting_bid) || 0,
@@ -39,7 +39,7 @@ export const useAuctions = () => {
             // Use category_name if available, fallback to enum category, then to 'electronics'
             category: auction.category_name || auction.category || 'electronics',
             condition: auction.condition || 'good',
-            image: auction.image || ',
+            image: auction.image || '',
             slug: auction.slug || undefined,
             created_at: auction.created_at || new Date().toISOString(),
             updated_at: auction.updated_at || new Date().toISOString()

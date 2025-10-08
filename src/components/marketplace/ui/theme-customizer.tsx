@@ -22,7 +22,7 @@ interface ThemeCustomizerProps {
 }
 
 export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({
-  className = ',
+  className = '',
   isOpen = false,
   onClose
 }) => {

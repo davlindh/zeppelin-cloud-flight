@@ -13,7 +13,7 @@ interface ProductImageZoomProps {
 export const ProductImageZoom: React.FC<ProductImageZoomProps> = ({
   src,
   alt,
-  className = ',
+  className = '',
   onLightboxOpen
 }) => {
   const [isHovered, setIsHovered] = useState(false);

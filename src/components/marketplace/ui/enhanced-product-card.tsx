@@ -236,7 +236,7 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
               </picture>
             ) : (
               <img 
-                src={getImageUrl(productData.image || ')}
+                src={getImageUrl(productData.image || '')}
                 alt={productData.title}
                 className="w-full h-full object-cover rounded-md"
                 onLoad={() => setImageLoaded(true)}
@@ -302,8 +302,9 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
         
         <CardContent className={cn(
           "flex-grow flex flex-col justify-end",
-          isEnhanced ? "p-6 space-y-4"` : "
+          isEnhanced ? "p-6 space-y-4" : ""
         )}>
+
           {/* Category and Brand - Enhanced version */}
           {isEnhanced && (
             <div className="flex items-center justify-between gap-2">

@@ -41,7 +41,7 @@ export const SocialProofBadge: React.FC<SocialProofBadgeProps> = ({
       case 'trending':
         return 'Trending';
       default:
-        return ';
+        return '';
     }
   };
 

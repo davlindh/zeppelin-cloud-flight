@@ -19,7 +19,7 @@ interface EnhancedBreadcrumbProps {
 
 export const EnhancedBreadcrumb: React.FC<EnhancedBreadcrumbProps> = ({
   items,
-  className = '
+  className = ''
 }) => {
   const getDefaultIcon = (index: number) => {
     if (index === 0) return <Home className="h-4 w-4" />;

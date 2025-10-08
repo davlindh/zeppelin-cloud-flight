@@ -22,7 +22,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   onRetry,
   onGoHome,
   variant = 'detailed',
-  className = '
+  className = ''
 }) => {
   const isExtendedError = (err: Error | ExtendedAppError): err is ExtendedAppError => {
     return 'type' in err && typeof err.type === 'string';

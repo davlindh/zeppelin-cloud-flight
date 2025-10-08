@@ -14,7 +14,7 @@ interface SocialProofNotificationsProps {
 }
 
 export const SocialProofNotifications: React.FC<SocialProofNotificationsProps> = ({
-  className = '
+  className = ''
 }) => {
   const [notifications, setNotifications] = useState<SocialProofItem[]>([]);
   const [currentNotification, setCurrentNotification] = useState<SocialProofItem | null>(null);

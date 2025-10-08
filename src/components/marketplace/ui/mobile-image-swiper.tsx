@@ -15,7 +15,7 @@ export const MobileImageSwiper: React.FC<MobileImageSwiperProps> = ({
   images,
   alt,
   onImageClick,
-  className = '
+  className = ''
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);

@@ -34,9 +34,9 @@ export const useAuthenticatedUser = () => {
 
         return {
           id: user.id,
-          email: user.email || ',
+          email: user.email || '',
           full_name: userData?.full_name || user.user_metadata?.full_name || '',
-          phone: userData?.phone || user.user_metadata?.phone || '
+          phone: userData?.phone || user.user_metadata?.phone || ''
         };
       } catch (error) {
         console.error('Failed to fetch authenticated user:', error);

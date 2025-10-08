@@ -15,7 +15,7 @@ export const StockUrgencyIndicator: React.FC<StockUrgencyIndicatorProps> = ({
   stockCount,
   isPopular = false,
   recentViews = 0,
-  className = '
+  className = ''
 }) => {
   const getUrgencyLevel = () => {
     if (stockCount === 0) return 'out-of-stock';

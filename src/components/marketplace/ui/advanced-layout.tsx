@@ -12,12 +12,12 @@ interface AdvancedContainerProps {
 export const AdvancedContainer: React.FC<AdvancedContainerProps> = ({
   children,
   size = 'xl',
-  className = ',
+  className = '',
   centerContent = true,
   applyGoldenRatio = false
 }) => {
   const getSizeClasses = () => {
-    const baseClasses = centerContent ? 'mx-auto' : ';
+    const baseClasses = centerContent ? 'mx-auto' : '';
     const paddingClasses = applyGoldenRatio 
       ? 'px-[var(--space-lg)] py-[var(--space-xl)]' 
       : 'px-4 sm:px-6 lg:px-8';
@@ -61,7 +61,7 @@ export const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
   children,
   variant = 'normal',
   density = 'comfortable',
-  className = ',
+  className = '',
   minItemWidth
 }) => {
   const getGridClasses = () => {
@@ -117,7 +117,7 @@ export const GoldenSection: React.FC<GoldenSectionProps> = ({
   orientation = 'horizontal',
   majorContent,
   minorContent,
-  className = '
+  className = ''
 }) => {
   const isHorizontal = orientation === 'horizontal';
   
@@ -150,7 +150,7 @@ export const FluidSpacing: React.FC<FluidSpacingProps> = ({
   children,
   size = 'md',
   direction = 'vertical',
-  className = '
+  className = ''
 }) => {
   const getSpacingClasses = () => {
     const spacingVar = `var(--space-${size})`;
@@ -167,7 +167,7 @@ export const FluidSpacing: React.FC<FluidSpacingProps> = ({
 
   return (
     <div className={cn(
-      direction === 'both' ? 'flex flex-col' : ',
+      direction === 'both' ? 'flex flex-col' : '',
       getSpacingClasses(),
       className
     )}>

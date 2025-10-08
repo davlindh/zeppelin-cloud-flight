@@ -10,7 +10,7 @@ interface BackToTopProps {
 
 export const BackToTop: React.FC<BackToTopProps> = ({
   threshold = 300,
-  className = '
+  className = ''
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);

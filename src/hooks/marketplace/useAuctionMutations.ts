@@ -180,7 +180,7 @@ export const useAuctionMutations = () => {
     setError(null);
 
     try {
-      console.log('🔄 Ending auction:', auctionId, force ? '(forced)' : ');
+      console.log('🔄 Ending auction:', auctionId, force ? '(forced)' : '');
 
       // If forcing end, set end_time to now
       const updateData = force 
