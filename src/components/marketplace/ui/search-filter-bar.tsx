@@ -44,7 +44,7 @@ export const SearchFilterBar: React.FC<SearchFilterBarProps> = ({
   const isMobile = useIsMobile();
 
   const clearSearch = () => {
-    onSearchChange(');
+    onSearchChange('');
   };
 
   const getActiveFilterCount = () => {

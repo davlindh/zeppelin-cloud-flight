@@ -24,7 +24,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   filters,
   onFiltersChange,
   availableBrands,
-  className = '
+  className = ''
 }) => {
   const handlePriceRangeChange = (value: number[]) => {
     const newFilters = { ...filters, priceRange: [value[0], value[1]] as [number, number] };

@@ -22,7 +22,7 @@ export const useSecureBidding = (auctionId: string) => {
     }
 
     // Validate auction ID
-    if (!auctionId || auctionId.trim() === ') {
+    if (!auctionId || auctionId.trim() === '') {
       console.error('❌ Invalid auction ID:', auctionId);
       toast({
         title: "Invalid Auction",

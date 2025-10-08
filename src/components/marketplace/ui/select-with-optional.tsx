@@ -33,7 +33,7 @@ export const SelectWithOptional: React.FC<SelectWithOptionalProps> = ({
   optionalValue = "none"
 }) => {
   // Convert null/empty values to the optional value for display
-  const displayValue = defaultValue === null || defaultValue === ' ? optionalValue : defaultValue;
+  const displayValue = defaultValue === null || defaultValue === '' ? optionalValue : defaultValue;
 
   const handleValueChange = (value: string) => {
     // Convert the optional value back to null when the value changes

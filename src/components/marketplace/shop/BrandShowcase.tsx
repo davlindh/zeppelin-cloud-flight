@@ -42,7 +42,7 @@ export const BrandShowcase: React.FC = () => {
       .map((brand: any) => ({
         ...brand,
         averageRating: brand.totalReviews > 0 ? brand.totalRating / brand.totalReviews : 0,
-        featuredImage: brand.products[0]?.image || ',
+        featuredImage: brand.products[0]?.image || '',
         isPopular: brand.productCount >= 5,
         priceRange: brand.minPrice === brand.maxPrice 
           ? `$${brand.minPrice}` 

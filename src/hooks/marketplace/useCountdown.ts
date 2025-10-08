@@ -42,7 +42,7 @@ export const useCountdown = (endTime: Date): CountdownState => {
       const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-      let displayTime = ';
+      let displayTime = '';
       if (days > 0) {
         displayTime = `${days}d ${hours}h`;
       } else if (hours > 0) {

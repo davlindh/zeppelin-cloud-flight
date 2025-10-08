@@ -44,7 +44,7 @@ export const ContactInformation: React.FC<ContactInformationProps> = ({
 
   const handleInputChange = (field: keyof ContactInfo, value: string): void => {
     // Allow empty strings for optional fields, but validate non-empty strings
-    if (value === ' || isValidString(value)) {
+    if (value === '' || isValidString(value)) {
       onContactInfoChange(field, value);
       
       // Save to customer info for future use

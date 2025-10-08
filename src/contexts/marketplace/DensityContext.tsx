@@ -74,7 +74,7 @@ interface DensityControlProps {
   className?: string;
 }
 
-export const DensityControl: React.FC<DensityControlProps> = ({ className = ' }) => {
+export const DensityControl: React.FC<DensityControlProps> = ({ className = '' }) => {
   const { density, setDensity } = useDensity();
 
   const densityOptions = [

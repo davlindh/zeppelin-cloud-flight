@@ -22,7 +22,7 @@ export const useAuctionDetail = (idOrSlug: string) => {
     queryFn: async (): Promise<AuctionDetail | null> => {
       console.log('🔍 Fetching auction by ID/slug:', idOrSlug);
       
-      if (!idOrSlug || idOrSlug.trim() === ') {
+      if (!idOrSlug || idOrSlug.trim() === '') {
         console.log('❌ Empty ID/slug provided');
         return null;
       }

@@ -30,7 +30,7 @@ type ShopAction =
 
 // Initial state
 const initialState: ShopState = {
-  searchTerm: ',
+  searchTerm: '',
   selectedCategory: 'all',
   sortBy: 'newest',
   filters: {
@@ -89,7 +89,7 @@ const shopReducer = (state: ShopState, action: ShopAction): ShopState => {
       
       switch (type) {
         case 'search':
-          updatedState.searchTerm = ';
+          updatedState.searchTerm = '';
           break;
         case 'category':
           updatedState.selectedCategory = 'all';
@@ -158,7 +158,7 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
   useEffect(() => {
     isUpdatingFromURL.current = true;
     
-    const urlSearch = searchParams.get('search') || ';
+    const urlSearch = searchParams.get('search') || '';
     const urlCategory = decodeURIComponent(searchParams.get('category') || 'all');
     const urlBrand = searchParams.get('brand');
     
@@ -232,8 +232,8 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
 
   // Calculate if filters are active
   const hasActiveFilters = React.useMemo(() => {
-    return state.searchTerm.trim() !== ' || 
-           state.selectedCategory !== 'all' || 
+    return state.searchTerm.trim() !== '' || 
+           state.selectedCategory !== 'all' ||
            state.filters.brands.length > 0 || 
            state.filters.inStockOnly || 
            state.filters.rating > 0 ||

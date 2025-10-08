@@ -15,8 +15,8 @@ interface UnifiedSearchBarProps {
 }
 
 export const UnifiedSearchBar: React.FC<UnifiedSearchBarProps> = ({
-  placeholder = "Search products, brands, categories..."`,
-  className = "
+  placeholder = "Search products, brands, categories...",
+  className = ""
 }) => {
   const { state, dispatch } = useShop();
   const [isOpen, setIsOpen] = useState(false);
@@ -97,7 +97,7 @@ export const UnifiedSearchBar: React.FC<UnifiedSearchBarProps> = ({
 
   const handleCategoryFilter = (category: string) => {
     dispatch({ type: 'SET_CATEGORY', payload: category });
-    dispatch({ type: 'SET_SEARCH_TERM', payload: ' });
+    dispatch({ type: 'SET_SEARCH_TERM', payload: '' });
     setIsOpen(false);
   };
 
@@ -108,7 +108,7 @@ export const UnifiedSearchBar: React.FC<UnifiedSearchBarProps> = ({
   };
 
   const handleClear = () => {
-    dispatch({ type: 'SET_SEARCH_TERM', payload: ' });
+    dispatch({ type: 'SET_SEARCH_TERM', payload: '' });
     inputRef.current?.focus();
   };
 
