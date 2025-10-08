@@ -39,6 +39,8 @@ import { CartProvider } from "./contexts/marketplace/CartProvider";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import OrderTrackingPage from "./pages/OrderTrackingPage";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -87,6 +89,10 @@ const App = () => (
                   <Route path="wishlist" element={<div>Wishlist - Coming Soon</div>} />
                   <Route path="notifications" element={<div>Notifications - Coming Soon</div>} />
                 </Route>
+
+                {/* Order Pages */}
+                <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+                <Route path="/order-tracking" element={<OrderTrackingPage />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
