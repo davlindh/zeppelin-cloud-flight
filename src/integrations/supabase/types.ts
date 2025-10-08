@@ -62,6 +62,344 @@ export type Database = {
         }
         Relationships: []
       }
+      auctions: {
+        Row: {
+          bidders: number
+          category: Database["public"]["Enums"]["auction_category"]
+          condition: Database["public"]["Enums"]["auction_condition"]
+          created_at: string
+          current_bid: number
+          description: string | null
+          end_time: string
+          id: string
+          image: string
+          images: string[] | null
+          slug: string | null
+          starting_bid: number
+          status: string | null
+          title: string
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          bidders?: number
+          category: Database["public"]["Enums"]["auction_category"]
+          condition: Database["public"]["Enums"]["auction_condition"]
+          created_at?: string
+          current_bid?: number
+          description?: string | null
+          end_time: string
+          id?: string
+          image: string
+          images?: string[] | null
+          slug?: string | null
+          starting_bid: number
+          status?: string | null
+          title: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          bidders?: number
+          category?: Database["public"]["Enums"]["auction_category"]
+          condition?: Database["public"]["Enums"]["auction_condition"]
+          created_at?: string
+          current_bid?: number
+          description?: string | null
+          end_time?: string
+          id?: string
+          image?: string
+          images?: string[] | null
+          slug?: string | null
+          starting_bid?: number
+          status?: string | null
+          title?: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
+      bid_history: {
+        Row: {
+          amount: number
+          auction_id: string
+          bid_type: string | null
+          bidder: string
+          bidder_email: string | null
+          created_at: string
+          id: string
+          is_auto_bid: boolean | null
+          time: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          bid_type?: string | null
+          bidder: string
+          bidder_email?: string | null
+          created_at?: string
+          id?: string
+          is_auto_bid?: boolean | null
+          time?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          bid_type?: string | null
+          bidder?: string
+          bidder_email?: string | null
+          created_at?: string
+          id?: string
+          is_auto_bid?: boolean | null
+          time?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bid_history_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          agreed_to_terms: boolean
+          created_at: string
+          customer_email: string
+          customer_message: string
+          customer_name: string
+          customer_phone: string
+          customizations: Json
+          id: string
+          selected_date: string
+          selected_time: string
+          service_id: string
+          status: Database["public"]["Enums"]["booking_status"]
+          total_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          agreed_to_terms?: boolean
+          created_at?: string
+          customer_email: string
+          customer_message: string
+          customer_name: string
+          customer_phone: string
+          customizations?: Json
+          id?: string
+          selected_date: string
+          selected_time: string
+          service_id: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agreed_to_terms?: boolean
+          created_at?: string
+          customer_email?: string
+          customer_message?: string
+          customer_name?: string
+          customer_phone?: string
+          customizations?: Json
+          id?: string
+          selected_date?: string
+          selected_time?: string
+          service_id?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_name: string
+          id: string
+          is_active: boolean | null
+          name: string
+          parent_category_id: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          parent_category_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          parent_category_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_category_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      category_metadata: {
+        Row: {
+          category_id: string | null
+          color_scheme: Json | null
+          created_at: string
+          icon_name: string | null
+          id: string
+          image_url: string | null
+          search_keywords: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          color_scheme?: Json | null
+          created_at?: string
+          icon_name?: string | null
+          id?: string
+          image_url?: string | null
+          search_keywords?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          color_scheme?: Json | null
+          created_at?: string
+          icon_name?: string | null
+          id?: string
+          image_url?: string | null
+          search_keywords?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_metadata_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      communication_requests: {
+        Row: {
+          additional_data: Json | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          estimated_response_time: string | null
+          id: string
+          message: string
+          provider_email: string
+          provider_id: string
+          provider_name: string
+          provider_response: string | null
+          reference_number: string
+          response_timestamp: string | null
+          service_id: string | null
+          service_name: string | null
+          service_price: number | null
+          status: Database["public"]["Enums"]["communication_status"]
+          subject: string | null
+          timestamp: string
+          type: Database["public"]["Enums"]["communication_type"]
+          updated_at: string
+        }
+        Insert: {
+          additional_data?: Json | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          estimated_response_time?: string | null
+          id?: string
+          message: string
+          provider_email: string
+          provider_id: string
+          provider_name: string
+          provider_response?: string | null
+          reference_number: string
+          response_timestamp?: string | null
+          service_id?: string | null
+          service_name?: string | null
+          service_price?: number | null
+          status?: Database["public"]["Enums"]["communication_status"]
+          subject?: string | null
+          timestamp?: string
+          type: Database["public"]["Enums"]["communication_type"]
+          updated_at?: string
+        }
+        Update: {
+          additional_data?: Json | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          estimated_response_time?: string | null
+          id?: string
+          message?: string
+          provider_email?: string
+          provider_id?: string
+          provider_name?: string
+          provider_response?: string | null
+          reference_number?: string
+          response_timestamp?: string | null
+          service_id?: string | null
+          service_name?: string | null
+          service_price?: number | null
+          status?: Database["public"]["Enums"]["communication_status"]
+          subject?: string | null
+          timestamp?: string
+          type?: Database["public"]["Enums"]["communication_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communication_requests_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       draft_submissions: {
         Row: {
           created_at: string
@@ -279,6 +617,201 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      product_reviews: {
+        Row: {
+          comment: string
+          created_at: string
+          helpful_votes: number | null
+          id: string
+          product_id: string
+          rating: number
+          reviewer_email: string | null
+          reviewer_name: string
+          title: string | null
+          updated_at: string
+          verified_purchase: boolean | null
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          helpful_votes?: number | null
+          id?: string
+          product_id: string
+          rating: number
+          reviewer_email?: string | null
+          reviewer_name: string
+          title?: string | null
+          updated_at?: string
+          verified_purchase?: boolean | null
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          helpful_votes?: number | null
+          id?: string
+          product_id?: string
+          rating?: number
+          reviewer_email?: string | null
+          reviewer_name?: string
+          title?: string | null
+          updated_at?: string
+          verified_purchase?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          material: string | null
+          price_adjustment: number | null
+          product_id: string
+          size: string | null
+          sku: string | null
+          stock_quantity: number | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          material?: string | null
+          price_adjustment?: number | null
+          product_id: string
+          size?: string | null
+          sku?: string | null
+          stock_quantity?: number | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          material?: string | null
+          price_adjustment?: number | null
+          product_id?: string
+          size?: string | null
+          sku?: string | null
+          stock_quantity?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          article_number: string | null
+          barcode: string | null
+          category_id: string | null
+          cost_price: number | null
+          created_at: string
+          description: string
+          features: string[] | null
+          id: string
+          image: string
+          images: string[] | null
+          in_stock: boolean | null
+          is_stock_item: boolean | null
+          original_price: number | null
+          product_brand: string | null
+          product_group: string | null
+          product_type: string | null
+          rating: number | null
+          reviews: number | null
+          selling_price: number
+          slug: string | null
+          stock_quantity: number | null
+          supplier: string | null
+          tags: string[] | null
+          tax_rate: number | null
+          title: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          article_number?: string | null
+          barcode?: string | null
+          category_id?: string | null
+          cost_price?: number | null
+          created_at?: string
+          description: string
+          features?: string[] | null
+          id?: string
+          image?: string
+          images?: string[] | null
+          in_stock?: boolean | null
+          is_stock_item?: boolean | null
+          original_price?: number | null
+          product_brand?: string | null
+          product_group?: string | null
+          product_type?: string | null
+          rating?: number | null
+          reviews?: number | null
+          selling_price: number
+          slug?: string | null
+          stock_quantity?: number | null
+          supplier?: string | null
+          tags?: string[] | null
+          tax_rate?: number | null
+          title: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          article_number?: string | null
+          barcode?: string | null
+          category_id?: string | null
+          cost_price?: number | null
+          created_at?: string
+          description?: string
+          features?: string[] | null
+          id?: string
+          image?: string
+          images?: string[] | null
+          in_stock?: boolean | null
+          is_stock_item?: boolean | null
+          original_price?: number | null
+          product_brand?: string | null
+          product_group?: string | null
+          product_type?: string | null
+          rating?: number | null
+          reviews?: number | null
+          selling_price?: number
+          slug?: string | null
+          stock_quantity?: number | null
+          supplier?: string | null
+          tags?: string[] | null
+          tax_rate?: number | null
+          title?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_access: {
         Row: {
@@ -642,6 +1175,231 @@ export type Database = {
         }
         Relationships: []
       }
+      service_portfolio_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          image: string
+          provider_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          image: string
+          provider_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image?: string
+          provider_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_portfolio_items_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_providers: {
+        Row: {
+          avatar: string
+          bio: string
+          certifications: string[] | null
+          completed_projects: number | null
+          created_at: string
+          email: string
+          experience: string
+          id: string
+          location: string
+          name: string
+          phone: string
+          rating: number
+          response_time: string | null
+          reviews: number
+          slug: string | null
+          specialties: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          avatar: string
+          bio: string
+          certifications?: string[] | null
+          completed_projects?: number | null
+          created_at?: string
+          email: string
+          experience: string
+          id?: string
+          location: string
+          name: string
+          phone: string
+          rating?: number
+          response_time?: string | null
+          reviews?: number
+          slug?: string | null
+          specialties?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string
+          bio?: string
+          certifications?: string[] | null
+          completed_projects?: number | null
+          created_at?: string
+          email?: string
+          experience?: string
+          id?: string
+          location?: string
+          name?: string
+          phone?: string
+          rating?: number
+          response_time?: string | null
+          reviews?: number
+          slug?: string | null
+          specialties?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_reviews: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          comment: string
+          created_at: string
+          date: string
+          id: string
+          rating: number
+          service_id: string
+          verified: boolean
+        }
+        Insert: {
+          client_email?: string | null
+          client_name: string
+          comment: string
+          created_at?: string
+          date?: string
+          id?: string
+          rating: number
+          service_id: string
+          verified?: boolean
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          comment?: string
+          created_at?: string
+          date?: string
+          id?: string
+          rating?: number
+          service_id?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_reviews_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          available: boolean
+          available_times: string[] | null
+          category: Database["public"]["Enums"]["service_category"]
+          created_at: string
+          description: string
+          duration: string
+          features: string[] | null
+          id: string
+          image: string
+          images: string[] | null
+          location: string
+          provider: string
+          provider_id: string | null
+          provider_rating: number | null
+          rating: number
+          response_time: string | null
+          reviews: number
+          slug: string | null
+          starting_price: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          available_times?: string[] | null
+          category: Database["public"]["Enums"]["service_category"]
+          created_at?: string
+          description: string
+          duration: string
+          features?: string[] | null
+          id?: string
+          image: string
+          images?: string[] | null
+          location: string
+          provider: string
+          provider_id?: string | null
+          provider_rating?: number | null
+          rating?: number
+          response_time?: string | null
+          reviews?: number
+          slug?: string | null
+          starting_price: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          available_times?: string[] | null
+          category?: Database["public"]["Enums"]["service_category"]
+          created_at?: string
+          description?: string
+          duration?: string
+          features?: string[] | null
+          id?: string
+          image?: string
+          images?: string[] | null
+          location?: string
+          provider?: string
+          provider_id?: string | null
+          provider_rating?: number | null
+          rating?: number
+          response_time?: string | null
+          reviews?: number
+          slug?: string | null
+          starting_price?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sponsors: {
         Row: {
           contact_email: string | null
@@ -756,6 +1514,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_priority: boolean | null
+          item_id: string
+          item_type: string
+          notes: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_priority?: boolean | null
+          item_id: string
+          item_type: string
+          notes?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_priority?: boolean | null
+          item_id?: string
+          item_type?: string
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -793,13 +1584,64 @@ export type Database = {
         Args: { email_to_check: string }
         Returns: boolean
       }
+      place_bid: {
+        Args: { p_amount: number; p_auction_id: string; p_bidder: string }
+        Returns: {
+          message: string
+          new_bidder_count: number
+          new_current_bid: number
+          success: boolean
+        }[]
+      }
       set_session_context: {
         Args: { device_fingerprint: string; session_id: string }
         Returns: undefined
       }
     }
     Enums: {
-      [_ in never]: never
+      auction_category:
+        | "electronics"
+        | "fashion"
+        | "home"
+        | "sports"
+        | "books"
+        | "art"
+        | "collectibles"
+        | "automotive"
+      auction_condition: "new" | "like-new" | "good" | "fair" | "poor"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+      communication_status:
+        | "sent"
+        | "delivered"
+        | "read"
+        | "responded"
+        | "completed"
+      communication_type: "message" | "consultation" | "quote"
+      product_category:
+        | "electronics"
+        | "clothing"
+        | "home"
+        | "sports"
+        | "books"
+        | "beauty"
+        | "toys"
+        | "automotive"
+      service_category:
+        | "photography"
+        | "design"
+        | "consulting"
+        | "tutoring"
+        | "fitness"
+        | "beauty"
+        | "home-services"
+        | "event-planning"
+        | "legal"
+        | "accounting"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -926,6 +1768,55 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      auction_category: [
+        "electronics",
+        "fashion",
+        "home",
+        "sports",
+        "books",
+        "art",
+        "collectibles",
+        "automotive",
+      ],
+      auction_condition: ["new", "like-new", "good", "fair", "poor"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+      communication_status: [
+        "sent",
+        "delivered",
+        "read",
+        "responded",
+        "completed",
+      ],
+      communication_type: ["message", "consultation", "quote"],
+      product_category: [
+        "electronics",
+        "clothing",
+        "home",
+        "sports",
+        "books",
+        "beauty",
+        "toys",
+        "automotive",
+      ],
+      service_category: [
+        "photography",
+        "design",
+        "consulting",
+        "tutoring",
+        "fitness",
+        "beauty",
+        "home-services",
+        "event-planning",
+        "legal",
+        "accounting",
+      ],
+    },
   },
 } as const
