@@ -532,6 +532,206 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          item_sku: string | null
+          item_title: string
+          item_type: Database["public"]["Enums"]["order_item_type"]
+          metadata: Json | null
+          order_id: string
+          quantity: number
+          tax_rate: number | null
+          total_price: number
+          unit_price: number
+          variant_details: Json | null
+          variant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          item_sku?: string | null
+          item_title: string
+          item_type: Database["public"]["Enums"]["order_item_type"]
+          metadata?: Json | null
+          order_id: string
+          quantity?: number
+          tax_rate?: number | null
+          total_price: number
+          unit_price: number
+          variant_details?: Json | null
+          variant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          item_sku?: string | null
+          item_title?: string
+          item_type?: Database["public"]["Enums"]["order_item_type"]
+          metadata?: Json | null
+          order_id?: string
+          quantity?: number
+          tax_rate?: number | null
+          total_price?: number
+          unit_price?: number
+          variant_details?: Json | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_status_history: {
+        Row: {
+          changed_by: string | null
+          changed_by_type: string | null
+          created_at: string
+          id: string
+          new_status: Database["public"]["Enums"]["order_status"]
+          notes: string | null
+          old_status: Database["public"]["Enums"]["order_status"] | null
+          order_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          changed_by_type?: string | null
+          created_at?: string
+          id?: string
+          new_status: Database["public"]["Enums"]["order_status"]
+          notes?: string | null
+          old_status?: Database["public"]["Enums"]["order_status"] | null
+          order_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          changed_by_type?: string | null
+          created_at?: string
+          id?: string
+          new_status?: Database["public"]["Enums"]["order_status"]
+          notes?: string | null
+          old_status?: Database["public"]["Enums"]["order_status"] | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          admin_notes: string | null
+          billing_address: Json | null
+          cancelled_at: string | null
+          carrier: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_notes: string | null
+          customer_phone: string | null
+          delivered_at: string | null
+          discount_amount: number
+          id: string
+          order_number: string
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          shipped_at: string | null
+          shipping_address: Json
+          shipping_amount: number
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          tracking_number: string | null
+          tracking_url: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          billing_address?: Json | null
+          cancelled_at?: string | null
+          carrier?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_notes?: string | null
+          customer_phone?: string | null
+          delivered_at?: string | null
+          discount_amount?: number
+          id?: string
+          order_number: string
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          shipped_at?: string | null
+          shipping_address: Json
+          shipping_amount?: number
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          tax_amount?: number
+          total_amount: number
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          billing_address?: Json | null
+          cancelled_at?: string | null
+          carrier?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_notes?: string | null
+          customer_phone?: string | null
+          delivered_at?: string | null
+          discount_amount?: number
+          id?: string
+          order_number?: string
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          shipped_at?: string | null
+          shipping_address?: Json
+          shipping_amount?: number
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       participant_media: {
         Row: {
           category: string
@@ -1622,6 +1822,10 @@ export type Database = {
         }
         Returns: Json
       }
+      generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_session_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1688,6 +1892,15 @@ export type Database = {
         | "responded"
         | "completed"
       communication_type: "message" | "consultation" | "quote"
+      order_item_type: "product" | "auction" | "service"
+      order_status:
+        | "pending"
+        | "paid"
+        | "processing"
+        | "shipped"
+        | "delivered"
+        | "cancelled"
+        | "refunded"
       product_category:
         | "electronics"
         | "clothing"
@@ -1862,6 +2075,16 @@ export const Constants = {
         "completed",
       ],
       communication_type: ["message", "consultation", "quote"],
+      order_item_type: ["product", "auction", "service"],
+      order_status: [
+        "pending",
+        "paid",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+      ],
       product_category: [
         "electronics",
         "clothing",

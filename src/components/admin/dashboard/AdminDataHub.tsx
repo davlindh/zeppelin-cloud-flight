@@ -98,7 +98,7 @@ const AdminDataHub: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, order_number, item_title, total_amount, status, created_at')
+        .select('id, order_number, total_amount, status, created_at')
         .order('created_at', { ascending: false })
         .limit(50);
       

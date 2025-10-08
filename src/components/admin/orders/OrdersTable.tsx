@@ -29,25 +29,30 @@ import { supabase } from '@/integrations/supabase/client';
 interface DatabaseOrder {
   id: string;
   order_number: string;
-  item_title: string;
-  item_type: string;
-  quantity: number;
-  unit_price: number;
+  customer_name: string;
+  customer_email: string;
+  customer_phone?: string;
   total_amount: number;
   tax_amount: number;
   shipping_amount: number;
   status: string;
+  payment_status?: string;
   created_at: string;
   updated_at: string;
   shipping_address: any;
-  billing_address: any;
-  notes?: string;
+  billing_address?: any;
+  customer_notes?: string;
+  admin_notes?: string;
+  tracking_number?: string;
   user_id?: string;
-  users?: {
-    full_name?: string;
-    email?: string;
-    phone?: string;
-  };
+  order_items?: Array<{
+    id: string;
+    item_title: string;
+    item_type: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+  }>;
 }
 
 const getStatusVariant = (status: string) => {
@@ -81,10 +86,13 @@ export function OrdersTable() {
           .from('orders')
           .select(`
             *,
-            users (
-              full_name,
-              email,
-              phone
+            order_items (
+              id,
+              item_title,
+              item_type,
+              quantity,
+              unit_price,
+              total_price
             )
           `)
           .order('created_at', { ascending: false });
@@ -170,23 +178,23 @@ export function OrdersTable() {
                   <TableCell>
                     <div>
                       <p className="font-medium">
-                        {order.users?.full_name || 'Unknown Customer'}
+                        {order.customer_name}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {order.users?.email || 'No email'}
+                        {order.customer_email}
                       </p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{order.item_title}</p>
+                      <p className="font-medium">{order.order_items?.[0]?.item_title || 'N/A'}</p>
                       <p className="text-sm text-muted-foreground">
-                        Qty: {order.quantity}
+                        Qty: {order.order_items?.[0]?.quantity || 0}
                       </p>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{order.item_type}</Badge>
+                    <Badge variant="outline">{order.order_items?.[0]?.item_type || 'N/A'}</Badge>
                   </TableCell>
                   <TableCell>${order.total_amount.toFixed(2)}</TableCell>
                   <TableCell>
@@ -210,13 +218,13 @@ export function OrdersTable() {
                           View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleEmailCustomer(order.users?.email)}
+                          onClick={() => handleEmailCustomer(order.customer_email)}
                         >
                           <Mail className="mr-2 h-4 w-4" />
                           Email Customer
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleCallCustomer(order.users?.phone)}
+                          onClick={() => handleCallCustomer(order.customer_phone)}
                         >
                           <Phone className="mr-2 h-4 w-4" />
                           Call Customer
@@ -248,15 +256,15 @@ export function OrdersTable() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <p className="font-semibold">Name</p>
-                      <p>{selectedOrder.users?.full_name || 'Unknown Customer'}</p>
+                      <p>{selectedOrder.customer_name}</p>
                     </div>
                     <div>
                       <p className="font-semibold">Email</p>
-                      <p>{selectedOrder.users?.email || 'No email provided'}</p>
+                      <p>{selectedOrder.customer_email}</p>
                     </div>
                     <div>
                       <p className="font-semibold">Phone</p>
-                      <p>{selectedOrder.users?.phone || 'No phone provided'}</p>
+                      <p>{selectedOrder.customer_phone || 'No phone provided'}</p>
                     </div>
                     <div>
                       <p className="font-semibold">Customer ID</p>
@@ -266,7 +274,7 @@ export function OrdersTable() {
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
-                      onClick={() => handleEmailCustomer(selectedOrder.users?.email)}
+                      onClick={() => handleEmailCustomer(selectedOrder.customer_email)}
                     >
                       <Mail className="mr-2 h-4 w-4" />
                       Email Customer
@@ -274,7 +282,7 @@ export function OrdersTable() {
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => handleCallCustomer(selectedOrder.users?.phone)}
+                      onClick={() => handleCallCustomer(selectedOrder.customer_phone)}
                     >
                       <Phone className="mr-2 h-4 w-4" />
                       Call Customer
@@ -302,19 +310,19 @@ export function OrdersTable() {
                     </div>
                     <div>
                       <p className="font-semibold">Item Title</p>
-                      <p>{selectedOrder.item_title}</p>
+                      <p>{selectedOrder.order_items?.[0]?.item_title || 'N/A'}</p>
                     </div>
                     <div>
                       <p className="font-semibold">Item Type</p>
-                      <Badge variant="outline">{selectedOrder.item_type}</Badge>
+                      <Badge variant="outline">{selectedOrder.order_items?.[0]?.item_type || 'N/A'}</Badge>
                     </div>
                     <div>
                       <p className="font-semibold">Quantity</p>
-                      <p>{selectedOrder.quantity}</p>
+                      <p>{selectedOrder.order_items?.[0]?.quantity || 0}</p>
                     </div>
                     <div>
                       <p className="font-semibold">Unit Price</p>
-                      <p>${selectedOrder.unit_price.toFixed(2)}</p>
+                      <p>${selectedOrder.order_items?.[0]?.unit_price?.toFixed(2) || '0.00'}</p>
                     </div>
                   </div>
                   
@@ -323,8 +331,8 @@ export function OrdersTable() {
                     <h4 className="font-semibold mb-2">Pricing Breakdown</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span>Subtotal ({selectedOrder.quantity} × ${selectedOrder.unit_price.toFixed(2)})</span>
-                        <span>${(selectedOrder.quantity * selectedOrder.unit_price).toFixed(2)}</span>
+                        <span>Subtotal</span>
+                        <span>${(selectedOrder.order_items?.[0]?.total_price || 0).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Tax</span>
@@ -341,11 +349,11 @@ export function OrdersTable() {
                     </div>
                   </div>
 
-                  {selectedOrder.notes && (
+                  {selectedOrder.customer_notes && (
                     <div>
-                      <p className="font-semibold">Notes</p>
+                      <p className="font-semibold">Customer Notes</p>
                       <p className="text-sm bg-muted p-2 rounded">
-                        {selectedOrder.notes}
+                        {selectedOrder.customer_notes}
                       </p>
                     </div>
                   )}
