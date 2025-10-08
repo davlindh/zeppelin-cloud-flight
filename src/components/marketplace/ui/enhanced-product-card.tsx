@@ -4,15 +4,15 @@ import { ShoppingCart, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FloatingActionButtons } from '@/components/ui/floating-action-buttons';
-import { useCart } from '@/contexts/CartContext';
-import { useQuickActions } from '@/hooks/useQuickActions';
+import { FloatingActionButtons } from '@/components/marketplace/ui/floating-action-buttons';
+import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
 import { useToast } from '@/hooks/use-toast';
-import { getProductStatusBadge } from '@/utils/productUtils';
-import { getResponsiveImageUrl, getImageAlt, getImageUrl } from '@/utils/imageUtils';
+import { getProductStatusBadge , calculateProductAnalytics } from '@/utils/marketplace/productUtils';
+import { getResponsiveImageUrl, getImageAlt, getImageUrl } from '@/utils/marketplace/imageUtils';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/unified';
-import { calculateProductAnalytics } from '@/utils/productUtils';
+
 
 interface EnhancedProductCardProps {
   // Support both Product object and individual props for flexibility

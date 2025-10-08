@@ -2,7 +2,7 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MobileFilterSheet } from '@/components/ui/mobile-filter-sheet';
+import { MobileFilterSheet } from '@/components/marketplace/ui/mobile-filter-sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 

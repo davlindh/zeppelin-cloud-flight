@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QuickConsultationForm } from './QuickConsultationForm';
 import { InstantQuoteForm } from './InstantQuoteForm';
 import { DirectMessageForm } from './DirectMessageForm';
-import { SecurityNotice } from '@/components/security/SecurityNotice';
+import { SecurityNotice } from '@/components/marketplace/security/SecurityNotice';
 
 interface GuestCommunicationProps {
   providerId: string;

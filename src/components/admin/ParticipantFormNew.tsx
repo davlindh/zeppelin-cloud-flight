@@ -84,7 +84,7 @@ const parseSocialLinks = (linksString: string) => {
 };
 
 export const ParticipantFormNew = ({ onClose, participantId, initialData }: ParticipantFormProps) => {
-  // eslint-disable-next-line complexity
+   
   const onSubmit = async (data: Record<string, unknown>) => {
     const name = data.name as string;
     const slug = (data.slug as string) || (name ? generateSlug(name) : '');

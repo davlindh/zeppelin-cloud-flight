@@ -37,8 +37,8 @@ export const parseHSL = (hslString: string): HSLColor => {
   }
   
   const h = parseFloat(values[0] || '0');
-  const s = parseFloat((values[1] || '0').replace('%', '));
-  const l = parseFloat((values[2] || '0').replace('%', '));
+  const s = parseFloat((values[1] || '0').replace('%', ''));
+  const l = parseFloat((values[2] || '0').replace('%', ''));
   
   return { h, s, l };
 };
@@ -200,11 +200,7 @@ export const generateAccessibleVariant = (
     }
     
     // Move lightness towards better contrast
-    if (isDarkBackground) {
-      variant.l = Math.min(100, variant.l + 1);
-    } else {
-      variant.l = Math.max(0, variant.l - 1);
-    }
+    variant.l = isDarkBackground ? Math.min(100, variant.l + 1) : Math.max(0, variant.l - 1);
   }
   
   return variant;

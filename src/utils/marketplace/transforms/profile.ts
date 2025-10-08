@@ -14,7 +14,7 @@ export const calculateProfileCompletion = (profile: UserProfile | null): number 
     profile.address
   ];
 
-  const completedFields = fields.filter(field => field && field.trim() !== ').length;
+  const completedFields = fields.filter(field => field && field.trim() !== '').length;
   return Math.round((completedFields / fields.length) * 100);
 };
 
@@ -24,7 +24,7 @@ export const getUserInitials = (profile: UserProfile | null, email?: string | nu
     const names = profile.full_name.split(' ');
     return names
       .map(name => name[0])
-      .join(')
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   }

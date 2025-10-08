@@ -4,20 +4,20 @@ import { Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CountdownTimer } from '@/components/auctions/CountdownTimer';
-import { EnhancedBidDialog } from '@/components/auctions/EnhancedBidDialog';
-import { FloatingActionButtons } from '@/components/ui/floating-action-buttons';
-import { EnhancedStatusBadges } from '@/components/auctions/EnhancedStatusBadges';
-import { AuctionAnalyticsDisplay } from '@/components/auctions/AuctionAnalyticsDisplay';
-import { useQuickActions } from '@/hooks/useQuickActions';
-import { useGuestBidding } from '@/hooks/useGuestBidding';
-import { useCategoryInfo } from '@/utils/dynamicCategoryUtils';
-import { getResponsiveImageUrl, getImageAlt } from '@/utils/imageUtils';
+import { CountdownTimer } from '@/components/marketplace/auctions/CountdownTimer';
+import { EnhancedBidDialog } from '@/components/marketplace/auctions/EnhancedBidDialog';
+import { FloatingActionButtons } from '@/components/marketplace/ui/floating-action-buttons';
+import { EnhancedStatusBadges } from '@/components/marketplace/auctions/EnhancedStatusBadges';
+import { AuctionAnalyticsDisplay } from '@/components/marketplace/auctions/AuctionAnalyticsDisplay';
+import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
+import { useGuestBidding } from '@/hooks/marketplace/useGuestBidding';
+import { useCategoryInfo } from '@/utils/marketplace/dynamicCategoryUtils';
+import { getResponsiveImageUrl, getImageAlt } from '@/utils/marketplace/imageUtils';
 import { 
   calculateAuctionAnalytics, 
   getEnhancedStatus, 
   getConditionStyling 
-} from '@/utils/auctionUtils';
+} from '@/utils/marketplace/auctionUtils';
 import { cn } from '@/lib/utils';
 
 interface AuctionCardProps {
@@ -150,7 +150,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
                   onLoad={() => setImageLoaded(true)}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = getResponsiveImageUrl(undefined);
+                    target.src = getResponsiveImageUrl();
                   }}
                 />
               </picture>

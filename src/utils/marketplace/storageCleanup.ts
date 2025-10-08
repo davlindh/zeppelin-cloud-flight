@@ -68,6 +68,10 @@ export const globalCleanupManager = new StorageCleanupManager();
 /**
  * Hook for component-level cleanup management
  */
+const logCleanup = async (oldUrl: string | null) => {
+  console.log('Cleanup queued for:', oldUrl);
+};
+
 export const useStorageCleanup = () => {
   const cleanupManager = new StorageCleanupManager();
 
@@ -80,17 +84,9 @@ export const useStorageCleanup = () => {
     };
   };
 
-  const replaceWithCleanup = async (
-    oldUrl: string | null
-  ) => {
-    // Implementation would use imageManager.replaceImage
-    // which already handles cleanup
-    console.log('Cleanup queued for:', oldUrl);
-  };
-
   return {
     cleanupManager,
     cleanupOnUnmount,
-    replaceWithCleanup,
+    replaceWithCleanup: logCleanup,
   };
 };

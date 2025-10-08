@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { VisualCalendar } from './VisualCalendar';
-import { SocialProofBadge } from '@/components/ui/social-proof-badge';
-import { useSocialProof } from '@/hooks/useSocialProof';
+import { SocialProofBadge } from '@/components/marketplace/ui/social-proof-badge';
+import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
 
 interface EnhancedDateTimeSelectionProps {
   serviceId: string;

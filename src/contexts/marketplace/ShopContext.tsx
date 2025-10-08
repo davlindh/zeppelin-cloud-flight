@@ -95,11 +95,7 @@ const shopReducer = (state: ShopState, action: ShopAction): ShopState => {
           updatedState.selectedCategory = 'all';
           break;
         case 'brands':
-          if (value) {
-            updatedState.filters.brands = state.filters.brands.filter(brand => brand !== value);
-          } else {
-            updatedState.filters.brands = [];
-          }
+          updatedState.filters.brands = value ? state.filters.brands.filter(brand => brand !== value) : [];
           break;
         case 'priceRange':
           updatedState.filters.priceRange = [0, 10000];

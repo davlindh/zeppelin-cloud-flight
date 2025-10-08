@@ -5,11 +5,11 @@ import { Star, User, MapPin, Clock, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { QuickActionsOverlay } from '@/components/ui/quick-actions-overlay';
-import { SocialProofBadge } from '@/components/ui/social-proof-badge';
-import { getResponsiveImageUrl, getImageAlt } from '@/utils/imageUtils';
-import { useQuickActions } from '@/hooks/useQuickActions';
-import { useSocialProof } from '@/hooks/useSocialProof';
+import { QuickActionsOverlay } from '@/components/marketplace/ui/quick-actions-overlay';
+import { SocialProofBadge } from '@/components/marketplace/ui/social-proof-badge';
+import { getResponsiveImageUrl, getImageAlt } from '@/utils/marketplace/imageUtils';
+import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
+import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
 
 interface UnifiedServiceCardProps {
   id: string;

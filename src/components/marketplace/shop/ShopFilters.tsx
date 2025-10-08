@@ -2,8 +2,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-import { useShop } from '@/contexts/ShopContext';
-import { useDynamicCategoryNames } from '@/hooks/useDynamicCategories';
+import { useShop } from '@/contexts/marketplace/ShopContext';
+import { useDynamicCategoryNames } from '@/hooks/marketplace/useDynamicCategories';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ShopFiltersProps {

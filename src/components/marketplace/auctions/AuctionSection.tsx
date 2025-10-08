@@ -2,13 +2,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { EnhancedAuctionCard } from '@/components/ui/enhanced-auction-card';
-import { AuctionSkeleton } from '@/components/ui/auction-skeleton';
-import { AsyncErrorBoundary } from '@/components/ui/async-error-boundary';
-import { useAuctions } from '@/hooks/useAuctions';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { EnhancedAuctionCard } from '@/components/marketplace/ui/enhanced-auction-card';
+import { AuctionSkeleton } from '@/components/marketplace/ui/auction-skeleton';
+import { AsyncErrorBoundary } from '@/components/marketplace/ui/async-error-boundary';
+import { useAuctions } from '@/hooks/marketplace/useAuctions';
+import { useErrorHandler } from '@/hooks/marketplace/useErrorHandler';
 import { RefreshCw, AlertCircle } from 'lucide-react';
-import { getImageUrl } from '@/utils/imageUtils';
+import { getImageUrl } from '@/utils/marketplace/imageUtils';
 
 const AuctionSection = () => {
   const { handleError } = useErrorHandler();

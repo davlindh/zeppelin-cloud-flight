@@ -52,7 +52,7 @@ export const formatTimeRemaining = (endTime: Date): string => {
   
   if (hours > 24) {
     const days = Math.floor(hours / 24);
-    return `${days} day${days !== 1 ? 's' : '}`;
+    return `${days} day${days !== 1 ? 's' : ''}`;
   } else if (hours > 0) {
     return `${hours}h ${minutes}m`;
   } else {

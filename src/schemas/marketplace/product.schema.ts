@@ -161,7 +161,7 @@ export const CreateProductSchema = BaseProductSchema.omit({
   original_price: z.union([
     z.number().positive(),
     z.string().transform((val) => {
-      if (!val) return undefined;
+      if (!val) return;
       const num = parseFloat(val);
       if (isNaN(num) || num <= 0) {
         throw new Error('Original price must be a positive number');
@@ -216,7 +216,7 @@ export const UpdateProductSchema = BaseProductSchema.omit({
   original_price: z.union([
     z.number().positive(),
     z.string().transform((val) => {
-      if (!val) return undefined;
+      if (!val) return;
       const num = parseFloat(val);
       if (isNaN(num) || num <= 0) {
         throw new Error('Original price must be a positive number');
@@ -477,7 +477,7 @@ export const calculateDiscountPercentage = (originalPrice: number, currentPrice:
 export const generateProductSlug = (title: string): string => {
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, ')
+    .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();

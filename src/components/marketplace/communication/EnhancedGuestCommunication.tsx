@@ -9,9 +9,9 @@ import { QuickConsultationForm } from './QuickConsultationForm';
 import { InstantQuoteForm } from './InstantQuoteForm';
 import { CommunicationReceipt } from './CommunicationReceipt';
 import { CommunicationTracker } from './CommunicationTracker';
-import { useCommunicationTracking } from '@/hooks/useCommunicationTracking';
-import { useServiceProvider } from '@/hooks/useServiceProvider';
-import { CommunicationRequest } from '@/types/communication';
+import { useCommunicationTracking } from '@/hooks/marketplace/useCommunicationTracking';
+import { useServiceProvider } from '@/hooks/marketplace/useServiceProvider';
+import { CommunicationRequest } from '@/types/marketplace/communication';
 
 interface EnhancedGuestCommunicationProps {
   providerId: string;

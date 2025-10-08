@@ -12,8 +12,8 @@ import { useAdaptiveTheme } from '@/contexts/ThemeContext';
 type ThemeMode = 'light' | 'dark' | 'system';
 type SeasonalMode = 'auto' | 'spring' | 'summer' | 'autumn' | 'winter' | 'off';
 type CategoryTheme = 'electronics' | 'fashion' | 'home' | 'sports' | 'books' | 'beauty' | 'default';
-import { useAdaptiveColors } from '@/hooks/useAdaptiveColors';
-import { toHSLString } from '@/utils/colorUtils';
+import { useAdaptiveColors } from '@/hooks/marketplace/useAdaptiveColors';
+import { toHSLString } from '@/utils/marketplace/colorUtils';
 
 interface ThemeCustomizerProps {
   className?: string;

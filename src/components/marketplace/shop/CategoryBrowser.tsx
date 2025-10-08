@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDynamicCategories } from '@/hooks/useDynamicCategories';
-import { useCategoryStats } from '@/hooks/useCategoryStats';
-import { getCategoryIconFromMetadata } from '@/utils/dynamicCategoryUtils';
+import { useDynamicCategories } from '@/hooks/marketplace/useDynamicCategories';
+import { useCategoryStats } from '@/hooks/marketplace/useCategoryStats';
+import { getCategoryIconFromMetadata } from '@/utils/marketplace/dynamicCategoryUtils';
 import { cn } from '@/lib/utils';
 
 export const CategoryBrowser: React.FC = () => {

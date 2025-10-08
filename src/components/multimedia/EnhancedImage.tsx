@@ -229,7 +229,7 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
 
   // Generate srcSet for responsive images
   const generateSrcSet = useMemo(() => {
-    if (!src) return undefined;
+    if (!src) return;
     
     // For Supabase storage URLs, generate responsive sizes
     if (src.includes('supabase') && (width || height)) {
@@ -240,7 +240,7 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
         .join(', ');
     }
     
-    return undefined;
+    return;
   }, [src, width, height]);
 
   return (

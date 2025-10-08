@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Search, TrendingUp, Clock, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useSearchHistory } from '@/hooks/useSearchHistory';
+import { useSearchHistory } from '@/hooks/marketplace/useSearchHistory';
 
 interface SearchSuggestionsProps {
   searchTerm: string;

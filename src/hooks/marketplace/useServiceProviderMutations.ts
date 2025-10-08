@@ -35,7 +35,7 @@ export const useServiceProviderMutations = () => {
           bio: data.bio,
           location: data.location,
           experience: data.experience,
-          avatar: data.avatar || ',
+          avatar: data.avatar || '',
           specialties: data.specialties || [],
           certifications: data.certifications || [],
           response_time: data.responseTime || '24 hours',

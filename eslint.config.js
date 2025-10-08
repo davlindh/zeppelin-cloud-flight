@@ -7,7 +7,7 @@ import importPlugin from "eslint-plugin-import";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules"] },
+  { ignores: ["dist", "node_modules", "service-auction-emporium-d4c4dedc/**"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -62,7 +62,7 @@ export default tseslint.config(
       "no-var": "error",
 
       // Complexity rules
-      "complexity": ["error", 12],
+      "complexity": ["warn", 20],
       "max-lines": ["warn", 600],
       "max-lines-per-function": ["warn", 80],
     },

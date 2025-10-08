@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
-import { RefreshCw } from 'lucide-react';
+import { AlertCircle , RefreshCw } from 'lucide-react';
+
 
 interface Props {
   children: React.ReactNode;

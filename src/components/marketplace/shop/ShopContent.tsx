@@ -1,8 +1,8 @@
 import React from 'react';
-import { useShop } from '@/contexts/ShopContext';
-import { useProducts } from '@/hooks/useProducts';
-import { useProductComparison } from '@/hooks/useProductComparison';
-import { sortProductsByAnalytics } from '@/utils/productUtils';
+import { useShop } from '@/contexts/marketplace/ShopContext';
+import { useProducts } from '@/hooks/marketplace/useProducts';
+import { useProductComparison } from '@/hooks/marketplace/useProductComparison';
+import { sortProductsByAnalytics } from '@/utils/marketplace/productUtils';
 import { ShopProductGrid } from './ShopProductGrid';
 import { CategoryBrowser } from './CategoryBrowser';
 import { AdvancedFilters } from './AdvancedFilters';
@@ -116,10 +116,7 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
     });
 
     // Apply sorting
-    if (['trending', 'best-deals', 'popularity', 'stock-velocity'].includes(state.sortBy)) {
-      return sortProductsByAnalytics(filtered, state.sortBy);
-    } else {
-      return filtered.sort((a, b) => {
+    return ['trending', 'best-deals', 'popularity', 'stock-velocity'].includes(state.sortBy) ? sortProductsByAnalytics(filtered, state.sortBy) : filtered.sort((a, b) => {
         switch (state.sortBy) {
           case 'price-low':
             return a.price - b.price;
@@ -131,7 +128,6 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
             return new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime();
         }
       });
-    }
   }, [products, state.filters, state.sortBy]);
 
   const handleQuickView = (productId: string) => {

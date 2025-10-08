@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MobileFilterSheet } from '@/components/ui/mobile-filter-sheet';
+import { MobileFilterSheet } from '@/components/marketplace/ui/mobile-filter-sheet';
 import { SlidersHorizontal, X } from 'lucide-react';
-import { useShop } from '@/contexts/ShopContext';
+import { useShop } from '@/contexts/marketplace/ShopContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useDynamicCategoryNames } from '@/hooks/useDynamicCategories';
+import { useDynamicCategoryNames } from '@/hooks/marketplace/useDynamicCategories';
 
 interface FilterOption {
   id: string;

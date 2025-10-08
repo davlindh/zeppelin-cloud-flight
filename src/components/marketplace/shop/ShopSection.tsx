@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { EnhancedProductCard } from '@/components/ui/enhanced-product-card';
-import { ProductSkeleton } from '@/components/ui/product-skeleton';
-import { ResponsiveGrid, AdvancedContainer, FluidSpacing } from '@/components/ui/advanced-layout';
+import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
+import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
+import { ResponsiveGrid, AdvancedContainer, FluidSpacing } from '@/components/marketplace/ui/advanced-layout';
 import { DensityProvider, DensityControl } from '@/contexts/DensityContext';
 import { Button } from '@/components/ui/button';
-import { AsyncErrorBoundary } from '@/components/ui/async-error-boundary';
-import { useProducts } from '@/hooks/useProducts';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { sortProductsByAnalytics } from '@/utils/productUtils';
+import { AsyncErrorBoundary } from '@/components/marketplace/ui/async-error-boundary';
+import { useProducts } from '@/hooks/marketplace/useProducts';
+import { useErrorHandler } from '@/hooks/marketplace/useErrorHandler';
+import { sortProductsByAnalytics } from '@/utils/marketplace/productUtils';
 
 const ShopSection = () => {
   const { handleError } = useErrorHandler();

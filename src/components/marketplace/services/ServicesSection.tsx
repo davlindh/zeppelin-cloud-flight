@@ -2,11 +2,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UnifiedServiceCard } from '@/components/ui/unified-service-card';
-import { ServiceLoading } from '@/components/ui/service-loading';
-import { ServiceError } from '@/components/ui/service-error';
-import { useServices } from '@/hooks/useServices';
-import { getImageUrl } from '@/utils/imageUtils';
+import { UnifiedServiceCard } from '@/components/marketplace/ui/unified-service-card';
+import { ServiceLoading } from '@/components/marketplace/ui/service-loading';
+import { ServiceError } from '@/components/marketplace/ui/service-error';
+import { useServices } from '@/hooks/marketplace/useServices';
+import { getImageUrl } from '@/utils/marketplace/imageUtils';
 
 const ServicesSection = () => {
   // Fetch featured services from database

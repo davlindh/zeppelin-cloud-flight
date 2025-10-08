@@ -5,10 +5,10 @@ import { Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CountdownTimer } from '@/components/auctions/CountdownTimer';
-import { FloatingActionButtons } from '@/components/ui/floating-action-buttons';
-import { useQuickActions } from '@/hooks/useQuickActions';
-import { getResponsiveImageUrl, getImageAlt } from '@/utils/imageUtils';
+import { CountdownTimer } from '@/components/marketplace/auctions/CountdownTimer';
+import { FloatingActionButtons } from '@/components/marketplace/ui/floating-action-buttons';
+import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
+import { getResponsiveImageUrl, getImageAlt } from '@/utils/marketplace/imageUtils';
 import { cn } from '@/lib/utils';
 
 interface EnhancedAuctionCardProps {

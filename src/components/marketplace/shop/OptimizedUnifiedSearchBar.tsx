@@ -4,10 +4,10 @@ import { Search, TrendingUp, X, Clock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useProducts } from '@/hooks/useProducts';
-import { useSearchHistory } from '@/hooks/useSearchHistory';
-import { useDynamicCategoryNames } from '@/hooks/useDynamicCategories';
-import { useShop } from '@/contexts/ShopContext';
+import { useProducts } from '@/hooks/marketplace/useProducts';
+import { useSearchHistory } from '@/hooks/marketplace/useSearchHistory';
+import { useDynamicCategoryNames } from '@/hooks/marketplace/useDynamicCategories';
+import { useShop } from '@/contexts/marketplace/ShopContext';
 
 interface OptimizedUnifiedSearchBarProps {
   placeholder?: string;

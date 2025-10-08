@@ -3,10 +3,10 @@ import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useWishlist } from '@/contexts/marketplace/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
-import { useProduct } from '@/hooks/useProducts';
+import { useProduct } from '@/hooks/marketplace/useProducts';
 
 interface QuickViewModalProps {
   productId: string | null;

@@ -4,7 +4,7 @@ import { Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useCustomerInfo } from '@/hooks/useCustomerInfo';
+import { useCustomerInfo } from '@/hooks/marketplace/useCustomerInfo';
 
 interface QuickConsultationFormProps {
   providerId: string;

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TrendingUp, DollarSign, Users, Clock } from 'lucide-react';
-import { AuctionAnalytics } from '@/utils/auctionUtils';
+import { AuctionAnalytics } from '@/utils/marketplace/auctionUtils';
 
 interface AuctionAnalyticsDisplayProps {
   analytics: AuctionAnalytics;

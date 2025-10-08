@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Clock } from 'lucide-react';
-import { AlertTriangle, TrendingUp} from 'lucide-react';
+import { Clock , AlertTriangle, TrendingUp} from 'lucide-react';
+
 
 interface StockUrgencyIndicatorProps {
   stockCount: number;

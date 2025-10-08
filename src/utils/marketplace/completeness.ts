@@ -190,7 +190,7 @@ export const checkProviderCompleteness = (provider: ProviderWithServices): Compl
   const critical: string[] = [];
   
   // Check avatar image
-  const hasProviderImage = !!provider.avatar && provider.avatar.trim() !== ';
+  const hasProviderImage = !!provider.avatar && provider.avatar.trim() !== '';
   if (!hasProviderImage) {
     missing.push('Avatar Image');
     critical.push('Avatar Image');

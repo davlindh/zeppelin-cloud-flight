@@ -1,6 +1,6 @@
 
-import type { Service } from '@/types/unified';
-import type { DatabaseService } from '@/types/serviceDatabase';
+import type { Service } from '@/types/marketplace/unified';
+import type { DatabaseService } from '@/types/marketplace/serviceDatabase';
 
 export const transformDatabaseService = (dbService: DatabaseService): Service => {
   console.log('Transforming database service:', dbService.id, 'Provider data:', dbService.service_providers);
@@ -13,14 +13,14 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
   const providerDetails = hasValidProviderData ? {
     id: dbService.service_providers!.id ?? dbService.provider_id ?? `provider-${dbService.id}`,
     name: dbService.service_providers!.name,
-    avatar: dbService.service_providers!.avatar ?? ',
+    avatar: dbService.service_providers!.avatar ?? '',
     rating: dbService.service_providers!.rating ?? 4.5,
     reviews: dbService.service_providers!.reviews ?? 0,
     experience: dbService.service_providers!.experience ?? '5+ years',
     location: dbService.service_providers!.location ?? dbService.location,
-    phone: dbService.service_providers!.phone ?? ',
+    phone: dbService.service_providers!.phone ?? '',
     email: dbService.service_providers!.email ?? '',
-    bio: dbService.service_providers!.bio ?? ',
+    bio: dbService.service_providers!.bio ?? '',
     specialties: dbService.service_providers!.specialties ?? [],
     certifications: dbService.service_providers!.certifications ?? [],
     responseTime: dbService.service_providers!.response_time ?? '24 hours',
@@ -31,12 +31,12 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
     // Fallback provider details when no provider data is available
     id: `provider-${dbService.id}`, // Generate a provider ID
     name: dbService.provider,
-    avatar: ',
+    avatar: '',
     rating: dbService.provider_rating ?? 4.5,
     reviews: 0,
     experience: '5+ years',
     location: dbService.location,
-    phone: ',
+    phone: '',
     email: '',
     bio: `Professional ${dbService.category} service provider`,
     specialties: [dbService.category],

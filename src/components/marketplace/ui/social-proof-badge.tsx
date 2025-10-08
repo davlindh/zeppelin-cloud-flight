@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Users } from 'lucide-react';
-import { Eye, TrendingUp } from 'lucide-react';
+import { Users , Eye, TrendingUp } from 'lucide-react';
+
 
 interface SocialProofBadgeProps {
   type: 'views' | 'activity' | 'trending';

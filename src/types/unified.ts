@@ -1,230 +1,190 @@
-// Unified type definitions - single source of truth for all data models
-// This file consolidates all frontend interfaces to eliminate duplication
 
-import type { MediaCategory, MediaType, BaseMediaItem, ParticipantMediaItem } from './media';
+// Unified type definitions with consistent string IDs and strict typing
 
-// ============= CORE CONTENT TYPES =============
-
-export interface ShowcaseCard {
+export interface BaseEntity {
   id: string;
-  slug: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProductVariant {
+  size?: string;
+  color?: string;
+  material?: string;
+  stock: number;
+}
+
+export interface Product extends BaseEntity {
   title: string;
   description: string;
-  imageUrl: string;
-  fullDescription?: string;
-  participants?: Array<{
+  price: number;
+  originalPrice?: number;
+  categoryId: string;
+  categoryName: string;
+  rating: number;
+  reviews: number;
+  inStock: boolean;
+  image: string | null;
+  images: string[];
+  variants: ProductVariant[];
+  features: string[];
+  brand: string;
+  tags: string[];
+  slug?: string;
+}
+
+export interface BidHistory {
+  bidder: string;
+  amount: number;
+  time: string;
+}
+
+export interface Auction extends BaseEntity {
+  title: string;
+  currentBid: number;
+  startingBid: number;
+  endTime: Date;
+  bidders: number;
+  category: string;
+  condition: string;
+  image: string | null;
+  bidHistory?: BidHistory[]; // Made optional for listing page
+  slug?: string;
+}
+
+export interface ServicePortfolioItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+}
+
+export interface ServiceReview {
+  id: string;
+  clientName: string;
+  rating: number;
+  comment: string;
+  date: string;
+  verified: boolean;
+}
+
+export interface ServiceProvider extends BaseEntity {
+  name: string;
+  avatar: string | null;
+  rating: number;
+  reviews: number;
+  experience: string;
+  location: string;
+  phone: string;
+  email: string;
+  bio: string;
+  specialties?: string[];
+  certifications?: string[];
+  responseTime?: string;
+  completedProjects?: number;
+  portfolio?: ServicePortfolioItem[];
+  recentReviews?: ServiceReview[];
+}
+
+export interface Service extends BaseEntity {
+  title: string;
+  provider: string;
+  rating: number;
+  reviews: number;
+  startingPrice: number;
+  duration: string;
+  category: string; // Changed from enum to string for database compatibility
+  location: string;
+  available: boolean;
+  image: string | null;
+  description: string;
+  features: string[];
+  images: string[];
+  providerDetails: ServiceProvider;
+  availableTimes: string[];
+  providerRating?: number;
+  responseTime?: string;
+  slug?: string;
+  customizationOptions?: {
     name: string;
-    role: string;
-    bio?: string;
-    avatar?: string;
-  }>;
-  links?: Array<{
-    type: 'github' | 'website' | 'demo' | 'other';
-    url: string;
-  }>;
-  tags?: string[];
-  
-  // Enhanced project data
-  purpose?: string;
-  budget?: {
-    amount?: number;
-    currency?: string;
-    breakdown?: Array<{ item: string; cost: number; }>;
-  };
-  timeline?: {
-    startDate?: string;
-    endDate?: string;
-    milestones?: Array<{ date: string; title: string; description?: string; }>;
-  };
-  sponsors?: Array<{
-    name: string;
-    type: 'main' | 'partner' | 'supporter';
-    logo?: string;
-    website?: string;
-  }>;
-  media?: Array<{
-    type: 'video' | 'audio' | 'image' | 'document';
-    url: string;
-    title: string;
+    type: 'select' | 'input' | 'textarea';
+    options?: string[];
+    required: boolean;
     description?: string;
-  }>;
-  access?: {
-    requirements?: string[];
-    target_audience?: string;
-    capacity?: number;
-    registration_required?: boolean;
-  };
-  voting?: {
-    enabled: boolean;
-    categories?: Array<{ name: string; description?: string; }>;
-    results?: Array<{ category: string; score: number; votes: number; }>;
-  };
-  associations?: string[];
-  expected_impact?: string;
+  }[];
 }
 
-// ============= PARTICIPANT TYPES =============
+// Updated booking types with string IDs
+export interface BookingData {
+  selectedDate: string;
+  selectedTime: string;
+  customizations: Record<string, string>;
+  contactInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    message: string;
+  };
+  agreedToTerms: boolean;
+}
 
-/**
- * Core participant interface - used for display and frontend logic
- * Combines database schema fields with computed frontend fields
- */
-export interface Participant {
+export interface ServiceForBooking {
   id: string;
-  name: string;
-  slug: string;
-  bio?: string;
-  avatar?: string;
-  website?: string;
-  socialLinks?: Array<{ platform: string; url: string; }>;
-  roles?: string[]; // Aggregated from projects
-  projects?: Array<{
-    id: string;
-    slug: string;
-    title: string;
-    role: string;
-    imageUrl?: string;
-  }>;
-  media?: ParticipantMediaItem[];
-  personalLinks?: Array<{
-    type: string;
-    url: string;
-  }>;
-  createdAt?: string;
-  updatedAt?: string;
+  title: string;
+  startingPrice: number;
+  duration: string;
+  provider: string;
+  providerEmail: string;
+  customizationOptions?: {
+    name: string;
+    type: 'select' | 'input' | 'textarea';
+    options?: string[];
+    required: boolean;
+    description?: string;
+  }[];
+}
+
+export interface EnhancedServiceBookingCardProps {
+  service: ServiceForBooking;
+  availableTimes: string[];
+  onBooking: (bookingData: BookingData) => void;
+}
+
+// Updated communication types with string IDs
+export interface CommunicationRequest {
+  id: string;
+  type: 'message' | 'consultation' | 'quote';
+  referenceNumber: string;
+  timestamp: Date;
+  status: 'sent' | 'delivered' | 'read' | 'responded' | 'completed';
   
-  // Enhanced participant fields from database
-  skills?: string[];
-  experienceLevel?: string;
-  interests?: string[];
-  timeCommitment?: string;
-  contributions?: string[];
-  location?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  howFoundUs?: string;
-  availability?: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  
+  providerId: string;
+  providerName: string;
+  providerEmail: string;
+  
+  serviceContext?: {
+    serviceId?: string; // Changed from number to string
+    serviceName?: string;
+    servicePrice?: number;
+  };
+  
+  subject?: string;
+  message: string;
+  additionalData?: Record<string, any>;
+  
+  providerResponse?: string;
+  responseTimestamp?: Date;
+  estimatedResponseTime?: string;
 }
 
-/**
- * Legacy support - mapped to Participant for backwards compatibility
- * @deprecated Use Participant instead
- */
-export type ParticipantWithMedia = Participant;
-
-/**
- * Legacy support - mapped to Participant for backwards compatibility  
- * @deprecated Use Participant instead
- */
-export type ParticipantEntity = Participant;
-
-// ============= PROJECT TYPES =============
-
-export interface Project {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  fullDescription?: string;
-  imageUrl?: string;
-  purpose?: string;
-  expectedImpact?: string;
-  associations?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-// ============= SPONSOR TYPES =============
-
-export interface Sponsor {
-  id: string;
-  name: string;
-  type: 'main' | 'partner' | 'supporter';
-  logo?: string;
-  website?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  // Contact fields
-  contactEmail?: string;
-  contactPhone?: string;
-  contactPerson?: string;
-}
-
-// ============= RELATIONSHIP TYPES =============
-
-export interface ProjectParticipant {
-  id: string;
-  projectId: string;
-  participantId: string;
-  role: string;
-  createdAt?: string;
-}
-
-export interface ProjectSponsor {
-  id: string;
-  projectId: string;
-  sponsorId: string;
-  createdAt?: string;
-}
-
-export interface ProjectLink {
-  id: string;
-  projectId: string;
-  type: 'github' | 'website' | 'demo' | 'other';
-  url: string;
-  createdAt?: string;
-}
-
-export interface ProjectTag {
-  id: string;
-  projectId: string;
-  tag: string;
-  createdAt?: string;
-}
-
-export interface ProjectMedia {
-  id: string;
-  projectId: string;
-  type: MediaType;
-  url: string;
-  title: string;
-  description?: string;
-  createdAt?: string;
-}
-
-export interface ProjectBudget {
-  id: string;
-  projectId: string;
-  amount?: number;
-  currency?: string;
-  breakdown?: Array<{ item: string; cost: number; }>;
-  createdAt?: string;
-}
-
-export interface ProjectTimeline {
-  id: string;
-  projectId: string;
-  startDate?: string;
-  endDate?: string;
-  milestones?: Array<{ date: string; title: string; description?: string; }>;
-  createdAt?: string;
-}
-
-export interface ProjectAccess {
-  id: string;
-  projectId: string;
-  requirements?: string[];
-  targetAudience?: string;
-  capacity?: number;
-  registrationRequired?: boolean;
-  createdAt?: string;
-}
-
-export interface ProjectVoting {
-  id: string;
-  projectId: string;
-  enabled: boolean;
-  categories?: Array<{ name: string; description?: string; }>;
-  results?: Array<{ category: string; score: number; votes: number; }>;
-  createdAt?: string;
+export interface NotificationTemplate {
+  type: 'customer_confirmation' | 'provider_notification' | 'status_update';
+  subject: string;
+  htmlContent: string;
+  textContent: string;
 }

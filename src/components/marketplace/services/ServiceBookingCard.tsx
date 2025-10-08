@@ -9,13 +9,13 @@ import { ContactInformation } from './booking/ContactInformation';
 import { BookingReview } from './booking/BookingReview';
 import { BookingProgressSteps } from './booking/BookingProgressSteps';
 import { BookingNavigation } from './booking/BookingNavigation';
-import { CommunicationTracker } from '@/components/communication/CommunicationTracker';
-import { useService } from '@/hooks/useService';
-import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
-import { useAvailableTimes } from '@/hooks/useAvailableTimes';
+import { CommunicationTracker } from '@/components/marketplace/communication/CommunicationTracker';
+import { useService } from '@/hooks/marketplace/useService';
+import { useAuthenticatedUser } from '@/hooks/marketplace/useAuthenticatedUser';
+import { useAvailableTimes } from '@/hooks/marketplace/useAvailableTimes';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { bookingFormSchema, stepValidationSchemas, type BookingFormData } from '@/schemas/booking.schema';
+import { bookingFormSchema, stepValidationSchemas, type BookingFormData } from '@/schemas/marketplace/booking.schema';
 import { z } from 'zod';
 
 interface ServiceBookingCardProps {

@@ -69,7 +69,7 @@ export const deleteImageSafely = async (
 
   try {
     // Skip deletion for placeholder images
-    if (!imageUrl || imageUrl === '/placeholder.svg' || imageUrl === ') {
+    if (!imageUrl || imageUrl === '/placeholder.svg' || imageUrl === '') {
       return true;
     }
 
@@ -104,7 +104,7 @@ export const deleteMultipleImages = async (
   options: ImageDeleteOptions = {}
 ): Promise<{ success: number; failed: number }> => {
   const validUrls = imageUrls.filter(url => 
-    url && url !== '/placeholder.svg' && url !== '
+    url && url !== '/placeholder.svg' && url !== ''
   ) as string[];
 
   let success = 0;

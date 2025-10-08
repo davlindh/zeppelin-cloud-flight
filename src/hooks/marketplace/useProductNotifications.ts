@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useWishlist } from '@/contexts/marketplace/WishlistContext';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import { supabase } from '@/integrations/supabase/client';
 

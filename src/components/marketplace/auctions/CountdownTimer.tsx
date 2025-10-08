@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Clock } from 'lucide-react';
-import { useCountdown } from '@/hooks/useCountdown';
+import { useCountdown } from '@/hooks/marketplace/useCountdown';
 import { cn } from '@/lib/utils';
 
 interface CountdownTimerProps {

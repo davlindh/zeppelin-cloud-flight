@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Star, ShoppingCart, Eye } from 'lucide-react';
-import { useProducts } from '@/hooks/useProducts';
-import { getImageUrl } from '@/utils/imageUtils';
+import { useProducts } from '@/hooks/marketplace/useProducts';
+import { getImageUrl } from '@/utils/marketplace/imageUtils';
 
 export const FeaturedProducts: React.FC = () => {
   const navigate = useNavigate();

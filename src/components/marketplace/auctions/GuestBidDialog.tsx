@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertCircle } from 'lucide-react';
-import { SecurityNotice } from '@/components/security/SecurityNotice';
+import { SecurityNotice } from '@/components/marketplace/security/SecurityNotice';
 
 interface GuestBidDialogProps {
   isOpen: boolean;

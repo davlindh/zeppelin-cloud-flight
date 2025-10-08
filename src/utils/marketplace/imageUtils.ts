@@ -69,17 +69,20 @@ export const preloadImage = (src: string): Promise<void> => {
 
 // Helper to check if an item has images
 export const hasImages = (item: { image?: string | null; images?: string[] | null }): boolean => {
-  const hasMainImage = item.image && item.image !== ' && item.image !== '/placeholder.svg';
-  const hasGalleryImages = item.images && item.images.length > 0 && item.images.some(img => img !== ' && img !== '/placeholder.svg');
+  const hasMainImage = item.image && item.image !== '' && item.image !== '/placeholder.svg';
+  const hasGalleryImages =
+    item.images &&
+    item.images.length > 0 &&
+    item.images.some(img => img !== '' && img !== '/placeholder.svg');
   return !!(hasMainImage || hasGalleryImages);
 };
 
 // Helper to get image count
 export const getImageCount = (item: { image?: string | null; images?: string[] | null }): number => {
   let count = 0;
-  if (item.image && item.image !== ' && item.image !== '/placeholder.svg') count++;
+  if (item.image && item.image !== '' && item.image !== '/placeholder.svg') count++;
   if (item.images) {
-    count += item.images.filter(img => img !== ' && img !== '/placeholder.svg').length;
+    count += item.images.filter(img => img !== '' && img !== '/placeholder.svg').length;
   }
   return count;
 };

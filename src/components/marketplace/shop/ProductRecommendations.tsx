@@ -1,7 +1,7 @@
 import React from 'react';
-import { EnhancedProductCard } from '@/components/ui/enhanced-product-card';
-import { useProducts } from '@/hooks/useProducts';
-import { sortProductsByAnalytics } from '@/utils/productUtils';
+import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
+import { useProducts } from '@/hooks/marketplace/useProducts';
+import { sortProductsByAnalytics } from '@/utils/marketplace/productUtils';
 import type { Product } from '@/types/unified';
 
 interface ProductRecommendationsProps {

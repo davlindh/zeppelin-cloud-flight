@@ -2,8 +2,8 @@
 import React, { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { isValidString } from '@/utils/typeGuards';
-import { useCustomerInfo } from '@/hooks/useCustomerInfo';
+import { isValidString } from '@/utils/marketplace/typeGuards';
+import { useCustomerInfo } from '@/hooks/marketplace/useCustomerInfo';
 
 interface ContactInfo {
   name: string;

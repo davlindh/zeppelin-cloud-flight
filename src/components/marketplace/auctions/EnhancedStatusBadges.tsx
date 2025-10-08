@@ -2,7 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Flame, TrendingUp, Zap, Clock, Users } from 'lucide-react';
-import { AuctionAnalytics, EnhancedStatus } from '@/utils/auctionUtils';
+import { AuctionAnalytics, EnhancedStatus } from '@/utils/marketplace/auctionUtils';
 
 interface EnhancedStatusBadgesProps {
   analytics: AuctionAnalytics;

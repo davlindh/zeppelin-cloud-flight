@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useTheme } from '@/components/ui/theme-provider';
+import { useTheme } from '@/components/marketplace/ui/theme-provider';
 import { cn } from '@/lib/utils';
 
 export const ThemeSwitcher: React.FC<{ className?: string }> = ({ className }) => {

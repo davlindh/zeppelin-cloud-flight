@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Minus, Plus, Trash2, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/CartContext';
-import { useProduct } from '@/hooks/useProducts';
+import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useProduct } from '@/hooks/marketplace/useProducts';
 
 interface CartSidebarProps {
   isOpen: boolean;

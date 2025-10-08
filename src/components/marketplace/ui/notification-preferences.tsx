@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Smartphone, Bell, Settings, Clock } from 'lucide-react';
-import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
+import { useNotificationPreferences } from '@/hooks/marketplace/useNotificationPreferences';
 
 export const NotificationPreferences: React.FC = () => {
   const { preferences, updatePreferences, resetToDefaults: _resetToDefaults, isLoaded } = useNotificationPreferences();

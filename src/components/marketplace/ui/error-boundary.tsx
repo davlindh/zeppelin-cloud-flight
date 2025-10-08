@@ -11,7 +11,7 @@ import type {
   ErrorDisplayProps
 } from '@/types/errorBoundary';
 import type { ExtendedAppError } from '@/types/errorHandling';
-import { reportError } from '@/utils/errorReporting';
+import { reportError } from '@/utils/marketplace/errorReporting';
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private resetTimeoutId: number | null = null;
@@ -86,7 +86,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return (
         <ErrorDisplay
           error={this.state.error!}
-          errorInfo={this.state.errorInfo || { componentStack: ' }}
+          errorInfo={this.state.errorInfo || { componentStack: "" }}
           onRetry={this.resetErrorBoundary}
           isDevelopment={import.meta.env.DEV}
         />

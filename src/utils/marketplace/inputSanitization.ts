@@ -1,19 +1,14 @@
-import DOMPurify from 'dompurify';
-
 // Input sanitization and validation utilities
 export class InputSanitizer {
   // Sanitize HTML content to prevent XSS
   static sanitizeHtml(input: string): string {
-    return DOMPurify.sanitize(input, {
-      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
-      ALLOWED_ATTR: []
-    });
+    return input.replace(/<[^>]*>/g, '');
   }
 
   // Sanitize plain text (remove HTML, limit length)
   static sanitizeText(input: string, maxLength: number = 1000): string {
     return input
-      .replace(/<[^>]*>/g, ') // Remove HTML tags
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
       .trim()
       .substring(0, maxLength);
   }
@@ -26,18 +21,18 @@ export class InputSanitizer {
 
   // Validate phone number (basic international format)
   static validatePhone(phone: string): boolean {
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+    const phoneRegex = /^[+]?[1-9]\d{0,15}$/;
+    return phoneRegex.test(phone.replace(/[\s()-]/g, ''));
   }
 
   // Sanitize and validate message content
   static sanitizeMessage(message: string): { isValid: boolean; sanitized: string; error?: string } {
     if (!message || message.trim().length < 10) {
-      return { isValid: false, sanitized: ', error: 'Message must be at least 10 characters long' };
+      return { isValid: false, sanitized: '', error: 'Message must be at least 10 characters long' };
     }
 
     if (message.length > 5000) {
-      return { isValid: false, sanitized: ', error: 'Message must be less than 5000 characters' };
+      return { isValid: false, sanitized: '', error: 'Message must be less than 5000 characters' };
     }
 
     const sanitized = this.sanitizeText(message, 5000);

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { EnhancedProductCard } from '@/components/ui/enhanced-product-card';
-import { ProductSkeleton } from '@/components/ui/product-skeleton';
-import { ResponsiveGrid } from '@/components/ui/advanced-layout';
+import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
+import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
+import { ResponsiveGrid } from '@/components/marketplace/ui/advanced-layout';
 
 import type { Product } from '@/types/unified';
 

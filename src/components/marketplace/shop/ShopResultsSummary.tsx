@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ActiveFilterChips } from '@/components/shop/ActiveFilterChips';
+import { ActiveFilterChips } from '@/components/marketplace/shop/ActiveFilterChips';
 
 interface ShopResultsSummaryProps {
   productsCount: number;

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '@/hooks/marketplace/useProducts';
 import { cn } from '@/lib/utils';
 import { Star, TrendingUp } from 'lucide-react';
 

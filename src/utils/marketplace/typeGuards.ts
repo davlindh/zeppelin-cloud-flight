@@ -1,12 +1,12 @@
-import { BookingData, ServiceForBooking, CommunicationRequest } from '@/types/unified';
+import { BookingData, ServiceForBooking, CommunicationRequest } from '@/types/marketplace/unified';
 import { 
   ServiceId, Email, PhoneNumber, DateTime, Currency, Rating,
   isServiceId, isEmail, isPhoneNumber, isDateTime, isCurrency, isRating
-} from '@/types/branded';
+} from '@/types/marketplace/branded';
 import {
   isValidServiceCategory, isValidServiceDuration
-} from '@/types/enums';
-import { createValidationError } from '@/types/errors';
+} from '@/types/marketplace/enums';
+import { createValidationError } from '@/types/marketplace/errors';
 
 // Re-export enhanced type guards
 export {
@@ -70,7 +70,7 @@ export const validateEmail = (value: unknown, fieldName: string): Email => {
 };
 
 export const validatePhoneNumber = (value: unknown, fieldName: string, required: boolean = false): PhoneNumber | undefined => {
-  if (!required && (value === undefined || value === null || value === ')) {
+  if (!required && (value === undefined || value === null || value === '')) {
     return undefined;
   }
   
@@ -266,7 +266,7 @@ export const assertNumber = (value: unknown, fieldName: string): number => {
 
 // Enhanced form validation helpers
 export const validateFormField = (value: unknown, fieldName: string, required: boolean = true): string => {
-  if (!required && (value === undefined || value === null || value === ')) {
+  if (!required && (value === undefined || value === null || value === '')) {
     return '';
   }
   
@@ -283,7 +283,7 @@ export const validateFormField = (value: unknown, fieldName: string, required: b
 };
 
 export const validateEmailField = (value: unknown, fieldName: string, required: boolean = true): string => {
-  if (!required && (value === undefined || value === null || value === ')) {
+  if (!required && (value === undefined || value === null || value === '')) {
     return '';
   }
   

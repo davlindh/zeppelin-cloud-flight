@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CountdownTimer } from './CountdownTimer';
 import { StandardizedBidDialog } from './StandardizedBidDialog';
-import { useWishlist } from '@/contexts/WishlistContext';
-import { useRealTimeBidding } from '@/hooks/useRealTimeBidding';
+import { useWishlist } from '@/contexts/marketplace/WishlistContext';
+import { useRealTimeBidding } from '@/hooks/marketplace/useRealTimeBidding';
 import { useToast } from '@/hooks/use-toast';
 
 interface BidSectionProps {

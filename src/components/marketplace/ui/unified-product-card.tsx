@@ -4,7 +4,7 @@ import { ShoppingCart, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/contexts/marketplace/CartProvider';
 import { useToast } from '@/hooks/use-toast';
 
 interface UnifiedProductCardProps {

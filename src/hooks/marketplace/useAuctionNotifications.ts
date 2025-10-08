@@ -1,8 +1,8 @@
 
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useWishlist } from '@/contexts/WishlistContext';
-import { useAuctions } from '@/hooks/useAuctions';
+import { useWishlist } from '@/contexts/marketplace/WishlistContext';
+import { useAuctions } from '@/hooks/marketplace/useAuctions';
 
 export const useAuctionNotifications = () => {
   const { toast } = useToast();

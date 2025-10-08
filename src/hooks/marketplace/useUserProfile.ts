@@ -94,7 +94,7 @@ export const useUserProfile = () => {
       setError(null);
 
       // Fetch user profile with safe UUID handling
-      if (!userId || userId === ') {
+      if (!userId || userId === '') {
         throw new Error('Invalid user ID');
       }
 

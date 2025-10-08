@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useWishlist } from '@/contexts/marketplace/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface QuickActionsConfig {

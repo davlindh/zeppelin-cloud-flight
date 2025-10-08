@@ -9,7 +9,7 @@ export const transformDatabaseProduct = (dbProduct: any): any => {
     price: dbProduct.selling_price || dbProduct.price || 0,
     brand: dbProduct.product_brand || dbProduct.brand || '',
     image: getImageUrl(dbProduct.image),
-    images: dbProduct.images?.filter((img: string) => img && img !== ') || [],
+    images: dbProduct.images?.filter((img: string) => img && img !== '') || [],
     // Ensure all required fields exist with defaults
     rating: dbProduct.rating || 0,
     reviews: dbProduct.reviews || 0,
@@ -34,7 +34,7 @@ export const transformDatabaseAuction = (dbAuction: any): any => {
   return {
     ...dbAuction,
     image: getImageUrl(dbAuction.image),
-    images: dbAuction.images?.filter((img: string) => img && img !== ') || [],
+    images: dbAuction.images?.filter((img: string) => img && img !== '') || [],
   };
 };
 

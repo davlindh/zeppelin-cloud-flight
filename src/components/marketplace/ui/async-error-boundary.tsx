@@ -1,7 +1,7 @@
 
 import React from 'react';
-import ErrorBoundary from '@/components/ui/error-boundary';
-import { ErrorFallback } from '@/components/ui/error-fallback';
+import ErrorBoundary from '@/components/marketplace/ui/error-boundary';
+import { ErrorFallback } from '@/components/marketplace/ui/error-fallback';
 import type { ExtendedAppError } from '@/types/errorHandling';
 import type { ErrorInfo } from '@/types/errorBoundary';
 

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { getImageUrl, getImageAlt } from '@/utils/imageUtils';
+import { getImageUrl, getImageAlt } from '@/utils/marketplace/imageUtils';
 
 interface AuctionImageGalleryProps {
   title: string;
