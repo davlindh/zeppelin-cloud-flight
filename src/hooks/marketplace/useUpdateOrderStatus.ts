@@ -1,10 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
+
+type OrderStatus = Database['public']['Enums']['order_status'];
 
 interface UpdateOrderStatusInput {
   orderId: string;
-  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  status: OrderStatus;
   notes?: string;
   trackingNumber?: string;
   trackingUrl?: string;

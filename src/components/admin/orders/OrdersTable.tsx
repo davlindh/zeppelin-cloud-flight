@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -20,6 +21,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MoreHorizontal, Eye, Mail, Phone, Package, MapPin } from 'lucide-react';
@@ -73,50 +76,60 @@ const getStatusVariant = (status: string) => {
 };
 
 export function OrdersTable() {
+  const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState<DatabaseOrder | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ['admin-orders'],
+    queryKey: ['admin-orders', statusFilter],
     queryFn: async (): Promise<DatabaseOrder[]> => {
-      console.log('Fetching all orders for admin');
+      let query = supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            id,
+            item_title,
+            item_type,
+            quantity,
+            unit_price,
+            total_price
+          )
+        `)
+        .order('created_at', { ascending: false });
       
-      try {
-        const { data: ordersData, error } = await supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items (
-              id,
-              item_title,
-              item_type,
-              quantity,
-              unit_price,
-              total_price
-            )
-          `)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching orders:', error);
-          throw error;
-        }
-
-        console.log('Fetched orders from database:', ordersData);
-        return (ordersData ?? []) as DatabaseOrder[];
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-        return [];
+      if (statusFilter) {
+        query = query.eq('status', statusFilter as any);
       }
+      
+      const { data: ordersData, error } = await query;
+
+      if (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
+      }
+
+      return (ordersData ?? []) as DatabaseOrder[];
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 30 * 1000, // 30 seconds
     gcTime: 5 * 60 * 1000,
     retry: 2,
   });
 
-  const handleViewDetails = (order: DatabaseOrder) => {
-    setSelectedOrder(order);
-    setShowDetailsDialog(true);
+  const filteredOrders = orders.filter(order => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      order.order_number.toLowerCase().includes(searchLower) ||
+      order.customer_name.toLowerCase().includes(searchLower) ||
+      order.customer_email.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const handleViewDetails = (orderId: string) => {
+    navigate(`/admin/orders/${orderId}`);
   };
 
   const handleEmailCustomer = (email?: string) => {
@@ -153,9 +166,35 @@ export function OrdersTable() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Order Management</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Orders Management
+          </CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="flex gap-4 mb-4">
+            <Input
+              placeholder="Search by order number, name, or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-sm"
+            />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All statuses</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="processing">Processing</SelectItem>
+                <SelectItem value="shipped">Shipped</SelectItem>
+                <SelectItem value="delivered">Delivered</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -170,7 +209,7 @@ export function OrdersTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">
                     {order.order_number}
@@ -213,7 +252,7 @@ export function OrdersTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleViewDetails(order)}>
+                        <DropdownMenuItem onClick={() => handleViewDetails(order.id)}>
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>

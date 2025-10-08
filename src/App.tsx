@@ -38,6 +38,8 @@ import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
 import { CartProvider } from "./contexts/marketplace/CartProvider";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 
+import OrderDetailPage from "./pages/admin/OrderDetailPage";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -115,6 +117,13 @@ const App = () => (
                   <AdminProvider>
                     <AdminRoute>
                       <SponsorEditPage />
+                    </AdminRoute>
+                  </AdminProvider>
+                } />
+                <Route path="/admin/orders/:orderId" element={
+                  <AdminProvider>
+                    <AdminRoute>
+                      <OrderDetailPage />
                     </AdminRoute>
                   </AdminProvider>
                 } />

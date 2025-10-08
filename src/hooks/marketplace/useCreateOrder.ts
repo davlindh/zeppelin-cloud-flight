@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
+
+type OrderItemType = Database['public']['Enums']['order_item_type'];
 
 export interface OrderItem {
-  type: 'product' | 'auction' | 'service';
+  type: OrderItemType;
   id: string;
   title: string;
   quantity: number;
