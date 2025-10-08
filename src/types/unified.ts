@@ -211,3 +211,85 @@ export interface Project extends ShowcaseCard {
   expected_impact?: string;
   associations?: string[];
 }
+
+// Participant types
+export interface Participant {
+  id: string;
+  name: string;
+  slug: string;
+  bio?: string;
+  avatar?: string;
+  website?: string;
+  socialLinks?: Array<{ platform: string; url: string }>;
+  personalLinks?: Array<{ type: string; url: string }>;
+  roles: string[];
+  projects: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    role: string;
+    imageUrl?: string;
+  }>;
+  media?: Array<{
+    id: string;
+    type: string;
+    category: string;
+    url: string;
+    title: string;
+    description?: string;
+    year?: string;
+    participantId: string;
+  }>;
+  skills?: string[];
+  experienceLevel?: string;
+  interests?: string[];
+  timeCommitment?: string;
+  contributions?: string[];
+  location?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  howFoundUs?: string;
+  availability?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Sponsor {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string;
+  website?: string;
+  description?: string;
+  tier?: string;
+  active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProjectParticipant {
+  participant_id: string;
+  role: string;
+}
+
+export interface ProjectSponsor {
+  sponsor_id: string;
+  tier?: string;
+}
+
+export interface ProjectLink {
+  type: string;
+  url: string;
+}
+
+export interface ProjectTag {
+  name: string;
+}
+
+export interface ProjectMedia {
+  id: string;
+  type: string;
+  url: string;
+  title?: string;
+  description?: string;
+}

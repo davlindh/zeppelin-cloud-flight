@@ -6,9 +6,6 @@ export * from './use-toast';
 export * from './useUserRole';
 export * from './useCanEditParticipant';
 
-// Security hooks
-export * from './useSecureSubmission';
-
 // Participant hooks
 export * from './useParticipantToken';
 export * from './useSendParticipantWelcome';

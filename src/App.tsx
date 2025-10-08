@@ -14,8 +14,6 @@ import { HomePage } from "./pages/HomePage";
 import { ShowcasePage } from "./pages/ShowcasePage";
 import { ProjectDetailPage } from "./pages/ProjectDetailPage";
 import { ParticipantsPage } from "./pages/ParticipantsPage";
-import { ParticipantDetailPage } from "./pages/ParticipantDetailPage";
-import { PartnersPage } from "./pages/PartnersPage";
 import { CompleteParticipantProfilePage } from "./pages/CompleteParticipantProfilePage";
 import { AuthPage } from "./pages/AuthPage";
 import MediaGalleryPage from "./pages/MediaGalleryPage";

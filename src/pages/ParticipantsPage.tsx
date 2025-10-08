@@ -10,13 +10,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useParticipantData } from '@/hooks/useParticipantData';
 import { EnhancedParticipantFilters } from '../components/participants/EnhancedParticipantFilters';
 import { ParticipantStats } from '../components/participants/ParticipantStats';
-import type { ParticipantEntity } from '../utils/participantHelpers';
+import type { Participant } from '@/types/unified';
 import type { FilterGroup } from '../components/participants/EnhancedParticipantFilters';
 
 export const ParticipantsPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Record<string, string[] | { min: number; max: number } | string>>({});
   const [showParticipantDialog, setShowParticipantDialog] = useState(false);
-  const [selectedParticipant, setSelectedParticipant] = useState<ParticipantEntity | null>(null);
+  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
 
   const {
     participants,
