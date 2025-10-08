@@ -18,7 +18,7 @@ import { ParticipantDetailPage } from "./pages/ParticipantDetailPage";
 import { PartnersPage } from "./pages/PartnersPage";
 import MediaGalleryPage from "./pages/MediaGalleryPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
-import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
 import { ProjectEditPage } from "./pages/admin/ProjectEditPage";
 import { ParticipantEditPage } from "./pages/admin/ParticipantEditPage";
