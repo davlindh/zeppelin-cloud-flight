@@ -2,13 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TagList } from './TagList';
 import { ImageWithFallback } from './ImageWithFallback';
-import type { Project } from '@/types/unified';
+import type { ShowcaseCard, Project } from '@/types/unified';
 
 // Extended interface for ProjectCard display with computed/derived fields
-interface ProjectCardData extends Project {
-    imageUrl?: string; // Computed from image_path for display
-    tags?: string[]; // Populated from project_tags relationship
-}
+type ProjectCardData = ShowcaseCard & {
+    imageUrl?: string;
+    tags?: string[];
+};
 
 interface ProjectCardProps {
     card: ProjectCardData;

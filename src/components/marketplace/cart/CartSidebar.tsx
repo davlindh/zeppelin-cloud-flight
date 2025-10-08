@@ -14,10 +14,10 @@ interface CartSidebarProps {
 
 const CartProductItem = ({ item, updateQuantity, removeItem }: {
   item: any;
-  updateQuantity: (productId: string, variants: any, quantity: number) => void;
-  removeItem: (productId: string, variants: any) => void;
+  updateQuantity: (id: string, variants: any, quantity: number) => void;
+  removeItem: (id: string, variants: any) => void;
 }) => {
-  const { data: product, isLoading } = useProduct(item.productId);
+  const { data: product, isLoading } = useProduct(item.id);
 
   if (isLoading) {
     return (
@@ -43,7 +43,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => removeItem(item.productId, item.selectedVariants)}
+            onClick={() => removeItem(item.id, item.variant)}
             className="text-red-500 hover:text-red-700 p-0 h-auto"
           >
             Remove from cart
@@ -55,9 +55,9 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
 
   const formatVariants = (variants: any) => {
     const parts = [];
-    if (variants.size) parts.push(variants.size);
-    if (variants.color) parts.push(variants.color);
-    if (variants.material) parts.push(variants.material);
+    if (variants?.size) parts.push(variants.size);
+    if (variants?.color) parts.push(variants.color);
+    if (variants?.material) parts.push(variants.material);
     return parts.join(', ');
   };
 
@@ -79,9 +79,9 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
         <h4 className="font-medium text-sm text-slate-900 truncate">
           {product.title}
         </h4>
-        {formatVariants(item.selectedVariants) && (
+        {formatVariants(item.variant) && (
           <p className="text-xs text-slate-500 mt-1">
-            {formatVariants(item.selectedVariants)}
+            {formatVariants(item.variant)}
           </p>
         )}
         <div className="flex items-center justify-between mt-2">
@@ -93,7 +93,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
               variant="outline"
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity - 1)}
+              onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
             >
               <Minus className="h-3 w-3" />
             </Button>
@@ -102,7 +102,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
               variant="outline"
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity + 1)}
+              onClick={() => updateQuantity(item.id, item.variant, item.quantity + 1)}
             >
               <Plus className="h-3 w-3" />
             </Button>
@@ -110,7 +110,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-              onClick={() => removeItem(item.productId, item.selectedVariants)}
+              onClick={() => removeItem(item.id, item.variant)}
             >
               <Trash2 className="h-3 w-3" />
             </Button>
@@ -170,7 +170,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
           <div className="flex-1 overflow-y-auto py-4 space-y-4">
             {state.items.map((item, index) => (
               <CartProductItem
-                key={`${item.productId}-${JSON.stringify(item.selectedVariants)}-${index}`}
+                key={`${item.id}-${JSON.stringify(item.variant)}-${index}`}
                 item={item}
                 updateQuantity={updateQuantity}
                 removeItem={removeItem}

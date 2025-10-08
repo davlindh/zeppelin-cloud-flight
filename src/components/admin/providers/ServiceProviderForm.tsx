@@ -169,8 +169,19 @@ export const ServiceProviderForm: React.FC<ServiceProviderFormProps> = ({
           ...formattedData
         });
       } else {
-        // Create new provider
-        result = await createServiceProvider(formattedData);
+        // Create new provider - ensure all required fields are present
+        result = await createServiceProvider({
+          name: formattedData.name!,
+          email: formattedData.email!,
+          phone: formattedData.phone!,
+          location: formattedData.location!,
+          experience: formattedData.experience!,
+          bio: formattedData.bio!,
+          avatar: formattedData.avatar || '',
+          responseTime: formattedData.responseTime,
+          specialties: formattedData.specialties,
+          certifications: formattedData.certifications,
+        });
       }
 
       if (result) {

@@ -183,7 +183,6 @@ const ComprehensiveSubmissionForm: React.FC<ComprehensiveSubmissionFormProps> = 
       toast({
         title: 'Submission Successful!',
         description: 'Thank you for your submission. We will review it and get back to you soon.',
-        variant: 'success',
       });
 
       onClose();

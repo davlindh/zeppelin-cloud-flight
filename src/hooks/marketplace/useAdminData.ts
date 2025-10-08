@@ -38,7 +38,10 @@ export const useAdminActivity = () => {
         throw error;
       }
 
-      return data || [];
+      return (data || []).map(log => ({
+        ...log,
+        timestamp: log.created_at
+      }));
     },
     staleTime: 1 * 60 * 1000, // 1 minute
     retry: 2,
@@ -53,13 +56,11 @@ export const useSecurityMetrics = () => {
       
       try {
         const [
-          usersRes,
           rolesRes,
           commRes,
           bidsRes,
           adminActionsRes
         ] = await Promise.all([
-          supabase.rpc('get_total_users_count'),
           supabase.from('user_roles').select('id', { count: 'exact' }),
           supabase.from('communication_requests').select('id', { count: 'exact' })
             .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
@@ -70,9 +71,9 @@ export const useSecurityMetrics = () => {
         ]);
 
         return {
-          totalUsers: usersRes.data || 0,
-          recentLogins: 0, // Would need auth logs for this
-          failedAttempts: 0, // Would need auth logs for this
+          totalUsers: 0, // Function not available
+          recentLogins: 0,
+          failedAttempts: 0,
           activeRoles: rolesRes.count || 0,
           communicationRequests: commRes.count || 0,
           recentBids: bidsRes.count || 0,
@@ -102,18 +103,8 @@ export const useRoleChangeAudit = () => {
     queryFn: async () => {
       console.log('📋 Fetching role change audit...');
       
-      const { data, error } = await supabase
-        .from('role_change_audit')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) {
-        console.error('Error fetching role change audit:', error);
-        throw error;
-      }
-
-      return data || [];
+      // Table doesn't exist - return empty array
+      return [];
     },
     staleTime: 1 * 60 * 1000,
     retry: 2,

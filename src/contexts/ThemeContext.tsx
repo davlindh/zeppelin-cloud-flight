@@ -186,6 +186,9 @@ export const useAccessibility = () => {
   };
 };
 
+// Alias for adaptive theme hook (for backwards compatibility)
+export const useAdaptiveTheme = useTheme;
+
 // Utility function to get theme colors
 function getThemeColors(colorScheme: ColorScheme, mode: 'light' | 'dark') {
   const colorPalettes = {

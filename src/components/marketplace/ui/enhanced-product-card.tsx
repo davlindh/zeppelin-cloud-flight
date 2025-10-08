@@ -315,7 +315,12 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
                 <Badge 
                   variant="secondary" 
                   className="text-xs capitalize w-fit cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                  onClick={handleBrandClickEvent}
+                  clickable={true}
+                  onClick={() => {
+                    if (onBrandClick && product.brand) {
+                      onBrandClick(product.brand);
+                    }
+                  }}
                 >
                   {product.brand}
                 </Badge>

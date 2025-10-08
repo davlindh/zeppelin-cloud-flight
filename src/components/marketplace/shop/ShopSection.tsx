@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
 import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
 import { ResponsiveGrid, AdvancedContainer, FluidSpacing } from '@/components/marketplace/ui/advanced-layout';
-import { DensityProvider, DensityControl } from '@/contexts/DensityContext';
+import { DensityProvider, DensityControl } from '@/contexts/marketplace/DensityContext';
 import { Button } from '@/components/ui/button';
 import { AsyncErrorBoundary } from '@/components/marketplace/ui/async-error-boundary';
 import { useProducts } from '@/hooks/marketplace/useProducts';

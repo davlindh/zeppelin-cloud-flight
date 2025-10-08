@@ -220,7 +220,6 @@ export const PublicMediaUpload: React.FC<PublicMediaUploadProps> = ({ onClose })
       toast({
         title: 'Material uppladdat!',
         description: `${successfulUploads.length} fil(er) har skickats för granskning. Du får besked inom 2-3 arbetsdagar.`,
-        variant: 'success',
       });
 
       onClose();

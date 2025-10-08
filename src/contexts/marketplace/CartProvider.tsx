@@ -15,10 +15,10 @@ interface CartItem {
 }
 
 interface CartContextType {
-  cartItems: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  state: { items: CartItem[]; itemCount: number; total: number };
+  addItem: (id: string, title: string, price: number, quantity: number, selectedVariants: any, image?: string) => void;
+  removeItem: (id: string, selectedVariants: any) => void;
+  updateQuantity: (id: string, selectedVariants: any, quantity: number) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
@@ -36,29 +36,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('marketplace-cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const addItem = (id: string, title: string, price: number, quantity: number, selectedVariants: any, image?: string) => {
+    const itemKey = `${id}-${JSON.stringify(selectedVariants)}`;
     setCartItems((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id);
+      const existingItem = prev.find((i) => `${i.id}-${JSON.stringify(i.variant)}` === itemKey);
       if (existingItem) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          `${i.id}-${JSON.stringify(i.variant)}` === itemKey ? { ...i, quantity: i.quantity + quantity } : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { id, type: 'product' as const, title, price, image: image || '', quantity, variant: selectedVariants }];
     });
   };
 
-  const removeFromCart = (id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const removeItem = (id: string, selectedVariants: any) => {
+    const itemKey = `${id}-${JSON.stringify(selectedVariants)}`;
+    setCartItems((prev) => prev.filter((item) => `${item.id}-${JSON.stringify(item.variant)}` !== itemKey));
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (id: string, selectedVariants: any, quantity: number) => {
+    const itemKey = `${id}-${JSON.stringify(selectedVariants)}`;
     if (quantity <= 0) {
-      removeFromCart(id);
+      removeItem(id, selectedVariants);
       return;
     }
     setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prev.map((item) => (`${item.id}-${JSON.stringify(item.variant)}` === itemKey ? { ...item, quantity } : item))
     );
   };
 
@@ -74,12 +77,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const totalPrice = getTotalPrice();
+  const totalItems = getTotalItems();
+
   return (
     <CartContext.Provider
       value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
+        state: { items: cartItems, itemCount: totalItems, total: totalPrice },
+        addItem,
+        removeItem,
         updateQuantity,
         clearCart,
         getTotalPrice,

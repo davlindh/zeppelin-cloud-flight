@@ -18,6 +18,7 @@ interface BadgeProps {
   dotColor?: string;
   animation?: boolean;
   pulse?: boolean;
+  title?: string;
 }
 
 const Badge: React.FC<BadgeProps> = ({
@@ -34,6 +35,7 @@ const Badge: React.FC<BadgeProps> = ({
   dotColor,
   animation = false,
   pulse = false,
+  title,
 }) => {
   const baseClasses = 'inline-flex items-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
@@ -84,6 +86,7 @@ const Badge: React.FC<BadgeProps> = ({
       onClick={handleClick}
       role={clickable || onClick ? 'button' : undefined}
       tabIndex={clickable || onClick ? 0 : undefined}
+      title={title}
       onKeyDown={(e) => {
         if ((clickable || onClick) && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();

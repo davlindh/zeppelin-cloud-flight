@@ -148,13 +148,13 @@ export const SecurityDashboard: React.FC = () => {
             <p className="text-slate-600 text-center py-4">No recent role changes</p>
           ) : (
             <div className="space-y-3">
-              {roleAudits.map((audit) => (
+              {roleAudits.map((audit: any) => (
                 <div key={audit.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">User Role Changed</span>
+                      <span className="text-sm font-medium">Role Change Audit</span>
                       <span className="text-xs text-slate-600">
-                        {audit.old_role ? `${audit.old_role} → ${audit.new_role}` : `Added role: ${audit.new_role}`}
+                        {audit.changed_at ? new Date(audit.changed_at).toLocaleDateString() : 'Recent change'}
                       </span>
                     </div>
                   </div>

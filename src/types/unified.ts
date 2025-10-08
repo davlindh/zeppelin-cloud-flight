@@ -188,3 +188,26 @@ export interface NotificationTemplate {
   htmlContent: string;
   textContent: string;
 }
+
+// Project/Showcase types
+export interface ShowcaseCard {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  full_description?: string;
+  fullDescription?: string;
+  image_path?: string;
+  imageUrl?: string;
+  tags?: string[];
+  participants?: Array<{ id: string; name: string; role: string; avatar?: string; bio?: string }>;
+  links?: Array<{ type: string; url: string }>;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Project extends ShowcaseCard {
+  purpose?: string;
+  expected_impact?: string;
+  associations?: string[];
+}

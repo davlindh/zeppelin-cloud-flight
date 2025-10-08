@@ -172,11 +172,10 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
 
   // Handle feature demonstration
   const handleFeatureClick = (feature: string) => {
-    toast({
-      title: `${feature} Feature`,
-      description: `You've clicked on the ${feature} feature! This demonstrates our Context7-compliant components.`,
-      variant: 'success',
-    });
+      toast({
+        title: `${feature} Feature`,
+        description: `You've clicked on the ${feature} feature! This demonstrates our Context7-compliant components.`,
+      });
   };
 
   // Handle submission form
@@ -420,7 +419,6 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
               toast({
                 title: 'Thank you!',
                 description: 'Thanks for exploring our Context7 components!',
-                variant: 'success',
               });
               setShowFeatureDialog(false);
             }}>
