@@ -60,6 +60,10 @@ export * from './useDashboardStats';
 export * from './useUserManagement';
 export * from './useAdminData';
 
+// Role & Permission hooks
+export * from './useUserRole';
+export * from './useCanEditParticipant';
+
 // Search hooks
 export * from './useUnifiedSearch';
 
