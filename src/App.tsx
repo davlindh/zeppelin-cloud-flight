@@ -16,6 +16,8 @@ import { ProjectDetailPage } from "./pages/ProjectDetailPage";
 import { ParticipantsPage } from "./pages/ParticipantsPage";
 import { ParticipantDetailPage } from "./pages/ParticipantDetailPage";
 import { PartnersPage } from "./pages/PartnersPage";
+import { CompleteParticipantProfilePage } from "./pages/CompleteParticipantProfilePage";
+import { AuthPage } from "./pages/AuthPage";
 import MediaGalleryPage from "./pages/MediaGalleryPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
@@ -67,6 +69,10 @@ const App = () => (
                   <Route path="partners" element={<PartnersPage />} />
                   <Route path="media" element={<MediaGalleryPage />} />
                 </Route>
+
+                {/* Auth & Profile Completion */}
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/participant/complete-profile" element={<CompleteParticipantProfilePage />} />
 
                 {/* Marketplace Routes */}
                 <Route path="/marketplace" element={

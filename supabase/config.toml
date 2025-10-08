@@ -1,1 +1,4 @@
 project_id = "paywaomkmjssbtkzwnwd"
+
+[functions.send-participant-welcome]
+verify_jwt = false

@@ -779,6 +779,41 @@ export type Database = {
           },
         ]
       }
+      participant_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          participant_id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          participant_id: string
+          token?: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          participant_id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_tokens_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
           auth_user_id: string | null
@@ -793,8 +828,13 @@ export type Database = {
           how_found_us: string | null
           id: string
           interests: string[] | null
+          is_featured: boolean | null
+          is_public: boolean | null
           location: string | null
           name: string
+          profile_completed: boolean | null
+          profile_completed_at: string | null
+          show_contact_info: boolean | null
           skills: string[] | null
           slug: string
           social_links: Json | null
@@ -815,8 +855,13 @@ export type Database = {
           how_found_us?: string | null
           id?: string
           interests?: string[] | null
+          is_featured?: boolean | null
+          is_public?: boolean | null
           location?: string | null
           name: string
+          profile_completed?: boolean | null
+          profile_completed_at?: string | null
+          show_contact_info?: boolean | null
           skills?: string[] | null
           slug: string
           social_links?: Json | null
@@ -837,8 +882,13 @@ export type Database = {
           how_found_us?: string | null
           id?: string
           interests?: string[] | null
+          is_featured?: boolean | null
+          is_public?: boolean | null
           location?: string | null
           name?: string
+          profile_completed?: boolean | null
+          profile_completed_at?: string | null
+          show_contact_info?: boolean | null
           skills?: string[] | null
           slug?: string
           social_links?: Json | null
@@ -1814,6 +1864,25 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      complete_participant_profile: {
+        Args: {
+          _auth_user_id: string
+          _availability?: string
+          _avatar_path?: string
+          _bio?: string
+          _contributions?: string[]
+          _experience_level?: string
+          _interests?: string[]
+          _skills?: string[]
+          _time_commitment?: string
+          _token: string
+        }
+        Returns: {
+          message: string
+          participant_slug: string
+          success: boolean
+        }[]
+      }
       convert_submission_media_to_library: {
         Args: {
           media_urls: string[]
@@ -1821,6 +1890,14 @@ export type Database = {
           target_project_id?: string
         }
         Returns: Json
+      }
+      create_participant_from_submission: {
+        Args: { _submission_id: string }
+        Returns: {
+          message: string
+          participant_id: string
+          success: boolean
+        }[]
       }
       generate_order_number: {
         Args: Record<PropertyKey, never>
@@ -1865,6 +1942,15 @@ export type Database = {
       set_session_context: {
         Args: { device_fingerprint: string; session_id: string }
         Returns: undefined
+      }
+      verify_participant_token: {
+        Args: { _token: string }
+        Returns: {
+          participant_email: string
+          participant_id: string
+          participant_name: string
+          valid: boolean
+        }[]
       }
     }
     Enums: {

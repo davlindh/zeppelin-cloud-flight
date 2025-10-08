@@ -158,11 +158,11 @@ export const ParticipantsPage: React.FC = () => {
         <div className="container mx-auto px-6 pb-12">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredParticipants.map((participant) => (
-              <Link
-                key={participant.slug}
-                to={`/participants/${participant.slug}`}
-                className="group block bg-card rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
-              >
+              <div key={participant.slug} className="relative">
+                <Link
+                  to={`/participants/${participant.slug}`}
+                  className="group block bg-card rounded-lg shadow-sm border border-border p-6 hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
+                >
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex-shrink-0 relative">
                     <EnhancedImage
@@ -201,6 +201,11 @@ export const ParticipantsPage: React.FC = () => {
                       {participant.media.length} media
                     </Badge>
                   )}
+                  {!(participant as any).profile_completed && (
+                    <Badge variant="outline" className="text-xs border-amber-500 text-amber-700">
+                      Inväntar profilslutsförande
+                    </Badge>
+                  )}
                 </div>
 
                 {participant.bio && (
@@ -209,6 +214,7 @@ export const ParticipantsPage: React.FC = () => {
                   </p>
                 )}
               </Link>
+              </div>
             ))}
           </div>
 

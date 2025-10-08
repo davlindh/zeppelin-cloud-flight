@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
   User,
-  Mail,
+  Mail as MailIcon,
   MapPin,
   Calendar,
   FileText,
@@ -24,11 +24,13 @@ import {
   Eye,
   Download,
   ExternalLink,
-  Loader2
+  Loader2,
+  Send
 } from 'lucide-react';
 import type { EnhancedSubmission } from '../hooks/useSubmissionData';
 import { getStatusColor, getStatusIcon, getTypeColor, getTypeLabel, hasFiles } from '../utils/submissionContentUtils';
 import { getCorrectedFileUrl } from '@/utils/fileNaming';
+import { useSendParticipantWelcome } from '@/hooks/useSendParticipantWelcome';
 
 interface SubmissionDetailModalProps {
   submission: EnhancedSubmission | null;
@@ -91,6 +93,8 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
+  
+  const sendWelcomeEmail = useSendParticipantWelcome();
 
   console.log('SubmissionDetailModal render:', { submission: submission?.id, isOpen });
 
@@ -424,7 +428,7 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
                 )}
                 {submission.contact_email && (
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <MailIcon className="h-4 w-4 text-muted-foreground" />
                     <span>{submission.contact_email}</span>
                   </div>
                 )}
@@ -443,6 +447,26 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-2">
+              {submission.type === 'participant' && submission.status === 'approved' && (
+                <Button
+                  onClick={() => sendWelcomeEmail.mutate(submission.id)}
+                  disabled={sendWelcomeEmail.isPending}
+                  className="w-full"
+                >
+                  {sendWelcomeEmail.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Skickar email...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Skicka välkomstemail
+                    </>
+                  )}
+                </Button>
+              )}
+              
               {hasFiles(submission) && submission.media_status === 'pending' && (
                 <>
                   <Button
