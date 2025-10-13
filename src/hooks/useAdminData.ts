@@ -7,7 +7,7 @@ export interface AdminActivity {
   action: string;
   ip_address: unknown; // inet type from database
   user_agent: string | null;
-  timestamp: string | null;
+  created_at: string | null;
   details?: Record<string, unknown>;
 }
 
@@ -30,7 +30,7 @@ export const useAdminActivity = () => {
       const { data, error } = await supabase
         .from('admin_access_logs')
         .select('*')
-        .order('timestamp', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) {
@@ -66,7 +66,7 @@ export const useSecurityMetrics = () => {
           supabase.from('bid_history').select('id', { count: 'exact' })
             .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
           supabase.from('admin_access_logs').select('id', { count: 'exact' })
-            .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+            .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
         ]);
 
         return {

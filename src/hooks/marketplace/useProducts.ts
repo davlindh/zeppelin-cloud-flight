@@ -105,7 +105,7 @@ export const useProducts = (filters?: {
           .from('products')
           .select(`
             *,
-            category:categories!fk_products_category_id (
+            category:categories!products_category_id_fkey (
               name,
               display_name
             ),
@@ -253,7 +253,7 @@ export const useProduct = (id: string) => {
           .from('products')
           .select(`
             *,
-            category:categories!fk_products_category_id (
+            category:categories!products_category_id_fkey (
               name,
               display_name
             ),

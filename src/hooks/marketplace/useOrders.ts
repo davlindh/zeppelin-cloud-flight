@@ -35,7 +35,7 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
       }
       
       if (status) {
-        query = query.eq('status', status);
+        query = query.eq('status', status as any);
       }
       
       if (limit) {

@@ -2154,6 +2154,10 @@ export type Database = {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]
       }
+      get_total_users_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2197,7 +2201,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "participant" | "customer"
+      app_role: "admin" | "participant" | "customer" | "moderator"
       auction_category:
         | "electronics"
         | "fashion"
@@ -2377,7 +2381,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "participant", "customer"],
+      app_role: ["admin", "participant", "customer", "moderator"],
       auction_category: [
         "electronics",
         "fashion",

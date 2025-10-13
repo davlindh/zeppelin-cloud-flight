@@ -211,3 +211,48 @@ export interface Project extends ShowcaseCard {
   expected_impact?: string;
   associations?: string[];
 }
+
+// Participant type
+export interface Participant extends BaseEntity {
+  name: string;
+  slug: string;
+  bio?: string;
+  avatar_path?: string;
+  avatar?: string; // Legacy compat
+  contact_email?: string;
+  contactEmail?: string; // Legacy compat
+  contact_phone?: string;
+  contactPhone?: string; // Legacy compat
+  location?: string;
+  skills?: string[];
+  experience_level?: string;
+  experienceLevel?: string; // Legacy compat
+  interests?: string[];
+  time_commitment?: string;
+  timeCommitment?: string; // Legacy compat
+  contributions?: string[];
+  availability?: string;
+  profile_completed?: boolean;
+  is_public?: boolean;
+  auth_user_id?: string;
+  website?: string;
+  social_links?: any;
+  socialLinks?: any; // Legacy compat
+  personal_links?: any;
+  personalLinks?: any; // Legacy compat
+  roles?: string[];
+  projects?: any[];
+  media?: any[];
+  howFoundUs?: string;
+}
+
+// Sponsor type
+export interface Sponsor extends BaseEntity {
+  name: string;
+  type: 'main' | 'partner' | 'supporter';
+  logo?: string;
+  website?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  contactPerson?: string;
+}

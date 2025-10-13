@@ -105,7 +105,7 @@ export const useProducts = (filters?: {
           .from('products')
           .select(`
             *,
-            category:categories!fk_products_category_id (
+            categories (
               name,
               display_name
             ),

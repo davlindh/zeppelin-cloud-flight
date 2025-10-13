@@ -43,7 +43,13 @@ export const useAdaptiveColors = (
   options: AdaptiveColorOptions = {}
 ): AdaptiveColorResult => {
   const mergedOptions = { ...defaultOptions, ...options };
-  const { preferences, effectiveTheme, currentColors, getCurrentSeason } = useAdaptiveTheme();
+  const themeContext = useAdaptiveTheme();
+  
+  // Fallbacks for theme context properties
+  const preferences = themeContext?.preferences || { highContrast: false, seasonal: 'off', timeBasedAdjustment: false, categoryTheme: 'default' } as any;
+  const effectiveTheme = themeContext?.effectiveTheme || 'light';
+  const currentColors = themeContext?.currentColors || { primary: { h: 220, s: 80, l: 50 }, secondary: { h: 0, s: 0, l: 50 } } as any;
+  const getCurrentSeason = themeContext?.getCurrentSeason || (() => 'spring');
   
   const [adaptedColors, setAdaptedColors] = useState<ColorTheme>(currentColors);
   const [currentCategory, setCurrentCategory] = useState<string | null>(null);
