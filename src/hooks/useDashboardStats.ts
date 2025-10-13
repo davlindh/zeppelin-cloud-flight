@@ -192,7 +192,7 @@ export const useRevenueStats = () => {
           .from('orders')
           .select('total_amount')
           .gte('created_at', today.toISOString().split('T')[0])
-          .eq('status', 'completed');
+          .eq('status', 'delivered');
 
         // Get yesterday's revenue
         const { data: yesterdayOrders } = await supabase
@@ -200,21 +200,21 @@ export const useRevenueStats = () => {
           .select('total_amount')
           .gte('created_at', yesterday.toISOString().split('T')[0])
           .lt('created_at', today.toISOString().split('T')[0])
-          .eq('status', 'completed');
+          .eq('status', 'delivered');
 
         // Get week's revenue
         const { data: weekOrders } = await supabase
           .from('orders')
           .select('total_amount')
           .gte('created_at', weekAgo.toISOString())
-          .eq('status', 'completed');
+          .eq('status', 'delivered');
 
         // Get month's revenue
         const { data: monthOrders } = await supabase
           .from('orders')
           .select('total_amount')
           .gte('created_at', monthAgo.toISOString())
-          .eq('status', 'completed');
+          .eq('status', 'delivered');
 
         const todayRevenue = todayOrders?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
         const yesterdayRevenue = yesterdayOrders?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;

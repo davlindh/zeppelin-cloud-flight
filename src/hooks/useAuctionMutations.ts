@@ -80,7 +80,7 @@ export const useAuctionMutations = () => {
         startingBid: data.starting_bid,
         endTime: new Date(data.end_time),
         bidders: data.bidders,
-        category: data.category_name ?? data.category,
+        category: data.category,
         condition: data.condition,
         image: data.image,
         slug: data.slug ?? undefined,
@@ -123,7 +123,6 @@ export const useAuctionMutations = () => {
       if (auctionData.condition) updateFields.condition = auctionData.condition;
       if (auctionData.image) updateFields.image = auctionData.image;
       if (auctionData.images) updateFields.images = auctionData.images;
-      if (auctionData.category_name) updateFields.category_name = auctionData.category_name;
 
       console.log('🔄 Updating auction:', auctionData.id, 'with data:', updateFields);
 
@@ -156,7 +155,7 @@ export const useAuctionMutations = () => {
         startingBid: data.starting_bid,
         endTime: new Date(data.end_time),
         bidders: data.bidders,
-        category: data.category_name ?? data.category,
+        category: data.category,
         condition: data.condition,
         image: data.image,
         slug: data.slug ?? undefined,

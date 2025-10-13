@@ -92,7 +92,7 @@ export type Database = {
       auctions: {
         Row: {
           bidders: number
-          category: Database["public"]["Enums"]["auction_category"]
+          category: string
           condition: Database["public"]["Enums"]["auction_condition"]
           created_at: string
           current_bid: number
@@ -110,7 +110,7 @@ export type Database = {
         }
         Insert: {
           bidders?: number
-          category: Database["public"]["Enums"]["auction_category"]
+          category: string
           condition: Database["public"]["Enums"]["auction_condition"]
           created_at?: string
           current_bid?: number
@@ -128,7 +128,7 @@ export type Database = {
         }
         Update: {
           bidders?: number
-          category?: Database["public"]["Enums"]["auction_category"]
+          category?: string
           condition?: Database["public"]["Enums"]["auction_condition"]
           created_at?: string
           current_bid?: number
@@ -1562,6 +1562,36 @@ export type Database = {
         }
         Relationships: []
       }
+      role_change_audit: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          id: string
+          new_role: string
+          old_role: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_role: string
+          old_role?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_role?: string
+          old_role?: string | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_portfolio_items: {
         Row: {
           category: string
@@ -1711,7 +1741,7 @@ export type Database = {
         Row: {
           available: boolean
           available_times: string[] | null
-          category: Database["public"]["Enums"]["service_category"]
+          category: string
           created_at: string
           description: string
           duration: string
@@ -1734,7 +1764,7 @@ export type Database = {
         Insert: {
           available?: boolean
           available_times?: string[] | null
-          category: Database["public"]["Enums"]["service_category"]
+          category: string
           created_at?: string
           description: string
           duration: string
@@ -1757,7 +1787,7 @@ export type Database = {
         Update: {
           available?: boolean
           available_times?: string[] | null
-          category?: Database["public"]["Enums"]["service_category"]
+          category?: string
           created_at?: string
           description?: string
           duration?: string
@@ -1953,6 +1983,33 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_watchlist: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          item_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          item_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          item_type?: string
           updated_at?: string | null
           user_id?: string
         }

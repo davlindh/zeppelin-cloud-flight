@@ -36,8 +36,7 @@ export const useAuctions = () => {
             startingBid: Number(auction.starting_bid) || 0,
             endTime: auction.end_time ? new Date(auction.end_time) : new Date(Date.now() + 24 * 60 * 60 * 1000), // Default to 24h from now
             bidders: Number(auction.bidders) || 0,
-            // Use category_name if available, fallback to enum category, then to 'electronics'
-            category: auction.category_name || auction.category || 'electronics',
+            category: auction.category || 'electronics',
             condition: auction.condition || 'good',
             image: auction.image || '',
             slug: auction.slug || undefined,
