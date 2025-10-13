@@ -11,7 +11,7 @@ export const AuctionsPage = () => {
   const [editingAuction, setEditingAuction] = useState<Auction | null>(null);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
 
-  const { handleCreate, handleUpdate } = useAuctionActions();
+  const { handleCreate, handleUpdate, handleDelete, handleView } = useAuctionActions();
 
   const handleCreateClick = () => {
     setEditingAuction(null);
@@ -67,7 +67,12 @@ export const AuctionsPage = () => {
         mode={formMode}
       />
       
-      <AuctionsTable />
+      <AuctionsTable
+        onCreateAuction={handleCreateClick}
+        onEditAuction={handleEdit}
+        onViewAuction={handleView}
+        onDeleteAuction={handleDelete}
+      />
     </div>
   );
 };

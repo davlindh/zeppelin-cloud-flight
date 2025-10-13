@@ -111,7 +111,7 @@ export const Dashboard = () => {
       {/* Security & Activity Row */}
       <div className="grid gap-4 md:grid-cols-2">
         <SecurityMetricsCard 
-          onClick={handleSecurityClick}
+          onViewDetails={handleSecurityClick}
         />
         <LiveActivityFeed 
           onViewAll={handleActivityViewAll}

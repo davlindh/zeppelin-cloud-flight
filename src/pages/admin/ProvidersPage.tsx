@@ -9,22 +9,20 @@ import type { ServiceProvider } from '@/types/unified';
 export const ProvidersPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProvider, setEditingProvider] = useState<ServiceProvider | null>(null);
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
 
-  const { handleCreate, handleUpdate, handleDelete, handleView } = useServiceProviderActions();
+  const { handleDelete, handleView } = useServiceProviderActions();
 
   const handleCreateClick = () => {
     setEditingProvider(null);
+    setFormMode('create');
     setShowForm(true);
   };
 
-  const handleEdit = (provider: ServiceProvider) => {
+  const handleEditClick = (provider: ServiceProvider) => {
     setEditingProvider(provider);
+    setFormMode('edit');
     setShowForm(true);
-  };
-
-  const handleSave = async () => {
-    setShowForm(false);
-    setEditingProvider(null);
   };
 
   const handleClose = () => {
@@ -45,15 +43,19 @@ export const ProvidersPage = () => {
         </Button>
       </div>
 
-      {showForm && (
-        <ServiceProviderForm
-          provider={editingProvider}
-          onSave={handleSave}
-          onCancel={handleClose}
-        />
-      )}
+      <ServiceProviderForm
+        isOpen={showForm}
+        onClose={handleClose}
+        onSave={handleClose}
+        provider={editingProvider}
+        mode={formMode}
+      />
       
-      <ServiceProvidersTable />
+      <ServiceProvidersTable
+        onEdit={handleEditClick}
+        onView={handleView}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };

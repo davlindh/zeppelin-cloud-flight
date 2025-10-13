@@ -11,7 +11,7 @@ export const ServicesPage = () => {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
 
-  const { handleCreate, handleUpdate } = useServiceActions();
+  const { handleCreate, handleUpdate, handleDelete, handleView } = useServiceActions();
 
   const handleCreateClick = () => {
     setEditingService(null);
@@ -67,7 +67,12 @@ export const ServicesPage = () => {
         mode={formMode}
       />
       
-      <ServicesTable />
+      <ServicesTable
+        onCreateService={handleCreateClick}
+        onEditService={handleEdit}
+        onViewService={handleView}
+        onDeleteService={handleDelete}
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { MediaProvider } from "@/contexts/MediaContext";
 import { UnifiedMediaProvider } from "@/contexts/UnifiedMediaContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
@@ -20,8 +21,8 @@ import { CompleteParticipantProfilePage } from "./pages/CompleteParticipantProfi
 import { AuthPage } from "./pages/AuthPage";
 import MediaGalleryPage from "./pages/MediaGalleryPage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
-import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import { AdminRoute } from "./components/admin/AdminRoute";
+import { AdminLayout } from "./components/admin/AdminLayout";
 import { ProjectEditPage } from "./pages/admin/ProjectEditPage";
 import { ParticipantEditPage } from "./pages/admin/ParticipantEditPage";
 import { SponsorEditPage } from "./pages/admin/SponsorEditPage";
@@ -43,6 +44,26 @@ import { NotificationProvider } from "./contexts/marketplace/NotificationProvide
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
+
+// Lazy load admin pages
+const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
+const ProductsPage = lazy(() => import("./pages/admin/ProductsPage").then(m => ({ default: m.ProductsPage })));
+const AuctionsPage = lazy(() => import("./pages/admin/AuctionsPage").then(m => ({ default: m.AuctionsPage })));
+const ServicesPage = lazy(() => import("./pages/admin/ServicesPage").then(m => ({ default: m.ServicesPage })));
+const OrdersPage = lazy(() => import("./pages/admin/OrdersPage").then(m => ({ default: m.OrdersPage })));
+const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
+const ProvidersPage = lazy(() => import("./pages/admin/ProvidersPage").then(m => ({ default: m.ProvidersPage })));
+const CategoriesPage = lazy(() => import("./pages/admin/CategoriesPage").then(m => ({ default: m.CategoriesPage })));
+const BrandsPage = lazy(() => import("./pages/admin/BrandsPage").then(m => ({ default: m.BrandsPage })));
+const BookingsPage = lazy(() => import("./pages/admin/BookingsPage").then(m => ({ default: m.BookingsPage })));
+const CommunicationsPage = lazy(() => import("./pages/admin/CommunicationsPage").then(m => ({ default: m.CommunicationsPage })));
+const SecurityPage = lazy(() => import("./pages/admin/SecurityPage").then(m => ({ default: m.SecurityPage })));
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-96">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -100,15 +121,78 @@ const App = () => (
                 <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                 <Route path="/order-tracking" element={<OrderTrackingPage />} />
                 
-                {/* Admin Routes */}
+                {/* Admin Routes - Nested with Layout */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
                 <Route path="/admin" element={
                   <AdminProvider>
                     <AdminRoute>
-                      <AdminDashboardPage />
+                      <AdminLayout />
                     </AdminRoute>
                   </AdminProvider>
-                } />
+                }>
+                  <Route index element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <Dashboard />
+                    </Suspense>
+                  } />
+                  <Route path="products" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ProductsPage />
+                    </Suspense>
+                  } />
+                  <Route path="auctions" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <AuctionsPage />
+                    </Suspense>
+                  } />
+                  <Route path="services" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ServicesPage />
+                    </Suspense>
+                  } />
+                  <Route path="orders" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <OrdersPage />
+                    </Suspense>
+                  } />
+                  <Route path="users" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <UsersPage />
+                    </Suspense>
+                  } />
+                  <Route path="providers" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ProvidersPage />
+                    </Suspense>
+                  } />
+                  <Route path="categories" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CategoriesPage />
+                    </Suspense>
+                  } />
+                  <Route path="brands" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <BrandsPage />
+                    </Suspense>
+                  } />
+                  <Route path="bookings" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <BookingsPage />
+                    </Suspense>
+                  } />
+                  <Route path="messages" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CommunicationsPage />
+                    </Suspense>
+                  } />
+                  <Route path="security" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <SecurityPage />
+                    </Suspense>
+                  } />
+                </Route>
+                
+                {/* Direct Admin Edit Routes (outside nested layout) */}
                 <Route path="/admin/projects/:slug/edit" element={
                   <AdminProvider>
                     <AdminRoute>

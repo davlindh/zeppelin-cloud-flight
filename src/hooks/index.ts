@@ -54,10 +54,10 @@ export * from './useCompanyData';
 export * from './useNotificationPreferences';
 
 // Admin hooks
-export * from './useAdminAuth';
+export { useAdminAuth } from './marketplace/useAdminAuth';
 export * from './useAdminAuditLog';
 export * from './useDashboardStats';
-export * from './useUserManagement';
+export { useUsers, useUserRoles, useUsersWithRoles, useUserMutations } from './marketplace/useUserManagement';
 export * from './useAdminData';
 
 // Role & Permission hooks

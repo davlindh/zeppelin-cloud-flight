@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import { 
   Users, 
   Package, 
@@ -26,18 +27,18 @@ import { Badge } from "@/components/ui/badge"
 import { useAdminCounts } from "@/hooks/useAdminCounts"
 
 const adminSections = [
-  { title: "Dashboard", tab: "dashboard", icon: BarChart3, description: "Overview & metrics" },
-  { title: "Products", tab: "products", icon: Package, description: "Manage inventory" },
-  { title: "Auctions", tab: "auctions", icon: Gavel, description: "Auction management" },
-  { title: "Services", tab: "services", icon: Wrench, description: "Service offerings" },
-  { title: "Messages", tab: "messages", icon: MessageSquare, description: "Communications" },
-  { title: "Bookings", tab: "bookings", icon: Calendar, description: "Service bookings" },
-  { title: "Orders", tab: "orders", icon: ShoppingCart, description: "Purchase orders" },
-  { title: "Users", tab: "users", icon: Users, description: "User management" },
-  { title: "Providers", tab: "providers", icon: Building, description: "Service providers" },
-  { title: "Categories", tab: "categories", icon: Tags, description: "Category management" },
-  { title: "Brands", tab: "brands", icon: Package, description: "Brand management" },
-  { title: "Security", tab: "security", icon: Shield, description: "Security overview" }
+  { title: "Dashboard", path: "/admin", icon: BarChart3, description: "Overview & metrics" },
+  { title: "Products", path: "/admin/products", icon: Package, description: "Manage inventory" },
+  { title: "Auctions", path: "/admin/auctions", icon: Gavel, description: "Auction management" },
+  { title: "Services", path: "/admin/services", icon: Wrench, description: "Service offerings" },
+  { title: "Messages", path: "/admin/messages", icon: MessageSquare, description: "Communications" },
+  { title: "Bookings", path: "/admin/bookings", icon: Calendar, description: "Service bookings" },
+  { title: "Orders", path: "/admin/orders", icon: ShoppingCart, description: "Purchase orders" },
+  { title: "Users", path: "/admin/users", icon: Users, description: "User management" },
+  { title: "Providers", path: "/admin/providers", icon: Building, description: "Service providers" },
+  { title: "Categories", path: "/admin/categories", icon: Tags, description: "Category management" },
+  { title: "Brands", path: "/admin/brands", icon: Package, description: "Brand management" },
+  { title: "Security", path: "/admin/security", icon: Shield, description: "Security overview" }
 ]
 
 interface AppSidebarAdminProps {
@@ -47,26 +48,28 @@ interface AppSidebarAdminProps {
 
 export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps) {
   const { state } = useSidebar()
+  const location = useLocation()
   const counts = useAdminCounts()
   const collapsed = state === 'collapsed'
 
-  const isActive = (tab: string) => activeTab === tab
-
-  const getBadgeCount = (tab: string): number => {
-    switch (tab) {
-      case 'messages':
-        return counts.unreadMessages || 0
-      case 'bookings':
-        return counts.pendingBookings || 0
-      case 'orders':
-        return counts.pendingOrders || 0
-      case 'products':
-        return counts.lowStockProducts || 0
-      case 'auctions':
-        return counts.endingAuctions || 0
-      default:
-        return 0
+  const isActive = (path: string) => {
+    if (path === '/admin') {
+      return location.pathname === '/admin'
     }
+    return location.pathname.startsWith(path)
+  }
+
+  const getBadgeCount = (path: string): number => {
+    if (path.includes('messages')) return counts.unreadMessages || 0
+    if (path.includes('bookings')) return counts.pendingBookings || 0
+    if (path.includes('orders')) return counts.pendingOrders || 0
+    if (path.includes('products')) return counts.lowStockProducts || 0
+    if (path.includes('auctions')) return counts.endingAuctions || 0
+    return 0
+  }
+
+  const handleClick = (path: string) => {
+    window.location.href = path
   }
 
   return (
@@ -80,16 +83,17 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
           <SidebarGroupContent>
             <SidebarMenu>
               {adminSections.map((section) => {
-                const badgeCount = getBadgeCount(section.tab)
+                const badgeCount = getBadgeCount(section.path)
+                const active = isActive(section.path)
                 
                 return (
                   <SidebarMenuItem key={section.title}>
                     <SidebarMenuButton 
                       asChild 
-                      className={isActive(section.tab) ? "bg-accent text-accent-foreground" : ""}
+                      className={active ? "bg-accent text-accent-foreground" : ""}
                     >
                       <button
-                        onClick={() => onTabChange(section.tab)}
+                        onClick={() => handleClick(section.path)}
                         className="w-full flex items-center justify-between p-2 hover:bg-accent/50 rounded-md transition-colors"
                       >
                         <div className="flex items-center">
