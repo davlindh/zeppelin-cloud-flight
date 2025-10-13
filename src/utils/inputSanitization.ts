@@ -1,13 +1,11 @@
-import DOMPurify from 'dompurify';
-
 // Input sanitization and validation utilities
 export class InputSanitizer {
-  // Sanitize HTML content to prevent XSS
+  // Sanitize HTML content to prevent XSS - using regex instead of DOMPurify
   static sanitizeHtml(input: string): string {
-    return DOMPurify.sanitize(input, {
-      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br'],
-      ALLOWED_ATTR: []
-    });
+    return input
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<[^>]*>/g, '')
+      .trim();
   }
 
   // Sanitize plain text (remove HTML, limit length)

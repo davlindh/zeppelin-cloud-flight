@@ -30,7 +30,7 @@ import {
   Database
 } from 'lucide-react';
 import DataCompletenessCenter from './DataCompletenessCenter';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '@/hooks/marketplace/useProducts';
 import { useAuctions } from '@/hooks/useAuctions';
 import { useServices } from '@/hooks/useServices';
 import { useServiceProviders } from '@/hooks/useServiceProviders';

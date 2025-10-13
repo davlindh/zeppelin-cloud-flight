@@ -10,7 +10,7 @@ import {
   Settings,
   ExternalLink
 } from 'lucide-react';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '@/hooks/marketplace/useProducts';
 
 const BrandManagement = () => {
   const { data: allProducts = [], isLoading } = useProducts();

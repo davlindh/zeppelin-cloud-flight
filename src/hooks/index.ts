@@ -1,7 +1,7 @@
 // Main hooks barrel export
 export * from './use-mobile';
 export * from './use-toast';
-export * from './useAdaptiveColors';
+export * from './marketplace/useAdaptiveColors';
 export * from './useCountdown';
 export * from './useDesignSystem';
 export * from './useErrorHandler';
@@ -12,7 +12,7 @@ export * from './useSearchHistory';
 export * from './useSocialProof';
 
 // Product & Shop hooks
-export * from './useProducts';
+export * from './marketplace/useProducts';
 export * from './useProductMutations';
 export * from './useProductComparison';
 export * from './useProductNotifications';

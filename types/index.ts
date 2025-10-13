@@ -6,12 +6,7 @@ export type {
   ShowcaseCard,
   Participant,
   Project,
-  Sponsor,
-  ProjectParticipant,
-  ProjectSponsor,
-  ProjectLink,
-  ProjectTag,
-  ProjectMedia
+  Sponsor
 } from '../src/types/unified';
 
 // Re-export admin types for convenience

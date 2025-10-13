@@ -64,23 +64,6 @@ export function aggregateParticipants(cards: ShowcaseCard[]): Participant[] {
           });
         }
         
-        // Add media from this project
-        if (card.media) {
-          if (!existingParticipant.media) existingParticipant.media = [];
-          card.media.forEach(mediaItem => {
-            const existingMedia = existingParticipant.media?.find(m => 
-              m.url === mediaItem.url
-            );
-            if (!existingMedia) {
-              existingParticipant.media?.push({
-                ...mediaItem,
-                category: 'featured' as const,
-                participantId: existingParticipant.id
-              });
-            }
-          });
-        }
-        
         // Add personal/professional links from this project
         if (card.links) {
           if (!existingParticipant.personalLinks) existingParticipant.personalLinks = [];
@@ -115,17 +98,6 @@ export function aggregateParticipants(cards: ShowcaseCard[]): Participant[] {
           media: [],
           personalLinks: []
         };
-        
-        // Add media from this project
-        if (card.media) {
-          card.media.forEach(mediaItem => {
-            newParticipant.media?.push({
-              ...mediaItem,
-              category: 'featured' as const,
-              participantId: newParticipant.id
-            });
-          });
-        }
         
         // Add personal/professional links from this project
         if (card.links) {

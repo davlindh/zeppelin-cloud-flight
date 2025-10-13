@@ -15,6 +15,11 @@ import { generateMediaId } from '@/utils/mediaHelpers';
 import { useParticipantData } from '@/hooks/useParticipantData';
 import type { Participant } from '../types/unified';
 
+interface PersonalLink {
+  url: string;
+  type: string;
+}
+
 export const ParticipantDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -354,7 +359,7 @@ export const ParticipantDetailPage: React.FC = () => {
                   Sociala länkar & Profiler
                 </h2>
                 <div className="flex flex-wrap gap-3">
-                  {participant.personalLinks && Array.from(new Map(participant.personalLinks.map(link => [link.url, link])).values()).map((link, index) => (
+                  {participant.personalLinks && Array.from(new Map((participant.personalLinks as PersonalLink[]).map(link => [link.url, link])).values()).map((link, index) => (
                     <Button key={`personal-${index}`} variant="outline" asChild>
                       <a 
                         href={link.url} 

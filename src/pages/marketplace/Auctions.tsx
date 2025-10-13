@@ -24,7 +24,7 @@ const Auctions = () => {
   const { data: auctions, isLoading: auctionsLoading, error: auctionsError, refetch, isRefetching } = useAuctions();
   const { data: categoryNames, isLoading: categoriesLoading, isError: categoriesError } = useDynamicCategoryNames();
   
-  // Create safe category list with fallbacks
+  // Create safe category list with fallbacks - extract just the names
   const safeCategoryNames = getSafeCategoryList(categoryNames);
   
   const sortOptions = [

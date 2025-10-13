@@ -91,9 +91,9 @@ const createLucideIcon = (iconName: string): React.ReactElement | null => {
 
   try {
     const formattedName = formatIconName(iconName);
-    const Icon = (LucideIcons as Record<string, React.ComponentType>)[formattedName];
+    const Icon = (LucideIcons as any)[formattedName];
     if (Icon) {
-      return React.createElement(Icon, { className: 'h-8 w-8' });
+      return React.createElement(Icon, { className: 'h-8 w-8' } as any);
     }
   } catch (error) {
     console.warn(`[dynamicCategoryUtils] Failed to load Lucide icon "${iconName}"`, error);
@@ -155,7 +155,7 @@ export const normalizeCategoryName = (categoryName: string): string => {
   return categoryName.toLowerCase().trim();
 };
 
-export const getSafeCategoryList = (categories?: Array<{ name: string }>): string[] => {
+export const getSafeCategoryList = (categories?: string[] | Array<{ name: string }>): string[] => {
   const baseFallback = ['all', 'electronics', 'fashion', 'home', 'sports', 'books', 'art'];
 
   if (!categories || categories.length === 0) {
@@ -163,7 +163,12 @@ export const getSafeCategoryList = (categories?: Array<{ name: string }>): strin
   }
 
   try {
-    const dynamicCategories = categories
+    // Handle both string[] and { name: string }[] formats
+    if (typeof categories[0] === 'string') {
+      return ['all', ...(categories as string[])];
+    }
+    
+    const dynamicCategories = (categories as Array<{ name: string }>)
       .map(category => category.name)
       .filter((name): name is string => Boolean(name));
 

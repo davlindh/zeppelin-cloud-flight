@@ -116,7 +116,7 @@ export const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({ onViewAll })
                               </span>
                               <span className="text-xs text-muted-foreground flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                {formatTimestamp(activity.timestamp)}
+                                {formatTimestamp(activity.created_at)}
                               </span>
                             </div>
                           </div>

@@ -1,8 +1,17 @@
 import { z } from 'zod';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
-// Extend Zod with OpenAPI functionality
-extendZodWithOpenApi(z);
+// OpenAPI functionality removed - using plain Zod validation
+// Mock .openapi() method to maintain compatibility
+declare module 'zod' {
+  interface ZodType<Output = any, Def extends z.ZodTypeDef = z.ZodTypeDef, Input = Output> {
+    openapi(metadata: any, options?: any): this;
+  }
+}
+
+// @ts-ignore
+z.ZodType.prototype.openapi = function(this: any, _metadata?: any, _options?: any) {
+  return this;
+};
 
 // Auction category enum for strict typing
 export const AuctionCategorySchema = z.enum([
