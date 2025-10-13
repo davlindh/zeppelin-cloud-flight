@@ -18,7 +18,7 @@ import {
   Edit,
   Loader2
 } from 'lucide-react';
-import { useUsersWithRoles, useUserMutations } from '@/hooks/useUserManagement';
+import { useUsersWithRoles, useUserMutations } from '@/hooks/marketplace/useUserManagement';
 
 interface User {
   id: string;

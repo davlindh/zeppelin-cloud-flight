@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle, Settings, LogOut, CheckCircle } from 'lucide-react';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { useAdminAuth } from '@/hooks/marketplace/useAdminAuth';
 
 interface AdminHeaderProps {
   securityStatus?: 'secure' | 'warning' | 'critical';

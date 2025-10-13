@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAdminAuth } from './useAdminAuth';
+import { useAdminAuth } from './marketplace/useAdminAuth';
 
 interface AuditLogEntry {
   action: string;

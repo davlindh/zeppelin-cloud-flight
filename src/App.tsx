@@ -109,8 +109,6 @@ const App = () => (
                     </AdminRoute>
                   </AdminProvider>
                 } />
-
-                {/* Direct Admin Edit Routes */}
                 <Route path="/admin/projects/:slug/edit" element={
                   <AdminProvider>
                     <AdminRoute>

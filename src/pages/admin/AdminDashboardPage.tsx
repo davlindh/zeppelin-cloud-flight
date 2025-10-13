@@ -51,7 +51,7 @@ import { useServiceProviderMutations } from '@/hooks/useServiceProviderMutations
 import type { Category } from '@/hooks/useCategoryMutations';
 import { useToast } from '@/hooks/use-toast';
 import { useDashboardStats, useRevenueStats } from '@/hooks/useDashboardStats';
-import { useUserMutations } from '@/hooks/useUserManagement';
+import { useUserMutations } from '@/hooks/marketplace/useUserManagement';
 import { useAdminRealtime } from '@/hooks/useAdminRealtime';
 import type { Product, Auction, Service, ServiceProvider } from '@/types/unified';
 
