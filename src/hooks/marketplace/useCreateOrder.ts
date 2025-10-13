@@ -39,7 +39,7 @@ export const useCreateOrder = () => {
       // 1. Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
-        .insert({
+        .insert([{
           customer_email: orderData.customerEmail,
           customer_name: orderData.customerName,
           customer_phone: orderData.customerPhone,
@@ -51,7 +51,7 @@ export const useCreateOrder = () => {
           shipping_address: orderData.shippingAddress,
           billing_address: orderData.billingAddress,
           customer_notes: orderData.notes,
-        })
+        } as any])
         .select()
         .single();
       

@@ -14,7 +14,6 @@ export interface UserProfile {
   bio: string | null;
   email_verified: boolean;
   preferences: any;
-  role: string;
   customer_id: number | null;
   address: string | null;
   company_name: string | null;

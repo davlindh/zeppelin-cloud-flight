@@ -14,7 +14,6 @@ export interface UserProfile {
   phone?: string | null;
   email_verified: boolean | null;
   preferences: any;
-  role: string | null;
   customer_id: number | null;
   address?: string | null;
   company_name?: string | null;

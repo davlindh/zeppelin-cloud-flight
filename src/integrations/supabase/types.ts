@@ -193,6 +193,44 @@ export type Database = {
           },
         ]
       }
+      bid_notifications: {
+        Row: {
+          auction_id: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string
+          user_id: string | null
+        }
+        Insert: {
+          auction_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type: string
+          user_id?: string | null
+        }
+        Update: {
+          auction_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bid_notifications_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           agreed_to_terms: boolean
@@ -531,6 +569,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          auction_ending_alerts: boolean | null
+          back_in_stock_alerts: boolean | null
+          created_at: string | null
+          daily_digest: boolean | null
+          email_notifications: boolean | null
+          frequency_daily: boolean | null
+          frequency_hourly: boolean | null
+          frequency_immediate: boolean | null
+          id: string
+          new_items_in_categories: boolean | null
+          outbid_alerts: boolean | null
+          price_drop_alerts: boolean | null
+          push_notifications: boolean | null
+          quiet_hours_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          stock_alerts: boolean | null
+          updated_at: string | null
+          user_id: string
+          weekly_recommendations: boolean | null
+        }
+        Insert: {
+          auction_ending_alerts?: boolean | null
+          back_in_stock_alerts?: boolean | null
+          created_at?: string | null
+          daily_digest?: boolean | null
+          email_notifications?: boolean | null
+          frequency_daily?: boolean | null
+          frequency_hourly?: boolean | null
+          frequency_immediate?: boolean | null
+          id?: string
+          new_items_in_categories?: boolean | null
+          outbid_alerts?: boolean | null
+          price_drop_alerts?: boolean | null
+          push_notifications?: boolean | null
+          quiet_hours_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          stock_alerts?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          weekly_recommendations?: boolean | null
+        }
+        Update: {
+          auction_ending_alerts?: boolean | null
+          back_in_stock_alerts?: boolean | null
+          created_at?: string | null
+          daily_digest?: boolean | null
+          email_notifications?: boolean | null
+          frequency_daily?: boolean | null
+          frequency_hourly?: boolean | null
+          frequency_immediate?: boolean | null
+          id?: string
+          new_items_in_categories?: boolean | null
+          outbid_alerts?: boolean | null
+          price_drop_alerts?: boolean | null
+          push_notifications?: boolean | null
+          quiet_hours_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          stock_alerts?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          weekly_recommendations?: boolean | null
+        }
+        Relationships: []
       }
       order_items: {
         Row: {
@@ -1851,6 +1958,81 @@ export type Database = {
         }
         Relationships: []
       }
+      users: {
+        Row: {
+          address: string | null
+          auth_user_id: string
+          avatar_url: string | null
+          bio: string | null
+          company_name: string | null
+          created_at: string | null
+          customer_id: number | null
+          customer_type: string | null
+          email: string | null
+          email_verified: boolean | null
+          full_name: string | null
+          id: string
+          last_purchase_date: string | null
+          location: string | null
+          loyalty_points: number | null
+          phone: string | null
+          preferences: Json | null
+          preferred_contact_method: string | null
+          preferred_payment_method: string | null
+          updated_at: string | null
+          username: string | null
+          vat_number: string | null
+        }
+        Insert: {
+          address?: string | null
+          auth_user_id: string
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          customer_id?: number | null
+          customer_type?: string | null
+          email?: string | null
+          email_verified?: boolean | null
+          full_name?: string | null
+          id?: string
+          last_purchase_date?: string | null
+          location?: string | null
+          loyalty_points?: number | null
+          phone?: string | null
+          preferences?: Json | null
+          preferred_contact_method?: string | null
+          preferred_payment_method?: string | null
+          updated_at?: string | null
+          username?: string | null
+          vat_number?: string | null
+        }
+        Update: {
+          address?: string | null
+          auth_user_id?: string
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          customer_id?: number | null
+          customer_type?: string | null
+          email?: string | null
+          email_verified?: boolean | null
+          full_name?: string | null
+          id?: string
+          last_purchase_date?: string | null
+          location?: string | null
+          loyalty_points?: number | null
+          phone?: string | null
+          preferences?: Json | null
+          preferred_contact_method?: string | null
+          preferred_payment_method?: string | null
+          updated_at?: string | null
+          username?: string | null
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1910,6 +2092,10 @@ export type Database = {
       generate_slug: {
         Args: { title: string }
         Returns: string
+      }
+      get_available_times: {
+        Args: { selected_date: string; service_uuid: string }
+        Returns: string[]
       }
       has_role: {
         Args: {
