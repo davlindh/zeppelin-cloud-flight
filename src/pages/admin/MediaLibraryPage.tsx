@@ -7,11 +7,13 @@ import { MediaFilterPanel } from '@/components/media/MediaFilterPanel';
 import { MediaBulkActionsToolbar } from '@/components/media/MediaBulkActionsToolbar';
 import { MediaViewModeToggle, ViewMode } from '@/components/media/MediaViewModeToggle';
 import { MediaStorageStats } from '@/components/media/MediaStorageStats';
+import { StorageExplorer } from '@/components/media/StorageExplorer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +34,7 @@ export const MediaLibraryPage: React.FC = () => {
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [previewItem, setPreviewItem] = React.useState<MediaLibraryItem | null>(null);
-  const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false);
+  const [showUploadDialog, setShowUploadDialog] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [showFilters, setShowFilters] = React.useState(false);
 
@@ -106,7 +108,7 @@ export const MediaLibraryPage: React.FC = () => {
   };
 
   const handleUploadComplete = () => {
-    setUploadDialogOpen(false);
+    setShowUploadDialog(false);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,20 +131,30 @@ export const MediaLibraryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Media Library</h1>
-          <p className="text-muted-foreground">
-            Manage all media files across the platform
-          </p>
+    <div className="container mx-auto py-6">
+      <div className="flex flex-col gap-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Media Library</h1>
+            <p className="text-muted-foreground">
+              Manage and organize all media assets
+            </p>
+          </div>
+          <Button onClick={() => setShowUploadDialog(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Upload Media
+          </Button>
         </div>
-        <Button onClick={() => setUploadDialogOpen(true)}>
-          <Upload className="h-4 w-4 mr-2" />
-          Upload Media
-        </Button>
-      </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="library" className="w-full">
+          <TabsList>
+            <TabsTrigger value="library">Media Library</TabsTrigger>
+            <TabsTrigger value="storage">Storage Explorer</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="library" className="space-y-6">
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
@@ -322,10 +334,18 @@ export const MediaLibraryPage: React.FC = () => {
         editable
       />
 
+          </TabsContent>
+
+          <TabsContent value="storage">
+            <StorageExplorer />
+          </TabsContent>
+        </Tabs>
+      </div>
+
       {/* Upload Dialog */}
       <MediaUploadDialog
-        open={uploadDialogOpen}
-        onOpenChange={setUploadDialogOpen}
+        open={showUploadDialog}
+        onOpenChange={setShowUploadDialog}
         onUploadComplete={handleUploadComplete}
       />
 

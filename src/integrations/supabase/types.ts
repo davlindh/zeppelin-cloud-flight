@@ -2237,6 +2237,10 @@ export type Database = {
         Args: { _participant_id: string }
         Returns: boolean
       }
+      clean_media_title: {
+        Args: { filename: string }
+        Returns: string
+      }
       cleanup_old_drafts: {
         Args: Record<PropertyKey, never>
         Returns: undefined

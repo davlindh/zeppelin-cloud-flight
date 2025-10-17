@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,7 +125,22 @@ export function MediaCard({
   const colorScheme = getMediaColorScheme(item.type);
   const statusScheme = getStatusColorScheme(item.status);
   const displayTitle = cleanTitle(item.title);
-  const thumbnailUrl = item.thumbnail_url || (item.type === 'image' ? getThumbnailUrl(item.public_url, { width: 400 }) : item.public_url);
+  
+  // Smart thumbnail generation
+  const thumbnailUrl = React.useMemo(() => {
+    if (item.type === 'image') {
+      // Use thumbnail_url if available
+      if (item.thumbnail_url) return item.thumbnail_url;
+      
+      // Generate thumbnail from public_url if available
+      if (item.public_url) {
+        return getThumbnailUrl(item.public_url, { width: 400, quality: 75 });
+      }
+      
+      return '/placeholder.svg';
+    }
+    return item.thumbnail_url || item.public_url;
+  }, [item]);
 
   return (
     <Card

@@ -1,0 +1,194 @@
+import { supabase } from "@/integrations/supabase/client";
+
+export interface StorageBucket {
+  id: string;
+  name: string;
+  public: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface StorageFile {
+  name: string;
+  id: string | null;
+  updated_at: string | null;
+  created_at: string | null;
+  last_accessed_at: string | null;
+  metadata: Record<string, any> | null;
+}
+
+export interface StorageFileWithUrl extends StorageFile {
+  publicUrl?: string;
+  inDatabase: boolean;
+  mediaId?: string;
+}
+
+/**
+ * List all storage buckets
+ */
+export async function listAllBuckets(): Promise<StorageBucket[]> {
+  try {
+    const { data, error } = await supabase.storage.listBuckets();
+    
+    if (error) {
+      console.error('Failed to list buckets:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Failed to list buckets:', error);
+    return [];
+  }
+}
+
+/**
+ * List files in a specific bucket
+ */
+export async function listFilesInBucket(
+  bucketName: string,
+  path: string = ''
+): Promise<StorageFile[]> {
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .list(path, {
+        limit: 1000,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
+    
+    if (error) {
+      console.error(`Failed to list files in bucket ${bucketName}:`, error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error(`Failed to list files in bucket ${bucketName}:`, error);
+    return [];
+  }
+}
+
+/**
+ * Get public URL for a file
+ */
+export function getPublicUrl(bucketName: string, filePath: string): string {
+  const { data } = supabase.storage
+    .from(bucketName)
+    .getPublicUrl(filePath);
+  
+  return data.publicUrl;
+}
+
+/**
+ * Check if files exist in media_library database
+ */
+export async function checkFilesInDatabase(
+  bucketName: string,
+  files: StorageFile[]
+): Promise<StorageFileWithUrl[]> {
+  const filesWithStatus = await Promise.all(
+    files.map(async (file) => {
+      const storagePath = file.name;
+      const publicUrl = getPublicUrl(bucketName, storagePath);
+      
+      // Check if this file exists in media_library
+      const { data } = await supabase
+        .from('media_library')
+        .select('id')
+        .eq('bucket', bucketName)
+        .eq('storage_path', storagePath)
+        .maybeSingle();
+      
+      return {
+        ...file,
+        publicUrl,
+        inDatabase: !!data,
+        mediaId: data?.id,
+      };
+    })
+  );
+  
+  return filesWithStatus;
+}
+
+/**
+ * Import orphaned file to media_library
+ */
+export async function importFileToMediaLibrary(
+  bucketName: string,
+  file: StorageFileWithUrl,
+  metadata: {
+    title?: string;
+    category?: string;
+    tags?: string[];
+    status?: string;
+  }
+) {
+  const mimeType = file.metadata?.mimetype || 'application/octet-stream';
+  const fileSize = file.metadata?.size || 0;
+  
+  // Determine media type
+  let type: 'image' | 'video' | 'audio' | 'document' = 'document';
+  if (mimeType.startsWith('image/')) type = 'image';
+  else if (mimeType.startsWith('video/')) type = 'video';
+  else if (mimeType.startsWith('audio/')) type = 'audio';
+  
+  // Generate smart title
+  const title = metadata.title || file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+  
+  // Generate thumbnail for images
+  let thumbnailUrl: string | undefined;
+  if (type === 'image' && file.publicUrl) {
+    thumbnailUrl = `${file.publicUrl}?width=400&quality=75&format=webp`;
+  }
+  
+  const { data, error } = await supabase
+    .from('media_library')
+    .insert({
+      title: title.charAt(0).toUpperCase() + title.slice(1),
+      filename: file.name,
+      original_filename: file.name,
+      type,
+      mime_type: mimeType,
+      file_size: fileSize,
+      storage_path: file.name,
+      public_url: file.publicUrl,
+      thumbnail_url: thumbnailUrl,
+      bucket: bucketName,
+      source: 'storage-import',
+      category: metadata.category,
+      tags: metadata.tags || [],
+      status: metadata.status || 'pending',
+      is_public: true,
+    })
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+}
+
+/**
+ * Get storage statistics
+ */
+export async function getStorageStats(bucketName: string) {
+  const files = await listFilesInBucket(bucketName);
+  const filesWithStatus = await checkFilesInDatabase(bucketName, files);
+  
+  const totalFiles = files.length;
+  const totalSize = files.reduce((sum, file) => sum + (file.metadata?.size || 0), 0);
+  const orphanedFiles = filesWithStatus.filter(f => !f.inDatabase).length;
+  const linkedFiles = filesWithStatus.filter(f => f.inDatabase).length;
+  
+  return {
+    totalFiles,
+    totalSize,
+    orphanedFiles,
+    linkedFiles,
+    files: filesWithStatus,
+  };
+}

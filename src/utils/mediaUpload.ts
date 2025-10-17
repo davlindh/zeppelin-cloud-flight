@@ -57,13 +57,37 @@ export const extractFileMetadata = (file: File): Promise<{
 
 /**
  * Get media type from MIME type
+ * @param mimeType - MIME type string
+ * @returns Media type category
  */
-export const getMediaType = (mimeType: string): 'image' | 'video' | 'audio' | 'document' => {
+function getMediaType(mimeType: string): 'image' | 'video' | 'audio' | 'document' {
   if (mimeType.startsWith('image/')) return 'image';
   if (mimeType.startsWith('video/')) return 'video';
   if (mimeType.startsWith('audio/')) return 'audio';
   return 'document';
-};
+}
+
+/**
+ * Generate smart title from filename
+ * @param filename - Original filename
+ * @returns Cleaned, user-friendly title
+ */
+function generateSmartTitle(filename: string): string {
+  // Remove extension
+  let title = filename.replace(/\.[^.]+$/, '');
+  
+  // Remove timestamp and hash patterns (e.g., "1759747290724-ysfzo5yhp4")
+  title = title.replace(/[0-9]{13,}-[a-z0-9]+/g, '');
+  
+  // Replace underscores and hyphens with spaces
+  title = title.replace(/[_-]/g, ' ');
+  
+  // Trim and capitalize
+  title = title.trim();
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  
+  return title || 'Untitled Media';
+}
 
 /**
  * Generate unique filename
@@ -141,6 +165,7 @@ export const uploadToMediaLibrary = async (
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from('media-files')
     .upload(storagePath, file, {
+      contentType: file.type,
       cacheControl: '3600',
       upsert: false,
     });
@@ -156,23 +181,34 @@ export const uploadToMediaLibrary = async (
 
   // 5. Extract file metadata
   const fileMetadata = await extractFileMetadata(file);
+  const mediaType = getMediaType(file.type);
 
-  // 6. Get current user
+  // 6. Generate thumbnail URL for images using Supabase transform
+  let thumbnailUrl: string | undefined;
+  if (mediaType === 'image') {
+    thumbnailUrl = `${urlData.publicUrl}?width=400&quality=75&format=webp`;
+  }
+
+  // 7. Generate smart title from filename
+  const smartTitle = options.metadata?.title || generateSmartTitle(file.name);
+
+  // 8. Get current user
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 7. Create media_library record
+  // 9. Create media_library record
   const { data: mediaRecord, error: dbError } = await supabase
     .from('media_library')
     .insert({
-      title: options.metadata?.title || file.name,
+      title: smartTitle,
       description: options.metadata?.description,
       filename: filename,
       original_filename: file.name,
-      type: getMediaType(file.type),
+      type: mediaType,
       mime_type: file.type,
       bucket: 'media-files',
       storage_path: uploadData.path,
       public_url: urlData.publicUrl,
+      thumbnail_url: thumbnailUrl,
       file_size: file.size,
       width: fileMetadata.width,
       height: fileMetadata.height,
