@@ -33,13 +33,39 @@ export async function listAllBuckets(): Promise<StorageBucket[]> {
     
     if (error) {
       console.error('Failed to list buckets:', error);
-      return [];
+      // Return hardcoded list of known buckets as fallback
+      return [
+        { id: 'media-files', name: 'media-files', public: true },
+        { id: 'project-images', name: 'project-images', public: true },
+        { id: 'participant-avatars', name: 'participant-avatars', public: true },
+        { id: 'sponsor-logos', name: 'sponsor-logos', public: true },
+        { id: 'documents', name: 'documents', public: false },
+        { id: 'ui', name: 'ui', public: true },
+        { id: 'media', name: 'media', public: false },
+        { id: 'product-images', name: 'product-images', public: true },
+        { id: 'auction-images', name: 'auction-images', public: true },
+        { id: 'service-images', name: 'service-images', public: true },
+        { id: 'provider-avatars', name: 'provider-avatars', public: true },
+      ];
     }
     
     return data || [];
   } catch (error) {
     console.error('Failed to list buckets:', error);
-    return [];
+    // Return hardcoded list as fallback
+    return [
+      { id: 'media-files', name: 'media-files', public: true },
+      { id: 'project-images', name: 'project-images', public: true },
+      { id: 'participant-avatars', name: 'participant-avatars', public: true },
+      { id: 'sponsor-logos', name: 'sponsor-logos', public: true },
+      { id: 'documents', name: 'documents', public: false },
+      { id: 'ui', name: 'ui', public: true },
+      { id: 'media', name: 'media', public: false },
+      { id: 'product-images', name: 'product-images', public: true },
+      { id: 'auction-images', name: 'auction-images', public: true },
+      { id: 'service-images', name: 'service-images', public: true },
+      { id: 'provider-avatars', name: 'provider-avatars', public: true },
+    ];
   }
 }
 
