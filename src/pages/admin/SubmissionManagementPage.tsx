@@ -10,7 +10,7 @@ import { SubmissionListItem } from '@/components/admin/submission-management/Sub
 import { SubmissionContentPreview } from '@/components/admin/submission-management/SubmissionContentPreview';
 import { SubmissionFilters } from '@/components/admin/submission-management/SubmissionFilters';
 import { MigrationTools } from '@/components/admin/submission-management/MigrationTools';
-import { MediaGrid } from '@/components/media/MediaGrid';
+import { MediaGrid } from '@/components/media/shared/MediaGrid';
 import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
 import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

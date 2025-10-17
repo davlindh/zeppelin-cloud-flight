@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -8,9 +8,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Image, Video, Music, FileText, MoreVertical, Download, Link2, Trash2, Edit, Eye } from "lucide-react";
-import { MediaLibraryItem } from "@/types/mediaLibrary";
+import {
+  Image,
+  Video,
+  Music,
+  FileText,
+  Clock,
+  Calendar,
+  CheckCircle2,
+  AlertCircle,
+  Archive,
+  MoreVertical,
+  Eye,
+  Edit,
+  Trash2,
+  Link2,
+  Download,
+} from "lucide-react";
+import type { MediaLibraryItem } from "@/types/mediaLibrary";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface MediaCardProps {
   item: MediaLibraryItem;
@@ -22,39 +39,57 @@ interface MediaCardProps {
   onLink?: (item: MediaLibraryItem) => void;
   onDownload?: (item: MediaLibraryItem) => void;
   showActions?: boolean;
+  showCheckbox?: boolean;
+  compact?: boolean;
+  showMetadata?: boolean;
+  showStatus?: boolean;
+  context?: "admin" | "public";
 }
 
-const getMediaIcon = (type: string) => {
+const getMediaIcon = (type: MediaLibraryItem["type"]) => {
   switch (type) {
-    case 'image':
-      return Image;
-    case 'video':
-      return Video;
-    case 'audio':
-      return Music;
-    default:
-      return FileText;
+    case "image":
+      return <Image className="h-4 w-4" />;
+    case "video":
+      return <Video className="h-4 w-4" />;
+    case "audio":
+      return <Music className="h-4 w-4" />;
+    case "document":
+      return <FileText className="h-4 w-4" />;
   }
 };
 
-const getStatusColor = (status: string) => {
+const getStatusIcon = (status: MediaLibraryItem["status"]) => {
   switch (status) {
-    case 'approved':
-      return 'bg-green-500/10 text-green-700 dark:text-green-400';
-    case 'pending':
-      return 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400';
-    case 'rejected':
-      return 'bg-red-500/10 text-red-700 dark:text-red-400';
-    default:
-      return 'bg-muted text-muted-foreground';
+    case "approved":
+      return <CheckCircle2 className="h-3 w-3 text-green-500" />;
+    case "pending":
+      return <Clock className="h-3 w-3 text-yellow-500" />;
+    case "rejected":
+      return <AlertCircle className="h-3 w-3 text-red-500" />;
+    case "archived":
+      return <Archive className="h-3 w-3 text-gray-500" />;
+  }
+};
+
+const getStatusColor = (status: MediaLibraryItem["status"]) => {
+  switch (status) {
+    case "approved":
+      return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20";
+    case "pending":
+      return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20";
+    case "rejected":
+      return "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20";
+    case "archived":
+      return "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20";
   }
 };
 
 const formatFileSize = (bytes: number | null): string => {
-  if (!bytes) return 'N/A';
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  if (!bytes) return "Unknown";
+  const mb = bytes / (1024 * 1024);
+  if (mb < 1) return `${Math.round(bytes / 1024)} KB`;
+  return `${mb.toFixed(1)} MB`;
 };
 
 export function MediaCard({
@@ -67,31 +102,67 @@ export function MediaCard({
   onLink,
   onDownload,
   showActions = true,
+  showCheckbox = false,
+  compact = false,
+  showMetadata = true,
+  showStatus = true,
+  context = "admin",
 }: MediaCardProps) {
-  const Icon = getMediaIcon(item.type);
+  const handleClick = (e: React.MouseEvent) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return;
+    onPreview?.(item);
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    onSelect?.(item.id, checked as boolean);
+  };
 
   return (
-    <Card className={cn(
-      "group relative overflow-hidden transition-all hover:shadow-lg",
-      selected && "ring-2 ring-primary"
-    )}>
-      {/* Selection Checkbox */}
-      {onSelect && (
+    <Card
+      className={cn(
+        "group relative overflow-hidden transition-all hover:shadow-lg cursor-pointer",
+        selected && "ring-2 ring-primary",
+        compact ? "h-32" : "h-64"
+      )}
+      onClick={handleClick}
+    >
+      {/* Checkbox */}
+      {showCheckbox && (
         <div className="absolute top-2 left-2 z-10">
           <Checkbox
             checked={selected}
-            onCheckedChange={(checked) => onSelect(item.id, checked as boolean)}
-            className="bg-background"
+            onCheckedChange={handleCheckboxChange}
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
 
-      {/* Actions Menu */}
-      {showActions && (
-        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Status & Featured Badge */}
+      {showStatus && (
+        <div className="absolute top-2 right-2 z-10 flex gap-1">
+          <Badge variant="outline" className={cn("text-xs", getStatusColor(item.status))}>
+            {getStatusIcon(item.status)}
+            <span className="ml-1 capitalize">{item.status}</span>
+          </Badge>
+          {item.is_featured && (
+            <Badge variant="secondary" className="text-xs">
+              Featured
+            </Badge>
+          )}
+        </div>
+      )}
+
+      {/* Actions Dropdown */}
+      {showActions && context === "admin" && (
+        <div className="absolute top-2 right-2 z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="h-8 w-8">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -105,13 +176,13 @@ export function MediaCard({
               {onEdit && (
                 <DropdownMenuItem onClick={() => onEdit(item)}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit Metadata
+                  Edit
                 </DropdownMenuItem>
               )}
               {onLink && (
                 <DropdownMenuItem onClick={() => onLink(item)}>
                   <Link2 className="mr-2 h-4 w-4" />
-                  Link to Project
+                  Link
                 </DropdownMenuItem>
               )}
               {onDownload && (
@@ -121,7 +192,7 @@ export function MediaCard({
                 </DropdownMenuItem>
               )}
               {onDelete && (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => onDelete(item)}
                   className="text-destructive"
                 >
@@ -134,70 +205,73 @@ export function MediaCard({
         </div>
       )}
 
-      {/* Media Preview */}
-      <div 
-        className="aspect-video bg-muted flex items-center justify-center cursor-pointer"
-        onClick={() => onPreview?.(item)}
+      {/* Thumbnail */}
+      <div
+        className={cn(
+          "relative overflow-hidden bg-muted",
+          compact ? "h-full" : "h-40"
+        )}
       >
-        {item.type === 'image' && item.thumbnail_url ? (
+        {item.type === "image" ? (
           <img
             src={item.thumbnail_url || item.public_url}
             alt={item.title}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            loading="lazy"
           />
-        ) : item.type === 'video' && item.thumbnail_url ? (
-          <div className="relative w-full h-full">
-            <img
-              src={item.thumbnail_url}
-              alt={item.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Video className="h-12 w-12 text-white opacity-80" />
-            </div>
-          </div>
         ) : (
-          <Icon className="h-16 w-16 text-muted-foreground" />
-        )}
-      </div>
-
-      {/* Media Info */}
-      <div className="p-4 space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-medium text-sm line-clamp-1" title={item.title}>
-            {item.title}
-          </h3>
-          <Badge className={cn("text-xs", getStatusColor(item.status))}>
-            {item.status}
-          </Badge>
-        </div>
-
-        {item.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">
-            {item.description}
-          </p>
-        )}
-
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formatFileSize(item.file_size)}</span>
-          <span>{item.type}</span>
-        </div>
-
-        {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {item.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {item.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{item.tags.length - 3}
-              </Badge>
-            )}
+          <div className="flex h-full items-center justify-center">
+            {getMediaIcon(item.type)}
           </div>
         )}
       </div>
+
+      {/* Content */}
+      {!compact && (
+        <CardContent className="p-3">
+          <h4 className="font-semibold text-sm truncate mb-1">{item.title}</h4>
+
+          {showMetadata && (
+            <>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                {getMediaIcon(item.type)}
+                <span>{formatFileSize(item.file_size)}</span>
+                {item.width && item.height && (
+                  <span>
+                    {item.width}×{item.height}
+                  </span>
+                )}
+                {item.duration && (
+                  <span>
+                    {Math.floor(item.duration / 60)}:
+                    {String(item.duration % 60).padStart(2, "0")}
+                  </span>
+                )}
+              </div>
+
+              {item.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {item.tags.slice(0, 3).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {item.tags.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{item.tags.length - 3}
+                    </Badge>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>{format(new Date(item.created_at), "MMM d, yyyy")}</span>
+              </div>
+            </>
+          )}
+        </CardContent>
+      )}
     </Card>
   );
 }

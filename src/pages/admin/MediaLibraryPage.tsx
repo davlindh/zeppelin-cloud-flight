@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 import { MediaToolbar } from '@/components/media/MediaToolbar';
-import { MediaGrid } from '@/components/media/MediaGrid';
+import { MediaGrid } from '@/components/media/shared/MediaGrid';
 import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
 import { MediaUploadDialog } from '@/components/media/MediaUploadDialog';
 import { Card } from '@/components/ui/card';
