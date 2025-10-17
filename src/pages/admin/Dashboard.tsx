@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Package, Gavel, Wrench, ShoppingCart, Users } from 'lucide-react';
+import { DollarSign, Package, Gavel, Wrench } from 'lucide-react';
 import { SecurityMetricsCard } from '@/components/admin/dashboard/SecurityMetricsCard';
 import { LiveActivityFeed } from '@/components/admin/dashboard/LiveActivityFeed';
 import { AlertsCenter } from '@/components/admin/dashboard/AlertsCenter';
 import AdminDataHub from '@/components/admin/dashboard/AdminDataHub';
 import { useDashboardStats, useRevenueStats } from '@/hooks/useDashboardStats';
 import { useAdminAuditLog } from '@/hooks/useAdminAuditLog';
+import { ZeppelStatsCards } from '@/components/admin/ZeppelStatsCards';
 
 export const Dashboard = () => {
   const { data: dashboardStats, isLoading: statsLoading } = useDashboardStats();
@@ -53,8 +54,16 @@ export const Dashboard = () => {
         <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Zeppel Admin Stats */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Zeppel Admin</h2>
+        <ZeppelStatsCards />
+      </div>
+
+      {/* Marketplace Stats */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Marketplace Overview</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -106,6 +115,7 @@ export const Dashboard = () => {
             </p>
           </CardContent>
         </Card>
+        </div>
       </div>
 
       {/* Security & Activity Row */}

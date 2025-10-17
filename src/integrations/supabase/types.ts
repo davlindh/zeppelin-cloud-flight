@@ -477,6 +477,41 @@ export type Database = {
         }
         Relationships: []
       }
+      media_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          media_id: string | null
+          performed_by: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          media_id?: string | null
+          performed_by?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          media_id?: string | null
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_audit_log_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_items: {
         Row: {
           category: string | null
@@ -545,6 +580,127 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_library: {
+        Row: {
+          approved_at: string | null
+          bucket: string
+          category: string | null
+          created_at: string
+          description: string | null
+          duration: number | null
+          file_size: number | null
+          filename: string
+          height: number | null
+          id: string
+          is_featured: boolean | null
+          is_public: boolean | null
+          mime_type: string
+          original_filename: string | null
+          participant_id: string | null
+          project_id: string | null
+          public_url: string
+          search_vector: unknown | null
+          source: string | null
+          status: string
+          storage_path: string
+          submission_id: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string
+          uploaded_at: string
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          approved_at?: string | null
+          bucket?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          filename: string
+          height?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          mime_type: string
+          original_filename?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          public_url: string
+          search_vector?: unknown | null
+          source?: string | null
+          status?: string
+          storage_path: string
+          submission_id?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          type: string
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          approved_at?: string | null
+          bucket?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          filename?: string
+          height?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          mime_type?: string
+          original_filename?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          public_url?: string
+          search_vector?: unknown | null
+          source?: string | null
+          status?: string
+          storage_path?: string
+          submission_id?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_library_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_library_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_library_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
             referencedColumns: ["id"]
           },
         ]
@@ -2139,6 +2295,10 @@ export type Database = {
       get_total_users_count: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_zeppel_admin_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       has_role: {
         Args: {

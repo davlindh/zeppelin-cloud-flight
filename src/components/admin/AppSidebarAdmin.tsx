@@ -29,7 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useAdminCounts } from "@/hooks/useAdminCounts"
 
-const showcaseSections = [
+const zeppelSections = [
   { title: "Inlämningar", path: "/admin/submissions", icon: MessageSquare, description: "Hantera inlämningar" },
   { title: "Deltagare", path: "/admin/participants-management", icon: Users, description: "Hantera deltagare" },
   { title: "Projekt", path: "/admin/projects-management", icon: FolderOpen, description: "Showcase-projekt" },
@@ -86,15 +86,15 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarContent>
-        {/* Showcase Admin Section */}
+        {/* Zeppel Admin Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
-            Showcase Admin
+            Zeppel Admin
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {showcaseSections.map((section) => {
+              {zeppelSections.map((section) => {
                 const active = isActive(section.path)
                 
                 return (
