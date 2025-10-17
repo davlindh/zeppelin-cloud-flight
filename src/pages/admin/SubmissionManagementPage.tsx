@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase-extensions';
+import { supabase } from '@/integrations/supabase/client';
 import { SubmissionListItem } from '@/components/admin/submission-management/SubmissionListItem';
 import { SubmissionContentPreview } from '@/components/admin/submission-management/SubmissionContentPreview';
 import { SubmissionFilters } from '@/components/admin/submission-management/SubmissionFilters';
@@ -16,11 +15,6 @@ import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
 import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
-
-// Use extended types with media_library support
-const supabaseUrl = "https://paywaomkmjssbtkzwnwd.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBheXdhb21rbWpzc2J0a3p3bndkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDg0NDIsImV4cCI6MjA3MzAyNDQ0Mn0.NkWnQCMJA3bZQy5746C_SmlWsT3pLnNOOLUNjlPv0tI";
-const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
 interface Submission {
   id: string;
@@ -61,7 +55,7 @@ export const SubmissionManagementPage: React.FC = () => {
       // Fetch media counts for each submission
       const withCounts = await Promise.all(
         (data || []).map(async (sub) => {
-          const { count } = await supabase
+          const { count } = await (supabase as any)
             .from('media_library')
             .select('*', { count: 'exact', head: true })
             .eq('submission_id', sub.id);
@@ -87,7 +81,7 @@ export const SubmissionManagementPage: React.FC = () => {
   }, [selectedSubmission]);
 
   const fetchSubmissionMedia = async (submissionId: string) => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('media_library')
       .select('*')
       .eq('submission_id', submissionId);

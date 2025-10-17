@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm, SubmitHandler, Path, PathValue, DefaultValues } from 'react-hook-form';
+import { useForm, SubmitHandler, Path, PathValue, DefaultValues, FormProvider } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -43,9 +43,11 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
     allowedTypes: ['image/*', 'video/*', 'audio/*', 'application/*']
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<T>({
+  const form = useForm<T>({
     defaultValues: defaultValues as DefaultValues<T>
   });
+
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,7 +110,7 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
 
     return (
       <StandardFormField
-        form={{ register, formState: { errors }, setValue, watch } as any}
+        form={form}
         name={fieldName as any}
         label={field.label}
         type={field.type}
@@ -134,7 +136,8 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
         </CardHeader>
 
         <form onSubmit={handleSubmit(onFormSubmit)}>
-          <CardContent className="space-y-6">
+          <FormProvider {...form}>
+            <CardContent className="space-y-6">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -179,6 +182,7 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
               } {config.entityName}
             </Button>
           </CardFooter>
+          </FormProvider>
         </form>
       </Card>
     </div>
