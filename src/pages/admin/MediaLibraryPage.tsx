@@ -52,6 +52,7 @@ export const MediaLibraryPage: React.FC = () => {
     bulkTag,
     bulkLink,
     bulkChangeStatus,
+    bulkDownload,
   } = useMediaLibrary(filters);
 
   // Statistics
@@ -105,6 +106,19 @@ export const MediaLibraryPage: React.FC = () => {
     bulkDelete(Array.from(selectedIds));
     setSelectedIds(new Set());
     setDeleteDialogOpen(false);
+  };
+
+  const handleDownload = (item: MediaLibraryItem) => {
+    const link = document.createElement('a');
+    link.href = item.public_url;
+    link.download = item.filename || item.title;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleBulkDownload = () => {
+    bulkDownload(Array.from(selectedIds));
   };
 
   const handleDelete = (id: string) => {
@@ -319,11 +333,12 @@ export const MediaLibraryPage: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-4">
                     {format(new Date(date), 'MMMM d, yyyy')}
                   </h3>
-                  <MediaGrid
+                   <MediaGrid
                     media={items}
                     selectedIds={selectedIds}
                     onSelect={handleSelect}
                     onPreview={setPreviewItem}
+                    onDownload={handleDownload}
                     showCheckboxes
                     columns={getViewColumns()}
                     loading={isLoading}
@@ -337,6 +352,7 @@ export const MediaLibraryPage: React.FC = () => {
               selectedIds={selectedIds}
               onSelect={handleSelect}
               onPreview={setPreviewItem}
+              onDownload={handleDownload}
               showCheckboxes
               compact={viewMode === 'list'}
               columns={getViewColumns()}
@@ -359,6 +375,9 @@ export const MediaLibraryPage: React.FC = () => {
             selectedCount={selectedIds.size}
             onApprove={handleBulkApprove}
             onDelete={handleBulkDelete}
+            onDownload={handleBulkDownload}
+            onTag={() => setShowTagEditor(true)}
+            onLink={() => setShowLinkDialog(true)}
             onClearSelection={() => setSelectedIds(new Set())}
           />
         </div>

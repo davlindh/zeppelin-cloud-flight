@@ -324,6 +324,71 @@ export const useMediaLibrary = (filters?: MediaFilters) => {
     },
   });
 
+  // Bulk download
+  const bulkDownload = async (ids: string[]) => {
+    try {
+      const { data: items } = await supabase
+        .from('media_library')
+        .select('public_url, filename, title')
+        .in('id', ids);
+
+      if (!items || items.length === 0) {
+        toast({
+          title: 'Error',
+          description: 'No files to download',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (items.length === 1) {
+        // Single file - direct download
+        const item = items[0] as any;
+        const link = document.createElement('a');
+        link.href = item.public_url;
+        link.download = item.filename || item.title;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast({
+          title: 'Success',
+          description: 'Download started',
+        });
+      } else {
+        // Multiple files - download each one
+        toast({
+          title: 'Downloading',
+          description: `Starting download of ${items.length} files...`,
+        });
+
+        for (const item of items as any[]) {
+          const link = document.createElement('a');
+          link.href = item.public_url;
+          link.download = item.filename || item.title;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Small delay between downloads
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+
+        toast({
+          title: 'Success',
+          description: `Downloaded ${items.length} files`,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to download:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to download files',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return {
     media: media || [],
     isLoading,
@@ -335,5 +400,6 @@ export const useMediaLibrary = (filters?: MediaFilters) => {
     bulkTag: bulkTagMutation.mutate,
     bulkLink: bulkLinkMutation.mutate,
     bulkChangeStatus: bulkChangeStatusMutation.mutate,
+    bulkDownload,
   };
 };
