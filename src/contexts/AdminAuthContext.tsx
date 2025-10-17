@@ -109,10 +109,10 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
 
   const verifyAdmin = async (userId: string, email?: string | null): Promise<boolean> => {
     try {
-      if (!email) return false;
+      if (!userId) return false;
       
       const { data: isAuthorized, error } = await supabase
-        .rpc('is_admin_email', { email_to_check: email });
+        .rpc('has_role', { _user_id: userId, _role: 'admin' });
 
       return !error && isAuthorized === true;
     } catch (error) {
@@ -124,16 +124,8 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
-      
-      // Check if email is authorized using secure function
-      const { data: isAuthorized, error: authError } = await supabase
-        .rpc('is_admin_email', { email_to_check: email });
 
-      if (authError || !isAuthorized) {
-        return { success: false, error: 'Email not authorized for admin access' };
-      }
-
-      // Sign in with Supabase Auth
+      // Sign in with Supabase Auth first
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -141,6 +133,17 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
 
       if (error) {
         return { success: false, error: error.message };
+      }
+
+      // Check if user has admin role
+      if (data.user) {
+        const { data: isAuthorized, error: authError } = await supabase
+          .rpc('has_role', { _user_id: data.user.id, _role: 'admin' });
+
+        if (authError || !isAuthorized) {
+          await supabase.auth.signOut();
+          return { success: false, error: 'User does not have admin privileges' };
+        }
       }
 
       return { success: true };
@@ -155,17 +158,9 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const signup = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
-      
-      // Check if email is authorized using secure function
-      const { data: isAuthorized, error: authError } = await supabase
-        .rpc('is_admin_email', { email_to_check: email });
-
-      if (authError || !isAuthorized) {
-        return { success: false, error: 'Email not authorized for admin access' };
-      }
 
       // Sign up with Supabase Auth
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -177,7 +172,11 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
         return { success: false, error: error.message };
       }
 
-      return { success: true };
+      // Note: Admin role must be assigned manually in the database by existing admins
+      return { 
+        success: true, 
+        error: 'Account created. Please contact an administrator to grant admin privileges.'
+      };
     } catch (error) {
       console.error('Signup error:', error);
       return { success: false, error: 'Signup failed. Please try again.' };

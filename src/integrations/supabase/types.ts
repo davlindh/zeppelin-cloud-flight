@@ -68,27 +68,6 @@ export type Database = {
         }
         Relationships: []
       }
-      admin_users: {
-        Row: {
-          auth_user_id: string | null
-          created_at: string
-          email: string
-          id: string
-        }
-        Insert: {
-          auth_user_id?: string | null
-          created_at?: string
-          email: string
-          id?: string
-        }
-        Update: {
-          auth_user_id?: string | null
-          created_at?: string
-          email?: string
-          id?: string
-        }
-        Relationships: []
-      }
       auctions: {
         Row: {
           bidders: number
@@ -2168,14 +2147,6 @@ export type Database = {
       hash_device_fingerprint: {
         Args: { fingerprint: string }
         Returns: string
-      }
-      is_admin: {
-        Args: { user_email: string } | { user_email?: string; user_id?: string }
-        Returns: boolean
-      }
-      is_admin_email: {
-        Args: { email_to_check: string }
-        Returns: boolean
       }
       place_bid: {
         Args: { p_amount: number; p_auction_id: string; p_bidder: string }
