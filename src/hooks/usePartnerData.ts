@@ -35,6 +35,7 @@ interface DbSponsor {
   type: 'main' | 'partner' | 'supporter';
   logo_path?: string | null;
   website?: string | null;
+  description?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
   contact_person?: string | null;
@@ -68,6 +69,7 @@ const transformStaticSponsor = (sponsor: DbSponsor): EnhancedPartner => {
     type: sponsor.type,
     logo: logoUrl,
     website: sponsor.website || undefined,
+    description: sponsor.description || undefined,
     contactEmail: sponsor.contact_email || undefined,
     contactPhone: sponsor.contact_phone || undefined,
     contactPerson: sponsor.contact_person || undefined,
@@ -120,9 +122,6 @@ export const usePartnerData = ({ enhanced = false } = {}) => {
             title: ps.projects.title,
             year: new Date(ps.projects.created_at).getFullYear().toString(),
           }));
-          partner.description = 'Enhanced description';
-          partner.partnershipHistory = [{ year: '2023', milestone: 'Became a partner' }];
-          partner.collaborationTypes = ['Funding', 'Support'];
         }
 
         return partner;

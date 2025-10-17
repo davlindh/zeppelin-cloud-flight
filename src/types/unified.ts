@@ -252,6 +252,7 @@ export interface Sponsor extends BaseEntity {
   type: 'main' | 'partner' | 'supporter';
   logo?: string;
   website?: string;
+  description?: string;
   contactEmail?: string;
   contactPhone?: string;
   contactPerson?: string;

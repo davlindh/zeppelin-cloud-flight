@@ -241,6 +241,12 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
         ]
       },
       {
+        name: 'description',
+        label: 'Beskrivning',
+        type: 'textarea',
+        placeholder: 'Beskriv partnern och deras verksamhet...'
+      },
+      {
         name: 'website',
         label: 'Website',
         type: 'url',
@@ -371,6 +377,7 @@ const dataTransformers = {
     toForm: (data: Record<string, unknown> | undefined) => ({
       name: (data?.name as string) || '',
       type: (data?.type as string) || 'partner',
+      description: (data?.description as string) || '',
       website: (data?.website as string) || '',
       contact_email: (data?.contact_email as string) || '',
       contact_phone: (data?.contact_phone as string) || '',
@@ -380,6 +387,7 @@ const dataTransformers = {
     fromForm: (data: Record<string, unknown>) => ({
       name: data.name as string,
       type: data.type as string,
+      description: data.description as string,
       website: data.website as string,
       contact_email: data.contact_email as string,
       contact_phone: data.contact_phone as string,
