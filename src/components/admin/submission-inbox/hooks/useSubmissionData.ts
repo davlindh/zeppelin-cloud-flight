@@ -2,11 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSubmissions } from '@/hooks/useApi';
 
 export interface SubmissionFilters {
-  type: string;
-  experience: string;
-  location: string;
-  sortBy: 'created_at' | 'title' | 'type';
-  sortOrder: 'asc' | 'desc';
+  type: string; // 'all' | 'project' | 'participant' | 'media' | 'collaboration'
 }
 
 export interface EnhancedSubmission {
@@ -34,11 +30,7 @@ export interface EnhancedSubmission {
 }
 
 const defaultFilters: SubmissionFilters = {
-  type: 'all',
-  experience: 'all',
-  location: 'all',
-  sortBy: 'created_at',
-  sortOrder: 'desc'
+  type: 'all'
 };
 
 /**
@@ -80,19 +72,17 @@ export const useSubmissionData = () => {
     }));
   }, [apiSubmissions]);
 
-  // Filtered and sorted submissions
+  // Filtered and sorted submissions (simplified)
   const filteredSubmissions = useMemo(() => {
     let filtered = [...submissions];
 
-    // Filter by search term
+    // Filter by search term - simplified to only search in key fields
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(sub =>
         sub.title.toLowerCase().includes(searchLower) ||
         sub.submitted_by?.toLowerCase().includes(searchLower) ||
-        sub.contact_email?.toLowerCase().includes(searchLower) ||
-        sub.location?.toLowerCase().includes(searchLower) ||
-        JSON.stringify(sub.content).toLowerCase().includes(searchLower)
+        sub.contact_email?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -101,90 +91,32 @@ export const useSubmissionData = () => {
       filtered = filtered.filter(sub => sub.type === filters.type);
     }
 
-    // Filter by experience level (for participant submissions)
-    if (filters.experience !== 'all') {
-      filtered = filtered.filter(sub => sub.type === 'participant' && sub.content.experienceLevel === filters.experience);
-    }
-
-    // Filter by location
-    if (filters.location !== 'all') {
-      filtered = filtered.filter(sub => sub.location?.toLowerCase().includes(filters.location.toLowerCase()));
-    }
-
     // Status filter (when viewing specific tabs)
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(sub => sub.status === selectedStatus);
     }
 
-    // Sort
-    filtered.sort((a, b) => {
-      let aVal: string | Date, bVal: string | Date;
-
-      switch (filters.sortBy) {
-        case 'title':
-          aVal = a.title.toLowerCase();
-          bVal = b.title.toLowerCase();
-          break;
-        case 'type':
-          aVal = a.type;
-          bVal = b.type;
-          break;
-        default:
-          aVal = new Date(a.created_at);
-          bVal = new Date(b.created_at);
-      }
-
-      if (aVal < bVal) return filters.sortOrder === 'asc' ? -1 : 1;
-      if (aVal > bVal) return filters.sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
+    // Always sort by created_at DESC (newest first)
+    filtered.sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
     return filtered;
   }, [submissions, searchTerm, filters, selectedStatus]);
 
   // Stats for dashboard
-  const stats = useMemo(() => {
-    const total = submissions.length;
-    const pending = submissions.filter(s => s.status === 'pending').length;
-    const approved = submissions.filter(s => s.status === 'approved').length;
-    const rejected = submissions.filter(s => s.status === 'rejected').length;
-
-    return {
-      total,
-      pending,
-      approved,
-      rejected,
-      byStatus: { pending, approved, rejected },
-      byType: [
-        {
-          type: 'project',
-          count: submissions.filter(s => s.type === 'project').length,
-          percentage: Math.round((submissions.filter(s => s.type === 'project').length / total) * 100) || 0
-        },
-        {
-          type: 'participant',
-          count: submissions.filter(s => s.type === 'participant').length,
-          percentage: Math.round((submissions.filter(s => s.type === 'participant').length / total) * 100) || 0
-        },
-        {
-          type: 'media',
-          count: submissions.filter(s => s.type === 'media').length,
-          percentage: Math.round((submissions.filter(s => s.type === 'media').length / total) * 100) || 0
-        }
-      ].filter(item => item.count > 0)
-    };
-  }, [submissions]);
-
-  // Unique filter values
-  const filterOptions = useMemo(() => {
-    const locations = Array.from(new Set(submissions.map(sub => sub.location).filter(Boolean)));
-    const types = Array.from(new Set(submissions.map(sub => sub.type)));
-
-    return {
-      locations,
-      types
-    };
-  }, [submissions]);
+  const stats = useMemo(() => ({
+    total: submissions.length,
+    pending: submissions.filter(s => s.status === 'pending').length,
+    approved: submissions.filter(s => s.status === 'approved').length,
+    rejected: submissions.filter(s => s.status === 'rejected').length,
+    byType: {
+      project: submissions.filter(s => s.type === 'project').length,
+      participant: submissions.filter(s => s.type === 'participant').length,
+      media: submissions.filter(s => s.type === 'media').length,
+      collaboration: submissions.filter(s => s.type === 'collaboration').length
+    }
+  }), [submissions]);
 
   return {
     submissions,
@@ -195,7 +127,6 @@ export const useSubmissionData = () => {
     filters,
     selectedStatus,
     stats,
-    filterOptions,
     setSearchTerm,
     setFilters,
     setSelectedStatus

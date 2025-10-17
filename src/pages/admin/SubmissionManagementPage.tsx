@@ -3,16 +3,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { SubmissionListItem } from '@/components/admin/submission-management/SubmissionListItem';
 import { SubmissionContentPreview } from '@/components/admin/submission-management/SubmissionContentPreview';
-import { SubmissionFilters } from '@/components/admin/submission-management/SubmissionFilters';
 import { MigrationTools } from '@/components/admin/submission-management/MigrationTools';
 import { MediaGrid } from '@/components/media/shared/MediaGrid';
 import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
-import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
 
@@ -216,14 +217,42 @@ export const SubmissionManagementPage: React.FC = () => {
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Inlämningar</CardTitle>
-            <SubmissionFilters
-              search={search}
-              onSearchChange={setSearch}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              typeFilter={typeFilter}
-              onTypeFilterChange={setTypeFilter}
-            />
+            <div className="flex gap-3 mt-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Sök efter titel, email..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alla status</SelectItem>
+                  <SelectItem value="pending">Väntande</SelectItem>
+                  <SelectItem value="approved">Godkända</SelectItem>
+                  <SelectItem value="rejected">Avvisade</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Typ" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alla typer</SelectItem>
+                  <SelectItem value="participant">Deltagare</SelectItem>
+                  <SelectItem value="project">Projekt</SelectItem>
+                  <SelectItem value="collaboration">Samarbete</SelectItem>
+                  <SelectItem value="media">Media</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[600px] px-6 pb-6">

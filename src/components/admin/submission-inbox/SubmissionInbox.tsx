@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, ArrowUpDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, CheckCircle } from 'lucide-react';
 import { SubmissionList } from './components/SubmissionList';
 import { SubmissionDetailModal } from './components/SubmissionDetailModal';
 import { useSubmissionData } from './hooks/useSubmissionData';
@@ -63,70 +64,46 @@ export const SubmissionInbox: React.FC = () => {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Inlämningar</span>
-            <span className="text-sm text-muted-foreground">
-              {stats.total} totalt
-            </span>
-          </CardTitle>
-
-          {/* Search and Filter Controls */}
-          <div className="flex gap-4 mt-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Sök i inlämningar..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+          <div className="flex items-center justify-between mb-4">
+            <CardTitle>Ansökningar</CardTitle>
+            <div className="flex items-center gap-4">
+              {stats.pending > 0 && (
+                <Badge variant="destructive">
+                  {stats.pending} väntande
+                </Badge>
+              )}
+              <span className="text-sm text-muted-foreground">
+                {stats.total} totalt
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Sök titel, namn eller email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            <div className="flex gap-2">
-              <select
-                value={filters.type}
-                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="all">Alla typer</option>
-                <option value="project">Projekt</option>
-                <option value="participant">Deltagare</option>
-                <option value="media">Media</option>
-                <option value="collaboration">Samarbete</option>
-              </select>
-
-              <select
-                value={filters.experience}
-                onChange={(e) => setFilters({ ...filters, experience: e.target.value })}
-                className="px-3 py-2 border rounded-md text-sm"
-              >
-                <option value="all">Alla erfarenheter</option>
-                <option value="beginner">Nybörjare</option>
-                <option value="intermediate">Medel</option>
-                <option value="experienced">Erfaren</option>
-                <option value="expert">Expert</option>
-              </select>
-
-              <Button
-                variant="outline"
-                onClick={() => exportToCSV(filteredSubmissions)}
-                title="Exportera alla inlämningar som CSV"
-              >
-                Export CSV
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => setFilters({
-                  ...filters,
-                  sortOrder: filters.sortOrder === 'asc' ? 'desc' : 'asc'
-                })}
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
+            <Select 
+              value={filters.type} 
+              onValueChange={(value) => setFilters({ ...filters, type: value })}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Alla typer" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alla typer ({stats.total})</SelectItem>
+                <SelectItem value="project">Projekt ({stats.byType.project})</SelectItem>
+                <SelectItem value="participant">Deltagare ({stats.byType.participant})</SelectItem>
+                <SelectItem value="media">Media ({stats.byType.media})</SelectItem>
+                <SelectItem value="collaboration">Samarbete ({stats.byType.collaboration})</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
 
@@ -134,10 +111,11 @@ export const SubmissionInbox: React.FC = () => {
           <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
             <TabsList>
               <TabsTrigger value="all">
-                Alla ({filteredSubmissions.length})
+                Alla ({stats.total})
               </TabsTrigger>
               <TabsTrigger value="pending">
                 Väntande ({stats.pending})
+                {stats.pending === 0 && <CheckCircle className="ml-2 h-3 w-3 text-green-500" />}
               </TabsTrigger>
               <TabsTrigger value="approved">
                 Godkända ({stats.approved})
@@ -148,18 +126,28 @@ export const SubmissionInbox: React.FC = () => {
             </TabsList>
 
             <TabsContent value={currentTab} className="mt-6">
-              <SubmissionList
-                submissions={visibleSubmissions}
-                selectedSubmission={selectedSubmission}
-                onSelect={setSelectedSubmission}
-                onEdit={setEditingSubmission}
-                onConvert={setConvertingSubmission}
-                onApprove={(id) => updateStatus(id, 'approved')}
-                onReject={(id) => updateStatus(id, 'rejected')}
-                onExport={exportToJSON}
-                onDelete={deleteSubmission}
-                loading={loading}
-              />
+              {currentTab === 'pending' && stats.pending === 0 ? (
+                <Card className="p-12 text-center">
+                  <CheckCircle className="h-16 w-16 mx-auto text-green-500 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Bra jobbat!</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Det finns inga väntande ansökningar att granska just nu.
+                  </p>
+                </Card>
+              ) : (
+                <SubmissionList
+                  submissions={visibleSubmissions}
+                  selectedSubmission={selectedSubmission}
+                  onSelect={setSelectedSubmission}
+                  onEdit={setEditingSubmission}
+                  onConvert={setConvertingSubmission}
+                  onApprove={(id) => updateStatus(id, 'approved')}
+                  onReject={(id) => updateStatus(id, 'rejected')}
+                  onExport={exportToJSON}
+                  onDelete={deleteSubmission}
+                  loading={loading}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
