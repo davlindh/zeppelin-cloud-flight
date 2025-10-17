@@ -118,11 +118,18 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
     onLoad?.();
   }, [onLoad]);
 
-  // Handle image error
+  // Handle image error with fallback to placeholder
   const handleError = useCallback((error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('Image load failed:', src, error);
     setHasError(true);
+    
+    // Try placeholder as fallback
+    if (imgRef.current && !src.includes('placeholder')) {
+      imgRef.current.src = '/placeholder.svg';
+    }
+    
     onError?.(error);
-  }, [onError]);
+  }, [src, onError]);
 
   // Generate filter styles
   const filterStyles = useMemo(() => {
