@@ -110,14 +110,14 @@ const transformSponsors = (projectSponsors: unknown) => {
   if (!Array.isArray(projectSponsors)) return [];
 
   return projectSponsors.map(junction => {
-    const sponsor = (junction as { sponsors?: any; type?: string })?.sponsors;
-    const type = (junction as { sponsors?: any; type?: string })?.type;
+    const sponsor = (junction as { sponsors?: any })?.sponsors;
     return sponsor ? {
       id: sponsor.id || sponsor.name,
       name: sponsor.name,
-      type: type || 'sponsor',
+      type: sponsor.type || 'supporter',
       logo_path: sponsor.logo_path,
-      website: sponsor.website
+      website: sponsor.website,
+      description: sponsor.description
     } : null;
   }).filter(Boolean);
 };

@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, Users, Award, ExternalLink } from 'lucide-react';
 
 interface ProjectInfoSidebarProps {
   created_at: string;
@@ -17,6 +18,7 @@ interface ProjectInfoSidebarProps {
     role: string;
     avatar_path?: string;
     bio?: string;
+    slug?: string;
   }>;
   sponsors?: Array<{
     id: string;
@@ -24,6 +26,7 @@ interface ProjectInfoSidebarProps {
     type: string;
     logo_path?: string;
     website?: string;
+    description?: string;
   }>;
 }
 
@@ -33,6 +36,11 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
   participants = [],
   sponsors = []
 }) => {
+  // Group sponsors by type
+  const mainSponsors = sponsors.filter(s => s.type === 'main');
+  const partners = sponsors.filter(s => s.type === 'partner');
+  const supporters = sponsors.filter(s => s.type === 'supporter');
+
   return (
     <div className="space-y-8">
       {/* Project Info */}
@@ -90,18 +98,17 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-4 md:space-y-6">
-              {participants.map((participant) => (
-                <div key={participant.id} className="group p-4 rounded-xl bg-background/50 border border-border/30 hover:border-border/50 hover:bg-background/80 transition-all duration-300 hover:shadow-soft">
+              {participants.map((participant) => {
+                const content = (
                   <div className="flex items-start gap-4">
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border/20 group-hover:border-primary/30 transition-all duration-300 shadow-soft">
+                      <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border/20 group-hover:border-primary/50 transition-all duration-300 shadow-soft">
                         {participant.avatar_path ? (
                           <img
                             src={participant.avatar_path}
                             alt={participant.name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              console.error('Failed to load participant avatar:', participant.avatar_path);
                               e.currentTarget.style.display = 'none';
                             }}
                           />
@@ -113,15 +120,38 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
                       </div>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-foreground text-base md:text-lg group-hover:text-primary transition-colors duration-300">{participant.name}</h3>
-                      <p className="text-sm text-muted-foreground font-medium mb-2">{participant.role}</p>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-foreground text-base md:text-lg group-hover:text-primary transition-colors duration-300">
+                            {participant.name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground font-medium mb-2">{participant.role}</p>
+                        </div>
+                        {participant.slug && (
+                          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
+                        )}
+                      </div>
                       {participant.bio && (
                         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{participant.bio}</p>
                       )}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+
+                return participant.slug ? (
+                  <Link
+                    key={participant.id}
+                    to={`/participants/${participant.slug}`}
+                    className="group block p-4 rounded-xl bg-background/50 border border-border/30 hover:border-primary/50 hover:bg-background/80 transition-all duration-300 hover:shadow-soft cursor-pointer"
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <div key={participant.id} className="group p-4 rounded-xl bg-background/50 border border-border/30">
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -129,39 +159,102 @@ export const ProjectInfoSidebar: React.FC<ProjectInfoSidebarProps> = ({
 
       {/* Sponsors */}
       {sponsors.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Sponsorer & Partners</CardTitle>
+        <Card className="card-enhanced border-0 shadow-elegant hover:shadow-glow transition-all duration-500">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-xl md:text-2xl font-semibold">
+              <div className="p-3 rounded-xl gradient-primary shadow-soft">
+                <Award className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
+              </div>
+              Sponsorer & Partners
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {sponsors.map((sponsor) => (
-                <div key={sponsor.id} className="flex items-center gap-3">
-                  {sponsor.logo_path && (
-                    <img
-                      src={sponsor.logo_path}
-                      alt={sponsor.name}
-                      className="w-8 h-8 object-contain"
-                      onError={(e) => {
-                        console.error('Failed to load sponsor logo:', sponsor.logo_path);
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  )}
-                  <div>
-                    <p className="text-sm font-medium">{sponsor.name}</p>
-                    <Badge variant="outline" className="text-xs">
-                      {sponsor.type === 'main' ? 'Huvudsponsor' :
-                       sponsor.type === 'partner' ? 'Partner' :
-                       'Supporter'}
-                    </Badge>
+          <CardContent className="pt-0">
+            <div className="space-y-6">
+              {/* Main Sponsors */}
+              {mainSponsors.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wide">Huvudsponsorer</h4>
+                  <div className="space-y-4">
+                    {mainSponsors.map((sponsor) => (
+                      <SponsorCard key={sponsor.id} sponsor={sponsor} />
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
+              
+              {/* Partners */}
+              {partners.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wide">Partners</h4>
+                  <div className="space-y-4">
+                    {partners.map((sponsor) => (
+                      <SponsorCard key={sponsor.id} sponsor={sponsor} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Supporters */}
+              {supporters.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wide">Supporters</h4>
+                  <div className="space-y-4">
+                    {supporters.map((sponsor) => (
+                      <SponsorCard key={sponsor.id} sponsor={sponsor} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+};
+
+// Sponsor Card Component
+const SponsorCard: React.FC<{ sponsor: ProjectInfoSidebarProps['sponsors'][number] }> = ({ sponsor }) => {
+  const handleClick = () => {
+    if (sponsor.website) {
+      window.open(sponsor.website, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  return (
+    <div
+      className={`group p-4 rounded-xl bg-background/50 border border-border/30 
+        hover:border-primary/50 hover:bg-background/80 transition-all duration-300 
+        hover:shadow-soft ${sponsor.website ? 'cursor-pointer' : ''}`}
+      onClick={handleClick}
+    >
+      <div className="flex items-center gap-4">
+        {sponsor.logo_path && (
+          <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/20 bg-white p-2">
+            <img
+              src={sponsor.logo_path}
+              alt={sponsor.name}
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <h4 className="font-semibold text-base group-hover:text-primary transition-colors">
+            {sponsor.name}
+          </h4>
+          {sponsor.description && (
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+              {sponsor.description}
+            </p>
+          )}
+        </div>
+        {sponsor.website && (
+          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+        )}
+      </div>
     </div>
   );
 };
