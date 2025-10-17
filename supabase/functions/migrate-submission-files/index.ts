@@ -8,13 +8,15 @@ const corsHeaders = {
 interface FileRecord {
   fieldName?: string;
   url: string;
-  fileName: string;
+  fileName?: string;
   bucketName?: string;
   name?: string;
   mime_type?: string;
   type?: string;
   size?: number;
 }
+
+type FilesData = FileRecord[] | Record<string, string | FileRecord>;
 
 const getMediaType = (mimeType: string): 'image' | 'video' | 'audio' | 'document' => {
   if (mimeType.startsWith('image/')) return 'image';
@@ -50,18 +52,54 @@ Deno.serve(async (req) => {
     const errors: string[] = [];
 
     for (const submission of submissions || []) {
-      if (!submission.files || !Array.isArray(submission.files)) continue;
+      if (!submission.files) continue;
 
-      console.log(`📁 Processing submission ${submission.id} with ${submission.files.length} files`);
+      const files: FilesData = submission.files;
+      
+      // Convert object format to array format
+      let fileArray: Array<{ fieldName?: string; file: FileRecord | string }> = [];
+      
+      if (Array.isArray(files)) {
+        // Already array format: [{url, fileName, ...}]
+        fileArray = files.map(f => ({ file: f }));
+        console.log(`📁 Processing submission ${submission.id} (array format) with ${fileArray.length} files`);
+      } else if (typeof files === 'object') {
+        // Object format: {cv: "url", portfolio: "url"} or {cv: {url, fileName}}
+        fileArray = Object.entries(files).map(([key, value]) => ({ 
+          fieldName: key, 
+          file: value 
+        }));
+        console.log(`📁 Processing submission ${submission.id} (object format) with ${fileArray.length} files`);
+      } else {
+        console.log(`⏭️  Skipping submission ${submission.id} - invalid files format`);
+        continue;
+      }
 
-      for (const file of submission.files as FileRecord[]) {
+      for (const { fieldName, file } of fileArray) {
         try {
-          const fileName = file.url.split('/').pop() || 'unknown';
-          const mimeType = file.mime_type || file.type || 'application/octet-stream';
+          // Handle both string URL and FileRecord object
+          let fileUrl: string;
+          let fileName: string;
+          let mimeType: string;
+          let fileSize: number | null = null;
+          
+          if (typeof file === 'string') {
+            // Simple string URL
+            fileUrl = file;
+            fileName = fileUrl.split('/').pop() || fieldName || 'unknown';
+            mimeType = 'application/octet-stream';
+          } else {
+            // FileRecord object
+            fileUrl = file.url;
+            fileName = file.fileName || file.name || fileUrl.split('/').pop() || fieldName || 'unknown';
+            mimeType = file.mime_type || file.type || 'application/octet-stream';
+            fileSize = file.size || null;
+          }
+          
           const fileType = getMediaType(mimeType);
           
           // Extract storage path from URL
-          const urlParts = file.url.split('/storage/v1/object/public/');
+          const urlParts = fileUrl.split('/storage/v1/object/public/');
           const storagePath = urlParts[1] || `submissions/${fileName}`;
           const bucket = storagePath.split('/')[0] || 'media-files';
 
@@ -79,23 +117,29 @@ Deno.serve(async (req) => {
           }
 
           // Create media_library record
+          const title = typeof file === 'string' 
+            ? (fieldName || fileName)
+            : (file.name || file.fileName || fileName);
+            
           const { error: insertError } = await supabase
             .from('media_library')
             .insert({
-              title: file.name || file.fileName || fileName,
+              title: title,
               filename: fileName,
-              original_filename: file.name || file.fileName,
+              original_filename: typeof file === 'string' ? fileName : (file.name || file.fileName),
               type: fileType,
               mime_type: mimeType,
               bucket: bucket,
               storage_path: storagePath.replace(`${bucket}/`, ''),
-              public_url: file.url,
-              file_size: file.size || null,
+              public_url: fileUrl,
+              file_size: fileSize,
               status: submission.status === 'approved' ? 'approved' : 'pending',
               source: 'submission',
               submission_id: submission.id,
               uploaded_at: submission.created_at,
-              tags: [`submission-${submission.id}`, 'migrated'],
+              tags: fieldName 
+                ? [`submission-${submission.id}`, 'migrated', `field:${fieldName}`]
+                : [`submission-${submission.id}`, 'migrated'],
               category: submission.type || 'general',
               is_public: submission.status === 'approved',
             });

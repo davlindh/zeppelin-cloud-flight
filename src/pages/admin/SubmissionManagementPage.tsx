@@ -10,6 +10,7 @@ import type { Database } from '@/types/supabase-extensions';
 import { SubmissionListItem } from '@/components/admin/submission-management/SubmissionListItem';
 import { SubmissionContentPreview } from '@/components/admin/submission-management/SubmissionContentPreview';
 import { SubmissionFilters } from '@/components/admin/submission-management/SubmissionFilters';
+import { MigrationTools } from '@/components/admin/submission-management/MigrationTools';
 import { MediaGrid } from '@/components/media/MediaGrid';
 import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
 import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle } from 'lucide-react';
@@ -176,6 +177,9 @@ export const SubmissionManagementPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Migration Tools */}
+      <MigrationTools />
+
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
