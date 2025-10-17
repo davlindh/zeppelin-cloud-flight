@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
 import { format } from 'date-fns';
+import { RichMediaPreview } from '@/components/media/RichMediaPreview';
+import { formatFileSize } from '@/utils/formatFileSize';
 
 interface MediaPreviewPanelProps {
   item: MediaLibraryItem | null;
@@ -46,12 +48,6 @@ const getMediaIcon = (type: MediaLibraryItem['type']) => {
   }
 };
 
-const formatFileSize = (bytes: number | null): string => {
-  if (!bytes) return 'Unknown';
-  const mb = bytes / (1024 * 1024);
-  if (mb < 1) return `${Math.round(bytes / 1024)} KB`;
-  return `${mb.toFixed(2)} MB`;
-};
 
 export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
   item,
@@ -98,29 +94,12 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
-          {/* Preview */}
-          <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-            {item.type === 'image' && (
-              <img
-                src={item.public_url}
-                alt={item.title}
-                className="w-full h-full object-contain"
-              />
-            )}
-            {item.type === 'video' && (
-              <video
-                src={item.public_url}
-                controls
-                className="w-full h-full"
-              />
-            )}
-            {item.type === 'audio' && (
-              <div className="flex items-center justify-center h-full">
-                <audio src={item.public_url} controls className="w-full px-4" />
-              </div>
-            )}
-            {item.type === 'document' && (
-              <div className="flex items-center justify-center h-full">
+          {/* Rich Preview */}
+          <div className="rounded-lg overflow-hidden bg-muted">
+            {(item.type === 'image' || item.type === 'video' || item.type === 'audio') ? (
+              <RichMediaPreview item={item} className="w-full" />
+            ) : (
+              <div className="aspect-video flex items-center justify-center">
                 <FileText className="h-16 w-16 text-muted-foreground" />
               </div>
             )}

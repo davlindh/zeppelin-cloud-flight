@@ -24,10 +24,15 @@ import {
   Trash2,
   Link2,
   Download,
+  Star,
+  Play,
 } from "lucide-react";
 import type { MediaLibraryItem } from "@/types/mediaLibrary";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { formatFileSize } from "@/utils/formatFileSize";
+import { getMediaColorScheme, getStatusColorScheme } from "@/utils/mediaColorScheme";
+import { getThumbnailUrl } from "@/utils/thumbnailHelpers";
 
 interface MediaCardProps {
   item: MediaLibraryItem;
@@ -85,11 +90,10 @@ const getStatusColor = (status: MediaLibraryItem["status"]) => {
   }
 };
 
-const formatFileSize = (bytes: number | null): string => {
-  if (!bytes) return "Unknown";
-  const mb = bytes / (1024 * 1024);
-  if (mb < 1) return `${Math.round(bytes / 1024)} KB`;
-  return `${mb.toFixed(1)} MB`;
+// Helper to clean up title from UUID patterns
+const cleanTitle = (title: string): string => {
+  const cleaned = title.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '');
+  return cleaned.replace(/^[-\s]+|[-\s]+$/g, '').trim() || title;
 };
 
 export function MediaCard({
@@ -117,12 +121,18 @@ export function MediaCard({
     onSelect?.(item.id, checked as boolean);
   };
 
+  const colorScheme = getMediaColorScheme(item.type);
+  const statusScheme = getStatusColorScheme(item.status);
+  const displayTitle = cleanTitle(item.title);
+  const thumbnailUrl = item.thumbnail_url || (item.type === 'image' ? getThumbnailUrl(item.public_url, { width: 400 }) : item.public_url);
+
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all hover:shadow-lg cursor-pointer",
-        selected && "ring-2 ring-primary",
-        compact ? "h-32" : "h-64"
+        "group relative overflow-hidden transition-all hover:shadow-lg cursor-pointer border-2",
+        colorScheme.border,
+        selected && "ring-2 ring-primary ring-offset-2",
+        compact ? "h-32" : "h-auto"
       )}
       onClick={handleClick}
     >
@@ -133,23 +143,25 @@ export function MediaCard({
             checked={selected}
             onCheckedChange={handleCheckboxChange}
             onClick={(e) => e.stopPropagation()}
+            className="bg-background shadow-md"
           />
         </div>
       )}
 
-      {/* Status & Featured Badge */}
+      {/* Featured Badge */}
+      {item.is_featured && (
+        <Badge className="absolute top-2 left-2 z-10 bg-yellow-500 text-white border-0 shadow-md">
+          <Star className="h-3 w-3 mr-1 fill-white" />
+          Featured
+        </Badge>
+      )}
+
+      {/* Status Badge */}
       {showStatus && (
-        <div className="absolute top-2 right-2 z-10 flex gap-1">
-          <Badge variant="outline" className={cn("text-xs", getStatusColor(item.status))}>
-            {getStatusIcon(item.status)}
-            <span className="ml-1 capitalize">{item.status}</span>
-          </Badge>
-          {item.is_featured && (
-            <Badge variant="secondary" className="text-xs">
-              Featured
-            </Badge>
-          )}
-        </div>
+        <Badge className={cn("absolute top-2 right-12 z-10 shadow-md border", statusScheme.className)}>
+          {getStatusIcon(item.status)}
+          <span className="ml-1 capitalize">{item.status}</span>
+        </Badge>
       )}
 
       {/* Actions Dropdown */}
@@ -205,52 +217,101 @@ export function MediaCard({
         </div>
       )}
 
-      {/* Thumbnail */}
-      <div
-        className={cn(
-          "relative overflow-hidden bg-muted",
-          compact ? "h-full" : "h-40"
-        )}
-      >
-        {item.type === "image" ? (
+      {/* Media Preview */}
+      <div className={cn(
+        'relative overflow-hidden',
+        compact ? 'h-full' : 'h-48',
+        'bg-gradient-to-br',
+        colorScheme.bg
+      )}>
+        {item.type === 'image' && (
           <img
-            src={item.thumbnail_url || item.public_url}
-            alt={item.title}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            src={thumbnailUrl}
+            alt={displayTitle}
+            className="w-full h-full object-cover transition-transform group-hover:scale-105"
             loading="lazy"
           />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            {getMediaIcon(item.type)}
+        )}
+        {item.type === 'video' && (
+          <div className="relative w-full h-full">
+            {item.thumbnail_url ? (
+              <img
+                src={item.thumbnail_url}
+                alt={displayTitle}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <Video className={cn('h-16 w-16', colorScheme.icon)} />
+              </div>
+            )}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-black/60 backdrop-blur-sm rounded-full p-4 transition-transform group-hover:scale-110">
+                <Play className="h-8 w-8 text-white fill-white" />
+              </div>
+            </div>
+            {item.duration && (
+              <Badge className="absolute bottom-2 right-2 bg-black/70 text-white border-0">
+                {Math.floor(item.duration / 60)}:{String(item.duration % 60).padStart(2, '0')}
+              </Badge>
+            )}
           </div>
         )}
+        {item.type === 'audio' && (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+            <div className={cn('p-6 rounded-lg', colorScheme.bg)}>
+              <Music className={cn('h-16 w-16', colorScheme.icon)} />
+            </div>
+            {item.duration && (
+              <Badge variant="secondary">
+                {Math.floor(item.duration / 60)}:{String(item.duration % 60).padStart(2, '0')}
+              </Badge>
+            )}
+          </div>
+        )}
+        {item.type === 'document' && (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className={cn('p-6 rounded-lg', colorScheme.bg)}>
+              <FileText className={cn('h-16 w-16', colorScheme.icon)} />
+            </div>
+          </div>
+        )}
+
+        {/* Type Badge */}
+        <Badge className={cn(
+          'absolute bottom-2 left-2 capitalize border-0 shadow-md',
+          colorScheme.bg,
+          colorScheme.text
+        )}>
+          {getMediaIcon(item.type)}
+          <span className="ml-1">{item.type}</span>
+        </Badge>
       </div>
 
-      {/* Content */}
+      {/* Media Info */}
       {!compact && (
-        <CardContent className="p-3">
-          <h4 className="font-semibold text-sm truncate mb-1">{item.title}</h4>
-
+        <CardContent className="p-4 space-y-2">
+          <h3 className="font-semibold truncate" title={displayTitle}>
+            {displayTitle}
+          </h3>
+          
           {showMetadata && (
             <>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                {getMediaIcon(item.type)}
-                <span>{formatFileSize(item.file_size)}</span>
+              {/* Metadata */}
+              <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                <span className="font-medium">{formatFileSize(item.file_size)}</span>
                 {item.width && item.height && (
-                  <span>
-                    {item.width}×{item.height}
-                  </span>
+                  <span>{item.width} × {item.height}px</span>
                 )}
-                {item.duration && (
-                  <span>
-                    {Math.floor(item.duration / 60)}:
-                    {String(item.duration % 60).padStart(2, "0")}
-                  </span>
+                {item.mime_type && (
+                  <span className="uppercase">{item.mime_type.split('/')[1]}</span>
                 )}
               </div>
 
+              {/* Tags */}
               {item.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
+                <div className="flex flex-wrap gap-1">
                   {item.tags.slice(0, 3).map((tag) => (
                     <Badge key={tag} variant="outline" className="text-xs">
                       {tag}
@@ -264,6 +325,7 @@ export function MediaCard({
                 </div>
               )}
 
+              {/* Date */}
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Calendar className="h-3 w-3" />
                 <span>{format(new Date(item.created_at), "MMM d, yyyy")}</span>
