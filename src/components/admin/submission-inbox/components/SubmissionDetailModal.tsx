@@ -82,6 +82,21 @@ const getFileType = (filename: string) => {
   return 'unknown';
 };
 
+const getFileTypeLabel = (filename: string): string => {
+  const ext = filename.toLowerCase().split('.').pop()?.toUpperCase() || '';
+  const type = getFileType(filename);
+  
+  const typeLabels: Record<string, string> = {
+    'image': 'Bild',
+    'video': 'Video',
+    'audio': 'Ljud',
+    'document': 'Dokument',
+    'unknown': 'Fil'
+  };
+  
+  return `${typeLabels[type]} (${ext})`;
+};
+
 export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
   submission,
   isOpen,
@@ -168,7 +183,7 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
         <div>
           <p className="font-medium text-sm">{file.name || 'Unnamed file'}</p>
           <p className="text-xs text-muted-foreground">
-            {file.type} {file.size && `• ${Math.round(file.size / 1024)} KB`}
+            {getFileTypeLabel(file.name || '')} {file.size && `• ${Math.round(file.size / 1024)} KB`}
           </p>
         </div>
       </div>
@@ -348,7 +363,7 @@ export const SubmissionDetailModal: React.FC<SubmissionDetailModalProps> = ({
       <File className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
       <p className="text-sm font-medium mb-1">{file.name}</p>
       <p className="text-xs text-muted-foreground mb-2">
-        {file.type} {file.size && `• ${Math.round(file.size / 1024)} KB`}
+        {getFileTypeLabel(file.name || '')} {file.size && `• ${Math.round(file.size / 1024)} KB`}
       </p>
       <Button
         size="sm"
