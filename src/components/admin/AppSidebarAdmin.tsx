@@ -12,7 +12,8 @@ import {
   Building,
   Tags,
   FolderOpen,
-  HandHeart
+  HandHeart,
+  Image
 } from "lucide-react"
 import {
   Sidebar,
@@ -32,6 +33,7 @@ const showcaseSections = [
   { title: "Deltagare", path: "/admin/participants-management", icon: Users, description: "Hantera deltagare" },
   { title: "Projekt", path: "/admin/projects-management", icon: FolderOpen, description: "Showcase-projekt" },
   { title: "Sponsorer", path: "/admin/sponsors-management", icon: HandHeart, description: "Partners & sponsorer" },
+  { title: "Media", path: "/admin/media", icon: Image, description: "Media library" },
 ]
 
 const marketplaceSections = [
