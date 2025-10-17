@@ -26,15 +26,17 @@ export function getThumbnailUrl(
   } = options;
 
   // Check if URL is from Supabase storage
-  if (originalUrl.includes('supabase.co/storage')) {
+  if (originalUrl && originalUrl.includes('supabase.co/storage')) {
     try {
+      // For public URLs, use Supabase transform API
       const url = new URL(originalUrl);
-      // Add transformation params
-      url.searchParams.set('width', width.toString());
-      if (height) url.searchParams.set('height', height.toString());
-      url.searchParams.set('quality', quality.toString());
-      url.searchParams.set('format', format);
-      return url.toString();
+      const params = new URLSearchParams();
+      params.set('width', width.toString());
+      if (height) params.set('height', height.toString());
+      params.set('quality', quality.toString());
+      
+      // Return URL with transform params
+      return `${url.origin}${url.pathname}?${params.toString()}`;
     } catch (error) {
       console.warn('Failed to generate thumbnail URL:', error);
       return originalUrl;
@@ -42,7 +44,7 @@ export function getThumbnailUrl(
   }
 
   // For external URLs or non-transformable sources, return original
-  return originalUrl;
+  return originalUrl || '';
 }
 
 /**

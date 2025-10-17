@@ -246,6 +246,9 @@ export function MediaCard({
             alt={displayTitle}
             className="w-full h-full object-cover transition-transform group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+            }}
           />
         )}
         {item.type === 'video' && (

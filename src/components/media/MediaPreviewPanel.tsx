@@ -16,6 +16,7 @@ import {
   ExternalLink, 
   Download, 
   Trash2,
+  Copy,
   Image,
   Video,
   Music,
@@ -25,6 +26,7 @@ import type { MediaLibraryItem } from '@/types/mediaLibrary';
 import { format } from 'date-fns';
 import { RichMediaPreview } from '@/components/media/RichMediaPreview';
 import { formatFileSize } from '@/utils/formatFileSize';
+import { useToast } from '@/hooks/use-toast';
 
 interface MediaPreviewPanelProps {
   item: MediaLibraryItem | null;
@@ -59,6 +61,7 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
 }) => {
   const [editedTitle, setEditedTitle] = React.useState('');
   const [editedDescription, setEditedDescription] = React.useState('');
+  const { toast } = useToast();
 
   React.useEffect(() => {
     if (item) {
@@ -168,48 +171,82 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
 
           <Separator />
 
+          {/* Public URL */}
+          <div className="space-y-2">
+            <Label>Public URL</Label>
+            <div className="flex gap-2">
+              <Input value={item.public_url} readOnly className="flex-1 font-mono text-xs" />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  navigator.clipboard.writeText(item.public_url);
+                  toast({ title: "URL copied to clipboard" });
+                }}
+                title="Copy URL"
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                asChild
+                title="Open in new tab"
+              >
+                <a href={item.public_url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
           {/* Metadata */}
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Status</span>
-              <Badge variant={item.status === 'approved' ? 'default' : 'secondary'}>
-                {item.status}
-              </Badge>
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+            <div>
+              <Label className="text-xs text-muted-foreground">Type</Label>
+              <p className="text-sm font-medium capitalize flex items-center gap-2">
+                {item.type}
+                <Badge variant="outline" className="text-xs">
+                  {item.mime_type?.split('/')[1]?.toUpperCase() || 'UNKNOWN'}
+                </Badge>
+              </p>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Type</span>
-              <span className="capitalize">{item.type}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">File Size</span>
-              <span>{formatFileSize(item.file_size)}</span>
+            <div>
+              <Label className="text-xs text-muted-foreground">Size</Label>
+              <p className="text-sm font-medium">{formatFileSize(item.file_size)}</p>
             </div>
             {item.width && item.height && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Dimensions</span>
-                <span>{item.width} × {item.height}px</span>
+              <div>
+                <Label className="text-xs text-muted-foreground">Dimensions</Label>
+                <p className="text-sm font-medium">{item.width} × {item.height}px</p>
               </div>
             )}
             {item.duration && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Duration</span>
-                <span>{Math.floor(item.duration / 60)}:{String(item.duration % 60).padStart(2, '0')}</span>
+              <div>
+                <Label className="text-xs text-muted-foreground">Duration</Label>
+                <p className="text-sm font-medium">
+                  {Math.floor(item.duration / 60)}:{String(item.duration % 60).padStart(2, '0')}
+                </p>
               </div>
             )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Uploaded</span>
-              <span>{format(new Date(item.uploaded_at), 'MMM d, yyyy')}</span>
+            <div>
+              <Label className="text-xs text-muted-foreground">Created</Label>
+              <p className="text-sm font-medium">{format(new Date(item.created_at), 'PPp')}</p>
             </div>
-            {item.tags.length > 0 && (
-              <div>
-                <span className="text-muted-foreground block mb-2">Tags</span>
-                <div className="flex flex-wrap gap-1">
-                  {item.tags.map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
+            <div>
+              <Label className="text-xs text-muted-foreground">Source</Label>
+              <p className="text-sm font-medium capitalize">
+                {item.source || 'Unknown'}
+              </p>
+            </div>
+            {item.bucket && (
+              <div className="col-span-2">
+                <Label className="text-xs text-muted-foreground">Storage Path</Label>
+                <p className="text-xs font-mono text-muted-foreground truncate">
+                  {item.bucket}/{item.storage_path}
+                </p>
               </div>
             )}
           </div>
