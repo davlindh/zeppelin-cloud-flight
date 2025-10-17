@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge"
 import { useAdminCounts } from "@/hooks/useAdminCounts"
 
 const showcaseSections = [
+  { title: "Inlämningar", path: "/admin/submissions", icon: MessageSquare, description: "Hantera inlämningar" },
   { title: "Deltagare", path: "/admin/participants-management", icon: Users, description: "Hantera deltagare" },
   { title: "Projekt", path: "/admin/projects-management", icon: FolderOpen, description: "Showcase-projekt" },
   { title: "Sponsorer", path: "/admin/sponsors-management", icon: HandHeart, description: "Partners & sponsorer" },

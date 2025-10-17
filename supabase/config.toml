@@ -2,3 +2,9 @@ project_id = "paywaomkmjssbtkzwnwd"
 
 [functions.send-participant-welcome]
 verify_jwt = false
+
+[functions.migrate-submission-files]
+verify_jwt = false
+
+[functions.process-submission]
+verify_jwt = false
