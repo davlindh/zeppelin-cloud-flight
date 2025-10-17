@@ -1,33 +1,66 @@
-// Supabase storage buckets configuration
-// Real buckets that correspond to actual Supabase storage
+// Unified Supabase storage configuration
+// Single source of truth for all media storage
 
+export const UNIFIED_STORAGE = {
+  // Main media bucket - all user uploads (PUBLIC)
+  'media-files': {
+    name: 'media-files',
+    bucketName: 'media-files',
+    public: true,
+    folders: {
+      SUBMISSIONS: 'submissions',
+      PROJECTS: 'projects',
+      PARTICIPANTS: 'participants',
+      SPONSORS: 'sponsors',
+      ADMIN: 'admin',
+      GENERAL: 'general'
+    } as const,
+    maxSize: 50 * 1024 * 1024, // 50MB
+    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 
+                   'video/mp4', 'video/webm', 'video/quicktime',
+                   'audio/mpeg', 'audio/wav', 'audio/ogg',
+                   'application/pdf'] as const
+  },
+  
+  // Private documents bucket
+  'documents': {
+    name: 'documents',
+    bucketName: 'documents',
+    public: false,
+    folders: {
+      CONTRACTS: 'contracts',
+      INTERNAL: 'internal',
+      SENSITIVE: 'sensitive'
+    } as const,
+    maxSize: 20 * 1024 * 1024, // 20MB
+    allowedTypes: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                   'text/plain', 'text/csv'] as const
+  }
+} as const;
+
+// Legacy bucket configuration (kept for backwards compatibility during migration)
 export const STORAGE_BUCKETS = {
-  // Main asset buckets - these correspond to real Supabase storage buckets
   participants: {
     name: 'participants',
-    bucketName: 'participants',
+    bucketName: 'participant-avatars',
     localPath: '/images/participants/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '5MB'
   },
-
   projects: {
     name: 'projects',
-    bucketName: 'projects',
+    bucketName: 'project-images',
     localPath: '/images/projects/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '10MB'
   },
-
   partners: {
     name: 'partners',
-    bucketName: 'partners',
+    bucketName: 'sponsor-logos',
     localPath: '/images/partners/',
     allowedTypes: ['jpg', 'jpeg', 'png', 'svg', 'webp'],
     maxSize: '2MB'
   },
-
-  // UI and system assets
   ui: {
     name: 'ui',
     bucketName: 'ui',
@@ -45,7 +78,33 @@ export const PLACEHOLDER_ASSETS = {
   ui: '/images/ui/placeholder.svg'
 } as const;
 
-// Helper functions for storage operations
+// Unified storage helper functions
+export const getUnifiedStorageUrl = (
+  bucket: keyof typeof UNIFIED_STORAGE,
+  folder: string,
+  filename: string
+): string => {
+  const bucketConfig = UNIFIED_STORAGE[bucket];
+  return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketConfig.bucketName}/${folder}/${filename}`;
+};
+
+export const validateFileType = (
+  bucket: keyof typeof UNIFIED_STORAGE,
+  mimeType: string
+): boolean => {
+  const bucketConfig = UNIFIED_STORAGE[bucket];
+  return (bucketConfig.allowedTypes as readonly string[]).includes(mimeType);
+};
+
+export const validateFileSize = (
+  bucket: keyof typeof UNIFIED_STORAGE,
+  fileSize: number
+): boolean => {
+  const bucketConfig = UNIFIED_STORAGE[bucket];
+  return fileSize <= bucketConfig.maxSize;
+};
+
+// Legacy helper functions (kept for backwards compatibility)
 export const getStoragePath = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
   const bucketConfig = STORAGE_BUCKETS[bucket];
   return `${bucketConfig.localPath}${filename}`;
@@ -61,13 +120,6 @@ export const getLocalStorageUrl = (bucket: keyof typeof STORAGE_BUCKETS, filenam
 };
 
 export const getFullAssetUrl = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): string => {
-  // Try Supabase storage first, fallback to local
   const bucketConfig = STORAGE_BUCKETS[bucket];
   return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/${bucketConfig.bucketName}/${filename}`;
-};
-
-export const validateFileType = (bucket: keyof typeof STORAGE_BUCKETS, filename: string): boolean => {
-  const bucketConfig = STORAGE_BUCKETS[bucket];
-  const extension = filename.split('.').pop()?.toLowerCase();
-  return extension ? (bucketConfig.allowedTypes as readonly string[]).includes(extension) : false;
 };
