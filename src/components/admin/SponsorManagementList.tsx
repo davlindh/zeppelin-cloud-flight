@@ -11,7 +11,7 @@ import {
   Search
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useSponsors } from '@/contexts/AdminContext';
+import { useSponsors, useDeleteSponsor } from '@/hooks/useApi';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +25,8 @@ import {
 
 export const SponsorManagementList = () => {
   const navigate = useNavigate();
-  const { sponsors, isLoading, error, deleteSponsor, fetchSponsors } = useSponsors();
+  const { data: sponsors = [], isLoading, error } = useSponsors();
+  const deleteSponsorMutation = useDeleteSponsor();
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sponsorToDelete, setSponsorToDelete] = useState<string | null>(null);
@@ -48,9 +49,8 @@ export const SponsorManagementList = () => {
     if (!sponsorToDelete) return;
     
     try {
-      await deleteSponsor(sponsorToDelete);
+      await deleteSponsorMutation.mutateAsync(sponsorToDelete);
       toast.success('Sponsor raderad');
-      await fetchSponsors();
     } catch (error) {
       toast.error('Kunde inte radera sponsor');
       console.error('Error deleting sponsor:', error);
@@ -82,10 +82,7 @@ export const SponsorManagementList = () => {
   if (error) {
     return (
       <Card className="p-6">
-        <p className="text-destructive">{error}</p>
-        <Button onClick={fetchSponsors} className="mt-4">
-          Försök igen
-        </Button>
+        <p className="text-destructive">{error?.message || 'Ett fel uppstod'}</p>
       </Card>
     );
   }

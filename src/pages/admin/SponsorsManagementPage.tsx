@@ -5,12 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
-import { useSponsors } from '@/contexts/AdminContext';
 
 export const SponsorsManagementPage = () => {
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { fetchSponsors } = useSponsors();
 
   const handleAddSponsor = () => {
     setIsAddDialogOpen(true);
@@ -22,7 +20,6 @@ export const SponsorsManagementPage = () => {
 
   const handleSuccess = async () => {
     setIsAddDialogOpen(false);
-    await fetchSponsors();
   };
 
   return (

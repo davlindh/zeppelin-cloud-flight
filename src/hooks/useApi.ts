@@ -551,3 +551,25 @@ export const useDeleteSubmission = () => {
     },
   });
 };
+
+/**
+ * Delete sponsor mutation
+ */
+export const useDeleteSponsor = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('sponsors')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.sponsors });
+    },
+  });
+};
