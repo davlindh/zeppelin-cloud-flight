@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Camera, Video, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,11 @@ interface ProjectDetailHeroProps {
     description: string;
     image_path?: string;
     associations?: string[];
+    media?: Array<{
+      type: string;
+      url: string;
+      title: string;
+    }>;
   };
   isAdmin: boolean;
   onEdit?: () => void;
@@ -100,15 +105,59 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
           </p>
 
           {/* Tags */}
-          {project.associations && (
-            <div className="flex flex-wrap gap-3 md:gap-4 animate-scale-in">
+          {project.associations && project.associations.length > 0 && (
+            <div className="flex flex-wrap gap-3 md:gap-4 animate-scale-in mb-8">
               {project.associations.map((assoc, index) => (
-                <Badge key={`assoc-${index}`} variant="outline" className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-medium bg-background/40 backdrop-blur-md border-border/50 hover:bg-background/60 transition-all duration-300 shadow-soft">
+                <Badge key={`assoc-${index}`} variant="outline" className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-medium bg-background/40 backdrop-blur-md border-border/50 hover:bg-background/60 hover:scale-105 transition-all duration-300 shadow-soft">
                   {assoc}
                 </Badge>
               ))}
             </div>
           )}
+
+          {/* Media Thumbnail Preview */}
+          {project.media && project.media.length > 0 && (() => {
+            const images = project.media.filter(m => m.type === 'image').slice(0, 6);
+            const videos = project.media.filter(m => m.type === 'video').slice(0, 2);
+            const displayMedia = [...images, ...videos].slice(0, 6);
+            
+            if (displayMedia.length === 0) return null;
+            
+            return (
+              <div className="mt-8 pt-6 border-t border-border/30 animate-fade-in backdrop-blur-md bg-background/20 rounded-xl p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Camera className="h-4 w-4 text-foreground/80" />
+                  <span className="text-sm text-foreground/80 font-medium">Projektmedia</span>
+                  <Badge variant="outline" className="ml-2 bg-background/40 border-border/40">
+                    {project.media.length} {project.media.length === 1 ? 'fil' : 'filer'}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {displayMedia.map((item, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer border border-border/20 hover:border-primary/40 transition-all duration-300">
+                      <img 
+                        src={item.url} 
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                        {item.type === 'video' ? (
+                          <Video className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        ) : (
+                          <ImageIcon className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {project.media.length > 6 && (
+                    <div className="aspect-square rounded-lg bg-background/30 backdrop-blur-sm flex items-center justify-center text-foreground/80 text-sm font-medium border border-border/30 hover:border-primary/40 hover:bg-background/40 transition-all duration-300 cursor-pointer">
+                      +{project.media.length - 6}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>

@@ -17,7 +17,8 @@ import {
   Image as ImageIcon,
   Video,
   FileText,
-  Music
+  Music,
+  Camera
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -68,6 +69,14 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
     return null;
   }
 
+  // Calculate media stats
+  const mediaStats = {
+    images: fullMediaData.filter(m => m.type === 'image').length,
+    videos: fullMediaData.filter(m => m.type === 'video').length,
+    audio: fullMediaData.filter(m => m.type === 'audio').length,
+    documents: fullMediaData.filter(m => m.type === 'document').length
+  };
+
   // Filter media based on search and type
   const filteredMedia = fullMediaData.filter((item) => {
     const matchesSearch = item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,9 +100,32 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
           <h2 className="text-2xl font-bold font-serif text-foreground">
             Projektmedia
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {fullMediaData.length} {fullMediaData.length === 1 ? 'fil' : 'filer'} tillgängliga
-          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {mediaStats.images > 0 && (
+              <Badge className="bg-blue-50 text-blue-700 border-blue-200">
+                <Camera className="h-3 w-3 mr-1" />
+                {mediaStats.images} {mediaStats.images === 1 ? 'bild' : 'bilder'}
+              </Badge>
+            )}
+            {mediaStats.videos > 0 && (
+              <Badge className="bg-purple-50 text-purple-700 border-purple-200">
+                <Video className="h-3 w-3 mr-1" />
+                {mediaStats.videos} {mediaStats.videos === 1 ? 'video' : 'videos'}
+              </Badge>
+            )}
+            {mediaStats.audio > 0 && (
+              <Badge className="bg-green-50 text-green-700 border-green-200">
+                <Music className="h-3 w-3 mr-1" />
+                {mediaStats.audio} {mediaStats.audio === 1 ? 'ljudfil' : 'ljudfiler'}
+              </Badge>
+            )}
+            {mediaStats.documents > 0 && (
+              <Badge className="bg-gray-50 text-gray-700 border-gray-200">
+                <FileText className="h-3 w-3 mr-1" />
+                {mediaStats.documents} {mediaStats.documents === 1 ? 'dokument' : 'dokument'}
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* View Mode Toggle */}
@@ -160,7 +192,7 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
 
       {/* Media Grid/List */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredMedia.map((item, index) => (
             <Card key={item.id || index} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-0 shadow-md">
               <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-muted/30 to-muted/60">

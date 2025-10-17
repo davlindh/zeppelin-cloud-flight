@@ -82,7 +82,8 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
           title: project.title,
           description: project.description,
           image_path: project.image_path,
-          associations: project.associations || project.tags
+          associations: project.associations || project.tags,
+          media: project.media
         }}
         isAdmin={isAdmin}
         onEdit={onEdit}
@@ -91,9 +92,9 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
 
       {/* Content Container */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 md:gap-16 max-w-8xl">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10 md:gap-16 max-w-8xl">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-10">
+          <div className="space-y-10 md:space-y-12 animate-fade-in">
             {/* Purpose & Impact */}
             <ProjectPurposeImpact
               full_description={project.full_description}
@@ -123,14 +124,14 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <aside className="lg:sticky lg:top-8 lg:self-start space-y-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <ProjectInfoSidebar
               created_at={project.created_at}
               access={project.access}
               participants={project.participants}
               sponsors={project.sponsors}
             />
-          </div>
+          </aside>
         </div>
       </div>
     </div>
