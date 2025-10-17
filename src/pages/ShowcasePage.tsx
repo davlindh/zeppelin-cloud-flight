@@ -7,11 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ProjectProposalForm } from '@/components/public/forms';
 import { ProjectImage } from '@/components/showcase/ProjectImage';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 import { getPlaceholderImage } from '@/utils/assetHelpers';
 import { useProjects } from '@/hooks/useApi';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Filter, Plus, Eye, Play, Image, FileText, Volume2, Sparkles, Users, Award, TrendingUp } from 'lucide-react';
+import { Search, Filter, Plus, Eye, Play, Image, FileText, Volume2, Sparkles, Users, Award, TrendingUp, Camera, Video, UserCheck } from 'lucide-react';
 
 // Types
 interface Project {
@@ -146,9 +145,57 @@ const getMediaPreview = (project: Project): JSX.Element | null => {
 // Small focused components
 const LoadingSpinner = (): JSX.Element => (
   <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
-    <div className="container mx-auto px-6 py-16 text-center">
-      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      <p className="mt-4 text-muted-foreground">Laddar projekt...</p>
+    {/* Hero skeleton */}
+    <div className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-secondary/10 border-b border-border/50 h-80 animate-pulse">
+      <div className="container mx-auto px-6 py-12">
+        <div className="text-center space-y-4">
+          <div className="h-12 w-12 bg-primary/20 rounded-2xl mx-auto" />
+          <div className="h-12 bg-primary/10 rounded-lg w-64 mx-auto" />
+          <div className="h-6 bg-muted rounded w-96 mx-auto" />
+          <div className="flex justify-center gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-6 w-32 bg-muted rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div className="container mx-auto px-6 py-12">
+      {/* Search and filters skeleton */}
+      <div className="mb-8 space-y-4">
+        <div className="h-10 bg-card rounded-lg animate-pulse w-full max-w-md" />
+        <div className="flex gap-2">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-8 w-24 bg-card rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </div>
+      
+      {/* Cards skeletons */}
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="bg-card rounded-lg shadow-sm border overflow-hidden animate-pulse">
+            <div className="h-48 bg-muted" />
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <div className="h-5 bg-muted rounded w-3/4" />
+                <div className="h-4 bg-muted rounded" />
+                <div className="h-4 bg-muted rounded w-5/6" />
+              </div>
+              <div className="flex gap-2">
+                <div className="h-6 w-20 bg-muted rounded" />
+                <div className="h-6 w-16 bg-muted rounded" />
+              </div>
+              <div className="grid grid-cols-4 gap-2 pt-4 border-t border-muted">
+                {[...Array(4)].map((_, j) => (
+                  <div key={j} className="aspect-square bg-muted rounded" />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 );
@@ -187,6 +234,68 @@ const NoProjectsFound = React.memo(({
 ));
 NoProjectsFound.displayName = 'NoProjectsFound';
 
+// Render media thumbnails for projects
+const renderProjectMediaThumbnails = (project: Project): JSX.Element | null => {
+  if (!project.media || project.media.length === 0) {
+    return (
+      <div className="mt-4 pt-4 border-t border-dashed border-border/50 text-center py-4">
+        <Camera className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+        <p className="text-xs text-muted-foreground">Inga mediafiler</p>
+      </div>
+    );
+  }
+  
+  const imageFiles = project.media.filter(m => m.type === 'image');
+  
+  if (imageFiles.length === 0) {
+    return (
+      <div className="mt-4 pt-4 border-t border-dashed border-border/50 text-center py-4">
+        <Camera className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+        <p className="text-xs text-muted-foreground">Inga bilder</p>
+      </div>
+    );
+  }
+  
+  const displayImages = imageFiles.slice(0, 4);
+  const remainingCount = imageFiles.length - displayImages.length;
+  
+  return (
+    <div className="mt-4 pt-4 border-t border-border/50">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        {displayImages.map((item, index) => (
+          <div 
+            key={index} 
+            className="relative aspect-square bg-muted rounded-lg overflow-hidden group cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.open(item.url, '_blank');
+            }}
+          >
+            <img
+              src={item.url}
+              alt={item.title || `Media ${index + 1}`}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+              <Eye className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </div>
+        ))}
+        
+        {remainingCount > 0 && (
+          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center text-xs font-medium text-muted-foreground border-2 border-dashed border-border hover:border-primary/50 hover:text-primary transition-colors">
+            +{remainingCount}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const ProjectCard = React.memo(({
   project,
   onClick
@@ -195,9 +304,13 @@ const ProjectCard = React.memo(({
   onClick: (slug: string) => void;
 }): JSX.Element => (
   <Card
-    className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-border"
+    className="group cursor-pointer hover:shadow-2xl hover:border-primary/40 transition-all duration-300 
+      hover:scale-[1.03] hover:-translate-y-2 border-border relative overflow-hidden"
     onClick={() => onClick(project.slug)}
   >
+    {/* Gradient overlay on hover */}
+    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10" />
+    
     <div className="relative overflow-hidden rounded-t-lg">
       <ProjectImage
         src={project.image_path}
@@ -205,15 +318,15 @@ const ProjectCard = React.memo(({
         className="w-full h-48"
       />
       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-        <div className="bg-white/95 dark:bg-black/95 backdrop-blur-sm rounded-full p-3 shadow-xl">
+        <div className="bg-white/95 dark:bg-black/95 backdrop-blur-sm rounded-full p-3 shadow-xl transform group-hover:scale-110 transition-transform duration-300">
           <Eye className="h-6 w-6 text-primary" />
         </div>
       </div>
       {getMediaPreview(project)}
     </div>
 
-    <CardHeader>
-      <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+    <CardHeader className="relative z-20">
+      <CardTitle className="line-clamp-2 group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/60 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
         {project.title}
       </CardTitle>
       <CardDescription className="line-clamp-3">
@@ -221,12 +334,45 @@ const ProjectCard = React.memo(({
       </CardDescription>
     </CardHeader>
 
-    <CardContent>
+    <CardContent className="relative z-20">
+      {/* Stats badges with icons */}
+      <div className="mb-3 flex flex-wrap gap-2">
+        {project.participants && project.participants.length > 0 && (
+          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+            <UserCheck className="h-3 w-3 mr-1" />
+            {project.participants.length} {project.participants.length === 1 ? 'deltagare' : 'deltagare'}
+          </Badge>
+        )}
+        
+        {project.media && project.media.length > 0 && (() => {
+          const imageCount = project.media.filter(m => m.type === 'image').length;
+          const videoCount = project.media.filter(m => m.type === 'video').length;
+          
+          return (
+            <>
+              {imageCount > 0 && (
+                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                  <Camera className="h-3 w-3 mr-1" />
+                  {imageCount} {imageCount === 1 ? 'bild' : 'bilder'}
+                </Badge>
+              )}
+              {videoCount > 0 && (
+                <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                  <Video className="h-3 w-3 mr-1" />
+                  {videoCount} {videoCount === 1 ? 'video' : 'videos'}
+                </Badge>
+              )}
+            </>
+          );
+        })()}
+      </div>
+
+      {/* Participants */}
       {project.participants && project.participants.length > 0 && (
         <div className="mb-3">
-          <p className="text-xs text-muted-foreground mb-1">Deltagare:</p>
+          <p className="text-xs text-muted-foreground mb-2 font-medium">Deltagare:</p>
           <div className="flex flex-wrap gap-1">
-            {project.participants.slice(0, 3).map((participant, index) => (
+            {project.participants.slice(0, 3).map((participant) => (
               <Badge key={participant.id} variant="secondary" className="text-xs">
                 {participant.name}
               </Badge>
@@ -240,8 +386,9 @@ const ProjectCard = React.memo(({
         </div>
       )}
 
+      {/* Tags */}
       {(project.tags?.length || project.associations?.length) && (
-        <div className="flex flex-wrap gap-1 mt-2">
+        <div className="flex flex-wrap gap-1 mb-3">
           {project.tags?.slice(0, 3).map((tag, index) => (
             <Badge key={`tag-${index}`} variant="outline" className="text-xs">
               {tag}
@@ -254,6 +401,9 @@ const ProjectCard = React.memo(({
           ))}
         </div>
       )}
+
+      {/* Media Thumbnails */}
+      {renderProjectMediaThumbnails(project)}
 
       <p className="text-xs text-muted-foreground mt-3">
         Skapad {new Date(project.created_at).toLocaleDateString('sv-SE')}
@@ -486,7 +636,7 @@ export const ShowcasePage: React.FC = React.memo(() => {
             onReset={handleReset}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {processedProjects.map((project) => (
               <ProjectCard
                 key={project.id}
