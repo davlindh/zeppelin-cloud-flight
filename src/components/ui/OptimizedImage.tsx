@@ -12,8 +12,13 @@ interface OptimizedImageProps {
   thumbnail?: boolean;
   aspectRatio?: string;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none';
+  objectPosition?: string;
+  rounded?: boolean | 'sm' | 'md' | 'lg' | 'full';
+  shadow?: boolean | 'sm' | 'md' | 'lg';
+  loading?: 'lazy' | 'eager';
+  placeholder?: 'blur' | 'none';
   onLoad?: () => void;
-  onError?: () => void;
+  onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
   sizes?: string;
   width?: number;
   height?: number;
@@ -28,6 +33,11 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   thumbnail = true,
   aspectRatio,
   objectFit = 'cover',
+  objectPosition = 'center',
+  rounded = false,
+  shadow = false,
+  loading = 'lazy',
+  placeholder = 'none',
   onLoad,
   onError,
   sizes,
@@ -87,11 +97,11 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     onLoad?.();
   };
 
-  const handleError = () => {
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     if (!hasError && currentSrc !== finalFallback) {
       setCurrentSrc(finalFallback);
       setHasError(true);
-      onError?.();
+      onError?.(e);
     }
     setIsLoading(false);
   };
@@ -101,15 +111,35 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     ? generateSrcSet(processedSrc)
     : undefined;
 
+  // Generate rounded classes
+  const roundedClass = rounded === true ? 'rounded-lg' :
+    rounded === 'sm' ? 'rounded-sm' :
+    rounded === 'md' ? 'rounded-md' :
+    rounded === 'lg' ? 'rounded-lg' :
+    rounded === 'full' ? 'rounded-full' : '';
+
+  // Generate shadow classes
+  const shadowClass = shadow === true ? 'shadow-md' :
+    shadow === 'sm' ? 'shadow-sm' :
+    shadow === 'md' ? 'shadow-md' :
+    shadow === 'lg' ? 'shadow-lg' : '';
+
   return (
     <div
       ref={containerRef}
-      className={cn('relative overflow-hidden', className)}
+      className={cn('relative overflow-hidden', roundedClass, shadowClass, className)}
       style={aspectRatio ? { aspectRatio } : undefined}
     >
-      {/* Loading skeleton */}
+      {/* Loading skeleton or blur placeholder */}
       {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
+        <div 
+          className={cn(
+            "absolute inset-0",
+            placeholder === 'blur' 
+              ? "bg-gradient-to-br from-muted/80 to-muted backdrop-blur-sm animate-pulse"
+              : "bg-muted animate-pulse"
+          )}
+        />
       )}
 
       {/* Image */}
@@ -122,7 +152,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           sizes={sizes}
           width={width}
           height={height}
-          loading={priority ? 'eager' : 'lazy'}
+          loading={priority ? 'eager' : loading}
           onLoad={handleLoad}
           onError={handleError}
           className={cn(
@@ -134,6 +164,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             objectFit === 'none' && 'object-none'
           )}
           style={{
+            objectPosition,
             imageRendering: isLoading ? 'pixelated' : 'auto'
           }}
         />

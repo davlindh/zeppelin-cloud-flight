@@ -2,7 +2,7 @@ import React from 'react';
 import { Play, Volume2, Image, FileText, Eye, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EnhancedImage } from './EnhancedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { useMediaPlayer } from '@/hooks/useMediaPlayer';
 import { getMediaIcon, getMediaTypeColor, isPlayableMedia, formatDuration } from '@/utils/mediaHelpers';
 import type { MediaItem } from '@/types/media';
@@ -81,11 +81,12 @@ export const MediaCardPreview: React.FC<MediaCardPreviewProps> = ({
       {/* Main preview */}
       {previewImage && (
         <div className="relative group">
-          <EnhancedImage
+          <OptimizedImage
             src={previewImage.url}
             alt={previewImage.title}
             className="rounded-lg"
-            aspectRatio="video"
+            aspectRatio="16/9"
+            objectFit="cover"
           />
           
           {/* Media count overlay */}

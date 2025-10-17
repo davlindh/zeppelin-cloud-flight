@@ -16,3 +16,5 @@ export { ProjectAccess } from './ProjectAccess';
 export { ParticipantMedia } from './ParticipantMedia';
 export { ProjectMediaDisplay } from './ProjectMediaDisplay';
 export { PartnerShowcase } from './PartnerShowcase';
+export { ProjectImage } from './ProjectImage';
+export { ParticipantAvatar } from './ParticipantAvatar';

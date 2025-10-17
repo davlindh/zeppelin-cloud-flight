@@ -6,5 +6,7 @@ export { MediaGridSkeleton } from './MediaGridSkeleton';
 
 // Unified components (new architecture)
 export { UnifiedMediaGrid } from './UnifiedMediaGrid';
-export { EnhancedImage } from './EnhancedImage';
 export { PersistentPlayer } from './PersistentPlayer';
+
+// Deprecated - Use OptimizedImage from @/components/ui/OptimizedImage instead
+export { EnhancedImage } from './_deprecated/EnhancedImage';

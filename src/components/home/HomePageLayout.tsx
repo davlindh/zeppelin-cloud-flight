@@ -3,7 +3,7 @@ import { useHomePage, useHomePageStats, useHomePageSections } from '@/contexts/H
 import { Card, CardHeader, CardTitle, CardContent , Button } from '@/components/ui';
 
 import { Badge, BadgeSuccess, BadgeWarning, BadgeInfo } from '@/components/ui/badge';
-import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { ParticipantApplicationForm } from '@/components/public/forms';

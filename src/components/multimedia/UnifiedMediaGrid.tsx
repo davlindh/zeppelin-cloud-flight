@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useUnifiedMedia } from '@/contexts/UnifiedMediaContext';
 import { MediaGridSkeleton } from './MediaGridSkeleton';
-import { EnhancedImageProps } from '@/components/multimedia/EnhancedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,15 +30,6 @@ import {
   getMediaPreviewUrl
 } from '@/utils/mediaHelpers';
 
-// Local fallback EnhancedImage component used when external module is not available
-const EnhancedImage: React.FC<{
-  src: string;
-  alt?: string;
-  className?: string;
-  onError?: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-}> = ({ src, alt, className, onError }) => {
-  return <img src={src} alt={alt || ''} className={className} loading="lazy" onError={onError} />;
-};
 
 // Constants
 const IMAGE_LOAD_DELAY = 300;
@@ -268,13 +259,13 @@ const UnifiedMediaItem: React.FC<UnifiedMediaItemProps> = React.memo(({
             {showPreview && (
               <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
                 {item.type === 'image' ? (
-                  <EnhancedImage
+                  <OptimizedImage
                     src={getMediaPreviewUrl(item.url, item.type)}
                     alt={item.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
+                    className="w-full h-full"
+                    objectFit="cover"
+                    onError={() => {
                       console.error('Failed to load media preview:', item.url);
-                      e.currentTarget.style.display = 'none';
                     }}
                   />
                 ) : (
@@ -407,10 +398,12 @@ const UnifiedMediaItem: React.FC<UnifiedMediaItemProps> = React.memo(({
             <>
               {item.type === 'image' && (
                 <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                  <EnhancedImage
+                  <OptimizedImage
                     src={item.url}
                     alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                    objectFit="cover"
+                    aspectRatio="16/9"
                   />
                 </div>
               )}

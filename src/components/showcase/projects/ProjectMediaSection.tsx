@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { UnifiedMediaItem } from '@/types/unified-media';
 import { generateMediaId } from '@/utils/mediaHelpers';
 import { 
@@ -165,10 +165,11 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
             <Card key={item.id || index} className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-0 shadow-md">
               <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-muted/30 to-muted/60">
                 {item.type === 'image' ? (
-                  <EnhancedImage
+                  <OptimizedImage
                     src={item.url}
                     alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                    objectFit="cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -242,10 +243,11 @@ export const ProjectMediaSection: React.FC<ProjectMediaSectionProps> = ({
                   {/* Preview Thumbnail */}
                   <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
                     {item.type === 'image' ? (
-                      <EnhancedImage
+                      <OptimizedImage
                         src={item.url}
                         alt={item.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
+                        objectFit="cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
