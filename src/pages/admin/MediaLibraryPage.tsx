@@ -8,6 +8,8 @@ import { MediaBulkActionsToolbar } from '@/components/media/MediaBulkActionsTool
 import { MediaViewModeToggle, ViewMode } from '@/components/media/MediaViewModeToggle';
 import { MediaStorageStats } from '@/components/media/MediaStorageStats';
 import { StorageExplorer } from '@/components/media/StorageExplorer';
+import { TagEditor } from '@/components/media/TagEditor';
+import { MediaLinkDialog } from '@/components/media/MediaLinkDialog';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +39,8 @@ export const MediaLibraryPage: React.FC = () => {
   const [showUploadDialog, setShowUploadDialog] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [showFilters, setShowFilters] = React.useState(false);
+  const [showTagEditor, setShowTagEditor] = React.useState(false);
+  const [showLinkDialog, setShowLinkDialog] = React.useState(false);
 
   const { 
     media, 
@@ -45,6 +49,9 @@ export const MediaLibraryPage: React.FC = () => {
     deleteMedia,
     bulkApprove,
     bulkDelete,
+    bulkTag,
+    bulkLink,
+    bulkChangeStatus,
   } = useMediaLibrary(filters);
 
   // Statistics
@@ -129,6 +136,35 @@ export const MediaLibraryPage: React.FC = () => {
         return 4;
     }
   };
+
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (selectedIds.size === 0 || e.target instanceof HTMLInputElement) return;
+      
+      switch(e.key.toLowerCase()) {
+        case 'a':
+          if (e.ctrlKey || e.metaKey) return;
+          handleBulkApprove();
+          break;
+        case 'd':
+          handleBulkDelete();
+          break;
+        case 't':
+          setShowTagEditor(true);
+          break;
+        case 'l':
+          setShowLinkDialog(true);
+          break;
+        case 'escape':
+          setSelectedIds(new Set());
+          break;
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [selectedIds]);
 
   return (
     <div className="container mx-auto py-6">
@@ -317,12 +353,16 @@ export const MediaLibraryPage: React.FC = () => {
       </div>
 
       {/* Bulk Actions Toolbar */}
-      <MediaBulkActionsToolbar
-        selectedCount={selectedIds.size}
-        onApprove={handleBulkApprove}
-        onDelete={handleBulkDelete}
-        onClearSelection={() => setSelectedIds(new Set())}
-      />
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+          <MediaBulkActionsToolbar
+            selectedCount={selectedIds.size}
+            onApprove={handleBulkApprove}
+            onDelete={handleBulkDelete}
+            onClearSelection={() => setSelectedIds(new Set())}
+          />
+        </div>
+      )}
 
       {/* Preview Panel */}
       <MediaPreviewPanel
@@ -367,6 +407,22 @@ export const MediaLibraryPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Tag Editor Dialog */}
+      <TagEditor
+        items={media.filter(m => selectedIds.has(m.id))}
+        open={showTagEditor}
+        onOpenChange={setShowTagEditor}
+        onSave={(tags) => bulkTag({ ids: Array.from(selectedIds), tags })}
+      />
+
+      {/* Link Dialog */}
+      <MediaLinkDialog
+        mediaIds={Array.from(selectedIds)}
+        open={showLinkDialog}
+        onOpenChange={setShowLinkDialog}
+        onLink={(entityType, entityId) => bulkLink({ mediaIds: Array.from(selectedIds), entityType, entityId })}
+      />
     </div>
   );
 };

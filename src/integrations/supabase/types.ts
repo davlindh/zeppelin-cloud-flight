@@ -1021,6 +1021,42 @@ export type Database = {
           },
         ]
       }
+      participant_media_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          media_id: string | null
+          participant_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          media_id?: string | null
+          participant_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          media_id?: string | null
+          participant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_media_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participant_media_links_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participant_tokens: {
         Row: {
           created_at: string
@@ -1474,6 +1510,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "project_media_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_media_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          media_id: string | null
+          project_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          media_id?: string | null
+          project_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          media_id?: string | null
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_media_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_media_links_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"

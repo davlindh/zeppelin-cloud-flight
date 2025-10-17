@@ -223,6 +223,107 @@ export const useMediaLibrary = (filters?: MediaFilters) => {
     },
   });
 
+  // Bulk tag
+  const bulkTagMutation = useMutation({
+    mutationFn: async ({ ids, tags }: { ids: string[]; tags: string[] }) => {
+      const query = supabase.from('media_library') as any;
+      const { error } = await query
+        .update({ tags })
+        .in('id', ids);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { ids }) => {
+      queryClient.invalidateQueries({ queryKey: ['media-library'] });
+      toast({
+        title: 'Success',
+        description: `Updated tags for ${ids.length} items`,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to tag media:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update tags',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Bulk link to project/participant
+  const bulkLinkMutation = useMutation({
+    mutationFn: async ({ 
+      mediaIds, 
+      entityType, 
+      entityId 
+    }: { 
+      mediaIds: string[]; 
+      entityType: 'project' | 'participant'; 
+      entityId: string 
+    }) => {
+      const table = entityType === 'project' ? 'project_media_links' : 'participant_media_links';
+      const idField = entityType === 'project' ? 'project_id' : 'participant_id';
+      
+      const links = mediaIds.map(mediaId => ({
+        [idField]: entityId,
+        media_id: mediaId,
+      }));
+
+      const { error } = await supabase
+        .from(table)
+        .upsert(links as any);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { mediaIds }) => {
+      queryClient.invalidateQueries({ queryKey: ['media-library'] });
+      toast({
+        title: 'Success',
+        description: `Linked ${mediaIds.length} items`,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to link media:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to link media',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Bulk change status
+  const bulkChangeStatusMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[]; status: string }) => {
+      const query = supabase.from('media_library') as any;
+      const updates: any = { status };
+      if (status === 'approved') {
+        updates.approved_at = new Date().toISOString();
+      }
+      
+      const { error } = await query
+        .update(updates)
+        .in('id', ids);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { ids }) => {
+      queryClient.invalidateQueries({ queryKey: ['media-library'] });
+      toast({
+        title: 'Success',
+        description: `Updated status for ${ids.length} items`,
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to change status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to change status',
+        variant: 'destructive',
+      });
+    },
+  });
+
   return {
     media: media || [],
     isLoading,
@@ -231,5 +332,8 @@ export const useMediaLibrary = (filters?: MediaFilters) => {
     deleteMedia: deleteMutation.mutate,
     bulkApprove: bulkApproveMutation.mutate,
     bulkDelete: bulkDeleteMutation.mutate,
+    bulkTag: bulkTagMutation.mutate,
+    bulkLink: bulkLinkMutation.mutate,
+    bulkChangeStatus: bulkChangeStatusMutation.mutate,
   };
 };
