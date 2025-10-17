@@ -55,24 +55,31 @@ interface DbSponsorWithProjects extends DbSponsor {
 // Database-only - removed static fallback
 const emptyPartners: EnhancedPartner[] = [];
 
-// Transform function for database sponsors
-const transformStaticSponsor = (sponsor: DbSponsor): EnhancedPartner => ({
-  id: sponsor.id,
-  name: sponsor.name,
-  type: sponsor.type,
-  logo: sponsor.logo_path ? `/images/${sponsor.logo_path}` : undefined,
-  website: sponsor.website || undefined,
-  contactEmail: sponsor.contact_email || undefined,
-  contactPhone: sponsor.contact_phone || undefined,
-  contactPerson: sponsor.contact_person || undefined,
-  created_at: sponsor.created_at || undefined,
-  updated_at: sponsor.updated_at || undefined,
-  // Legacy fields for backward compatibility
-  alt: sponsor.name,
-  src: sponsor.logo_path ? `/images/${sponsor.logo_path}` : '',
-  tagline: '',
-  href: sponsor.website || '',
-});
+// Transform function for database sponsors with normalized logo handling
+const transformStaticSponsor = (sponsor: DbSponsor): EnhancedPartner => {
+  // Normalize logo path - handle both full URLs and relative paths
+  const logoUrl = sponsor.logo_path
+    ? (sponsor.logo_path.startsWith('http') ? sponsor.logo_path : `/images/${sponsor.logo_path}`)
+    : undefined;
+
+  return {
+    id: sponsor.id,
+    name: sponsor.name,
+    type: sponsor.type,
+    logo: logoUrl,
+    website: sponsor.website || undefined,
+    contactEmail: sponsor.contact_email || undefined,
+    contactPhone: sponsor.contact_phone || undefined,
+    contactPerson: sponsor.contact_person || undefined,
+    created_at: sponsor.created_at || undefined,
+    updated_at: sponsor.updated_at || undefined,
+    // Legacy fields for backward compatibility
+    alt: sponsor.name,
+    src: logoUrl || '',
+    tagline: '',
+    href: sponsor.website || '',
+  };
+};
 
 // Main hook using TanStack Query
 export const usePartnerData = ({ enhanced = false } = {}) => {

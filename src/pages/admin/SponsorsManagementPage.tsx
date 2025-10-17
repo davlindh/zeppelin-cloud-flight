@@ -3,13 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { SponsorManagementList } from '@/components/admin/SponsorManagementList';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
+import { useSponsors } from '@/contexts/AdminContext';
 
 export const SponsorsManagementPage = () => {
   const navigate = useNavigate();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { fetchSponsors } = useSponsors();
 
   const handleAddSponsor = () => {
-    // TODO: Implement add sponsor dialog/modal
-    console.log('Add sponsor');
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsAddDialogOpen(false);
+  };
+
+  const handleSuccess = async () => {
+    setIsAddDialogOpen(false);
+    await fetchSponsors();
   };
 
   return (
@@ -27,9 +40,20 @@ export const SponsorsManagementPage = () => {
         </Button>
       </div>
 
-      <SponsorManagementList
-        onAddSponsor={handleAddSponsor}
-      />
+      <SponsorManagementList />
+
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Lägg till ny sponsor</DialogTitle>
+          </DialogHeader>
+          <AdminFormFactory
+            entityType="sponsor"
+            onClose={handleCloseDialog}
+            onSuccess={handleSuccess}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
