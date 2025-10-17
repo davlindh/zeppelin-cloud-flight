@@ -10,7 +10,9 @@ import {
   BarChart3, 
   Shield, 
   Building,
-  Tags
+  Tags,
+  FolderOpen,
+  HandHeart
 } from "lucide-react"
 import {
   Sidebar,
@@ -26,7 +28,13 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useAdminCounts } from "@/hooks/useAdminCounts"
 
-const adminSections = [
+const showcaseSections = [
+  { title: "Deltagare", path: "/admin/participants-management", icon: Users, description: "Hantera deltagare" },
+  { title: "Projekt", path: "/admin/projects-management", icon: FolderOpen, description: "Showcase-projekt" },
+  { title: "Sponsorer", path: "/admin/sponsors-management", icon: HandHeart, description: "Partners & sponsorer" },
+]
+
+const marketplaceSections = [
   { title: "Dashboard", path: "/admin", icon: BarChart3, description: "Overview & metrics" },
   { title: "Products", path: "/admin/products", icon: Package, description: "Manage inventory" },
   { title: "Auctions", path: "/admin/auctions", icon: Gavel, description: "Auction management" },
@@ -75,14 +83,54 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
   return (
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarContent>
+        {/* Showcase Admin Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
-            Admin Panel
+            Showcase Admin
           </SidebarGroupLabel>
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {adminSections.map((section) => {
+              {showcaseSections.map((section) => {
+                const active = isActive(section.path)
+                
+                return (
+                  <SidebarMenuItem key={section.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      className={active ? "bg-accent text-accent-foreground" : ""}
+                    >
+                      <button
+                        onClick={() => handleClick(section.path)}
+                        className="w-full flex items-center justify-between p-2 hover:bg-accent/50 rounded-md transition-colors"
+                      >
+                        <div className="flex items-center">
+                          <section.icon className="h-4 w-4 mr-2 shrink-0" />
+                          {!collapsed && (
+                            <div className="flex flex-col items-start">
+                              <span className="text-sm font-medium">{section.title}</span>
+                              <span className="text-xs text-muted-foreground">{section.description}</span>
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Marketplace Admin Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
+            Marketplace Admin
+          </SidebarGroupLabel>
+
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {marketplaceSections.map((section) => {
                 const badgeCount = getBadgeCount(section.path)
                 const active = isActive(section.path)
                 

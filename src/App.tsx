@@ -58,6 +58,9 @@ const BrandsPage = lazy(() => import("./pages/admin/BrandsPage").then(m => ({ de
 const BookingsPage = lazy(() => import("./pages/admin/BookingsPage").then(m => ({ default: m.BookingsPage })));
 const CommunicationsPage = lazy(() => import("./pages/admin/CommunicationsPage").then(m => ({ default: m.CommunicationsPage })));
 const SecurityPage = lazy(() => import("./pages/admin/SecurityPage").then(m => ({ default: m.SecurityPage })));
+const ParticipantsManagementPage = lazy(() => import("./pages/admin/ParticipantsManagementPage").then(m => ({ default: m.ParticipantsManagementPage })));
+const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManagementPage").then(m => ({ default: m.ProjectsManagementPage })));
+const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManagementPage").then(m => ({ default: m.SponsorsManagementPage })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-96">
@@ -188,6 +191,21 @@ const App = () => (
                   <Route path="security" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SecurityPage />
+                    </Suspense>
+                  } />
+                  <Route path="participants-management" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ParticipantsManagementPage />
+                    </Suspense>
+                  } />
+                  <Route path="projects-management" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ProjectsManagementPage />
+                    </Suspense>
+                  } />
+                  <Route path="sponsors-management" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <SponsorsManagementPage />
                     </Suspense>
                   } />
                 </Route>
