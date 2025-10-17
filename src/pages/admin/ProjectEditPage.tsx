@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { EditPageLayout } from '@/components/admin/EditPageLayout';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
 import { ProjectMediaLibrary } from '@/components/admin/ProjectMediaLibrary';
+import { SponsorSelector } from '@/components/admin/project/SponsorSelector';
 
 export const ProjectEditPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -37,11 +38,20 @@ export const ProjectEditPage: React.FC = () => {
 
         {/* Project media library - only shown if we have a project ID */}
         {currentProjectId && (
-          <div className="max-w-none">
-            <ProjectMediaLibrary
-              projectId={currentProjectId}
-            />
-          </div>
+          <>
+            <div className="max-w-none">
+              <ProjectMediaLibrary
+                projectId={currentProjectId}
+              />
+            </div>
+
+            {/* Sponsor selector */}
+            <div className="max-w-none">
+              <SponsorSelector
+                projectId={currentProjectId}
+              />
+            </div>
+          </>
         )}
       </div>
     </EditPageLayout>
