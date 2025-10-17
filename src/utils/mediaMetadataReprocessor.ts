@@ -15,17 +15,37 @@ interface ReprocessResult {
 }
 
 /**
- * Fetch file size from storage URL
+ * Fetch actual file metadata from Supabase storage
  */
-async function fetchFileSize(url: string): Promise<number | null> {
+async function fetchFileMetadata(bucket: string, path: string): Promise<{ size: number; mimeType: string } | null> {
   try {
-    const response = await fetch(url, { method: 'HEAD' });
-    const contentLength = response.headers.get('content-length');
-    return contentLength ? parseInt(contentLength, 10) : null;
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .download(path);
+    
+    if (error || !data) {
+      console.error('Failed to fetch file metadata:', error);
+      return null;
+    }
+    
+    return {
+      size: data.size,
+      mimeType: data.type || 'application/octet-stream',
+    };
   } catch (error) {
-    console.error('Failed to fetch file size:', error);
+    console.error('Failed to fetch file metadata:', error);
     return null;
   }
+}
+
+/**
+ * Determine media type from MIME type
+ */
+function getMediaType(mimeType: string): 'image' | 'video' | 'audio' | 'document' {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  return 'document';
 }
 
 /**
@@ -86,11 +106,30 @@ export async function reprocessMediaMetadata(mediaId: string): Promise<Reprocess
 
     const updates: ReprocessResult['updates'] = {};
 
-    // Fix file size if missing
-    if (!media.file_size && media.public_url) {
-      const fileSize = await fetchFileSize(media.public_url);
-      if (fileSize) {
-        updates.file_size = fileSize;
+    // Fix file size and MIME type if missing
+    if ((!media.file_size || media.mime_type === 'application/octet-stream') && media.bucket && media.storage_path) {
+      const metadata = await fetchFileMetadata(media.bucket, media.storage_path);
+      if (metadata) {
+        updates.file_size = metadata.size;
+        
+        // Update MIME type if it's generic
+        if (media.mime_type === 'application/octet-stream') {
+          const { error: mimeUpdateError } = await supabase
+            .from('media_library')
+            .update({ mime_type: metadata.mimeType })
+            .eq('id', mediaId);
+          
+          if (!mimeUpdateError) {
+            // Update type based on MIME type
+            const correctType = getMediaType(metadata.mimeType);
+            if (correctType !== media.type) {
+              await supabase
+                .from('media_library')
+                .update({ type: correctType })
+                .eq('id', mediaId);
+            }
+          }
+        }
       }
     }
 
@@ -170,8 +209,8 @@ export async function reprocessBulkMetadata(
 export async function findMediaWithMissingMetadata() {
   const { data, error } = await supabase
     .from('media_library')
-    .select('id, title, type, file_size, width, height, thumbnail_url, original_filename')
-    .or('file_size.is.null,thumbnail_url.is.null')
+    .select('id, title, type, file_size, width, height, thumbnail_url, original_filename, mime_type')
+    .or('file_size.is.null,thumbnail_url.is.null,mime_type.eq.application/octet-stream')
     .order('created_at', { ascending: false });
 
   if (error) {

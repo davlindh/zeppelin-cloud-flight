@@ -143,6 +143,32 @@ export async function checkFilesInDatabase(
 }
 
 /**
+ * Get file metadata from storage (including size and mime type)
+ */
+async function getFileMetadata(bucketName: string, filePath: string) {
+  try {
+    // Download file to get actual metadata
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .download(filePath);
+    
+    if (error) {
+      console.error('Failed to get file metadata:', error);
+      return { size: 0, mimeType: 'application/octet-stream' };
+    }
+    
+    // Get actual file size and type
+    const size = data.size;
+    const mimeType = data.type || 'application/octet-stream';
+    
+    return { size, mimeType };
+  } catch (error) {
+    console.error('Failed to get file metadata:', error);
+    return { size: 0, mimeType: 'application/octet-stream' };
+  }
+}
+
+/**
  * Import orphaned file to media_library
  */
 export async function importFileToMediaLibrary(
@@ -155,8 +181,10 @@ export async function importFileToMediaLibrary(
     status?: string;
   }
 ) {
-  const mimeType = file.metadata?.mimetype || 'application/octet-stream';
-  const fileSize = file.metadata?.size || 0;
+  // Get actual file metadata from storage
+  const actualMetadata = await getFileMetadata(bucketName, file.fullPath);
+  const mimeType = actualMetadata.mimeType;
+  const fileSize = actualMetadata.size;
   
   // Determine media type
   let type: 'image' | 'video' | 'audio' | 'document' = 'document';
