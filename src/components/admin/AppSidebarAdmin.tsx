@@ -105,17 +105,17 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
                     >
                       <button
                         onClick={() => handleClick(section.path)}
-                        className="w-full flex items-center justify-between p-2 hover:bg-accent/50 rounded-md transition-colors"
+                        className="w-full flex items-center gap-3 p-3 hover:bg-accent/50 rounded-lg transition-all duration-200"
                       >
-                        <div className="flex items-center">
-                          <section.icon className="h-4 w-4 mr-2 shrink-0" />
-                          {!collapsed && (
-                            <div className="flex flex-col items-start">
-                              <span className="text-sm font-medium">{section.title}</span>
-                              <span className="text-xs text-muted-foreground">{section.description}</span>
-                            </div>
-                          )}
+                        <div className={`flex items-center justify-center shrink-0 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                          <section.icon className="h-5 w-5" />
                         </div>
+                        {!collapsed && (
+                          <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                            <span className="text-sm font-semibold leading-none">{section.title}</span>
+                            <span className="text-xs text-muted-foreground leading-tight">{section.description}</span>
+                          </div>
+                        )}
                       </button>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -145,19 +145,21 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
                     >
                       <button
                         onClick={() => handleClick(section.path)}
-                        className="w-full flex items-center justify-between p-2 hover:bg-accent/50 rounded-md transition-colors"
+                        className="w-full flex items-center justify-between gap-3 p-3 hover:bg-accent/50 rounded-lg transition-all duration-200"
                       >
-                        <div className="flex items-center">
-                          <section.icon className="h-4 w-4 mr-2 shrink-0" />
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`flex items-center justify-center shrink-0 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                            <section.icon className="h-5 w-5" />
+                          </div>
                           {!collapsed && (
-                            <div className="flex flex-col items-start">
-                              <span className="text-sm font-medium">{section.title}</span>
-                              <span className="text-xs text-muted-foreground">{section.description}</span>
+                            <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                              <span className="text-sm font-semibold leading-none">{section.title}</span>
+                              <span className="text-xs text-muted-foreground leading-tight">{section.description}</span>
                             </div>
                           )}
                         </div>
                         {!collapsed && badgeCount > 0 && (
-                          <Badge variant="secondary" className="ml-auto text-xs">
+                          <Badge variant="secondary" className="shrink-0 text-xs">
                             {badgeCount > 99 ? '99+' : badgeCount}
                           </Badge>
                         )}
