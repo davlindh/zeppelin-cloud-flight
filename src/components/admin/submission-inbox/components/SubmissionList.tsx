@@ -54,6 +54,72 @@ export const SubmissionList: React.FC<SubmissionListProps> = ({
   onDelete,
   loading = false
 }) => {
+  const renderMediaThumbnails = (submission: EnhancedSubmission) => {
+    if (!hasFiles(submission) || !submission.files) return null;
+
+    const filesArray = Array.isArray(submission.files) 
+      ? submission.files 
+      : Object.values(submission.files).filter((f): f is any => 
+          f && typeof f === 'object' && 'url' in f
+        );
+
+    const imageFiles = filesArray.filter((file: any) => {
+      const ext = file.name?.toLowerCase().split('.').pop() || '';
+      return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+    });
+
+    if (imageFiles.length === 0) return null;
+
+    const displayImages = imageFiles.slice(0, 4);
+    const remainingCount = imageFiles.length - displayImages.length;
+
+    return (
+      <div className="mt-3 pt-3 border-t">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          {displayImages.map((file: any, index: number) => (
+            <div 
+              key={index} 
+              className="relative aspect-square bg-muted rounded overflow-hidden group cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(file.url, '_blank');
+              }}
+            >
+              <img
+                src={file.url}
+                alt={file.name || `Bild ${index + 1}`}
+                className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                onError={(e) => {
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                <Eye className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              
+              {submission.media_status === 'approved' && (
+                <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
+                  <Check className="h-3 w-3 text-white" />
+                </div>
+              )}
+              {submission.media_status === 'rejected' && (
+                <div className="absolute top-1 right-1 bg-red-500 rounded-full p-0.5">
+                  <X className="h-3 w-3 text-white" />
+                </div>
+              )}
+            </div>
+          ))}
+          
+          {remainingCount > 0 && (
+            <div className="aspect-square bg-muted rounded flex items-center justify-center text-sm font-medium text-muted-foreground border-2 border-dashed">
+              +{remainingCount}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <Card>
@@ -100,12 +166,27 @@ export const SubmissionList: React.FC<SubmissionListProps> = ({
                       {submission.status}
                     </div>
                   </Badge>
-                  {hasFiles(submission) && (
-                    <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200">
-                      <Image className="h-3 w-3 mr-1" />
-                      {getFileCount(submission)} {getFileCount(submission) === 1 ? 'fil' : 'filer'}
-                    </Badge>
-                  )}
+                  {hasFiles(submission) && (() => {
+                    const filesArray = Array.isArray(submission.files) 
+                      ? submission.files 
+                      : Object.values(submission.files).filter((f): f is any => 
+                          f && typeof f === 'object' && 'url' in f
+                        );
+                    
+                    const nonImageFiles = filesArray.filter((file: any) => {
+                      const ext = file.name?.toLowerCase().split('.').pop() || '';
+                      return !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+                    });
+
+                    if (nonImageFiles.length === 0) return null;
+
+                    return (
+                      <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200">
+                        <FileIcon className="h-3 w-3 mr-1" />
+                        {nonImageFiles.length} {nonImageFiles.length === 1 ? 'dokument' : 'dokument'}
+                      </Badge>
+                    );
+                  })()}
                   {submission.media_status && submission.media_status !== 'pending' && (
                     <Badge
                       variant="outline"
@@ -155,6 +236,9 @@ export const SubmissionList: React.FC<SubmissionListProps> = ({
                     : 'Ingen beskrivning tillgänglig'
                   }
                 </div>
+
+                {/* Media thumbnails */}
+                {renderMediaThumbnails(submission)}
               </div>
 
               <div className="flex flex-col gap-2 ml-4">
