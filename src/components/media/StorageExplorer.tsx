@@ -45,9 +45,27 @@ export function StorageExplorer() {
 
   const loadBuckets = async () => {
     setLoading(true);
-    const data = await listAllBuckets();
-    setBuckets(data);
-    setLoading(false);
+    try {
+      const data = await listAllBuckets();
+      console.log('Loaded buckets:', data);
+      setBuckets(data);
+      if (data.length === 0) {
+        toast({
+          title: "No buckets found",
+          description: "Unable to load storage buckets. Check console for details.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error loading buckets:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load storage buckets",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadFiles = async (bucketName: string) => {

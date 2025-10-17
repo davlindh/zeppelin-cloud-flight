@@ -28,31 +28,36 @@ export interface StorageFileWithUrl extends StorageFile {
  * List all storage buckets
  */
 export async function listAllBuckets(): Promise<StorageBucket[]> {
+  console.log('Fetching storage buckets...');
   try {
     const { data, error } = await supabase.storage.listBuckets();
     
+    console.log('Storage API response:', { data, error });
+    
     if (error) {
-      console.error('Failed to list buckets:', error);
-      // Return hardcoded list of known buckets as fallback
-      return [
-        { id: 'media-files', name: 'media-files', public: true },
-        { id: 'project-images', name: 'project-images', public: true },
-        { id: 'participant-avatars', name: 'participant-avatars', public: true },
-        { id: 'sponsor-logos', name: 'sponsor-logos', public: true },
-        { id: 'documents', name: 'documents', public: false },
-        { id: 'ui', name: 'ui', public: true },
-        { id: 'media', name: 'media', public: false },
-        { id: 'product-images', name: 'product-images', public: true },
-        { id: 'auction-images', name: 'auction-images', public: true },
-        { id: 'service-images', name: 'service-images', public: true },
-        { id: 'provider-avatars', name: 'provider-avatars', public: true },
-      ];
+      console.error('Storage API error:', error);
     }
     
-    return data || [];
+    // Always return the fallback list since storage.listBuckets() requires service_role key
+    // which is not available on the client side for security reasons
+    const buckets = [
+      { id: 'media-files', name: 'media-files', public: true },
+      { id: 'project-images', name: 'project-images', public: true },
+      { id: 'participant-avatars', name: 'participant-avatars', public: true },
+      { id: 'sponsor-logos', name: 'sponsor-logos', public: true },
+      { id: 'documents', name: 'documents', public: false },
+      { id: 'ui', name: 'ui', public: true },
+      { id: 'media', name: 'media', public: false },
+      { id: 'product-images', name: 'product-images', public: true },
+      { id: 'auction-images', name: 'auction-images', public: true },
+      { id: 'service-images', name: 'service-images', public: true },
+      { id: 'provider-avatars', name: 'provider-avatars', public: true },
+    ];
+    
+    console.log('Returning buckets:', buckets);
+    return buckets;
   } catch (error) {
-    console.error('Failed to list buckets:', error);
-    // Return hardcoded list as fallback
+    console.error('Exception while listing buckets:', error);
     return [
       { id: 'media-files', name: 'media-files', public: true },
       { id: 'project-images', name: 'project-images', public: true },
