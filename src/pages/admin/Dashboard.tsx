@@ -1,26 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Package, Gavel, Wrench } from 'lucide-react';
 import { SecurityMetricsCard } from '@/components/admin/dashboard/SecurityMetricsCard';
 import { LiveActivityFeed } from '@/components/admin/dashboard/LiveActivityFeed';
 import { AlertsCenter } from '@/components/admin/dashboard/AlertsCenter';
 import AdminDataHub from '@/components/admin/dashboard/AdminDataHub';
-import { useDashboardStats, useRevenueStats } from '@/hooks/useDashboardStats';
 import { useAdminAuditLog } from '@/hooks/useAdminAuditLog';
-import { ZeppelStatsCards } from '@/components/admin/ZeppelStatsCards';
+import { DashboardHero } from '@/components/admin/dashboard/DashboardHero';
+import { QuickActions } from '@/components/admin/dashboard/QuickActions';
+import { ZeppelStatsSection } from '@/components/admin/dashboard/ZeppelStatsSection';
+import { MarketplaceStatsSection } from '@/components/admin/dashboard/MarketplaceStatsSection';
+import { useUnifiedDashboardStats } from '@/hooks/useUnifiedDashboardStats';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Dashboard = () => {
-  const { data: dashboardStats, isLoading: statsLoading } = useDashboardStats();
-  const { data: revenueStats } = useRevenueStats();
+  const { data: stats, isLoading, refetch } = useUnifiedDashboardStats();
   const { logAdminAction } = useAdminAuditLog();
-
-  const securityStatus: 'secure' | 'warning' | 'critical' = (() => {
-    const lowStock = dashboardStats?.products.lowStock ?? 0;
-    const endingToday = dashboardStats?.auctions.endingToday ?? 0;
-    
-    if (lowStock > 10 || endingToday > 5) return 'critical';
-    if (lowStock > 0 || endingToday > 0) return 'warning';
-    return 'secure';
-  })();
 
   const handleSecurityClick = () => {
     logAdminAction({
@@ -43,80 +35,55 @@ export const Dashboard = () => {
     });
   };
 
-  if (statsLoading) {
-    return <div className="flex items-center justify-center h-96">Loading dashboard...</div>;
+  if (isLoading || !stats) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-5 w-96" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+      </div>
+    );
   }
+
+  const handleRefresh = () => {
+    refetch();
+    logAdminAction({
+      action: 'refresh_dashboard',
+      details: { timestamp: new Date().toISOString() }
+    });
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
-      </div>
+      {/* Hero Section */}
+      <DashboardHero
+        actionItemsCount={stats.action_items.total}
+        lastUpdated={stats.last_updated}
+        onRefresh={handleRefresh}
+        isRefreshing={isLoading}
+      />
 
-      {/* Zeppel Admin Stats */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Zeppel Admin</h2>
-        <ZeppelStatsCards />
-      </div>
+      {/* Quick Actions */}
+      {stats.action_items.total > 0 && (
+        <QuickActions
+          submissionsPending={stats.action_items.submissions_pending}
+          mediaPending={stats.action_items.media_pending}
+          lowStockCount={stats.action_items.low_stock_count}
+          endingTodayCount={stats.marketplace.auctions.ending_today}
+        />
+      )}
+
+      {/* Zeppel Stats */}
+      <ZeppelStatsSection stats={stats.zeppel} />
 
       {/* Marketplace Stats */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Marketplace Overview</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${revenueStats?.today.toLocaleString() ?? 0}</div>
-            <p className="text-xs text-muted-foreground">
-              +{revenueStats?.growth ?? 0}% from yesterday
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats?.products.total ?? 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats?.products.lowStock ?? 0} low stock
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Auctions</CardTitle>
-            <Gavel className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats?.auctions.total ?? 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats?.auctions.endingToday ?? 0} ending today
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Services</CardTitle>
-            <Wrench className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats?.services.total ?? 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboardStats?.services.active ?? 0} active
-            </p>
-          </CardContent>
-        </Card>
-        </div>
-      </div>
+      <MarketplaceStatsSection stats={stats.marketplace} />
 
       {/* Security & Activity Row */}
       <div className="grid gap-4 md:grid-cols-2">

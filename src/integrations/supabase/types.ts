@@ -2372,6 +2372,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      get_unified_admin_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_zeppel_admin_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json
