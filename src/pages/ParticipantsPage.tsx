@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Sparkles, Heart, MessageCircle, ExternalLink, Award, Star, Zap, Target, Briefcase, Code, Palette, Camera, Music, BookOpen, Coffee, TrendingUp } from 'lucide-react';
-import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
+import { ParticipantAvatar } from '@/components/showcase/ParticipantAvatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -165,16 +165,10 @@ export const ParticipantsPage: React.FC = () => {
                 >
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex-shrink-0 relative">
-                    <EnhancedImage
-                      src={participant.avatar || '/images/participants/placeholder-avatar.svg'}
-                      alt={participant.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                      rounded="full"
-                      shadow="md"
-                      onError={(e) => {
-                        const target = e.currentTarget as HTMLImageElement;
-                        target.src = '/images/participants/placeholder-avatar.svg';
-                      }}
+                    <ParticipantAvatar
+                      src={participant.avatar}
+                      name={participant.name}
+                      size="lg"
                     />
                     <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1 shadow-sm">
                       <Award className="h-3 w-3" />

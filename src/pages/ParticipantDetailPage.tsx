@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
+import { ParticipantAvatar } from '@/components/showcase/ParticipantAvatar';
 import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
 import { useToast } from '@/hooks/use-toast';
 import type { UnifiedMediaItem } from '@/types/unified-media';
@@ -113,16 +113,12 @@ export const ParticipantDetailPage: React.FC = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="flex-shrink-0">
               <div className="relative">
-                <EnhancedImage
-                  src={participant.avatar || '/images/participants/placeholder-avatar.svg'}
-                  alt={participant.name}
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white/20"
-                  rounded="full"
-                  shadow="lg"
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.src = '/images/participants/placeholder-avatar.svg';
-                  }}
+                <ParticipantAvatar
+                  src={participant.avatar}
+                  name={participant.name}
+                  size="xl"
+                  priority
+                  className="border-4 border-white/20 shadow-lg"
                 />
                 <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full p-2 shadow-lg">
                   <Award className="h-4 w-4" />
@@ -439,17 +435,11 @@ export const ParticipantDetailPage: React.FC = () => {
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-muted flex items-center justify-center">
-                    <EnhancedImage
-                      src={participant.avatar || '/images/participants/placeholder-avatar.svg'}
-                      alt={participant.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.currentTarget as HTMLImageElement;
-                        target.src = '/images/participants/placeholder-avatar.svg';
-                      }}
-                    />
-                  </div>
+                  <ParticipantAvatar
+                    src={participant.avatar}
+                    name={participant.name}
+                    size="sm"
+                  />
                   <div>
                     <h3 className="text-lg font-semibold">{participant.name}</h3>
                     <p className="text-sm text-muted-foreground">Kontakta deltagare</p>

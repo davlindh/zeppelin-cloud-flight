@@ -1,19 +1,20 @@
-import React from 'react';
-import { MediaFilters } from '../multimedia';
+import React, { useMemo } from 'react';
 import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
-import { Button } from '@/components/ui/button';
-import type { ProjectMediaItem, MediaType } from '@/types/media';
-import type { UnifiedMediaItem } from '@/types/unified-media';
-import { generateMediaId } from '@/utils/mediaHelpers';
+import { MediaFilters } from '@/components/multimedia/MediaFilters';
 import { useMediaFiltering } from '@/hooks/useMediaFiltering';
-import { resolveMediaUrl } from '@/utils/assetHelpers';
+import type { UnifiedMediaItem } from '@/types/unified-media';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { generateMediaId } from '@/utils/mediaHelpers';
+import { getImageUrl } from '@/utils/imageUtils';
 
 interface ProjectMediaDisplayProps {
   media?: Array<{
-    type: 'video' | 'audio' | 'image' | 'document' | 'pdf' | 'presentation' | 'archive' | 'code' | '3d' | 'portfolio';
+    type: string;
     url: string;
     title: string;
     description?: string;
+    project_id?: string;
   }>;
   showPreview?: boolean;
   allowCategorization?: boolean;
@@ -24,14 +25,16 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
   showPreview = true,
   allowCategorization = true 
 }) => {
-  // Convert to UnifiedMediaItem format with centralized URL resolution
-  const mediaItems: UnifiedMediaItem[] = media.map((item, index) => ({
-    id: generateMediaId(item) || `project-media-${index}`,
-    type: item.type,
-    url: resolveMediaUrl(item.url, item.type, 'project'),
-    title: item.title,
-    description: item.description,
-  }));
+  // Transform media into UnifiedMediaItem format with optimized URLs
+  const unifiedMedia: UnifiedMediaItem[] = useMemo(() => 
+    media.map((item) => ({
+      id: generateMediaId(item),
+      type: item.type as UnifiedMediaItem['type'],
+      url: getImageUrl(item.url), // Optimize URL handling
+      title: item.title,
+      description: item.description,
+    })), [media]
+  );
 
   const {
     viewMode,
@@ -44,7 +47,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
     totalCount,
     filteredCount,
     hasFilters
-  } = useMediaFiltering({ media: mediaItems });
+  } = useMediaFiltering({ media: unifiedMedia });
 
   // Convert viewMode to match UnifiedMediaGrid's expected type
   const gridViewMode = viewMode === 'gallery' ? 'grid' : viewMode;

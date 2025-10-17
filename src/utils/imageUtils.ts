@@ -13,9 +13,29 @@ export const getImageUrl = (imageId?: string | null): string => {
     return imageId;
   }
 
-  // Handle paths that are just file names - convert to full Supabase storage URL
+  // Handle local asset paths
+  if (imageId.startsWith('/') || imageId.startsWith('./')) {
+    return imageId;
+  }
+
+  // Handle paths that are just file names - try different buckets
   if (!imageId.startsWith('http') && !imageId.includes('storage')) {
-    return `https://bjffyadrmkdnmgwpsbnw.supabase.co/storage/v1/object/public/uploads/${imageId}`;
+    // Try to determine bucket from context or use default
+    const supabaseUrl = 'https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public';
+    
+    // Check common patterns to determine bucket
+    if (imageId.includes('avatar') || imageId.includes('participant')) {
+      return `${supabaseUrl}/participant-avatars/${imageId}`;
+    }
+    if (imageId.includes('project')) {
+      return `${supabaseUrl}/project-images/${imageId}`;
+    }
+    if (imageId.includes('sponsor') || imageId.includes('partner')) {
+      return `${supabaseUrl}/sponsor-logos/${imageId}`;
+    }
+    
+    // Default to media-files bucket (most common)
+    return `${supabaseUrl}/media-files/${imageId}`;
   }
   
   // Fallback to placeholder

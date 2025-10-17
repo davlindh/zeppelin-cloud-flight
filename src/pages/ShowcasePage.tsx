@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ProjectProposalForm } from '@/components/public/forms';
-import { EnhancedImage } from '@/components/multimedia/EnhancedImage';
+import { ProjectImage } from '@/components/showcase/ProjectImage';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { getPlaceholderImage } from '@/utils/assetHelpers';
@@ -199,9 +199,9 @@ const ProjectCard = React.memo(({
     onClick={() => onClick(project.slug)}
   >
     <div className="relative overflow-hidden rounded-t-lg">
-      <EnhancedImage
-        src={getImageUrl(project.image_path)}
-        alt={project.title}
+      <ProjectImage
+        src={project.image_path}
+        title={project.title}
         className="w-full h-48"
       />
       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
