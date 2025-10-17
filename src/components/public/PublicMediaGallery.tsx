@@ -89,32 +89,34 @@ export const PublicMediaGallery: React.FC<PublicMediaGalleryProps> = ({ classNam
       const from = (currentPage - 1) * itemsPerPage;
       const to = from + itemsPerPage - 1;
       
-      // Optimized query: only select needed fields, use pagination
-      const { data: submissions, error: submissionError, count } = await supabase
-        .from('submissions')
-        .select('id, title, content, thumbnail_url, created_at', { count: 'exact' })
-        .eq('type', 'media')
+      // Query media_library table for approved and public media
+      const { data: mediaLibrary, error: mediaError, count } = await supabase
+        .from('media_library')
+        .select('id, title, description, type, category, public_url, thumbnail_url, file_size, mime_type, uploaded_at, tags, created_at', { count: 'exact' })
         .eq('status', 'approved')
-        .order('created_at', { ascending: false })
+        .eq('is_public', true)
+        .order('uploaded_at', { ascending: false })
         .range(from, to);
 
-      if (submissionError) throw submissionError;
+      if (mediaError) throw mediaError;
 
-      // Transform submissions to MediaItem format
-      const transformedItems: MediaItem[] = (submissions || [])
-        .filter(sub => (sub.content as any)?.publication_permission === true)
-        .map(sub => ({
-          id: sub.id,
-          title: sub.title,
-          description: (sub.content as any)?.description,
-          media_type: (sub.content as any)?.media_type,
-          category: (sub.content as any)?.category,
-          uploader_name: (sub.content as any)?.uploader_name,
-          event_date: (sub.content as any)?.event_date,
-          files: (sub.content as any)?.files || [],
-          created_at: sub.created_at
-        }))
-        .filter(item => item.files.length > 0);
+      // Transform media_library records to MediaItem format
+      const transformedItems: MediaItem[] = (mediaLibrary || []).map(media => ({
+        id: media.id,
+        title: media.title,
+        description: media.description || undefined,
+        media_type: media.type as 'image' | 'video' | 'audio' | 'document',
+        category: media.category || 'general',
+        uploader_name: 'Deltagare',
+        event_date: media.created_at,
+        files: [{
+          filename: media.title,
+          url: media.public_url,
+          size: media.file_size || 0,
+          mimeType: media.mime_type || undefined
+        }],
+        created_at: media.created_at
+      }));
 
       setMediaItems(prev => currentPage === 1 ? transformedItems : [...prev, ...transformedItems]);
       setHasMore((count || 0) > currentPage * itemsPerPage);
