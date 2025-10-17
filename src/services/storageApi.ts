@@ -21,6 +21,7 @@ export interface StorageFileWithUrl extends StorageFile {
   publicUrl?: string;
   inDatabase: boolean;
   mediaId?: string;
+  fullPath: string;
 }
 
 /**
@@ -43,26 +44,54 @@ export async function listAllBuckets(): Promise<StorageBucket[]> {
 }
 
 /**
- * List files in a specific bucket
+ * Recursively list all files in bucket including subdirectories
+ */
+async function listFilesRecursively(
+  bucketName: string,
+  path: string = '',
+  allFiles: StorageFile[] = []
+): Promise<StorageFile[]> {
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .list(path, {
+      limit: 1000,
+      sortBy: { column: 'created_at', order: 'desc' }
+    });
+  
+  if (error) {
+    console.error(`Failed to list files in ${bucketName}/${path}:`, error);
+    return allFiles;
+  }
+  
+  if (!data) return allFiles;
+  
+  for (const item of data) {
+    const fullPath = path ? `${path}/${item.name}` : item.name;
+    
+    if (item.id === null) {
+      // This is a folder, recurse into it
+      await listFilesRecursively(bucketName, fullPath, allFiles);
+    } else {
+      // This is a file
+      allFiles.push({
+        ...item,
+        name: fullPath, // Use full path as name
+      });
+    }
+  }
+  
+  return allFiles;
+}
+
+/**
+ * List files in a specific bucket (with recursive folder scanning)
  */
 export async function listFilesInBucket(
   bucketName: string,
   path: string = ''
 ): Promise<StorageFile[]> {
   try {
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .list(path, {
-        limit: 1000,
-        sortBy: { column: 'created_at', order: 'desc' }
-      });
-    
-    if (error) {
-      console.error(`Failed to list files in bucket ${bucketName}:`, error);
-      return [];
-    }
-    
-    return data || [];
+    return await listFilesRecursively(bucketName, path);
   } catch (error) {
     console.error(`Failed to list files in bucket ${bucketName}:`, error);
     return [];
@@ -102,6 +131,7 @@ export async function checkFilesInDatabase(
       
       return {
         ...file,
+        fullPath: storagePath,
         publicUrl,
         inDatabase: !!data,
         mediaId: data?.id,
@@ -134,8 +164,9 @@ export async function importFileToMediaLibrary(
   else if (mimeType.startsWith('video/')) type = 'video';
   else if (mimeType.startsWith('audio/')) type = 'audio';
   
-  // Generate smart title
-  const title = metadata.title || file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+  // Generate smart title from filename (not full path)
+  const filename = file.name.split('/').pop() || file.name;
+  const title = metadata.title || filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
   
   // Generate thumbnail for images
   let thumbnailUrl: string | undefined;
@@ -147,16 +178,16 @@ export async function importFileToMediaLibrary(
     .from('media_library')
     .insert({
       title: title.charAt(0).toUpperCase() + title.slice(1),
-      filename: file.name,
-      original_filename: file.name,
+      filename: filename,
+      original_filename: filename,
       type,
       mime_type: mimeType,
       file_size: fileSize,
-      storage_path: file.name,
+      storage_path: file.fullPath,
       public_url: file.publicUrl,
       thumbnail_url: thumbnailUrl,
       bucket: bucketName,
-      source: 'storage-import',
+      source: 'imported',
       category: metadata.category,
       tags: metadata.tags || [],
       status: metadata.status || 'pending',

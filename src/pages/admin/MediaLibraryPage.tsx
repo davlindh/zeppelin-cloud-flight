@@ -162,7 +162,11 @@ export const MediaLibraryPage: React.FC = () => {
           handleBulkApprove();
           break;
         case 'd':
-          handleBulkDelete();
+          if (e.shiftKey) {
+            handleBulkDelete();
+          } else {
+            handleBulkDownload();
+          }
           break;
         case 't':
           setShowTagEditor(true);
@@ -307,8 +311,9 @@ export const MediaLibraryPage: React.FC = () => {
         <MediaViewModeToggle value={viewMode} onChange={setViewMode} />
 
         {selectedIds.size > 0 && (
-          <Badge variant="secondary">
+          <Badge variant="secondary" className="gap-2">
             {selectedIds.size} selected
+            <span className="text-xs opacity-70">• D=Download Shift+D=Delete</span>
           </Badge>
         )}
       </div>

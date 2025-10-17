@@ -79,12 +79,12 @@ export function StorageExplorer() {
     
     try {
       await importFileToMediaLibrary(selectedBucket, file, {
-        status: 'pending',
+        status: 'approved',
       });
       
       toast({
         title: "Success",
-        description: `Imported ${file.name} to media library`,
+        description: `Imported ${file.name.split('/').pop()} to media library`,
       });
       
       // Reload files
@@ -118,7 +118,7 @@ export function StorageExplorer() {
     for (const file of orphanedFiles) {
       try {
         await importFileToMediaLibrary(selectedBucket, file, {
-          status: 'pending',
+          status: 'approved',
         });
         imported++;
       } catch (error) {
@@ -221,10 +221,17 @@ export function StorageExplorer() {
                               <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{file.name}</p>
+                              <p className="text-sm font-medium truncate" title={file.fullPath}>
+                                {file.name.split('/').pop()}
+                              </p>
                               <p className="text-xs text-muted-foreground">
                                 {formatFileSize(file.metadata?.size || 0)} • {file.metadata?.mimetype}
                               </p>
+                              {file.name.includes('/') && (
+                                <p className="text-xs text-muted-foreground/60 truncate">
+                                  {file.name.split('/').slice(0, -1).join('/')}
+                                </p>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
