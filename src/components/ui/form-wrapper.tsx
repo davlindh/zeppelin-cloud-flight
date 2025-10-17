@@ -6,7 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { X, User, Building, Lightbulb, Users } from 'lucide-react';
+import { X, User, Building, Lightbulb, Users, Save } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { format } from 'date-fns';
 
 export interface FormWrapperProps<T extends FieldValues> {
   title: string;
@@ -23,6 +25,12 @@ export interface FormWrapperProps<T extends FieldValues> {
   currentStep?: number;
   totalSteps?: number;
   className?: string;
+  enableAutoSave?: boolean;
+  showProgress?: boolean;
+  estimatedTime?: string;
+  onStepChange?: (step: number) => void;
+  lastSaved?: Date | null;
+  isSaving?: boolean;
 }
 
 export function FormWrapper<T extends FieldValues>({
@@ -40,6 +48,12 @@ export function FormWrapper<T extends FieldValues>({
   currentStep = 1,
   totalSteps = 1,
   className,
+  enableAutoSave = false,
+  showProgress = true,
+  estimatedTime,
+  onStepChange,
+  lastSaved,
+  isSaving = false,
 }: FormWrapperProps<T>) {
   const { toast } = useToast();
 
@@ -79,19 +93,39 @@ export function FormWrapper<T extends FieldValues>({
     }
   };
 
+  const progressPercentage = Math.round((currentStep / totalSteps) * 100);
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className={`w-full max-w-2xl max-h-[90vh] overflow-auto ${className}`}>
         <CardHeader className="flex flex-row items-center justify-between">
-          <div>
+          <div className="flex-1">
             <CardTitle className="flex items-center gap-2">
               {getIcon()}
               {title}
             </CardTitle>
             {totalSteps > 1 && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Step {currentStep} of {totalSteps}
-              </p>
+              <div className="space-y-1 mt-2">
+                <p className="text-sm text-muted-foreground">
+                  Step {currentStep} of {totalSteps}
+                  {estimatedTime && (
+                    <span className="ml-2 text-xs">({estimatedTime} remaining)</span>
+                  )}
+                </p>
+                {showProgress && (
+                  <Progress value={progressPercentage} className="h-1" />
+                )}
+              </div>
+            )}
+            {enableAutoSave && (lastSaved || isSaving) && (
+              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                <Save className="h-3 w-3" />
+                {isSaving ? (
+                  <span>Saving draft...</span>
+                ) : lastSaved ? (
+                  <span>Last saved: {format(lastSaved, 'HH:mm:ss')}</span>
+                ) : null}
+              </div>
             )}
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} disabled={isSubmitting}>
