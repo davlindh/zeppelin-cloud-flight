@@ -14,6 +14,7 @@ import {
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { BUCKET_MAP } from '@/config/storage.config';
 
 // Remove unused interface
 
@@ -63,7 +64,7 @@ export const AdminImageGallery: React.FC<AuctionImageGalleryProps> = ({
     }
 
     try {
-      const results = await uploadMultiple(files, 'uploads', 'auctions');
+      const results = await uploadMultiple(files, BUCKET_MAP.AUCTIONS);
       const newImageUrls = results.map(result => result.url);
       const updatedImages = [...images, ...newImageUrls];
       
@@ -91,7 +92,7 @@ export const AdminImageGallery: React.FC<AuctionImageGalleryProps> = ({
           target: { files: [imageFile] }
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         
-        const result = await handleFileSelect(fakeEvent, 'uploads', 'auctions');
+        const result = await handleFileSelect(fakeEvent, BUCKET_MAP.AUCTIONS);
         
         if (result) {
           const updatedImages = [...images, result.url];
