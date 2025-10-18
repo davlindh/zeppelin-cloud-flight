@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, UseFormProps, UseFormReturn, FieldValues, Path } from 'react-hook-form';
+import { useForm, UseFormProps, UseFormReturn, FieldValues, Path, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ZodSchema } from 'zod';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -135,25 +135,27 @@ export function FormWrapper<T extends FieldValues>({
 
         {totalSteps > 1 && <ProgressIndicator currentStep={currentStep} totalSteps={totalSteps} />}
 
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <CardContent className="space-y-6">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            {children(form)}
-          </CardContent>
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <CardContent className="space-y-6">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              {children(form)}
+            </CardContent>
 
-          <CardFooter className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-              {cancelButtonText}
-            </Button>
-            <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
-              {isSubmitting ? 'Submitting...' : submitButtonText}
-            </Button>
-          </CardFooter>
-        </form>
+            <CardFooter className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+                {cancelButtonText}
+              </Button>
+              <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                {isSubmitting ? 'Submitting...' : submitButtonText}
+              </Button>
+            </CardFooter>
+          </form>
+        </FormProvider>
       </Card>
     </div>
   );
