@@ -974,6 +974,47 @@ export type Database = {
         }
         Relationships: []
       }
+      participant_claim_audit: {
+        Row: {
+          admin_assisted: boolean
+          admin_user_id: string | null
+          claim_method: string
+          claimed_at: string
+          claimed_by_user_id: string
+          id: string
+          notes: string | null
+          participant_id: string
+        }
+        Insert: {
+          admin_assisted?: boolean
+          admin_user_id?: string | null
+          claim_method?: string
+          claimed_at?: string
+          claimed_by_user_id: string
+          id?: string
+          notes?: string | null
+          participant_id: string
+        }
+        Update: {
+          admin_assisted?: boolean
+          admin_user_id?: string | null
+          claim_method?: string
+          claimed_at?: string
+          claimed_by_user_id?: string
+          id?: string
+          notes?: string | null
+          participant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participant_claim_audit_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participant_media: {
         Row: {
           category: string
@@ -2305,9 +2346,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_claim_participant: {
+        Args: { _participant_id: string; _user_email: string }
+        Returns: boolean
+      }
       can_edit_participant: {
         Args: { _participant_id: string }
         Returns: boolean
+      }
+      claim_participant_profile: {
+        Args: { _participant_id: string; _user_email: string; _user_id: string }
+        Returns: Json
       }
       clean_media_title: {
         Args: { filename: string }
