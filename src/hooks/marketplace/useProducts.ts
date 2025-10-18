@@ -117,7 +117,6 @@ export const useProducts = (filters?: {
               stock_quantity
             )
           `)
-          .eq('is_stock_item', true)
           .order('created_at', { ascending: false });
 
         // Apply category filter

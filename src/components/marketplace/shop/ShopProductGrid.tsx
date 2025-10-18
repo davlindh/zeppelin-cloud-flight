@@ -48,15 +48,24 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-slate-700 text-lg mb-2">No products found matching your criteria.</p>
-        <p className="text-slate-600">Try adjusting your search or browse all categories.</p>
+      <div className="text-center py-16">
+        <div className="max-w-md mx-auto">
+          <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+            <span className="text-3xl">📦</span>
+          </div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">
+            No products found
+          </h3>
+          <p className="text-muted-foreground mb-6">
+            Try adjusting your filters or search terms to find what you're looking for
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <ResponsiveGrid density={density} variant="normal">
+    <ResponsiveGrid density="compact" variant="normal">
       {products.map((product) => (
         <ProductCard
           key={product.id}

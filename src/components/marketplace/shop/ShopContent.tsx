@@ -189,19 +189,21 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
   return (
     <div className="animate-fade-in">
       <div className="flex gap-6">
-        {/* Compact Filters Sidebar */}
-        <div className="hidden lg:block">
-          <div className="sticky top-6 w-64">
-            <div className="p-4 rounded-lg bg-card border border-border shadow-sm">
-              <h3 className="text-sm font-semibold mb-4 text-foreground">Filters</h3>
-              <AdvancedFilters
-                filters={state.filters}
-                onFiltersChange={handleFiltersChange}
-                availableBrands={availableBrands}
-              />
+        {/* Compact Filters Sidebar - Only show if we have products */}
+        {filteredAndSortedProducts.length > 0 && (
+          <div className="hidden lg:block">
+            <div className="sticky top-6 w-64">
+              <div className="p-4 rounded-lg bg-card border border-border shadow-sm">
+                <h3 className="text-sm font-semibold mb-4 text-foreground">Filters</h3>
+                <AdvancedFilters
+                  filters={state.filters}
+                  onFiltersChange={handleFiltersChange}
+                  availableBrands={availableBrands}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
@@ -217,7 +219,7 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
           
           {/* Active Filter Chips */}
           {hasActiveFilters && (
-            <div className="mb-4">
+            <div className="mb-3">
               <ActiveFilterChips
                 filters={state.filters}
                 onRemoveFilter={handleRemoveFilter}
@@ -226,15 +228,15 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
             </div>
           )}
           
-          <div className="mb-4">
-            <ShopResultsSummary
-              productsCount={filteredAndSortedProducts.length}
-              sortBy={state.sortBy}
-              filters={state.filters}
-              onRemoveFilter={handleRemoveFilter}
-              onClearAllFilters={handleClearAllFilters}
-            />
-          </div>
+          {/* Results Summary */}
+          {filteredAndSortedProducts.length > 0 && (
+            <div className="mb-3">
+              <ShopResultsSummary
+                productsCount={filteredAndSortedProducts.length}
+                sortBy={state.sortBy}
+              />
+            </div>
+          )}
           
           <ShopProductGrid
             products={filteredAndSortedProducts}

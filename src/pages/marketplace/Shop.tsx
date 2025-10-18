@@ -61,21 +61,21 @@ const ShopPage = () => {
         style={{ backgroundImage: 'radial-gradient(circle at top right, hsl(var(--brand-primary)/0.03) 0%, transparent 50%)' }}
       >
         {/* Unified Search & Browse Interface */}
-        <div className="relative overflow-hidden rounded-xl p-4 sm:p-6 mb-8 brand-gradient-bg border border-border/20">
+        <div className="relative overflow-hidden rounded-xl p-3 sm:p-4 mb-6 brand-gradient-bg border border-border/20">
           <div className="relative z-10 max-w-4xl mx-auto">
             {/* Header */}
-            <div className="text-center mb-6">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-2">
+            <div className="text-center mb-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text mb-1">
                 Discover Premium Products
               </h1>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                Search thousands of products or browse by category
+              <p className="text-muted-foreground text-xs sm:text-sm">
+                Search products or browse by category
               </p>
             </div>
 
             {/* Primary Search Interface */}
-            <div className="max-w-2xl mx-auto mb-6">
-              <div className="shadow-2xl border-2 border-primary/30 bg-white/98 backdrop-blur-sm rounded-xl p-3">
+            <div className="max-w-2xl mx-auto mb-4">
+              <div className="shadow-xl border border-primary/20 bg-white/98 backdrop-blur-sm rounded-lg p-2">
                 <SearchErrorBoundary>
                   <OptimizedUnifiedSearchBar />
                 </SearchErrorBoundary>
@@ -83,34 +83,36 @@ const ShopPage = () => {
             </div>
 
             {/* Shopping Benefits */}
-            <div className="flex justify-center gap-4 sm:gap-8 text-xs sm:text-sm">
-              <div className="flex items-center gap-1.5 text-green-700">
-                <Truck className="h-4 w-4" />
+            <div className="flex justify-center gap-3 sm:gap-6 text-xs">
+              <div className="flex items-center gap-1 text-green-700">
+                <Truck className="h-3 w-3" />
                 <span className="font-medium">Free Shipping $50+</span>
               </div>
-              <div className="flex items-center gap-1.5 text-blue-700">
-                <Zap className="h-4 w-4" />
+              <div className="flex items-center gap-1 text-blue-700">
+                <Zap className="h-3 w-3" />
                 <span className="font-medium">24h Delivery</span>
               </div>
-              <div className="flex items-center gap-1.5 text-purple-700">
-                <Shield className="h-4 w-4" />
+              <div className="flex items-center gap-1 text-purple-700">
+                <Shield className="h-3 w-3" />
                 <span className="font-medium">Price Match</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Brand Showcase */}
-        <div className="mb-8">
-          <BrandShowcase />
-        </div>
+        {/* Brand Showcase - Only show if we have brands */}
+        {availableBrands.length >= 3 && (
+          <div className="mb-6">
+            <BrandShowcase />
+          </div>
+        )}
 
         {/* Recently Viewed & Featured Products */}
-        <div className="mb-8">
+        <div className="mb-6">
           <RecentlyViewedProducts />
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <FeaturedProducts />
         </div>
 
