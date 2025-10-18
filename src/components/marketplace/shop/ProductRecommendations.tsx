@@ -1,5 +1,5 @@
 import React from 'react';
-import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
+import { ProductCard } from '@/components/marketplace/ui/product-card';
 import { useProducts } from '@/hooks/marketplace/useProducts';
 import { sortProductsByAnalytics } from '@/utils/marketplace/productUtils';
 import type { Product } from '@/types/unified';
@@ -67,8 +67,9 @@ export const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {recommendations.map((product) => (
           <div key={product.id} onClick={() => onProductClick?.(product.id)}>
-            <EnhancedProductCard
+            <ProductCard
               product={product}
+              variant="default"
               showAnalytics={false}
             />
           </div>

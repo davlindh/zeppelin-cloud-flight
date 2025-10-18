@@ -1,3 +1,25 @@
+/**
+ * ProductCard - Unified product card component
+ * 
+ * Supports two variants:
+ * - default: Simple card with basic info and robust error handling
+ * - enhanced: Rich card with animations, quick actions, and analytics
+ * 
+ * @example
+ * // Basic usage
+ * <ProductCard product={product} />
+ * 
+ * @example
+ * // Full-featured enhanced card
+ * <ProductCard 
+ *   product={product}
+ *   variant="enhanced"
+ *   showQuickActions
+ *   showAnalytics
+ *   onBrandClick={handleFilter}
+ * />
+ */
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Star } from 'lucide-react';
@@ -8,74 +30,43 @@ import { FloatingActionButtons } from '@/components/marketplace/ui/floating-acti
 import { useCart } from '@/contexts/marketplace/CartProvider';
 import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
 import { useToast } from '@/hooks/use-toast';
-import { getProductStatusBadge , calculateProductAnalytics } from '@/utils/marketplace/productUtils';
-import { getResponsiveImageUrl, getImageAlt, getImageUrl } from '@/utils/marketplace/imageUtils';
+import { getProductStatusBadge, calculateProductAnalytics } from '@/utils/marketplace/productUtils';
+import { getImageUrl, getImageAlt } from '@/utils/marketplace/imageUtils';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/unified';
 
-
-interface EnhancedProductCardProps {
-  // Support both Product object and individual props for flexibility
-  product?: Product;
-  // Individual props for unified-product-card compatibility
-  id?: string;
-  title?: string;
-  price?: number;
-  originalPrice?: number;
-  category?: string;
-  rating?: number;
-  reviews?: number;
-  inStock?: boolean;
-  image?: string;
-  images?: string[];
-  // Enhanced features
-  href?: string;
+interface ProductCardProps {
+  // Required
+  product: Product;
+  
+  // Optional display
   variant?: 'default' | 'enhanced';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  stockCount?: number;
-  recentViews?: number;
+  href?: string;
+  
+  // Optional enhanced features
+  showQuickActions?: boolean;
+  showAnalytics?: boolean;
+  
+  // Optional callbacks
   onQuickView?: () => void;
   onToggleComparison?: (product: Product) => void;
   isInComparison?: boolean;
-  showAnalytics?: boolean;
   onBrandClick?: (brand: string) => void;
 }
 
-export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
+export const ProductCard: React.FC<ProductCardProps> = ({
   product,
-  id,
-  title,
-  price,
-  originalPrice,
-  category,
-  rating,
-  reviews,
-  inStock,
-  image,
-  href,
   variant = 'default',
   size = 'sm',
-  stockCount,
+  href,
+  showQuickActions = false,
+  showAnalytics = false,
   onQuickView,
   onToggleComparison,
   isInComparison = false,
   onBrandClick
 }) => {
-  // Use product object if provided, otherwise use individual props
-  const productData = product || {
-    id: id!,
-    title: title!,
-    price: price!,
-    originalPrice,
-    category: category!,
-    categoryName: category!,
-    rating: rating!,
-    reviews: reviews!,
-    inStock: inStock!,
-    image: image!,
-    brand: undefined
-  };
-
   const { addItem } = useCart();
   const { toast } = useToast();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -87,30 +78,27 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
     handleToggleWatch,
     handleShare
   } = useQuickActions({
-    itemId: productData.id,
+    itemId: product.id,
     itemType: 'product',
-    itemTitle: productData.title,
-    price: productData.price,
+    itemTitle: product.title,
+    price: product.price,
     onQuickView
   });
 
-  const finalHref = href || `/marketplace/shop/${productData.id}`;
-  const finalStockCount = stockCount ?? (productData.inStock ? 50 : 0);
+  const finalHref = href || `/marketplace/shop/${product.id}`;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     setAddingToCart(true);
-    
-    // Simulate API delay for demo
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    addItem(productData.id, productData.title, productData.price, 1, {});
+    addItem(product.id, product.title, product.price, 1, {});
     
     toast({
       title: "Added to cart",
-      description: `"${productData.title}" has been added to your cart.`,
+      description: `"${product.title}" has been added to your cart.`,
     });
     
     setAddingToCart(false);
@@ -120,14 +108,14 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (onToggleComparison && product) {
+    if (onToggleComparison) {
       onToggleComparison(product);
       
       toast({
         title: isInComparison ? "Removed from comparison" : "Added to comparison",
         description: isInComparison 
-          ? `"${productData.title}" removed from comparison.`
-          : `"${productData.title}" added to comparison.`,
+          ? `"${product.title}" removed from comparison.`
+          : `"${product.title}" added to comparison.`,
       });
     }
   };
@@ -136,16 +124,23 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (onBrandClick && product?.brand) {
+    if (onBrandClick && product.brand) {
       onBrandClick(product.brand);
     }
   };
 
-  const discountPercent = productData.originalPrice 
-    ? Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)
+  // Image error handler - CRITICAL: Used for all image variants
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.warn(`[ProductCard] Failed to load image for product: ${product.title}`);
+    e.currentTarget.src = '/placeholder.svg';
+    setImageLoaded(true);
+  };
+
+  const discountPercent = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const analytics = product ? calculateProductAnalytics(product) : null;
+  const analytics = showAnalytics ? calculateProductAnalytics(product) : null;
   const statusBadge = analytics ? getProductStatusBadge(analytics) : null;
 
   const isEnhanced = variant === 'enhanced';
@@ -183,6 +178,8 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
     xl: 'text-4xl'
   };
 
+  const stockCount = product.inStock ? 50 : 0;
+
   return (
     <Link to={finalHref}>
       <Card className={cn(
@@ -190,8 +187,8 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
         isEnhanced ? "shadow-lg border-0 bg-white rounded-2xl animate-fade-in" : "card-base card-hover border border-border/50",
         sizeClasses[size]
       )}>
-        {/* Floating Action Buttons - Enhanced version only */}
-        {isEnhanced && (
+        {/* Floating Action Buttons - Only if enabled */}
+        {isEnhanced && showQuickActions && (
           <FloatingActionButtons
             isWatching={isWatching}
             isSharing={isSharing}
@@ -204,7 +201,7 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
         )}
 
         <CardHeader className={isEnhanced ? "p-0" : "pb-3"}>
-          {/* Product Image */}
+          {/* Product Image - WITH ERROR HANDLING */}
           <div className={cn(
             "relative overflow-hidden",
             isEnhanced ? "aspect-square rounded-t-2xl" : imageSizeClasses[size]
@@ -216,36 +213,17 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
               )} />
             )}
             
-            {isEnhanced && product ? (
-              <picture>
-                <source 
-                  media="(max-width: 640px)" 
-                  srcSet={getResponsiveImageUrl(productData.image)} 
-                />
-                <source 
-                  media="(max-width: 1024px)" 
-                  srcSet={getResponsiveImageUrl(productData.image)} 
-                />
-                <img 
-                  src={getResponsiveImageUrl(productData.image)} 
-                  alt={getImageAlt(productData.title, 'product')}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                  onLoad={() => setImageLoaded(true)}
-                />
-              </picture>
-            ) : (
-              <img 
-                src={getImageUrl(productData.image)}
-                alt={productData.title}
-                className="w-full h-full object-cover rounded-md"
-                onLoad={() => setImageLoaded(true)}
-                onError={(e) => {
-                  console.warn(`[EnhancedProductCard] Failed to load image for product: ${productData.title}`);
-                  e.currentTarget.src = '/placeholder.svg';
-                }}
-              />
-            )}
+            <img 
+              src={getImageUrl(product.image)}
+              alt={getImageAlt(product.title, 'product')}
+              className={cn(
+                "w-full h-full object-cover",
+                isEnhanced ? "transition-transform duration-700 group-hover:scale-105" : "rounded-md"
+              )}
+              loading="lazy"
+              onLoad={() => setImageLoaded(true)}
+              onError={handleImageError}
+            />
             
             {/* Discount Badge */}
             {discountPercent > 0 && (
@@ -258,16 +236,16 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
             )}
 
             {/* Stock indicator */}
-            {finalStockCount < 10 && finalStockCount > 0 && (
+            {stockCount < 10 && stockCount > 0 && (
               <Badge className={cn(
                 "absolute bg-orange-500",
                 isEnhanced ? "bottom-4 left-4 z-20 text-xs shadow-lg bg-white/95 backdrop-blur-sm border-0 text-orange-700" : "top-2 right-2"
               )}>
-                Only {finalStockCount} left
+                Only {stockCount} left
               </Badge>
             )}
 
-            {/* Status Badge - Enhanced version only */}
+            {/* Status Badge - Only if analytics enabled */}
             {isEnhanced && statusBadge && (
               <div className="absolute bottom-4 right-4 z-20">
                 <Badge 
@@ -280,17 +258,17 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
             )}
           </div>
           
-          {/* Category and Brand - Non-enhanced version */}
+          {/* Category and Stock - Non-enhanced version */}
           {!isEnhanced && (
             <div className="flex items-center justify-between mb-3">
               <Badge variant="outline" className="text-xs capitalize">
-                {(productData as any).categoryName || (productData as any).category}
+                {product.categoryName}
               </Badge>
               <Badge 
-                variant={productData.inStock ? "default" : "secondary"} 
-                className={`text-xs ${productData.inStock ? 'status-available' : 'status-unavailable'}`}
+                variant={product.inStock ? "default" : "secondary"} 
+                className={`text-xs ${product.inStock ? 'status-available' : 'status-unavailable'}`}
               >
-                {productData.inStock ? 'In Stock' : 'Out of Stock'}
+                {product.inStock ? 'In Stock' : 'Out of Stock'}
               </Badge>
             </div>
           )}
@@ -300,7 +278,7 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
             "group-hover:text-blue-600 transition-colors leading-tight",
             isEnhanced ? "text-lg font-semibold text-slate-900 line-clamp-2" : titleSizeClasses[size]
           )}>
-            {productData.title}
+            {product.title}
           </CardTitle>
         </CardHeader>
         
@@ -313,9 +291,9 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
           {isEnhanced && (
             <div className="flex items-center justify-between gap-2">
               <Badge variant="outline" className="text-xs capitalize w-fit">
-                {(productData as any).categoryName || (productData as any).category}
+                {product.categoryName}
               </Badge>
-              {product?.brand && product.brand.trim() !== '' && (
+              {product.brand && product.brand.trim() !== '' && (
                 <div onClick={handleBrandClickEvent}>
                   <Badge 
                     variant="secondary" 
@@ -327,13 +305,6 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
               )}
             </div>
           )}
-
-          {/* Product Meta Info - Article Number */}
-          {isEnhanced && (product as any).articleNumber && (
-            <div className="text-xs text-slate-500">
-              Art.nr: {(product as any).articleNumber}
-            </div>
-          )}
           
           {/* Rating */}
           {isEnhanced ? (
@@ -342,54 +313,54 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
                 {[...Array(5)].map((_, i) => (
                   <Star 
                     key={i} 
-                    className={`h-4 w-4 ${i < Math.floor(productData.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`} 
+                    className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`} 
                   />
                 ))}
               </div>
               <span className="text-sm text-slate-600">
-                {productData.rating} ({productData.reviews})
+                {product.rating} ({product.reviews})
               </span>
             </div>
           ) : (
             <div className="flex items-center gap-1 text-sm text-slate-600 mb-2">
-              <span>⭐ {productData.rating}</span>
-              <span>({productData.reviews})</span>
+              <span>⭐ {product.rating}</span>
+              <span>({product.reviews})</span>
             </div>
           )}
 
-          {/* Enhanced Pricing */}
+          {/* Pricing */}
           <div className={cn("mb-6", isEnhanced && "space-y-2")}>
             <div className="flex items-center gap-3">
               <span className={cn(
                 "font-bold text-foreground",
                 isEnhanced ? "text-3xl" : priceSizeClasses[size]
               )}>
-                ${productData.price.toLocaleString()}
+                ${product.price.toLocaleString()}
               </span>
-              {productData.originalPrice && productData.originalPrice > productData.price && (
+              {product.originalPrice && product.originalPrice > product.price && (
                 <>
                   <span className={cn(
                     "text-muted-foreground line-through",
                     isEnhanced ? "text-xl" : size === 'xs' ? 'text-sm' : size === 'xl' ? 'text-2xl' : 'text-lg'
                   )}>
-                    ${productData.originalPrice.toLocaleString()}
+                    ${product.originalPrice.toLocaleString()}
                   </span>
                   {isEnhanced && (
                     <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
-                      Save ${(productData.originalPrice - productData.price).toLocaleString()}
+                      Save ${(product.originalPrice - product.price).toLocaleString()}
                     </Badge>
                   )}
                 </>
               )}
             </div>
-            {isEnhanced && productData.originalPrice && productData.originalPrice > productData.price && (
+            {isEnhanced && product.originalPrice && product.originalPrice > product.price && (
               <p className="text-sm text-green-600 font-medium">
-                {Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)}% off retail price
+                {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% off retail price
               </p>
             )}
           </div>
           
-          {/* Enhanced Action Button */}
+          {/* Action Button */}
           <Button 
             className={cn(
               "w-full disabled:opacity-50 transition-all duration-200",
@@ -397,11 +368,11 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
                 ? "h-14 rounded-xl font-semibold text-lg bg-gradient-to-r from-primary to-primary-glow hover:shadow-xl hover:scale-[1.02] text-primary-foreground border-0" 
                 : "btn-primary h-10"
             )}
-            disabled={!productData.inStock || addingToCart}
+            disabled={!product.inStock || addingToCart}
             onClick={handleAddToCart}
           >
             <ShoppingCart className={cn("mr-2", isEnhanced ? "h-5 w-5" : "h-4 w-4")} />
-            {addingToCart ? 'Adding...' : productData.inStock ? 'Add to Cart' : 'Out of Stock'}
+            {addingToCart ? 'Adding...' : product.inStock ? 'Add to Cart' : 'Out of Stock'}
           </Button>
         </CardContent>
       </Card>

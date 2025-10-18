@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
+import { ProductCard } from '@/components/marketplace/ui/product-card';
 import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
 import { ResponsiveGrid, AdvancedContainer, FluidSpacing } from '@/components/marketplace/ui/advanced-layout';
 import { DensityProvider, DensityControl } from '@/contexts/marketplace/DensityContext';
@@ -110,8 +110,10 @@ const ShopSection = () => {
                     >
                       {featuredProducts.map((product) => (
                         <div key={product.id} className="w-full">
-                          <EnhancedProductCard
+                          <ProductCard
                             product={product}
+                            variant="enhanced"
+                            showQuickActions={true}
                             showAnalytics={true}
                             onBrandClick={handleBrandFilter}
                           />

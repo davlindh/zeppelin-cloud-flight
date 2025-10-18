@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { EnhancedProductCard } from '@/components/marketplace/ui/enhanced-product-card';
+import { ProductCard } from '@/components/marketplace/ui/product-card';
 import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
 import { ResponsiveGrid } from '@/components/marketplace/ui/advanced-layout';
 
@@ -58,9 +58,11 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   return (
     <ResponsiveGrid density={density} variant="normal">
       {products.map((product) => (
-        <EnhancedProductCard
+        <ProductCard
           key={product.id}
           product={product}
+          variant="enhanced"
+          showQuickActions={true}
           showAnalytics={true}
           onQuickView={() => handleQuickView(product.id)}
           onToggleComparison={handleAddToComparison}

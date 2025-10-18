@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { UnifiedProductCard } from '@/components/marketplace/ui/unified-product-card';
+import { ProductCard } from '@/components/marketplace/ui/product-card';
 import { useProducts } from '@/hooks/marketplace/useProducts';
 import type { Product } from '@/types/unified';
-import { getImageUrl } from '@/utils/marketplace/imageUtils';
 
 interface RelatedProductsProps {
   currentProduct: Product;
@@ -37,19 +36,12 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {relatedProducts.map((product) => (
-          <UnifiedProductCard
+          <ProductCard
             key={product.id}
-            id={product.id}
-            title={product.title}
-            price={product.price}
-            originalPrice={product.originalPrice}
-            category={product.categoryName}
-            rating={product.rating}
-            reviews={product.reviews}
-            inStock={product.inStock}
-            image={getImageUrl(product.image)}
-            href={`/marketplace/shop/${product.id}`}
+            product={product}
             variant="enhanced"
+            showQuickActions={false}
+            showAnalytics={false}
           />
         ))}
       </div>
