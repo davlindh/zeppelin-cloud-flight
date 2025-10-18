@@ -404,6 +404,7 @@ interface AdminFormFactoryProps {
   entityId?: string;
   initialData?: Record<string, unknown>;
   onSuccess?: () => void;
+  renderMode?: 'modal' | 'page';
 }
 
 export const AdminFormFactory: React.FC<AdminFormFactoryProps> = ({
@@ -411,7 +412,8 @@ export const AdminFormFactory: React.FC<AdminFormFactoryProps> = ({
   onClose,
   entityId,
   initialData,
-  onSuccess
+  onSuccess,
+  renderMode = 'modal'
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [entityData, setEntityData] = useState<Record<string, unknown> | undefined>(initialData);
@@ -489,6 +491,7 @@ export const AdminFormFactory: React.FC<AdminFormFactoryProps> = ({
       defaultValues={formData}
       entityId={entityId}
       isUpdate={!!entityId}
+      renderMode={renderMode}
     />
   );
 };

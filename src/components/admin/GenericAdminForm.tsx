@@ -18,6 +18,7 @@ interface GenericAdminFormProps<T extends Record<string, unknown>> {
   defaultValues?: DefaultValues<T>;
   entityId?: string;
   isUpdate?: boolean;
+  renderMode?: 'modal' | 'page';
 }
 
 export const GenericAdminForm = <T extends Record<string, unknown>>({
@@ -26,7 +27,8 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
   onSubmit,
   defaultValues,
   entityId,
-  isUpdate = false
+  isUpdate = false,
+  renderMode = 'modal'
 }: GenericAdminFormProps<T>) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,6 +125,68 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
     );
   };
 
+  const formContent = (
+    <form onSubmit={handleSubmit(onFormSubmit)}>
+      <FormProvider {...form}>
+        <CardContent className="space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {config.fields.map((field) => (
+            <div key={field.name} className="space-y-2">
+              {renderField(field)}
+
+              {errors[field.name as Path<T>] && (
+                <p className="text-sm text-destructive">
+                  {String(errors[field.name as Path<T>]?.message) || `${field.label} is required`}
+                </p>
+              )}
+
+              {field.type === 'file' && config.bucketName && (
+                <p className="text-xs text-muted-foreground">
+                  Supported formats: Images, Videos, Audio, Documents. Max size: 10MB
+                </p>
+              )}
+            </div>
+          ))}
+        </CardContent>
+
+        <CardFooter className="flex gap-3">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting || isUploadingFile || fileUpload?.isUploading}
+          >
+            {isSubmitting
+              ? (isUpdate ? 'Updating...' : 'Creating...')
+              : (isUpdate ? 'Update' : 'Create')
+            } {config.entityName}
+          </Button>
+        </CardFooter>
+      </FormProvider>
+    </form>
+  );
+
+  // Render as modal or page based on renderMode
+  if (renderMode === 'page') {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>
+            {isUpdate ? `Edit ${config.entityName}` : `Add New ${config.entityName}`}
+          </CardTitle>
+        </CardHeader>
+        {formContent}
+      </Card>
+    );
+  }
+
+  // Default modal rendering
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-auto">
@@ -134,56 +198,7 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
-
-        <form onSubmit={handleSubmit(onFormSubmit)}>
-          <FormProvider {...form}>
-            <CardContent className="space-y-6">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {config.fields.map((field) => (
-              <div key={field.name} className="space-y-2">
-                <Label htmlFor={field.name}>
-                  {field.label}
-                  {field.required && <span className="text-destructive ml-1">*</span>}
-                </Label>
-
-                {renderField(field)}
-
-                {errors[field.name as Path<T>] && (
-                  <p className="text-sm text-destructive">
-                    {String(errors[field.name as Path<T>]?.message) || `${field.label} is required`}
-                  </p>
-                )}
-
-                {field.type === 'file' && config.bucketName && (
-                  <p className="text-xs text-muted-foreground">
-                    Supported formats: Images, Videos, Audio, Documents. Max size: 10MB
-                  </p>
-                )}
-              </div>
-            ))}
-          </CardContent>
-
-          <CardFooter className="flex gap-3">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || isUploadingFile || fileUpload?.isUploading}
-            >
-              {isSubmitting
-                ? (isUpdate ? 'Updating...' : 'Creating...')
-                : (isUpdate ? 'Update' : 'Create')
-              } {config.entityName}
-            </Button>
-          </CardFooter>
-          </FormProvider>
-        </form>
+        {formContent}
       </Card>
     </div>
   );

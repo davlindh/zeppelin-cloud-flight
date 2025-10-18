@@ -5,6 +5,10 @@ import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
 import { ProjectMediaLibrary } from '@/components/admin/ProjectMediaLibrary';
 import { SponsorSelector } from '@/components/admin/project/SponsorSelector';
 import { supabase } from '@/integrations/supabase/client';
+import { useCanEditProject } from '@/hooks/useCanEditProject';
+import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ShieldAlert } from 'lucide-react';
 
 export const ProjectEditPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -73,11 +77,14 @@ export const ProjectEditPage: React.FC = () => {
     resolveProjectId();
   }, [slug, projectData]);
 
+  const { data: user, isLoading: isLoadingUser } = useAuthenticatedUser();
+  const { canEdit, isLoading: isLoadingPermission } = useCanEditProject(projectId);
+
   // Determine if we're editing or creating
   const isEdit = !!projectId || !!projectData?.id;
   const pageTitle = isEdit ? 'Redigera projekt' : 'Lägg till nytt projekt';
 
-  if (isLoadingId) {
+  if (isLoadingId || isLoadingUser || isLoadingPermission) {
     return (
       <EditPageLayout entityType="project" title={pageTitle}>
         <div className="flex items-center justify-center p-8">
@@ -100,6 +107,21 @@ export const ProjectEditPage: React.FC = () => {
     );
   }
 
+  // Check permissions for editing
+  if (!canEdit && user && isEdit) {
+    return (
+      <EditPageLayout entityType="project" title={pageTitle}>
+        <Alert variant="destructive" className="m-8">
+          <ShieldAlert className="h-4 w-4" />
+          <AlertTitle>Åtkomst nekad</AlertTitle>
+          <AlertDescription>
+            Du har inte behörighet att redigera detta projekt. Endast administratörer kan redigera projekt.
+          </AlertDescription>
+        </Alert>
+      </EditPageLayout>
+    );
+  }
+
   return (
     <EditPageLayout
       entityType="project"
@@ -112,6 +134,7 @@ export const ProjectEditPage: React.FC = () => {
             entityType="project"
             entityId={projectId}
             initialData={projectData}
+            renderMode="page"
             onClose={() => window.history.back()}
             onSuccess={() => window.history.back()}
           />

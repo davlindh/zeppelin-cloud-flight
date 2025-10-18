@@ -2354,6 +2354,14 @@ export type Database = {
         Args: { _participant_id: string }
         Returns: boolean
       }
+      can_edit_project: {
+        Args: { _project_id: string }
+        Returns: boolean
+      }
+      can_edit_sponsor: {
+        Args: { _sponsor_id: string }
+        Returns: boolean
+      }
       claim_participant_profile: {
         Args: { _participant_id: string; _user_email: string; _user_id: string }
         Returns: Json
