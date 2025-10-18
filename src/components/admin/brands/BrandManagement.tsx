@@ -145,7 +145,7 @@ const BrandManagement = () => {
                   asChild
                 >
                   <a 
-                    href={`/shop/brand/${encodeURIComponent(brand.name)}`} 
+                    href={`/marketplace/shop/brand/${encodeURIComponent(brand.name)}`} 
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -210,7 +210,7 @@ const BrandManagement = () => {
               Brand Performance Report
             </Button>
             <Button variant="outline" className="justify-start" asChild>
-              <a href="/shop" target="_blank">
+              <a href="/marketplace/shop" target="_blank">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 View Shop Frontend
               </a>

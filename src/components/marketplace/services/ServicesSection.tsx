@@ -108,7 +108,7 @@ const ServicesSection = () => {
         )}
 
         <div className="text-center">
-          <Link to="/services">
+          <Link to="/marketplace/services">
             <Button variant="outline" size="lg">
               View All Services
             </Button>

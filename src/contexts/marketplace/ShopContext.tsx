@@ -209,7 +209,7 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
       if (newParams) {
         setSearchParams(newSearchParams, { replace: true });
       } else {
-        navigate('/shop', { replace: true });
+        navigate('/marketplace/shop', { replace: true });
       }
     }
   }, [state, searchParams, setSearchParams, navigate]);

@@ -84,7 +84,7 @@ const ProductDetail = () => {
 
   // Now handle conditional returns after all hooks have been called
   if (!id) {
-    return <Navigate to="/shop" replace />;
+    return <Navigate to="/marketplace/shop" replace />;
   }
 
   if (productLoading) {
@@ -100,7 +100,7 @@ const ProductDetail = () => {
   }
 
   if (productError || !product) {
-    return <Navigate to="/shop" replace />;
+    return <Navigate to="/marketplace/shop" replace />;
   }
 
   const isWishlisted = isInWishlist(product.id);
@@ -116,9 +116,9 @@ const ProductDetail = () => {
   // Breadcrumb items
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop' },
-    { label: product.categoryName, href: `/shop?category=${encodeURIComponent(product.categoryName)}` },
-    { label: product.title, href: `/shop/product/${product.id}` }
+    { label: 'Shop', href: '/marketplace/shop' },
+    { label: product.categoryName, href: `/marketplace/shop?category=${encodeURIComponent(product.categoryName)}` },
+    { label: product.title, href: `/marketplace/shop/${product.id}` }
   ];
 
   const handleAddToCart = async () => {

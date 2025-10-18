@@ -106,7 +106,7 @@ const AuctionSection = () => {
           )}
 
           <div className="text-center">
-            <Link to="/auctions">
+            <Link to="/marketplace/auctions">
               <Button variant="outline" size="lg">
                 View All Auctions
               </Button>

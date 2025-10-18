@@ -42,7 +42,7 @@ const ShopSection = () => {
   const handleBrandFilter = (brand: string) => {
     try {
       // Navigate to shop page with brand filter
-      window.location.href = `/shop?brand=${encodeURIComponent(brand)}`;
+      window.location.href = `/marketplace/shop?brand=${encodeURIComponent(brand)}`;
     } catch (error) {
       handleError(error as Error);
     }
@@ -131,7 +131,7 @@ const ShopSection = () => {
               )}
 
               <div className="text-center">
-                <Link to="/shop">
+                <Link to="/marketplace/shop">
                   <Button variant="outline" size="lg" className="interactive-lift">
                     Browse All Products
                   </Button>

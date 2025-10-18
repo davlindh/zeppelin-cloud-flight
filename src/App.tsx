@@ -104,6 +104,14 @@ const App = () => (
                   <Route path="media" element={<MediaGalleryPage />} />
                 </Route>
 
+                {/* Legacy redirects for old marketplace URLs */}
+                <Route path="/shop" element={<Navigate to="/marketplace/shop" replace />} />
+                <Route path="/shop/:id" element={<Navigate to="/marketplace/shop/:id" replace />} />
+                <Route path="/auctions" element={<Navigate to="/marketplace/auctions" replace />} />
+                <Route path="/auctions/:id" element={<Navigate to="/marketplace/auctions/:id" replace />} />
+                <Route path="/services" element={<Navigate to="/marketplace/services" replace />} />
+                <Route path="/services/:id" element={<Navigate to="/marketplace/services/:id" replace />} />
+
                 {/* Auth & Profile Completion */}
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/participant/complete-profile" element={<CompleteParticipantProfilePage />} />
