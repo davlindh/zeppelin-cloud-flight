@@ -51,7 +51,19 @@ export const ParticipantApplicationForm: React.FC<ParticipantApplicationFormProp
 
   // Step navigation
   const nextStep = async () => {
-    const isValid = await trigger();
+    // Validate only the current step's fields
+    let fieldsToValidate: (keyof ParticipantFormData)[] = [];
+    
+    if (currentStep === 1) {
+      fieldsToValidate = ['email'];
+    } else if (currentStep === 2) {
+      fieldsToValidate = ['firstName', 'lastName'];
+    }
+    
+    const isValid = fieldsToValidate.length > 0 
+      ? await trigger(fieldsToValidate)
+      : true;
+      
     if (isValid) {
       setCurrentStep(prev => Math.min(prev + 1, totalSteps));
     }
