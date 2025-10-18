@@ -1,5 +1,7 @@
 export const getImageUrl = (imageId?: string | null): string => {
-  if (!imageId || imageId === '') {
+  // Handle null, undefined, empty strings, and whitespace-only strings
+  if (!imageId || imageId.trim() === '') {
+    console.warn('[ImageUtils] No valid image ID provided, using placeholder');
     return '/placeholder.svg';
   }
   
@@ -19,6 +21,7 @@ export const getImageUrl = (imageId?: string | null): string => {
   }
   
   // Fallback to placeholder
+  console.warn('[ImageUtils] Could not determine image URL format, using placeholder');
   return '/placeholder.svg';
 };
 

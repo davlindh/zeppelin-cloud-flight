@@ -202,11 +202,16 @@ const ProductDetail = () => {
           <div className="xl:col-span-3 space-y-4">
             <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5 relative">
               <ProductImageZoom
-                src={product.image || '/placeholder.svg'}
+                src={product.image && product.image.trim() !== '' ? product.image : '/placeholder.svg'}
                 alt={product.title}
                 className="w-full h-full rounded-2xl"
                 onLightboxOpen={() => handleImageClick(0)}
               />
+              {(!product.image || product.image.trim() === '') && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-muted-foreground text-sm">No image available</p>
+                </div>
+              )}
               {product.originalPrice && (
                 <Badge className="absolute top-6 left-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 shadow-lg text-sm px-3 py-1">
                   Save ${product.originalPrice - product.price}
@@ -232,6 +237,10 @@ const ProductDetail = () => {
                       src={img ?? '/placeholder.svg'} 
                       alt={`${product.title} ${index + 2}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.warn(`[ProductDetail] Failed to load gallery image ${index + 2}`);
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
                     />
                   </button>
                 ))}

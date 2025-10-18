@@ -236,10 +236,14 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
               </picture>
             ) : (
               <img 
-                src={getImageUrl(productData.image || '')}
+                src={getImageUrl(productData.image)}
                 alt={productData.title}
                 className="w-full h-full object-cover rounded-md"
                 onLoad={() => setImageLoaded(true)}
+                onError={(e) => {
+                  console.warn(`[EnhancedProductCard] Failed to load image for product: ${productData.title}`);
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
               />
             )}
             
