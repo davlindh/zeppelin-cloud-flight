@@ -29,8 +29,8 @@ interface ShowcaseItem {
 
 interface ShowcaseManagementListProps {
   onAddShowcase: () => void;
-  onEditShowcase: (showcaseId: string) => void;
-  onViewShowcase?: (showcaseId: string) => void;
+  onEditShowcase: (showcaseSlug: string) => void;
+  onViewShowcase?: (showcaseSlug: string) => void;
 }
 
 export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewShowcase }: ShowcaseManagementListProps) => {
@@ -382,7 +382,7 @@ export const ShowcaseManagementList = ({ onAddShowcase, onEditShowcase, onViewSh
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onEditShowcase(showcase.id)}>
+                          <DropdownMenuItem onClick={() => onEditShowcase(showcase.slug || showcase.id)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </DropdownMenuItem>

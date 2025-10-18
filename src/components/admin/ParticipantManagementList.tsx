@@ -14,7 +14,7 @@ import { Participant } from '@/types/admin';
 
 interface ParticipantManagementListProps {
   onAddParticipant: () => void;
-  onEditParticipant: (id: string) => void;
+  onEditParticipant: (slug: string) => void;
   onViewParticipant: (slug: string) => void;
 }
 
@@ -180,7 +180,7 @@ export const ParticipantManagementList = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onEditParticipant(participant.id)}
+                          onClick={() => onEditParticipant(participant.slug)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
