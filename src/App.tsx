@@ -40,9 +40,12 @@ import ServiceDetail from "./pages/marketplace/ServiceDetail";
 import { CartPage } from "./pages/marketplace/CartPage";
 import { WishlistPage } from "./pages/marketplace/WishlistPage";
 import { NotificationsPage } from "./pages/marketplace/NotificationsPage";
+import { ProfilePage } from "./pages/marketplace/ProfilePage";
+import { OrdersPage as CustomerOrdersPage } from "./pages/marketplace/OrdersPage";
 import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
 import { CartProvider } from "./contexts/marketplace/CartProvider";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
+import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
@@ -124,6 +127,16 @@ const App = () => (
                   <Route path="cart" element={<CartPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
                   <Route path="notifications" element={<NotificationsPage />} />
+                  <Route path="account" element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="orders" element={
+                    <ProtectedRoute>
+                      <CustomerOrdersPage />
+                    </ProtectedRoute>
+                  } />
                 </Route>
 
                 {/* Order Pages */}
