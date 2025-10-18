@@ -31,6 +31,7 @@ export interface Participant extends BaseEntity {
   contact_phone?: string;
   how_found_us?: string;
   availability?: string;
+  auth_user_id?: string | null;
   participant_media?: ParticipantMedia[];
 }
 

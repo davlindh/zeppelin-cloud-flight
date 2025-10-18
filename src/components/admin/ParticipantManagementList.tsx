@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Participant } from '@/types/admin';
+import { ParticipantClaimStatus } from './ParticipantClaimStatus';
+import { ClaimAuditLogViewer } from './ClaimAuditLogViewer';
 
 interface ParticipantManagementListProps {
   onAddParticipant: () => void;
@@ -92,10 +94,13 @@ export const ParticipantManagementList = ({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Participant Management</CardTitle>
-        <Button onClick={onAddParticipant}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Participant
-        </Button>
+        <div className="flex gap-2">
+          <ClaimAuditLogViewer />
+          <Button onClick={onAddParticipant}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Participant
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
@@ -121,6 +126,7 @@ export const ParticipantManagementList = ({
                 <TableRow>
                   <TableHead>Participant</TableHead>
                   <TableHead>Slug</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Media</TableHead>
                   <TableHead>Links</TableHead>
                   <TableHead>Created</TableHead>
@@ -152,6 +158,14 @@ export const ParticipantManagementList = ({
                       <Badge variant="outline" className="font-mono text-xs">
                         {participant.slug}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <ParticipantClaimStatus
+                        participantId={participant.id}
+                        authUserId={participant.auth_user_id}
+                        contactEmail={participant.contact_email}
+                        onUpdate={loadParticipants}
+                      />
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
