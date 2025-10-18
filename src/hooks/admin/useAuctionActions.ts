@@ -11,8 +11,8 @@ export const useAuctionActions = () => {
       const result = await createAuction({
         title: auctionData.title!,
         description: auctionData.description,
-        starting_bid: auctionData.starting_bid!,
-        end_time: auctionData.end_time!,
+        starting_bid: auctionData.startingBid!, // Fixed: use camelCase
+        end_time: auctionData.endTime!.toISOString(), // Fixed: use camelCase and convert to ISO string
         category: auctionData.category!,
         condition: auctionData.condition || 'good',
         image: auctionData.image!,
@@ -50,9 +50,9 @@ export const useAuctionActions = () => {
         id,
         title: auctionData.title,
         description: auctionData.description,
-        starting_bid: auctionData.starting_bid,
-        current_bid: auctionData.current_bid,
-        end_time: auctionData.end_time,
+        starting_bid: auctionData.startingBid, // Fixed: use camelCase
+        current_bid: auctionData.currentBid, // Fixed: use camelCase
+        end_time: auctionData.endTime ? auctionData.endTime.toISOString() : undefined, // Fixed: use camelCase and convert
         category: auctionData.category,
         condition: auctionData.condition,
         image: auctionData.image,
