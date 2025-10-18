@@ -11,8 +11,10 @@ export const CartPage = () => {
   const { state, removeItem, updateQuantity, clearCart } = useCart();
 
   const handleCheckout = () => {
-    // TODO: Implement checkout flow
-    navigate('/marketplace');
+    if (state.items.length === 0) {
+      return;
+    }
+    navigate('/marketplace/checkout');
   };
 
   if (state.items.length === 0) {

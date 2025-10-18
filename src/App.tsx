@@ -38,6 +38,7 @@ import ProductDetail from "./pages/marketplace/ProductDetail";
 import Services from "./pages/marketplace/Services";
 import ServiceDetail from "./pages/marketplace/ServiceDetail";
 import { CartPage } from "./pages/marketplace/CartPage";
+import CheckoutPage from "./pages/marketplace/CheckoutPage";
 import { WishlistPage } from "./pages/marketplace/WishlistPage";
 import { NotificationsPage } from "./pages/marketplace/NotificationsPage";
 import { ProfilePage } from "./pages/marketplace/ProfilePage";
@@ -125,6 +126,7 @@ const App = () => (
                   <Route path="services" element={<Services />} />
                   <Route path="services/:id" element={<ServiceDetail />} />
                   <Route path="cart" element={<CartPage />} />
+                  <Route path="checkout" element={<CheckoutPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
                   <Route path="notifications" element={<NotificationsPage />} />
                   <Route path="account" element={
