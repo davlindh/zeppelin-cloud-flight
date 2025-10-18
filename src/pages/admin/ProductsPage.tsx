@@ -10,7 +10,7 @@ export const ProductsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
-  const { handleDelete } = useProductActions();
+  const { handleCreate, handleUpdate, handleDelete } = useProductActions();
 
   const handleCreateClick = () => {
     setEditingProduct(null);
@@ -22,6 +22,16 @@ export const ProductsPage = () => {
     setEditingProduct(product);
     setFormMode('edit');
     setShowForm(true);
+  };
+
+  const handleSave = async (productData: Partial<Product>) => {
+    const success = formMode === 'create'
+      ? await handleCreate(productData)
+      : await handleUpdate(editingProduct!.id, productData);
+    
+    if (success) {
+      setShowForm(false);
+    }
   };
 
   return (
@@ -40,7 +50,7 @@ export const ProductsPage = () => {
       <ProductForm
         isOpen={showForm}
         onClose={() => setShowForm(false)}
-        onSave={() => setShowForm(false)}
+        onSave={handleSave}
         product={editingProduct}
         mode={formMode}
       />
