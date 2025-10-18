@@ -15,7 +15,7 @@ export const getImageUrl = (imageId?: string | null): string => {
 
   // Handle paths that are just file names - convert to full Supabase storage URL
   if (!imageId.startsWith('http') && !imageId.includes('storage')) {
-    return `https://bjffyadrmkdnmgwpsbnw.supabase.co/storage/v1/object/public/uploads/${imageId}`;
+    return `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/auction-images/${imageId}`;
   }
   
   // Fallback to placeholder

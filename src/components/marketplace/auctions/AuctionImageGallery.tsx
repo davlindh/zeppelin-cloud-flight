@@ -15,12 +15,8 @@ export const AuctionImageGallery: React.FC<AuctionImageGalleryProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   
-  // Use provided images or fallback to some default auction images
-  const galleryImages = images.length > 0 ? images : [
-    mainImage ?? "photo-1472396961693-142e6e269027",
-    "photo-1509316975850-ff9c5deb0cd9",
-    "photo-1513836279014-a89f7a76ae86"
-  ];
+  // Use provided images or fallback to main image or placeholder
+  const galleryImages = images.length > 0 ? images : (mainImage ? [mainImage] : ['/placeholder.svg']);
 
   return (
     <div className="space-y-4">
