@@ -83,6 +83,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   
   const [newFeature, setNewFeature] = useState('');
   const [newTag, setNewTag] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { uploadProgress, deleteFromSupabase } = useImageUpload();
   const { data: categories = [], isLoading: categoriesLoading } = useDynamicCategories();
 
@@ -109,6 +111,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         productGroup: (product as any).productGroup ?? '',
         unit: (product as any).unit ?? 'pcs',
       });
+      setHasUnsavedChanges(false);
     } else if (mode === 'create') {
       setFormData({
         title: '',
@@ -128,8 +131,74 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         productGroup: '',
         unit: 'pcs',
       });
+      setHasUnsavedChanges(false);
     }
   }, [product, mode, isOpen, defaultBrand]); // Removed categories from dependencies to prevent infinite loop
+
+  // Track unsaved changes
+  useEffect(() => {
+    if (isOpen && !isSubmitting) {
+      const hasChanges = 
+        formData.title !== '' ||
+        formData.description !== '' ||
+        formData.price > 0 ||
+        formData.images.length > 0 ||
+        formData.features.length > 0 ||
+        formData.tags.length > 0;
+      
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [formData, isOpen, isSubmitting]);
+
+  // Autosave to localStorage
+  useEffect(() => {
+    if (!isOpen || mode !== 'create') return;
+    
+    const timer = setInterval(() => {
+      if (hasUnsavedChanges) {
+        localStorage.setItem('product-form-draft', JSON.stringify({
+          formData,
+          timestamp: new Date().toISOString()
+        }));
+        console.log('💾 Draft auto-saved to localStorage');
+      }
+    }, 5000); // Save every 5 seconds
+    
+    return () => clearInterval(timer);
+  }, [formData, isOpen, mode, hasUnsavedChanges]);
+
+  // Restore from localStorage on open
+  useEffect(() => {
+    if (isOpen && mode === 'create') {
+      const draftJson = localStorage.getItem('product-form-draft');
+      if (draftJson) {
+        try {
+          const draft = JSON.parse(draftJson);
+          const draftAge = Date.now() - new Date(draft.timestamp).getTime();
+          
+          // Only show restore prompt if draft is younger than 24h
+          if (draftAge < 24 * 60 * 60 * 1000) {
+            const confirmRestore = window.confirm(
+              '📝 Ett utkast hittades!\n\nVill du återställa ditt senaste osparade arbete?'
+            );
+            
+            if (confirmRestore) {
+              setFormData(draft.formData);
+              console.log('♻️ Draft restored from localStorage');
+            } else {
+              localStorage.removeItem('product-form-draft');
+            }
+          } else {
+            // Remove old drafts
+            localStorage.removeItem('product-form-draft');
+          }
+        } catch (error) {
+          console.error('Failed to restore draft:', error);
+          localStorage.removeItem('product-form-draft');
+        }
+      }
+    }
+  }, [isOpen, mode]);
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({
@@ -225,6 +294,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }));
   };
 
+  const handleClose = () => {
+    // Block if upload is in progress
+    if (uploadProgress.isUploading) {
+      window.alert('⏳ Bilduppladdning pågår. Vänta tills den är klar innan du stänger.');
+      return;
+    }
+    
+    if (hasUnsavedChanges && !isSubmitting) {
+      const confirmClose = window.confirm(
+        '⚠️ Du har osparade ändringar.\n\nÄr du säker på att du vill stänga formuläret? All data kommer att förloras.'
+      );
+      if (!confirmClose) return;
+    }
+    
+    setHasUnsavedChanges(false);
+    onClose();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -251,17 +338,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       reviews: product?.reviews ?? 0,
     };
 
+    setIsSubmitting(true);
+    localStorage.removeItem('product-form-draft');
+    setHasUnsavedChanges(false);
     onSave(productData);
   };
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {mode === 'create' ? 'Add New Product' : 'Edit Product'}
+              {hasUnsavedChanges && <span className="text-orange-500 ml-2">●</span>}
             </DialogTitle>
+            {hasUnsavedChanges && (
+              <p className="text-xs text-muted-foreground mt-1">
+                💾 Sparar automatiskt var 5:e sekund...
+              </p>
+            )}
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -646,7 +744,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             </Card>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
               <Button type="submit" disabled={uploadProgress.isUploading}>
