@@ -50,7 +50,9 @@ export const ParticipantApplicationForm: React.FC<ParticipantApplicationFormProp
   };
 
   // Step navigation
-  const nextStep = async () => {
+  const nextStep = async (e?: React.MouseEvent) => {
+    e?.preventDefault(); // Prevent any form submission
+    
     // Validate only the current step's fields
     let fieldsToValidate: (keyof ParticipantFormData)[] = [];
     

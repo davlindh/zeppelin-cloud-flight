@@ -50,9 +50,12 @@ export const BaseSubmissionForm = <T extends FieldValues>({
 }: SubmissionFormProps<T>) => {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔍 handleFormSubmit called - Current step:', currentStep, 'Total steps:', totalSteps);
+    
     // Only submit on the last step
     if (currentStep === totalSteps) {
       try {
+        console.log('✅ Submitting form (final step reached)');
         // Call the onSubmit handler which is already wrapped by react-hook-form's handleSubmit
         // It will extract form data and call the actual submission handler
         const submitHandler = onSubmit as unknown as (e: React.FormEvent) => Promise<void>;
@@ -63,6 +66,8 @@ export const BaseSubmissionForm = <T extends FieldValues>({
         // Error is already handled by the form component, don't close
         console.error('Submission failed:', error);
       }
+    } else {
+      console.log('⚠️ Not final step, ignoring submit');
     }
   };
 
@@ -104,25 +109,6 @@ export const BaseSubmissionForm = <T extends FieldValues>({
           {children}
         </div>
 
-        <div className="flex justify-end gap-2 p-6 border-t">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-muted-foreground bg-background border border-input hover:bg-accent hover:text-accent-foreground disabled:opacity-50 rounded-md"
-          >
-            Cancel
-          </button>
-          {currentStep === totalSteps && (
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-md"
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
-            </button>
-          )}
-        </div>
       </form>
     </div>
   );

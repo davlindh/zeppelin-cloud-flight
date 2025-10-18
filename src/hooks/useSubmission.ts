@@ -177,7 +177,7 @@ export const useSubmission = () => {
         .from('submissions')
         .insert(submissionData as any)
         .select()
-        .single();
+        .maybeSingle();
 
       if (submitError) {
         console.error('🔍 Submission error:', submitError);
