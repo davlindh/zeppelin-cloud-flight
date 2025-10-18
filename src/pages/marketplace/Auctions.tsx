@@ -229,17 +229,12 @@ const Auctions = () => {
                   }}
                 >
                   <AuctionCard 
-                    id={auction.id}
-                    title={auction.title}
-                    currentBid={auction.currentBid}
-                    startingBid={auction.startingBid}
-                    endTime={auction.endTime}
-                    bidders={auction.bidders}
-                    category={auction.category}
-                    condition={auction.condition}
-                    image={auction.image ?? undefined}
-                    slug={auction.slug}
-                    created_at={auction.created_at}
+                    auction={auction}
+                    variant="enhanced"
+                    showAnalytics={true}
+                    showEnhancedStatus={true}
+                    showBidDialog={true}
+                    showQuickActions={true}
                   />
                 </div>
               ))}

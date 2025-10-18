@@ -19,112 +19,143 @@ import {
   getConditionStyling 
 } from '@/utils/marketplace/auctionUtils';
 import { cn } from '@/lib/utils';
+import type { Auction } from '@/types/marketplace/unified';
 
 interface AuctionCardProps {
-  id: string;
-  title: string;
-  currentBid: number;
-  startingBid: number;
-  endTime: Date;
-  bidders: number;
-  category: string;
-  condition: string;
+  // Can accept full Auction object OR individual props for backwards compatibility
+  auction?: Auction;
+  
+  // Individual props (for backwards compatibility)
+  id?: string;
+  title?: string;
+  currentBid?: number;
+  startingBid?: number;
+  endTime?: Date;
+  bidders?: number;
+  category?: string;
+  condition?: string;
   image?: string;
   slug?: string;
   created_at?: string;
+  bidHistory?: any[];
+  
+  // Optional display
+  variant?: 'default' | 'enhanced';
+  href?: string;
+  
+  // Optional features
+  showAnalytics?: boolean;
+  showEnhancedStatus?: boolean;
+  showBidDialog?: boolean;
+  showQuickActions?: boolean;
+  
+  // Callbacks
+  onQuickView?: () => void;
 }
 
 export const AuctionCard: React.FC<AuctionCardProps> = ({
-  id,
-  title,
-  currentBid,
-  startingBid,
-  endTime,
-  bidders,
-  category,
-  condition,
-  image,
-  slug,
-  created_at
+  auction,
+  id: propId,
+  title: propTitle,
+  currentBid: propCurrentBid,
+  startingBid: propStartingBid,
+  endTime: propEndTime,
+  bidders: propBidders,
+  category: propCategory,
+  condition: propCondition,
+  image: propImage,
+  slug: propSlug,
+  created_at: propCreatedAt,
+  bidHistory: propBidHistory,
+  variant = 'enhanced',
+  href: propHref,
+  showAnalytics = true,
+  showEnhancedStatus = true,
+  showBidDialog = true,
+  showQuickActions = true,
+  onQuickView
 }) => {
-  const [showBidDialog, setShowBidDialog] = useState(false);
+  // Extract values from auction object OR use individual props
+  const id = auction?.id || propId || '';
+  const title = auction?.title || propTitle || 'Untitled Auction';
+  const currentBid = auction?.currentBid || propCurrentBid || 0;
+  const startingBid = auction?.startingBid || propStartingBid || 0;
+  const endTime = auction?.endTime ? new Date(auction.endTime) : (propEndTime || new Date(Date.now() + 24 * 60 * 60 * 1000));
+  const bidders = auction?.bidders || propBidders || 0;
+  const category = auction?.category || propCategory || 'electronics';
+  const condition = auction?.condition || propCondition || 'good';
+  const image = auction?.image || propImage;
+  const slug = auction?.slug || propSlug;
+  const created_at = auction?.created_at || propCreatedAt || new Date().toISOString();
+  const bidHistory = auction?.bidHistory || propBidHistory || [];
+
+  const [showBidDialogState, setShowBidDialogState] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const { submitBid, isSubmitting } = useGuestBidding();
 
-  // Get dynamic category information with comprehensive fallbacks
-  const { colors: categoryColors, displayName: categoryDisplayName, icon: categoryIcon, isFromDatabase } = useCategoryInfo(category || 'electronics');
+  // Get dynamic category information
+  const { colors: categoryColors, displayName: categoryDisplayName, icon: categoryIcon } = useCategoryInfo(category);
 
-  // Ensure all required data has safe defaults
-  const safeTitle = title || 'Untitled Auction';
-  const safeCurrentBid = Number(currentBid) || 0;
-  const safeStartingBid = Number(startingBid) || 0;
-  const safeBidders = Number(bidders) || 0;
-  const safeCategory = category || 'electronics';
-  const safeCondition = condition || 'good';
-  const safeEndTime = endTime instanceof Date ? endTime : new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const safeCreatedAt = created_at || new Date().toISOString();
+  // Calculate analytics and status
+  const analytics = calculateAuctionAnalytics(currentBid, startingBid, bidders, endTime, created_at);
+  const status = getEnhancedStatus(analytics, condition, category);
+  const conditionStyling = getConditionStyling(condition);
 
-  // Calculate enhanced analytics and status with safe data
-  const analytics = calculateAuctionAnalytics(safeCurrentBid, safeStartingBid, safeBidders, safeEndTime, safeCreatedAt);
-  const status = getEnhancedStatus(analytics, safeCondition, safeCategory);
-  const conditionStyling = getConditionStyling(safeCondition);
-
-  // Use slug for URL if available, otherwise fall back to ID
-  const href = slug ? `/marketplace/auctions/${slug}` : `/marketplace/auctions/${id}`;
+  // Use provided href, slug, or fallback to ID
+  const finalHref = propHref || (slug ? `/marketplace/auctions/${slug}` : `/marketplace/auctions/${id}`);
 
   const {
     isWatching,
     isSharing,
     handleToggleWatch,
+    handleQuickView: handleQuickViewAction,
     handleShare
   } = useQuickActions({
     itemId: id,
     itemType: 'auction',
-    itemTitle: safeTitle,
-    currentBid: safeCurrentBid,
-    onQuickView: () => setShowBidDialog(true)
+    itemTitle: title,
+    currentBid: currentBid,
+    onQuickView: onQuickView || (() => setShowBidDialogState(true))
   });
 
   const handleQuickBid = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setShowBidDialog(true);
-  };
-
-  const handleQuickView = () => {
-    setShowBidDialog(true);
+    setShowBidDialogState(true);
   };
 
   const handleBidSubmit = async (bidData: { email: string; name: string; amount: number }) => {
     try {
       await submitBid(id, bidData);
-      setShowBidDialog(false);
+      setShowBidDialogState(false);
     } catch (error) {
       // Error handling is done in the hook
     }
   };
 
   // Calculate if auction is hot or ending soon
-  const isHot = safeBidders >= 10;
-  const timeLeft = safeEndTime.getTime() - new Date().getTime();
-  const isEndingSoon = timeLeft <= 3600000; // Less than 1 hour
+  const isHot = bidders >= 10;
+  const timeLeft = endTime.getTime() - new Date().getTime();
+  const isEndingSoon = timeLeft <= 3600000;
 
   return (
     <>
-      <Link to={href}>
+      <Link to={finalHref}>
         <Card className={cn(
           "group relative overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:shadow-black/10 border-0 bg-white rounded-2xl",
-          conditionStyling.ring,
-          conditionStyling.bg
+          variant === 'enhanced' && conditionStyling.ring,
+          variant === 'enhanced' && conditionStyling.bg
         )}>
           {/* Floating Action Buttons */}
-          <FloatingActionButtons
-            isWatching={isWatching}
-            isSharing={isSharing}
-            onToggleWatch={handleToggleWatch}
-            onQuickView={handleQuickView}
-            onShare={handleShare}
-          />
+          {showQuickActions && (
+            <FloatingActionButtons
+              isWatching={isWatching}
+              isSharing={isSharing}
+              onToggleWatch={handleToggleWatch}
+              onQuickView={handleQuickViewAction}
+              onShare={handleShare}
+            />
+          )}
 
           <CardHeader className="p-0">
             {/* Auction Image */}
@@ -144,82 +175,123 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
                 />
                 <img 
                   src={getResponsiveImageUrl(image)} 
-                  alt={getImageAlt(safeTitle, 'auction')}
+                  alt={getImageAlt(title, 'auction')}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                   onLoad={() => setImageLoaded(true)}
                   onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = getResponsiveImageUrl();
+                    console.warn(`[AuctionCard] Image failed for: ${title}`);
+                    e.currentTarget.src = '/placeholder.svg';
+                    setImageLoaded(true);
                   }}
                 />
               </picture>
-              
-              {/* Hot/Ending Soon Badge - Top Center */}
-              {(isHot || isEndingSoon) && (
-                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
-                  <Badge className={cn(
-                    "text-xs text-white shadow-lg border-0 backdrop-blur-sm",
-                    isEndingSoon ? "bg-red-500 hover:bg-red-600 animate-pulse" : "bg-orange-500 hover:bg-orange-600"
-                  )}>
-                    {isEndingSoon ? "⏰ Ending Soon" : "🔥 Hot"}
-                  </Badge>
-                </div>
-              )}
 
-              {/* Condition Badge - Bottom Left */}
-              <div className="absolute bottom-4 left-4 z-20">
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    "text-xs shadow-lg bg-white/95 backdrop-blur-sm border-0",
-                    safeCondition === 'new' || safeCondition === 'like-new' 
-                      ? 'text-emerald-700' 
-                      : safeCondition === 'good' 
-                      ? 'text-blue-700'
-                      : 'text-slate-700'
+              {/* Enhanced Status Badges */}
+              {showEnhancedStatus && variant === 'enhanced' ? (
+                <>
+                  {/* Hot/Ending Soon Badge - Top Center */}
+                  {(isHot || isEndingSoon) && (
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+                      <Badge className={cn(
+                        "text-xs text-white shadow-lg border-0 backdrop-blur-sm",
+                        isEndingSoon ? "bg-red-500 hover:bg-red-600 animate-pulse" : "bg-orange-500 hover:bg-orange-600"
+                      )}>
+                        {isEndingSoon ? "⏰ Ending Soon" : "🔥 Hot"}
+                      </Badge>
+                    </div>
                   )}
-                >
-                  {safeCondition}
-                </Badge>
-              </div>
 
-              {/* Status Badge - Bottom Right */}
-              <div className="absolute bottom-4 right-4 z-20">
-                <EnhancedStatusBadges analytics={analytics} status={status} />
-              </div>
+                  {/* Condition Badge - Bottom Left */}
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <Badge 
+                      variant="outline" 
+                      className={cn(
+                        "text-xs shadow-lg bg-white/95 backdrop-blur-sm border-0",
+                        condition === 'new' || condition === 'like-new' 
+                          ? 'text-emerald-700' 
+                          : condition === 'good' 
+                          ? 'text-blue-700'
+                          : 'text-slate-700'
+                      )}
+                    >
+                      {condition}
+                    </Badge>
+                  </div>
+
+                  {/* Status Badge - Bottom Right */}
+                  <div className="absolute bottom-4 right-4 z-20">
+                    <EnhancedStatusBadges analytics={analytics} status={status} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Simple badges for default variant */}
+                  {(isHot || isEndingSoon) && (
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+                      <Badge className={cn(
+                        "text-xs text-white shadow-lg border-0 backdrop-blur-sm",
+                        isEndingSoon ? "bg-red-500 hover:bg-red-600 animate-pulse" : "bg-orange-500 hover:bg-orange-600"
+                      )}>
+                        {isEndingSoon ? "⏰ Ending Soon" : "🔥 Hot"}
+                      </Badge>
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs shadow-lg bg-white/95 backdrop-blur-sm border-0 text-blue-700"
+                    >
+                      {condition}
+                    </Badge>
+                  </div>
+
+                  <div className="absolute bottom-4 right-4 z-20">
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs capitalize shadow-lg bg-white/95 backdrop-blur-sm border-0 text-slate-700"
+                    >
+                      {category}
+                    </Badge>
+                  </div>
+                </>
+              )}
             </div>
           </CardHeader>
           
           <CardContent className="p-6 space-y-4">
-            {/* Category */}
-            <Badge 
-              variant="outline" 
-              className={cn("text-xs capitalize w-fit", categoryColors.bg, categoryColors.text, categoryColors.border)}
-              title={isFromDatabase ? 'Category from database' : 'Fallback category'}
-            >
-              <span className="mr-1">{categoryIcon}</span>
-              {categoryDisplayName}
-            </Badge>
+            {/* Category Badge - Enhanced variant only */}
+            {variant === 'enhanced' && (
+              <Badge 
+                variant="outline" 
+                className={cn("text-xs capitalize w-fit", categoryColors.bg, categoryColors.text, categoryColors.border)}
+              >
+                <span className="mr-1">{categoryIcon}</span>
+                {categoryDisplayName}
+              </Badge>
+            )}
             
-            <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-              {safeTitle}
+            {/* Auction Title */}
+            <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight line-clamp-2">
+              {title}
             </CardTitle>
 
+            {/* Bidding Info */}
             <div className="space-y-3">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-600">Starting bid:</span>
-                  <span className="font-medium">${safeStartingBid.toLocaleString()}</span>
+                  <span className="font-medium">${startingBid.toLocaleString()}</span>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600">Current bid:</span>
                   <div className="text-right">
-                    <span className="text-xl font-bold text-blue-600">
-                      ${safeCurrentBid.toLocaleString()}
+                    <span className="text-2xl font-bold text-blue-600">
+                      ${currentBid.toLocaleString()}
                     </span>
-                    {analytics.valueAppreciation > 0 && (
+                    {variant === 'enhanced' && analytics.valueAppreciation > 0 && (
                       <span className="text-xs text-green-600 block">
                         +{analytics.valueAppreciation.toFixed(0)}%
                       </span>
@@ -228,48 +300,61 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
                 </div>
               </div>
               
-              <AuctionAnalyticsDisplay 
-                analytics={analytics}
-                currentBid={safeCurrentBid}
-                startingBid={safeStartingBid}
-                createdAt={safeCreatedAt}
-                endTime={safeEndTime}
-              />
+              {/* Analytics Display - Enhanced variant only */}
+              {showAnalytics && variant === 'enhanced' && (
+                <AuctionAnalyticsDisplay 
+                  analytics={analytics}
+                  currentBid={currentBid}
+                  startingBid={startingBid}
+                  createdAt={created_at}
+                  endTime={endTime}
+                />
+              )}
               
               <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                <CountdownTimer endTime={safeEndTime} />
+                <CountdownTimer endTime={endTime} />
                 <div className="flex items-center gap-1 text-sm text-slate-600">
                   <Users className="h-4 w-4" />
-                  <span>{safeBidders} bidders</span>
+                  <span>{bidders} bidders</span>
                 </div>
               </div>
             </div>
             
-            <Button 
-              className={cn(
-                "w-full h-12 rounded-xl font-medium text-white transition-all duration-200",
-                status.urgency === 'critical' 
-                  ? 'bg-red-600 hover:bg-red-700 animate-pulse' 
-                  : status.urgency === 'high'
-                  ? 'bg-orange-600 hover:bg-orange-700'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              )}
-              onClick={handleQuickBid}
-            >
-              {status.urgency === 'critical' ? 'BID NOW!' : 'Place Bid'}
-            </Button>
+            {/* Action Button */}
+            {showBidDialog ? (
+              <Button 
+                className={cn(
+                  "w-full h-12 rounded-xl font-medium text-white transition-all duration-200",
+                  variant === 'enhanced' && status.urgency === 'critical' 
+                    ? 'bg-red-600 hover:bg-red-700 animate-pulse' 
+                    : variant === 'enhanced' && status.urgency === 'high'
+                    ? 'bg-orange-600 hover:bg-orange-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                )}
+                onClick={handleQuickBid}
+              >
+                {variant === 'enhanced' && status.urgency === 'critical' ? 'BID NOW!' : 'Place Bid'}
+              </Button>
+            ) : (
+              <Button className="w-full h-12 rounded-xl font-medium bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200">
+                View Auction
+              </Button>
+            )}
           </CardContent>
         </Card>
       </Link>
 
-      <EnhancedBidDialog
-        isOpen={showBidDialog}
-        onClose={() => setShowBidDialog(false)}
-        auctionId={id}
-        currentBid={safeCurrentBid}
-        onBidSubmit={handleBidSubmit}
-        isSubmitting={isSubmitting}
-      />
+      {/* Enhanced Bid Dialog */}
+      {showBidDialog && (
+        <EnhancedBidDialog
+          isOpen={showBidDialogState}
+          onClose={() => setShowBidDialogState(false)}
+          auctionId={id}
+          currentBid={currentBid}
+          onBidSubmit={handleBidSubmit}
+          isSubmitting={isSubmitting}
+        />
+      )}
     </>
   );
 };

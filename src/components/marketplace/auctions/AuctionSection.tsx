@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { EnhancedAuctionCard } from '@/components/marketplace/ui/enhanced-auction-card';
+import { AuctionCard } from '@/components/marketplace/ui/auction-card';
 import { AuctionSkeleton } from '@/components/marketplace/ui/auction-skeleton';
 import { AsyncErrorBoundary } from '@/components/marketplace/ui/async-error-boundary';
 import { useAuctions } from '@/hooks/marketplace/useAuctions';
@@ -87,17 +87,14 @@ const AuctionSection = () => {
             <AsyncErrorBoundary fallbackVariant="minimal">
               <div className="grid-responsive mb-8">
                 {featuredAuctions.map((auction) => (
-                  <EnhancedAuctionCard
+                  <AuctionCard
                     key={auction.id}
-                    id={auction.id}
-                    title={auction.title}
-                    currentBid={auction.currentBid}
-                    startingBid={auction.startingBid}
-                    endTime={auction.endTime}
-                    bidders={auction.bidders}
-                    image={getImageUrl(auction.image)}
-                    category={auction.category}
-                    condition={auction.condition}
+                    auction={auction}
+                    variant="default"
+                    showQuickActions={true}
+                    showAnalytics={false}
+                    showEnhancedStatus={false}
+                    showBidDialog={false}
                     onQuickView={() => handleQuickView(auction.id)}
                   />
                 ))}

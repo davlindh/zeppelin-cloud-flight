@@ -156,6 +156,11 @@ export const UnifiedServiceCard: React.FC<UnifiedServiceCardProps> = ({
                   className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                   loading="lazy"
                   onLoad={() => setImageLoaded(true)}
+                  onError={(e) => {
+                    console.warn(`[ServiceCard] Image failed for: ${title}`);
+                    e.currentTarget.src = '/placeholder.svg';
+                    setImageLoaded(true);
+                  }}
                 />
               </picture>
             </div>
