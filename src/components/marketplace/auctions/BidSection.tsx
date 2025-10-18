@@ -69,7 +69,7 @@ export const BidSection: React.FC<BidSectionProps> = ({
     const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     
     // Use slug-based URL for sharing (SEO-friendly)
-    const shareUrl = `${window.location.origin}/auctions/${slug}`;
+    const shareUrl = `${window.location.origin}/marketplace/auctions/${slug}`;
     
     const shareData = {
       title: `${title} - Live Auction`,

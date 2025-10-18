@@ -70,7 +70,7 @@ export const AuctionCard: React.FC<AuctionCardProps> = ({
   const conditionStyling = getConditionStyling(safeCondition);
 
   // Use slug for URL if available, otherwise fall back to ID
-  const href = slug ? `/auctions/${slug}` : `/auctions/${id}`;
+  const href = slug ? `/marketplace/auctions/${slug}` : `/marketplace/auctions/${id}`;
 
   const {
     isWatching,

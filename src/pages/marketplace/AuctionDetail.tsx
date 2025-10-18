@@ -45,8 +45,8 @@ const AuctionDetail = () => {
 
   // Generate canonical URL for SEO and sharing
   const canonicalUrl = auction?.slug 
-    ? `${window.location.origin}/auctions/${auction.slug}`
-    : `${window.location.origin}/auctions/${idOrSlug}`;
+    ? `${window.location.origin}/marketplace/auctions/${auction.slug}`
+    : `${window.location.origin}/marketplace/auctions/${idOrSlug}`;
 
   React.useEffect(() => {
     if (auction) {
@@ -83,7 +83,7 @@ const AuctionDetail = () => {
 
   // If we have a numeric ID that doesn't correspond to an auction, redirect
   if (!isLoading && !auction && idOrSlug && /^\d+$/.test(idOrSlug)) {
-    return <Navigate to="/auctions" replace />;
+    return <Navigate to="/marketplace/auctions" replace />;
   }
 
   if (error || !auction) {
@@ -102,7 +102,7 @@ const AuctionDetail = () => {
               }
             </p>
             <Link 
-              to="/auctions" 
+              to="/marketplace/auctions" 
               className="inline-flex items-center text-blue-600 hover:text-blue-700"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
@@ -125,7 +125,7 @@ const AuctionDetail = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb with improved navigation */}
           <div className="flex items-center gap-2 mb-6">
-            <Link to="/auctions" className="flex items-center text-blue-600 hover:text-blue-700">
+            <Link to="/marketplace/auctions" className="flex items-center text-blue-600 hover:text-blue-700">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Auctions
             </Link>

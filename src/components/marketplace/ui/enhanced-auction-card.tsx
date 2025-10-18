@@ -35,7 +35,7 @@ export const EnhancedAuctionCard: React.FC<EnhancedAuctionCardProps> = ({
   image,
   category,
   condition,
-  href = `/auctions/${id}`,
+  href = `/marketplace/auctions/${id}`,
   onQuickView
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);

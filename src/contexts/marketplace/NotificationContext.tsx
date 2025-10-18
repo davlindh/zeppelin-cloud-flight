@@ -141,7 +141,7 @@ export const useNotificationTrigger = () => {
       message: `"${auctionTitle}" ends in ${timeLeft}`,
       userId,
       auctionId,
-      actionUrl: `/auctions/${auctionId}`,
+      actionUrl: `/marketplace/auctions/${auctionId}`,
       actionText: 'Place Bid'
     });
   };
@@ -155,7 +155,7 @@ export const useNotificationTrigger = () => {
       message: `Someone placed a $${newBidAmount} bid on "${auctionTitle}"`,
       userId,
       auctionId,
-      actionUrl: `/auctions/${auctionId}`,
+      actionUrl: `/marketplace/auctions/${auctionId}`,
       actionText: 'Place New Bid'
     });
   };

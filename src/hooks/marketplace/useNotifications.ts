@@ -286,9 +286,9 @@ function getActionText(type: string): string {
 
 function getActionUrl(item: any): string {
   if (item.auction_id) {
-    return `/auctions/${item.auction_id}`;
+    return `/marketplace/auctions/${item.auction_id}`;
   }
-  return '/auctions';
+  return '/marketplace/auctions';
 }
 
 function formatTimestamp(timestamp: string): string {
