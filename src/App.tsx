@@ -37,6 +37,9 @@ import Shop from "./pages/marketplace/Shop";
 import ProductDetail from "./pages/marketplace/ProductDetail";
 import Services from "./pages/marketplace/Services";
 import ServiceDetail from "./pages/marketplace/ServiceDetail";
+import { CartPage } from "./pages/marketplace/CartPage";
+import { WishlistPage } from "./pages/marketplace/WishlistPage";
+import { NotificationsPage } from "./pages/marketplace/NotificationsPage";
 import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
 import { CartProvider } from "./contexts/marketplace/CartProvider";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
@@ -118,9 +121,9 @@ const App = () => (
                   <Route path="shop/:id" element={<ProductDetail />} />
                   <Route path="services" element={<Services />} />
                   <Route path="services/:id" element={<ServiceDetail />} />
-                  <Route path="cart" element={<div>Cart - Coming Soon</div>} />
-                  <Route path="wishlist" element={<div>Wishlist - Coming Soon</div>} />
-                  <Route path="notifications" element={<div>Notifications - Coming Soon</div>} />
+                  <Route path="cart" element={<CartPage />} />
+                  <Route path="wishlist" element={<WishlistPage />} />
+                  <Route path="notifications" element={<NotificationsPage />} />
                 </Route>
 
                 {/* Order Pages */}
