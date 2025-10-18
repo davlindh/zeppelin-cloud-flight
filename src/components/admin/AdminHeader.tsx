@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -15,6 +16,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onSecurityClick 
 }) => {
   const { user, signOut } = useAdminAuth();
+  const navigate = useNavigate();
 
   const getSecurityIcon = () => {
     switch (securityStatus) {
@@ -27,25 +29,33 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     }
   };
 
+  const handleSecurityClick = () => {
+    if (onSecurityClick) {
+      onSecurityClick();
+    } else {
+      navigate('/admin/security');
+    }
+  };
+
   const getSecurityBadge = () => {
     switch (securityStatus) {
       case 'critical':
         return (
-          <Badge variant="destructive" className="cursor-pointer" onClick={onSecurityClick}>
+          <Badge variant="destructive" className="cursor-pointer" onClick={handleSecurityClick}>
             {getSecurityIcon()}
             <span className="ml-1">Critical Security Issues</span>
           </Badge>
         );
       case 'warning':
         return (
-          <Badge variant="secondary" className="cursor-pointer bg-yellow-100 text-yellow-800 hover:bg-yellow-200" onClick={onSecurityClick}>
+          <Badge variant="secondary" className="cursor-pointer bg-yellow-100 text-yellow-800 hover:bg-yellow-200" onClick={handleSecurityClick}>
             {getSecurityIcon()}
             <span className="ml-1">Security Warnings</span>
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="cursor-pointer text-green-700 border-green-200" onClick={onSecurityClick}>
+          <Badge variant="outline" className="cursor-pointer text-green-700 border-green-200" onClick={handleSecurityClick}>
             {getSecurityIcon()}
             <span className="ml-1">Secure</span>
           </Badge>
@@ -76,7 +86,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         </Badge>
         
         {/* Action Buttons */}
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={() => navigate('/admin/settings')}>
           <Settings className="h-4 w-4 mr-2" />
           Settings
         </Button>
