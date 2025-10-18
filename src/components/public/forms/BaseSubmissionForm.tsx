@@ -48,11 +48,23 @@ export const BaseSubmissionForm = <T extends FieldValues>({
   isSubmitting = false,
   error,
 }: SubmissionFormProps<T>) => {
-  // For backward compatibility, we'll create a simple wrapper
-  // that renders children directly without form management
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Only submit on the last step
+    if (currentStep === totalSteps) {
+      // Call the onSubmit handler which is already wrapped by react-hook-form's handleSubmit
+      // It will extract form data and call the actual submission handler
+      const submitHandler = onSubmit as unknown as (e: React.FormEvent) => Promise<void>;
+      await submitHandler(e);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className={`w-full max-w-2xl max-h-[90vh] overflow-auto bg-background rounded-lg border ${className}`}>
+      <form 
+        onSubmit={handleFormSubmit}
+        className={`w-full max-w-2xl max-h-[90vh] overflow-auto bg-background rounded-lg border ${className}`}
+      >
         <div className="flex flex-row items-center justify-between p-6 border-b">
           <div>
             <h2 className="text-lg font-semibold">{title}</h2>
@@ -63,6 +75,7 @@ export const BaseSubmissionForm = <T extends FieldValues>({
             )}
           </div>
           <button
+            type="button"
             onClick={onClose}
             disabled={isSubmitting}
             className="text-muted-foreground hover:text-foreground disabled:opacity-50"
@@ -93,15 +106,17 @@ export const BaseSubmissionForm = <T extends FieldValues>({
           >
             Cancel
           </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-md"
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
-          </button>
+          {currentStep === totalSteps && (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-md"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
+          )}
         </div>
-      </div>
+      </form>
     </div>
   );
 };
