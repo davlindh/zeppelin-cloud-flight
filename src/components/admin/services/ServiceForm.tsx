@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +20,7 @@ import { useServiceCategories } from '@/hooks/useServiceCategories';
 import { getStoragePathFromPublicUrl } from '@/utils/imageUtils';
 import { BUCKET_MAP } from '@/config/storage.config';
 import { useToast } from '@/hooks/use-toast';
+import { RichTextEditor } from './RichTextEditor';
 import type { Service } from '@/types/unified';
 
 interface ServiceFormProps {
@@ -314,13 +314,14 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Describe your service..."
-                    rows={4}
+                  <RichTextEditor
+                    content={formData.description}
+                    onChange={(content) => handleInputChange('description', content)}
+                    placeholder="Describe your service in detail. You can use formatting, add links, and embed images..."
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Supports markdown shortcuts: **bold**, *italic*, # headings, - lists
+                  </p>
                 </div>
 
                 <div>

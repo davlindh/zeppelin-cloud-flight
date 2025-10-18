@@ -154,6 +154,83 @@
   .safe-area-inset-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  /* Prose styling for rich text editor */
+  .prose {
+    @apply text-foreground;
+    max-width: none;
+  }
+
+  .prose h2 {
+    @apply text-2xl font-bold mt-6 mb-4 text-foreground;
+  }
+
+  .prose h3 {
+    @apply text-xl font-semibold mt-5 mb-3 text-foreground;
+  }
+
+  .prose p {
+    @apply my-3 text-foreground/90 leading-7;
+  }
+
+  .prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .prose em {
+    @apply italic;
+  }
+
+  .prose code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-4;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply my-4 ml-6;
+  }
+
+  .prose ul {
+    @apply list-disc;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose li {
+    @apply my-2 text-foreground/90;
+  }
+
+  .prose a {
+    @apply text-primary underline hover:text-primary/80 transition-colors;
+  }
+
+  .prose img {
+    @apply rounded-lg my-4 max-w-full h-auto;
+  }
+
+  .prose hr {
+    @apply border-border my-6;
+  }
+
+  /* TipTap editor specific styles */
+  .ProseMirror {
+    @apply outline-none;
+  }
+
+  .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    @apply text-muted-foreground float-left h-0 pointer-events-none;
+  }
+
+  .ProseMirror-focused {
+    @apply outline-none;
+  }
 }
 
 /* Mobile optimizations */
