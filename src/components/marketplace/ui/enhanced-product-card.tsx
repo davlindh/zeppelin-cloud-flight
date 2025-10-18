@@ -94,7 +94,7 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
     onQuickView
   });
 
-  const finalHref = href || `/shop/product/${productData.id}`;
+  const finalHref = href || `/marketplace/shop/${productData.id}`;
   const finalStockCount = stockCount ?? (productData.inStock ? 50 : 0);
 
   const handleAddToCart = async (e: React.MouseEvent) => {

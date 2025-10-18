@@ -49,7 +49,7 @@ export const UnifiedServiceCard: React.FC<UnifiedServiceCardProps> = ({
   location,
   available,
   image,
-  href = `/services/${id}`,
+  href = `/marketplace/services/${id}`,
   variant = 'default',
   size = 'sm',
   showImage = true,

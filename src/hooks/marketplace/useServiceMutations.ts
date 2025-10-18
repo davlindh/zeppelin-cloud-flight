@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { generateSlug } from '@/utils/formUtils';
 import type { Service } from '@/types/unified';
 
 // Database service type and transformation function
@@ -108,6 +109,7 @@ export const useServiceMutations = () => {
           features: serviceData.features ?? [],
           provider: serviceData.provider,
           provider_id: serviceData.provider_id || null,
+          slug: generateSlug(serviceData.title),
           available: true,
           available_times: serviceData.available_times ?? [],
           response_time: serviceData.response_time || '24 hours',
@@ -137,9 +139,14 @@ export const useServiceMutations = () => {
       
       const { id, ...updateData } = serviceData;
       
+      const updatePayload = {
+        ...updateData,
+        slug: serviceData.title ? generateSlug(serviceData.title) : undefined,
+      };
+      
       const { data, error } = await supabase
         .from('services')
-        .update(updateData)
+        .update(updatePayload)
         .eq('id', id)
         .select()
         .single();

@@ -36,7 +36,7 @@ export const UnifiedProductCard: React.FC<UnifiedProductCardProps> = ({
   reviews,
   inStock,
   image,
-  href = `/shop/${id}`,
+  href = `/marketplace/shop/${id}`,
   variant = 'default',
   size = 'sm',
   stockCount = inStock ? 50 : 0,

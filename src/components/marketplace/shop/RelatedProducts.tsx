@@ -48,7 +48,7 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({
             reviews={product.reviews}
             inStock={product.inStock}
             image={getImageUrl(product.image)}
-            href={`/shop/product/${product.id}`}
+            href={`/marketplace/shop/${product.id}`}
             variant="enhanced"
           />
         ))}

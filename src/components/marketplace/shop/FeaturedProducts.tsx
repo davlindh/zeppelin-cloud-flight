@@ -38,7 +38,7 @@ export const FeaturedProducts: React.FC = () => {
   if (featuredProducts.length === 0) return null;
 
   const handleProductClick = (productId: string) => {
-    navigate(`/shop/product/${productId}`);
+    navigate(`/marketplace/shop/${productId}`);
   };
 
   return (

@@ -53,7 +53,7 @@ export const BrandShowcase: React.FC = () => {
   }, [products]);
 
   const handleBrandClick = (brandName: string) => {
-    navigate(`/shop/brand/${encodeURIComponent(brandName)}`);
+    navigate(`/marketplace/shop/brand/${encodeURIComponent(brandName)}`);
   };
 
   if (isLoading) {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { generateSlug } from '@/utils/formUtils';
 import type { Product } from '@/types/unified';
 
 interface CreateProductData {
@@ -55,6 +56,7 @@ const buildProductPayload = (productData: CreateProductData, totalStock: number)
   original_price: productData.originalPrice,
   category_id: productData.categoryId || null,
   product_brand: productData.brand,
+  slug: generateSlug(productData.title),
   features: productData.features ?? [],
   tags: productData.tags ?? [],
   images: productData.images ?? [],
@@ -142,6 +144,7 @@ export const useProductMutations = () => {
 
       const payload = {
         ...buildProductPayload(productData, totalStock),
+        slug: productData.title ? generateSlug(productData.title) : undefined,
         updated_at: new Date().toISOString(),
       };
 
