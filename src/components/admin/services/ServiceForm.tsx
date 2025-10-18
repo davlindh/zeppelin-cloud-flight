@@ -20,6 +20,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import { useServiceCategories } from '@/hooks/useServiceCategories';
 import { getStoragePathFromPublicUrl } from '@/utils/imageUtils';
 import { BUCKET_MAP } from '@/config/storage.config';
+import { useToast } from '@/hooks/use-toast';
 import type { Service } from '@/types/unified';
 
 interface ServiceFormProps {
@@ -58,6 +59,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
   const { uploadToSupabase, uploadProgress, deleteFromSupabase } = useImageUpload();
   const { data: categories = [] } = useServiceCategories();
+  const { toast } = useToast();
   
   const isUploading = uploadProgress.isUploading;
 
@@ -105,18 +107,58 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      try {
-        const result = await uploadToSupabase(file, BUCKET_MAP.SERVICES);
-        if (result) {
-          if (!formData.image) {
-            handleInputChange('image', result.url);
-          }
-          handleInputChange('images', [...formData.images, result.url]);
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload an image file (JPG, PNG, GIF, WebP)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Image must be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate max images (10)
+    if (formData.images.length >= 10) {
+      toast({
+        title: "Maximum images reached",
+        description: "You can upload up to 10 images per service",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const result = await uploadToSupabase(file, BUCKET_MAP.SERVICES);
+      if (result) {
+        if (!formData.image) {
+          handleInputChange('image', result.url);
         }
-      } catch (error) {
-        console.error('Failed to upload image:', error);
+        handleInputChange('images', [...formData.images, result.url]);
+        toast({
+          title: "Image uploaded",
+          description: "Image has been successfully uploaded",
+        });
       }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -146,7 +188,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     // Delete from storage
     const storagePath = getStoragePathFromPublicUrl(imageUrl);
     if (storagePath) {
-      deleteFromSupabase(storagePath, 'uploads');
+      deleteFromSupabase(storagePath, BUCKET_MAP.SERVICES);
     }
     
     handleInputChange('images', formData.images.filter(img => img !== imageUrl));
@@ -159,7 +201,40 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.category || !formData.provider || !formData.image) {
+    // Validate required fields with user feedback
+    if (!formData.title) {
+      toast({
+        title: "Title required",
+        description: "Please enter a service title",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.category) {
+      toast({
+        title: "Category required",
+        description: "Please select a category",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.provider) {
+      toast({
+        title: "Provider required",
+        description: "Please enter a provider name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.image) {
+      toast({
+        title: "Image required",
+        description: "Please upload at least one image",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -170,21 +245,26 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        startingPrice: formData.starting_price,
+        starting_price: formData.starting_price,
         duration: formData.duration,
         location: formData.location,
         image: formData.image,
         images: formData.images,
         features: formData.features,
         provider: formData.provider,
-        availableTimes: formData.available_times,
-        responseTime: formData.response_time
+        available_times: formData.available_times,
+        response_time: formData.response_time
       };
 
       await onSave(serviceData);
       onClose();
     } catch (error) {
       console.error('Failed to save service:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save service. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }

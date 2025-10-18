@@ -19,7 +19,9 @@ export const useServiceActions = () => {
         location: serviceData.location || '',
         image: serviceData.image ?? undefined,
         images: serviceData.images,
+        features: serviceData.features || [],
         available_times: serviceData.available_times,
+        response_time: serviceData.response_time,
       });
       
       if (result) {
@@ -60,7 +62,9 @@ export const useServiceActions = () => {
         location: serviceData.location,
         image: serviceData.image,
         images: serviceData.images,
+        features: serviceData.features || [],
         available_times: serviceData.available_times,
+        response_time: serviceData.response_time,
       });
       
       if (result) {
