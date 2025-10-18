@@ -52,10 +52,17 @@ export const BaseSubmissionForm = <T extends FieldValues>({
     e.preventDefault();
     // Only submit on the last step
     if (currentStep === totalSteps) {
-      // Call the onSubmit handler which is already wrapped by react-hook-form's handleSubmit
-      // It will extract form data and call the actual submission handler
-      const submitHandler = onSubmit as unknown as (e: React.FormEvent) => Promise<void>;
-      await submitHandler(e);
+      try {
+        // Call the onSubmit handler which is already wrapped by react-hook-form's handleSubmit
+        // It will extract form data and call the actual submission handler
+        const submitHandler = onSubmit as unknown as (e: React.FormEvent) => Promise<void>;
+        await submitHandler(e);
+        // Close the form after successful submission
+        onClose();
+      } catch (error) {
+        // Error is already handled by the form component, don't close
+        console.error('Submission failed:', error);
+      }
     }
   };
 

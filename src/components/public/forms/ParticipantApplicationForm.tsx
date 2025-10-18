@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { FileUpload } from '@/components/admin/FileUpload';
 import { BaseSubmissionForm, BaseSubmissionData } from './BaseSubmissionForm';
 import { useSubmission, FileSubmission } from '@/hooks/useSubmission';
+import { useToast } from '@/hooks/use-toast';
 
 export interface ParticipantFormData extends BaseSubmissionData {
   // Participant-specific fields
@@ -38,6 +39,7 @@ export const ParticipantApplicationForm: React.FC<ParticipantApplicationFormProp
   });
 
   const { isSubmitting, error, submitForm } = useSubmission();
+  const { toast } = useToast();
 
   const totalSteps = 3;
 
@@ -144,6 +146,13 @@ export const ParticipantApplicationForm: React.FC<ParticipantApplicationFormProp
       console.log('Submitting participant application:', { payload, fileCount: files.length });
 
       await submitForm('participant', payload, files);
+      
+      // Show success message
+      toast({
+        title: "Application Submitted!",
+        description: "Thank you for your application. We'll review it soon.",
+        duration: 3000,
+      });
     } catch (error) {
       console.error('Form submission failed:', error);
       throw error;
@@ -434,14 +443,22 @@ export const ParticipantApplicationForm: React.FC<ParticipantApplicationFormProp
         </div>
 
         <div>
-          {currentStep < totalSteps && (
+          {currentStep < totalSteps ? (
             <button
               type="button"
               onClick={nextStep}
-              className="text-sm text-primary hover:text-primary/80 font-medium"
+              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-md"
               disabled={isSubmitting}
             >
               Next →
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 disabled:opacity-50 rounded-md"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Application'}
             </button>
           )}
         </div>
