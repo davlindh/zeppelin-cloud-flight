@@ -21,6 +21,12 @@ interface CreateProductData {
   }>;
   images?: string[];
   image?: string;
+  stockQuantity?: number;
+  articleNumber?: string;
+  barcode?: string;
+  supplier?: string;
+  productGroup?: string;
+  unit?: string;
 }
 
 interface UpdateProductData extends CreateProductData {
@@ -49,25 +55,33 @@ const mapToProduct = (
   reviews: dbProduct.reviews ?? 0,
 });
 
-const buildProductPayload = (productData: CreateProductData, totalStock: number) => ({
-  title: productData.title,
-  description: productData.description,
-  selling_price: productData.price,
-  original_price: productData.originalPrice,
-  category_id: productData.categoryId || null,
-  product_brand: productData.brand,
-  slug: generateSlug(productData.title),
-  features: productData.features ?? [],
-  tags: productData.tags ?? [],
-  images: productData.images ?? [],
-  image: productData.image ?? (productData.images?.[0] ?? ''),
-  stock_quantity: totalStock,
-  in_stock: totalStock > 0,
-  rating: 0,
-  reviews: 0,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-});
+const buildProductPayload = (productData: CreateProductData, totalStock: number) => {
+  const finalStockQuantity = productData.stockQuantity ?? totalStock;
+  return {
+    title: productData.title,
+    description: productData.description,
+    selling_price: productData.price,
+    original_price: productData.originalPrice,
+    category_id: productData.categoryId || null,
+    product_brand: productData.brand,
+    slug: generateSlug(productData.title),
+    features: productData.features ?? [],
+    tags: productData.tags ?? [],
+    images: productData.images ?? [],
+    image: productData.image ?? (productData.images?.[0] ?? ''),
+    stock_quantity: finalStockQuantity,
+    in_stock: finalStockQuantity > 0,
+    article_number: productData.articleNumber,
+    barcode: productData.barcode,
+    supplier: productData.supplier,
+    product_group: productData.productGroup,
+    unit: productData.unit ?? 'pcs',
+    rating: 0,
+    reviews: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+};
 
 export const useProductMutations = () => {
   const [isLoading, setIsLoading] = useState(false);

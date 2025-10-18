@@ -46,6 +46,12 @@ interface FormData {
   tags: string[];
   variants: ProductVariant[];
   images: string[];
+  stockQuantity?: number;
+  articleNumber?: string;
+  barcode?: string;
+  supplier?: string;
+  productGroup?: string;
+  unit?: string;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -61,12 +67,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     description: '',
     price: 0,
     originalPrice: undefined,
-        categoryId: '',
+    categoryId: '',
     brand: '',
     features: [],
     tags: [],
     variants: [{ color: '', size: '', stock: 0 }],
     images: [],
+    stockQuantity: 0,
+    articleNumber: '',
+    barcode: '',
+    supplier: '',
+    productGroup: '',
+    unit: 'pcs',
   });
   
   const [newFeature, setNewFeature] = useState('');
@@ -90,6 +102,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         tags: product.tags ?? [],
         variants: product.variants ?? [{ color: '', size: '', stock: 0 }],
         images: product.images ?? [],
+        stockQuantity: (product as any).stockQuantity ?? 0,
+        articleNumber: (product as any).articleNumber ?? '',
+        barcode: (product as any).barcode ?? '',
+        supplier: (product as any).supplier ?? '',
+        productGroup: (product as any).productGroup ?? '',
+        unit: (product as any).unit ?? 'pcs',
       });
     } else if (mode === 'create') {
       setFormData({
@@ -103,6 +121,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         tags: [],
         variants: [{ color: '', size: '', stock: 0 }],
         images: [],
+        stockQuantity: 0,
+        articleNumber: '',
+        barcode: '',
+        supplier: '',
+        productGroup: '',
+        unit: 'pcs',
       });
     }
   }, [product, mode, isOpen, defaultBrand]); // Removed categories from dependencies to prevent infinite loop
@@ -468,6 +492,93 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       </Button>
                     </Badge>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Stock Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Stock Management</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="stockQuantity">Total Stock</Label>
+                    <Input
+                      id="stockQuantity"
+                      type="number"
+                      value={formData.stockQuantity ?? 0}
+                      onChange={(e) => handleInputChange('stockQuantity', Number(e.target.value))}
+                      placeholder="0"
+                      min="0"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Leave 0 for non-stock items
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="articleNumber">Article Number</Label>
+                    <Input
+                      id="articleNumber"
+                      value={formData.articleNumber ?? ''}
+                      onChange={(e) => handleInputChange('articleNumber', e.target.value)}
+                      placeholder="ART-12345"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="barcode">Barcode/SKU</Label>
+                    <Input
+                      id="barcode"
+                      value={formData.barcode ?? ''}
+                      onChange={(e) => handleInputChange('barcode', e.target.value)}
+                      placeholder="123456789"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Product Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Product Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="supplier">Supplier</Label>
+                    <Input
+                      id="supplier"
+                      value={formData.supplier ?? ''}
+                      onChange={(e) => handleInputChange('supplier', e.target.value)}
+                      placeholder="Supplier name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="productGroup">Product Group</Label>
+                    <Input
+                      id="productGroup"
+                      value={formData.productGroup ?? ''}
+                      onChange={(e) => handleInputChange('productGroup', e.target.value)}
+                      placeholder="e.g., Electronics"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="unit">Unit</Label>
+                    <select
+                      id="unit"
+                      value={formData.unit ?? 'pcs'}
+                      onChange={(e) => handleInputChange('unit', e.target.value)}
+                      className="w-full h-10 px-3 py-2 border border-input bg-background rounded-md text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <option value="pcs">Pieces</option>
+                      <option value="kg">Kilograms</option>
+                      <option value="m">Meters</option>
+                      <option value="l">Liters</option>
+                      <option value="box">Box</option>
+                    </select>
+                  </div>
                 </div>
               </CardContent>
             </Card>

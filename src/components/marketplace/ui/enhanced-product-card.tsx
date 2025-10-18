@@ -311,20 +311,23 @@ export const EnhancedProductCard: React.FC<EnhancedProductCardProps> = ({
               <Badge variant="outline" className="text-xs capitalize w-fit">
                 {(productData as any).categoryName || (productData as any).category}
               </Badge>
-              {product?.brand && (
-                <Badge 
-                  variant="secondary" 
-                  className="text-xs capitalize w-fit cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                  clickable={true}
-                  onClick={() => {
-                    if (onBrandClick && product.brand) {
-                      onBrandClick(product.brand);
-                    }
-                  }}
-                >
-                  {product.brand}
-                </Badge>
+              {product?.brand && product.brand.trim() !== '' && (
+                <div onClick={handleBrandClickEvent}>
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs capitalize w-fit cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                  >
+                    {product.brand}
+                  </Badge>
+                </div>
               )}
+            </div>
+          )}
+
+          {/* Product Meta Info - Article Number */}
+          {isEnhanced && (product as any).articleNumber && (
+            <div className="text-xs text-slate-500">
+              Art.nr: {(product as any).articleNumber}
             </div>
           )}
           
