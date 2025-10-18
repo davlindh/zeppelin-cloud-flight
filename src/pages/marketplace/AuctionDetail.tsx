@@ -157,7 +157,11 @@ const AuctionDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Image Gallery */}
-          <AuctionImageGallery title={auction.title} />
+          <AuctionImageGallery 
+            title={auction.title}
+            images={auction.images || []}
+            mainImage={auction.image || undefined}
+          />
 
           {/* Auction Details */}
           <div className="space-y-6">
