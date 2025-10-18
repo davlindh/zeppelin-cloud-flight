@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { replaceImage, deleteImageSafely, getImageMetadata } from '@/utils/marketplace/imageManager';
+import { BUCKET_MAP } from '@/config/storage.config';
 
 interface UploadProgress {
   progress: number;
@@ -126,8 +127,8 @@ export const useImageUpload = () => {
   // Upload to Supabase Storage
   const uploadToSupabase = useCallback(async (
     file: File,
-    bucket: string = 'uploads',
-    folder: string = 'admin'
+    bucket: string = BUCKET_MAP.MEDIA,
+    folder: string = ''
   ): Promise<ImageUploadResult | null> => {
     try {
       setUploadProgress({ progress: 0, isUploading: true });
@@ -137,7 +138,9 @@ export const useImageUpload = () => {
       
       // Generate unique filename
       const fileExt = optimizedFile.name.split('.').pop();
-      const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = folder 
+        ? `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+        : `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
       setUploadProgress({ progress: 25, isUploading: true });
 
@@ -188,7 +191,7 @@ export const useImageUpload = () => {
   // Delete from Supabase Storage
   const deleteFromSupabase = useCallback(async (
     path: string,
-    bucket: string = 'uploads'
+    bucket: string = BUCKET_MAP.MEDIA
   ): Promise<boolean> => {
     try {
       const { error } = await supabase.storage
@@ -274,8 +277,8 @@ export const useImageUpload = () => {
   const replaceImageWithCleanup = useCallback(async (
     newFile: File,
     oldImageUrl?: string | null,
-    bucket: string = 'uploads',
-    folder: string = 'admin'
+    bucket: string = BUCKET_MAP.MEDIA,
+    folder: string = ''
   ): Promise<ImageUploadResult | null> => {
     try {
       setUploadProgress({ progress: 0, isUploading: true });

@@ -20,12 +20,14 @@ export const replaceImage = async (
   newFile: File,
   options: ImageReplaceOptions = {}
 ): Promise<{ url: string; path: string } | null> => {
-  const { oldImageUrl, bucket = 'uploads', folder = 'admin' } = options;
+  const { oldImageUrl, bucket = 'media-files', folder = '' } = options;
 
   try {
     // First, upload the new image
     const fileExt = newFile.name.split('.').pop();
-    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const fileName = folder 
+      ? `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      : `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
     const { data, error } = await supabase.storage
       .from(bucket)
@@ -65,7 +67,7 @@ export const deleteImageSafely = async (
   imageUrl: string,
   options: ImageDeleteOptions = {}
 ): Promise<boolean> => {
-  const { bucket = 'uploads' } = options;
+  const { bucket = 'media-files' } = options;
 
   try {
     // Skip deletion for placeholder images

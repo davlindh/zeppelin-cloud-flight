@@ -28,6 +28,7 @@ import {
 import { CameraCapture } from '@/components/admin/CameraCapture';
 import { AlertCircle, Loader2, Upload, X } from 'lucide-react';
 import { getImageUrl, getStoragePathFromPublicUrl } from '@/utils/imageUtils';
+import { BUCKET_MAP } from '@/config/storage.config';
 
 // Schema validation
 const serviceProviderSchema = z.object({
@@ -112,7 +113,7 @@ export const ServiceProviderForm: React.FC<ServiceProviderFormProps> = ({
         }
       }
 
-      const result = await uploadToSupabase(file, 'uploads', 'providers');
+      const result = await uploadToSupabase(file, BUCKET_MAP.PROVIDERS);
       if (result) {
         form.setValue('avatar', result.url);
         toast({

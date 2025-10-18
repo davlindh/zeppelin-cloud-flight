@@ -9,6 +9,7 @@ import { Upload, Camera, CheckCircle, AlertCircle } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useToast } from '@/hooks/use-toast';
 import { CameraCapture } from '@/components/admin/CameraCapture';
+import { BUCKET_MAP } from '@/config/storage.config';
 
 interface BulkImageUploadWizardProps {
   isOpen: boolean;
@@ -79,10 +80,11 @@ export const BulkImageUploadWizard: React.FC<BulkImageUploadWizardProps> = ({
     ));
 
     try {
-      const folder = currentItem.type === 'product' ? 'products' : 
-                   currentItem.type === 'service' ? 'services' : 'auctions';
+      const bucket = currentItem.type === 'product' ? BUCKET_MAP.PRODUCTS : 
+                     currentItem.type === 'service' ? BUCKET_MAP.SERVICES : 
+                     BUCKET_MAP.AUCTIONS;
       
-      const result = await uploadToSupabase(file, 'uploads', folder);
+      const result = await uploadToSupabase(file, bucket);
       
       if (result) {
         setItemProgress(prev => prev.map(p => 

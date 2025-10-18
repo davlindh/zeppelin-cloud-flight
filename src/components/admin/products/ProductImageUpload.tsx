@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useToast } from '@/hooks/use-toast';
+import { BUCKET_MAP } from '@/config/storage.config';
 
 interface ProductImageUploadProps {
   onImageUploaded: (url: string) => void;
@@ -22,7 +23,7 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
     if (!file) return;
 
     try {
-      const result = await uploadToSupabase(file, 'uploads', 'products');
+      const result = await uploadToSupabase(file, BUCKET_MAP.PRODUCTS);
       if (result) {
         onImageUploaded(result.url);
       }

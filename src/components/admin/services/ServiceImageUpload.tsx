@@ -4,6 +4,7 @@ import { Upload, Camera } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useToast } from '@/hooks/use-toast';
 import { CameraCapture } from '@/components/admin/CameraCapture';
+import { BUCKET_MAP } from '@/config/storage.config';
 import { useState } from 'react';
 
 interface ServiceImageUploadProps {
@@ -27,7 +28,7 @@ export const ServiceImageUpload: React.FC<ServiceImageUploadProps> = ({
     if (!file) return;
 
     try {
-      const result = await uploadToSupabase(file, 'uploads', 'services');
+      const result = await uploadToSupabase(file, BUCKET_MAP.SERVICES);
       if (result) {
         onImageUploaded(result.url);
       }
@@ -85,8 +86,7 @@ export const ServiceImageUpload: React.FC<ServiceImageUploadProps> = ({
       {showCamera && (
         <CameraCapture
           onImageCapture={handleCameraCapture}
-          bucket="uploads"
-          folder="services"
+          bucket={BUCKET_MAP.SERVICES}
         />
       )}
     </>

@@ -1,10 +1,34 @@
 // Centralized storage configuration to ensure consistency
 
+/**
+ * Bucket mapping for all entity types
+ * Maps entity types to their corresponding Supabase storage buckets
+ */
+export const BUCKET_MAP = {
+  PRODUCTS: 'product-images',
+  AUCTIONS: 'auction-images',
+  SERVICES: 'service-images',
+  PROVIDERS: 'provider-avatars',
+  MEDIA: 'media-files',
+  PROJECTS: 'project-images',
+  PARTICIPANTS: 'participant-avatars',
+  SPONSORS: 'sponsor-logos',
+  UI: 'ui',
+  DOCUMENTS: 'documents',
+} as const;
+
+/**
+ * Get the appropriate bucket for an entity type
+ */
+export const getBucketForEntity = (entityType: keyof typeof BUCKET_MAP): string => {
+  return BUCKET_MAP[entityType];
+};
+
 export const STORAGE_CONFIG = {
-  // Default bucket for all uploads
-  DEFAULT_BUCKET: 'uploads' as const,
+  // Default bucket for general uploads
+  DEFAULT_BUCKET: 'media-files' as const,
   
-  // Folder structure
+  // Folder structure (deprecated - use specific buckets instead)
   FOLDERS: {
     ADMIN: 'admin',
     PRODUCTS: 'products', 
@@ -41,6 +65,7 @@ export const STORAGE_CONFIG = {
 
 /**
  * Get the appropriate folder for an entity type
+ * @deprecated Use getBucketForEntity instead - folders are no longer needed with specific buckets
  */
 export const getFolderForEntity = (entityType: 'product' | 'auction' | 'service' | 'provider' | 'admin'): string => {
   switch (entityType) {

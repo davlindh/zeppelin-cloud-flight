@@ -23,6 +23,7 @@ import { ProductImageUpload } from '@/components/admin/products/ProductImageUplo
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useDynamicCategories } from '@/hooks/useDynamicCategories';
 import { getStoragePathFromPublicUrl } from '@/utils/imageUtils';
+import { BUCKET_MAP } from '@/config/storage.config';
 import type { Product, ProductVariant } from '@/types/unified';
 
 interface ProductFormProps {
@@ -347,8 +348,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <div className="flex flex-wrap gap-2">
                   <CameraCapture
                     onImageCapture={handleCameraCapture}
-                    bucket="uploads"
-                    folder="products"
+                    bucket={BUCKET_MAP.PRODUCTS}
                     buttonText="Take Photo"
                     buttonVariant="outline"
                   />

@@ -19,6 +19,7 @@ import {
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useServiceCategories } from '@/hooks/useServiceCategories';
 import { getStoragePathFromPublicUrl } from '@/utils/imageUtils';
+import { BUCKET_MAP } from '@/config/storage.config';
 import type { Service } from '@/types/unified';
 
 interface ServiceFormProps {
@@ -106,7 +107,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     const file = event.target.files?.[0];
     if (file) {
       try {
-        const result = await uploadToSupabase(file, 'uploads', 'services');
+        const result = await uploadToSupabase(file, BUCKET_MAP.SERVICES);
         if (result) {
           if (!formData.image) {
             handleInputChange('image', result.url);
