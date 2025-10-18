@@ -56,8 +56,8 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
   } = useProducts({
     category: state.selectedCategory !== 'all' ? state.selectedCategory : undefined,
     search: state.searchTerm || undefined,
-    minPrice: state.filters.priceRange[0],
-    maxPrice: state.filters.priceRange[1],
+    minPrice: state.filters.priceRange[0] > 0 ? state.filters.priceRange[0] : undefined,
+    maxPrice: state.filters.priceRange[1] < 10000 ? state.filters.priceRange[1] : undefined,
     inStockOnly: state.filters.inStockOnly
   });
 
