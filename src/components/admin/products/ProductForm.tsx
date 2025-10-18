@@ -242,8 +242,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       // Convert categoryId back to category name for compatibility
       category: selectedCategory?.name || 'general',
       categoryId: formData.categoryId, // Include categoryId for database operations
-      // Set main image as first image if available
-      image: formData.images[0] ?? '',
+      // Set main image as first image if available, or null if no images
+      image: formData.images.length > 0 ? formData.images[0] : null,
       // Calculate if in stock based on variants
       inStock: formData.variants.some(v => v.stock > 0),
       // Set default values
