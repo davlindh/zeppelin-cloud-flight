@@ -49,8 +49,8 @@ export const useProductMutations = () => {
         product_brand: productData.brand,
         features: productData.features ?? [],
         tags: productData.tags ?? [],
-        images: productData.images ?? [],
-        image: productData.image ?? (productData.images?.[0] ? productData.images[0] : ''),
+        images: Array.isArray(productData.images) ? productData.images : [],
+        image: productData.image || productData.images?.[0] || null,
         stock_quantity: totalStock,
         in_stock: totalStock > 0,
         rating: 0,
@@ -60,6 +60,11 @@ export const useProductMutations = () => {
       };
 
       console.log('🔄 Creating product with data:', dbData);
+      console.log('📸 Image data being saved:', {
+        image: dbData.image,
+        images: dbData.images,
+        images_count: dbData.images.length
+      });
 
       const { data, error } = await supabase
         .from('products')
@@ -146,14 +151,19 @@ export const useProductMutations = () => {
         product_brand: productData.brand,
         features: productData.features ?? [],
         tags: productData.tags ?? [],
-        images: productData.images ?? [],
-        image: productData.image ?? (productData.images?.[0] ? productData.images[0] : ''),
+        images: Array.isArray(productData.images) ? productData.images : [],
+        image: productData.image || productData.images?.[0] || null,
         stock_quantity: totalStock,
         in_stock: totalStock > 0,
         updated_at: new Date().toISOString()
       };
 
       console.log('🔄 Updating product:', productData.id, 'with data:', dbData);
+      console.log('📸 Image data being saved:', {
+        image: dbData.image,
+        images: dbData.images,
+        images_count: dbData.images.length
+      });
 
       const { data, error } = await supabase
         .from('products')

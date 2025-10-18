@@ -171,16 +171,28 @@ export const useImageUpload = () => {
         file: optimizedFile,
       };
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('❌ Upload error details:', {
+        error,
+        bucket,
+        folder,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Upload failed';
+      
       setUploadProgress({ 
         progress: 0, 
         isUploading: false, 
-        error: error instanceof Error ? error.message : 'Upload failed' 
+        error: errorMessage 
       });
       
       toast({
         title: "Upload Failed",
-        description: "Failed to upload image. Please try again.",
+        description: `${errorMessage}. Please check bucket permissions.`,
         variant: "destructive",
       });
       

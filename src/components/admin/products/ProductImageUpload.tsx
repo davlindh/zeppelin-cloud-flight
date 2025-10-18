@@ -39,16 +39,30 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
 
   return (
     <>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={disabled || uploadProgress.isUploading}
-        className="flex items-center gap-2"
-      >
-        <Upload className="h-4 w-4" />
-        {uploadProgress.isUploading ? 'Uploading...' : 'Upload Image'}
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={disabled || uploadProgress.isUploading}
+          className="flex items-center gap-2"
+        >
+          <Upload className="h-4 w-4" />
+          {uploadProgress.isUploading ? 'Uploading...' : 'Upload Image'}
+        </Button>
+        
+        {uploadProgress.isUploading && (
+          <div className="text-xs text-muted-foreground">
+            Uploading: {uploadProgress.progress}%
+          </div>
+        )}
+        
+        {uploadProgress.error && (
+          <div className="text-xs text-destructive">
+            {uploadProgress.error}
+          </div>
+        )}
+      </div>
       
       <input
         ref={fileInputRef}
