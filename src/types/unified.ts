@@ -41,6 +41,7 @@ export interface BidHistory {
 
 export interface Auction extends BaseEntity {
   title: string;
+  description?: string;
   currentBid: number;
   startingBid: number;
   endTime: Date;

@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -165,9 +166,10 @@ const AuctionForm: React.FC<AuctionFormProps> = ({
     const auctionData: Partial<Auction> = {
       ...(mode === 'edit' && auction ? { id: auction.id } : {}),
       title: formData.title,
+      description: formData.description,
       startingBid: Number(formData.starting_bid),
       endTime: new Date(formData.end_time),
-      category: formData.category_name ?? formData.category,
+      category: formData.category,
       condition: formData.condition,
       image: formData.image || formData.images[0] || '',
       ...(formData.images.length > 0 && { images: formData.images })
@@ -231,6 +233,18 @@ const AuctionForm: React.FC<AuctionFormProps> = ({
                   className={errors.title ? 'border-red-500' : ''}
                 />
                 {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Description (Optional)</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe the item in detail..."
+                  rows={4}
+                />
               </div>
 
               {/* Starting Bid and Category */}
