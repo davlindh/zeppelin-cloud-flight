@@ -15,6 +15,7 @@ import { usePresenceCount } from '@/hooks/marketplace/usePresenceCount';
 import { calculateAuctionAnalytics } from '@/utils/marketplace/auctionUtils';
 import { Badge } from '@/components/ui/badge';
 import { featureConfig } from '@/config/features.config';
+import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
 
 const AuctionDetail = () => {
   const { id } = useParams();
@@ -23,6 +24,16 @@ const AuctionDetail = () => {
   const { data: auction, isLoading, error } = useAuctionDetail(idOrSlug);
   const { isEnded } = useCountdown(auction?.endTime ?? new Date());
   const { watchersCount, isConnected } = usePresenceCount(auction?.id || '', 'auction');
+
+  // Centralized view tracking
+  const { recordView } = useSocialProof(auction?.id ?? '', 'auction');
+  
+  // Record view once when auction loads
+  React.useEffect(() => {
+    if (auction) {
+      recordView();
+    }
+  }, [auction?.id, recordView]);
 
   // Calculate auction analytics when auction data is available
   const analytics = React.useMemo(() => {

@@ -13,6 +13,8 @@ import { ServiceLoading } from '@/components/marketplace/ui/service-loading';
 import { ServiceError } from '@/components/marketplace/ui/service-error';
 
 import { useService } from '@/hooks/marketplace/useService';
+import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
+import React from 'react';
 
 const ServiceDetail = () => {
   const { id } = useParams();
@@ -25,6 +27,16 @@ const ServiceDetail = () => {
     error, 
     refetch 
   } = useService(id ?? '');
+
+  // Centralized view tracking
+  const { recordView } = useSocialProof(id ?? '', 'service');
+  
+  // Record view once when service loads
+  React.useEffect(() => {
+    if (service) {
+      recordView();
+    }
+  }, [service?.id, recordView]);
 
   const handleGoHome = (): void => {
     navigate('/services');

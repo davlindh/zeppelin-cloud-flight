@@ -26,12 +26,7 @@ export const EnhancedDateTimeSelection: React.FC<EnhancedDateTimeSelectionProps>
   onTimeChange,
   errors
 }) => {
-  const { views, recordView, getActivityMessage } = useSocialProof(serviceId, 'service');
-
-  // Record view when component mounts
-  React.useEffect(() => {
-    recordView();
-  }, [recordView]);
+  const { views, getActivityMessage } = useSocialProof(serviceId, 'service');
 
   // Show validation errors if any
   React.useEffect(() => {

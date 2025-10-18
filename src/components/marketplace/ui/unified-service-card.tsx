@@ -64,13 +64,8 @@ export const UnifiedServiceCard: React.FC<UnifiedServiceCardProps> = ({
   const isTopRated = providerRating >= 4.8;
   const isFastResponse = responseTime.includes('hour') || responseTime.includes('minute');
 
-  // Social proof hook
-  const { views, recordView, getActivityMessage } = useSocialProof(id, 'service');
-
-  // Record view when card is rendered
-  React.useEffect(() => {
-    recordView();
-  }, []);
+  // Social proof hook (display only - view recording happens on detail page)
+  const { views, getActivityMessage } = useSocialProof(id, 'service');
 
   // Size-aware styling
   const sizeClasses = {

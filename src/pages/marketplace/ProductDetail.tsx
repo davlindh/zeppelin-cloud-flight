@@ -22,6 +22,7 @@ import { LightboxModal } from '@/components/marketplace/ui/lightbox-modal';
 import { usePresenceCount } from '@/hooks/marketplace/usePresenceCount';
 import { RelatedProducts } from '@/components/marketplace/shop/RelatedProducts';
 import { RecentlyViewedProducts } from '@/components/marketplace/shop/RecentlyViewedProducts';
+import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -45,12 +46,16 @@ const ProductDetail = () => {
   const { data: variants = [] } = useProductVariants(id ?? '');
   const { watchersCount, isConnected } = usePresenceCount(id || '', 'product');
 
+  // Centralized view tracking
+  const { recordView } = useSocialProof(id ?? '', 'product');
+
   // Add to recently viewed when product loads
   useEffect(() => {
     if (product) {
       addToRecentlyViewed(product);
+      recordView();
     }
-  }, [product, addToRecentlyViewed]);
+  }, [product?.id, addToRecentlyViewed, recordView]);
 
   // Memoized values - called after all other hooks
   const availableOptions = useMemo(() => {
