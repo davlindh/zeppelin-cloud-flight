@@ -62,49 +62,90 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
   const { data: media = [], isLoading, error } = useQuery({
     queryKey: ['unified-media', filters],
     queryFn: async () => {
-      // Handle project/participant filtering through link tables
+      // Handle project filtering (both direct and via links)
       if (filters.project_id) {
+        // Get media linked via media_project_links
         const { data: links } = await supabase
           .from('media_project_links')
           .select('media_id')
           .eq('project_id', filters.project_id);
         
-        if (!links || links.length === 0) return [];
+        const linkedMediaIds = links?.map(link => link.media_id) || [];
         
-        const mediaIds = links.map(link => link.media_id);
-        let query = supabase
+        // Get media with direct project_id
+        let directQuery = supabase
           .from('media_library')
           .select('*')
-          .in('id', mediaIds)
-          .order('created_at', { ascending: false });
+          .eq('project_id', filters.project_id);
         
-        query = applyFilters(query);
+        directQuery = applyFilters(directQuery);
+        const { data: directMedia, error: directError } = await directQuery;
+        if (directError) throw directError;
         
-        const { data, error } = await query;
-        if (error) throw error;
-        return data as MediaLibraryItem[];
+        // Get media via links if any exist
+        let linkedMedia: MediaLibraryItem[] = [];
+        if (linkedMediaIds.length > 0) {
+          let linkedQuery = supabase
+            .from('media_library')
+            .select('*')
+            .in('id', linkedMediaIds);
+          
+          linkedQuery = applyFilters(linkedQuery);
+          const { data, error } = await linkedQuery;
+          if (error) throw error;
+          linkedMedia = data as MediaLibraryItem[];
+        }
+        
+        // Combine and deduplicate by id
+        const allMedia = [...(directMedia || []), ...linkedMedia];
+        const uniqueMedia = Array.from(
+          new Map(allMedia.map(item => [item.id, item])).values()
+        ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        
+        return uniqueMedia;
       }
       
+      // Handle participant filtering (both direct and via links)
       if (filters.participant_id) {
+        // Get media linked via media_participant_links
         const { data: links } = await supabase
           .from('media_participant_links')
           .select('media_id')
           .eq('participant_id', filters.participant_id);
         
-        if (!links || links.length === 0) return [];
+        const linkedMediaIds = links?.map(link => link.media_id) || [];
         
-        const mediaIds = links.map(link => link.media_id);
-        let query = supabase
+        // Get media with direct participant_id
+        let directQuery = supabase
           .from('media_library')
           .select('*')
-          .in('id', mediaIds)
-          .order('created_at', { ascending: false });
+          .eq('participant_id', filters.participant_id);
         
-        query = applyFilters(query);
+        directQuery = applyFilters(directQuery);
+        const { data: directMedia, error: directError } = await directQuery;
+        if (directError) throw directError;
         
-        const { data, error } = await query;
-        if (error) throw error;
-        return data as MediaLibraryItem[];
+        // Get media via links if any exist
+        let linkedMedia: MediaLibraryItem[] = [];
+        if (linkedMediaIds.length > 0) {
+          let linkedQuery = supabase
+            .from('media_library')
+            .select('*')
+            .in('id', linkedMediaIds);
+          
+          linkedQuery = applyFilters(linkedQuery);
+          const { data, error } = await linkedQuery;
+          if (error) throw error;
+          linkedMedia = data as MediaLibraryItem[];
+        }
+        
+        // Combine and deduplicate by id
+        const allMedia = [...(directMedia || []), ...linkedMedia];
+        const uniqueMedia = Array.from(
+          new Map(allMedia.map(item => [item.id, item])).values()
+        ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        
+        return uniqueMedia;
       }
       
       // Default query without project/participant filtering
