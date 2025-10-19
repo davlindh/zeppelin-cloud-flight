@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { EditPageLayout } from '@/components/admin/EditPageLayout';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
-import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { supabase } from '@/integrations/supabase/client';
 import { useCanEditParticipant } from '@/hooks/useCanEditParticipant';
 import { useClaimableParticipant } from '@/hooks/useClaimableParticipant';
 import { ClaimProfileBanner } from '@/components/participants/ClaimProfileBanner';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, User, Award, Mail, Image as ImageIcon, Briefcase, Settings } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AdminFormSections, FormSection } from '@/components/admin/AdminFormSections';
+import { ParticipantMediaEditor, VisibilitySettings } from '@/components/admin/editors';
 
 export const ParticipantEditPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -128,37 +130,84 @@ export const ParticipantEditPage: React.FC = () => {
     );
   }
 
+  // Fetch full participant data for settings
+  const [participantData, setParticipantData] = useState<any>(null);
+  
+  useEffect(() => {
+    const fetchParticipant = async () => {
+      if (!participantId) return;
+      const { data } = await supabase
+        .from('participants')
+        .select('*')
+        .eq('id', participantId)
+        .single();
+      setParticipantData(data);
+    };
+    fetchParticipant();
+  }, [participantId]);
+
   // Show edit form if user has permission
   return (
     <EditPageLayout entityType="participant" title="Redigera deltagare">
-      <div className="space-y-8">
-        {/* Main participant form */}
-        {participantId && (
-          <div className="max-w-none">
-            <AdminFormFactory
-              entityType="participant"
-              entityId={participantId}
-              onClose={() => window.history.back()}
-              onSuccess={() => window.history.back()}
-            />
-          </div>
-        )}
+      {participantId && (
+        <Tabs defaultValue="basic" className="w-full">
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="basic">Basinformation</TabsTrigger>
+            <TabsTrigger value="media">Media & Portfolio</TabsTrigger>
+            <TabsTrigger value="projects">Projekt</TabsTrigger>
+            <TabsTrigger value="settings">Inställningar</TabsTrigger>
+          </TabsList>
 
-        {/* Participant media management */}
-        {participantId && (
-          <div className="max-w-none">
-            <UnifiedMediaManager
-              entityType="participant"
-              entityId={participantId}
-              entityName={participantName}
-              mode="admin"
-              showUpload
-              showLinking
-              showFilters
+          <TabsContent value="basic" className="mt-6">
+            <AdminFormSections>
+              <FormSection 
+                title="Personlig information" 
+                description="Grundläggande information om deltagaren"
+                icon={User}
+                defaultOpen={true}
+              >
+                <AdminFormFactory
+                  entityType="participant"
+                  entityId={participantId}
+                  onClose={() => window.history.back()}
+                  onSuccess={() => window.history.back()}
+                />
+              </FormSection>
+            </AdminFormSections>
+          </TabsContent>
+
+          <TabsContent value="media" className="mt-6">
+            <ParticipantMediaEditor 
+              participantId={participantId}
+              participantName={participantName}
             />
-          </div>
-        )}
-      </div>
+          </TabsContent>
+
+          <TabsContent value="projects" className="mt-6">
+            <div className="rounded-lg border p-8 text-center">
+              <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Projekthantering</h3>
+              <p className="text-muted-foreground">
+                Projektlänkning för deltagare kommer snart
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-6">
+            {participantData && (
+              <VisibilitySettings
+                entityType="participant"
+                entityId={participantId}
+                currentSettings={{
+                  is_public: participantData.is_public,
+                  is_featured: participantData.is_featured,
+                  show_contact_info: participantData.show_contact_info,
+                }}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
     </EditPageLayout>
   );
 };
