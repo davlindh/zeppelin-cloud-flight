@@ -39,6 +39,8 @@ interface MediaUploadDialogProps {
   acceptedTypes?: string[];
   maxFiles?: number;
   maxSizeMB?: number;
+  entityType?: 'project' | 'participant' | 'sponsor';
+  entityId?: string;
 }
 
 export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
@@ -49,6 +51,8 @@ export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
   acceptedTypes = ['image/*', 'video/*', 'audio/*', 'application/pdf'],
   maxFiles = 10,
   maxSizeMB = 50,
+  entityType,
+  entityId,
 }) => {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);

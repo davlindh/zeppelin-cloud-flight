@@ -11,6 +11,7 @@ interface MediaItem {
   description?: string;
   url: string;
   thumbnail?: string;
+  isLegacy?: boolean;
 }
 
 interface MediaGridProps {

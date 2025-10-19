@@ -59,9 +59,9 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
   };
 
   // Fetch media items
-  const { data: media = [], isLoading, error } = useQuery({
+  const { data: media = [], isLoading, error } = useQuery<MediaLibraryItem[]>({
     queryKey: ['unified-media', filters],
-    queryFn: async () => {
+    queryFn: async (): Promise<MediaLibraryItem[]> => {
       // Handle project filtering (both direct and via links)
       if (filters.project_id) {
         // Get media linked via media_project_links
@@ -102,7 +102,53 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
           new Map(allMedia.map(item => [item.id, item])).values()
         ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         
-        return uniqueMedia;
+        // FALLBACK: Fetch from OLD project_media table
+        const { data: legacyMedia } = await supabase
+          .from('project_media')
+          .select('*')
+          .eq('project_id', filters.project_id);
+        
+        // Transform legacy media to MediaLibraryItem format
+        const transformedLegacy: MediaLibraryItem[] = (legacyMedia || []).map(pm => ({
+          id: `legacy-${pm.id}`,
+          type: pm.type as MediaLibraryItem['type'],
+          title: pm.title,
+          description: pm.description || null,
+          filename: pm.url.split('/').pop() || pm.title,
+          original_filename: pm.title,
+          public_url: pm.url,
+          storage_path: pm.url,
+          thumbnail_url: pm.thumbnail_url,
+          mime_type: pm.type === 'video' ? 'video/mp4' : pm.type === 'image' ? 'image/jpeg' : 'application/octet-stream',
+          status: 'approved' as MediaLibraryItem['status'],
+          source: 'legacy_project_media' as MediaLibraryItem['source'],
+          bucket: 'media-files',
+          is_public: true,
+          is_featured: false,
+          uploaded_at: pm.created_at,
+          approved_at: pm.created_at,
+          created_at: pm.created_at,
+          updated_at: pm.created_at,
+          project_id: pm.project_id,
+          participant_id: null,
+          submission_id: null,
+          uploaded_by: null,
+          tags: [],
+          category: null,
+          file_size: null,
+          width: null,
+          height: null,
+          duration: null,
+          is_legacy: true,
+        }));
+        
+        // Merge with new media and deduplicate by public_url
+        const allMediaWithLegacy = [...uniqueMedia, ...transformedLegacy];
+        const deduplicatedMedia = Array.from(
+          new Map(allMediaWithLegacy.map(item => [item.public_url, item])).values()
+        ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as MediaLibraryItem[];
+        
+        return deduplicatedMedia;
       }
       
       // Handle participant filtering (both direct and via links)
@@ -145,7 +191,53 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
           new Map(allMedia.map(item => [item.id, item])).values()
         ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         
-        return uniqueMedia;
+        // FALLBACK: Fetch from OLD participant_media table
+        const { data: legacyMedia } = await supabase
+          .from('participant_media')
+          .select('*')
+          .eq('participant_id', filters.participant_id);
+        
+        // Transform legacy media to MediaLibraryItem format
+        const transformedLegacy: MediaLibraryItem[] = (legacyMedia || []).map(pm => ({
+          id: `legacy-${pm.id}`,
+          type: pm.type as MediaLibraryItem['type'],
+          title: pm.title,
+          description: pm.description || null,
+          filename: pm.url.split('/').pop() || pm.title,
+          original_filename: pm.title,
+          public_url: pm.url,
+          storage_path: pm.url,
+          thumbnail_url: pm.thumbnail_url,
+          mime_type: pm.type === 'video' ? 'video/mp4' : pm.type === 'image' ? 'image/jpeg' : 'application/octet-stream',
+          status: 'approved' as MediaLibraryItem['status'],
+          source: 'legacy_participant_media' as MediaLibraryItem['source'],
+          bucket: 'media-files',
+          is_public: true,
+          is_featured: false,
+          uploaded_at: pm.created_at,
+          approved_at: pm.created_at,
+          created_at: pm.created_at,
+          updated_at: pm.created_at,
+          project_id: null,
+          participant_id: pm.participant_id,
+          submission_id: null,
+          uploaded_by: null,
+          tags: [],
+          category: pm.category,
+          file_size: null,
+          width: null,
+          height: null,
+          duration: null,
+          is_legacy: true,
+        }));
+        
+        // Merge with new media and deduplicate by public_url
+        const allMediaWithLegacy = [...uniqueMedia, ...transformedLegacy];
+        const deduplicatedMedia = Array.from(
+          new Map(allMediaWithLegacy.map(item => [item.public_url, item])).values()
+        ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as MediaLibraryItem[];
+        
+        return deduplicatedMedia;
       }
       
       // Default query without project/participant filtering
@@ -224,6 +316,7 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
       public: media.filter(item => item.is_public).length,
       private: media.filter(item => !item.is_public).length,
       featured: media.filter(item => item.is_featured).length,
+      legacy: media.filter(item => item.is_legacy === true).length,
     };
   }, [media, selectedItems.length]);
 

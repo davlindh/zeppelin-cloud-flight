@@ -6,6 +6,7 @@ import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
 import { useUnifiedMedia } from '@/hooks/useUnifiedMedia';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,6 +23,10 @@ import {
   List
 } from 'lucide-react';
 import type { UnifiedMediaItem, MediaFilters } from '@/types/unified-media';
+import type { MediaLibraryItem } from '@/types/mediaLibrary';
+import { uploadMultipleToMediaLibrary } from '@/utils/mediaUpload';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface UnifiedMediaManagerProps {
@@ -53,6 +58,8 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
   showFilters = mode === 'admin',
 }) => {
   const { isAdmin } = useAdminAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showLinkManager, setShowLinkManager] = useState(false);
   const [selectedMediaIds, setSelectedMediaIds] = useState<string[]>([]);
@@ -117,6 +124,68 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
 
   const clearSelection = () => {
     setSelectedMediaIds([]);
+  };
+
+  // Handle upload with auto-linking
+  const handleUpload = async (files: any[]) => {
+    try {
+      const uploadOptions: any = {
+        autoApprove: true,
+      };
+
+      // Add entity ID to upload options
+      if (entityType === 'project' && entityId) {
+        uploadOptions.projectId = entityId;
+      } else if (entityType === 'participant' && entityId) {
+        uploadOptions.participantId = entityId;
+      }
+
+      // Upload files
+      const { success, failed } = await uploadMultipleToMediaLibrary(
+        files.map(f => f.file),
+        uploadOptions
+      );
+
+      // Create links in link tables
+      if (success.length > 0 && entityType !== 'global' && entityId) {
+        const linkData = success.map(media => ({
+          media_id: media.id,
+          [`${entityType}_id`]: entityId,
+        }));
+
+        let linkError = null;
+        if (entityType === 'project') {
+          const { error } = await supabase.from('media_project_links').upsert(linkData as any);
+          linkError = error;
+        } else if (entityType === 'participant') {
+          const { error } = await supabase.from('media_participant_links').upsert(linkData as any);
+          linkError = error;
+        } else if (entityType === 'sponsor') {
+          const { error } = await supabase.from('media_sponsor_links').upsert(linkData as any);
+          linkError = error;
+        }
+
+        if (linkError) {
+          console.error('Failed to create links:', linkError);
+        }
+      }
+
+      // Refetch media
+      queryClient.invalidateQueries({ queryKey: ['unified-media'] });
+
+      // Show success message
+      toast({
+        title: 'Uppladdning klar',
+        description: `${success.length} fil(er) uppladdade${failed.length > 0 ? `, ${failed.length} misslyckades` : ''}`,
+      });
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast({
+        title: 'Uppladdning misslyckades',
+        description: error instanceof Error ? error.message : 'Ett fel uppstod',
+        variant: 'destructive',
+      });
+    }
   };
 
   // Convert to UnifiedMediaItem format
@@ -271,7 +340,8 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
               <MediaGrid
                 media={tabFilteredMedia.map(item => ({
                   ...item,
-                  type: item.type as 'image' | 'video' | 'audio' | 'document'
+                  type: item.type as 'image' | 'video' | 'audio' | 'document',
+                  isLegacy: (media.find(m => m.id === item.id) as MediaLibraryItem)?.is_legacy
                 }))}
                 viewMode={viewMode}
               />
@@ -301,8 +371,12 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
         <MediaUploadDialog
           open={showUploadDialog}
           onOpenChange={setShowUploadDialog}
+          entityType={entityType !== 'global' ? entityType : undefined}
+          entityId={entityId}
+          onUpload={handleUpload}
           onUploadComplete={() => {
             setShowUploadDialog(false);
+            queryClient.invalidateQueries({ queryKey: ['unified-media'] });
           }}
         />
       )}

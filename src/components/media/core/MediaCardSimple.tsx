@@ -25,6 +25,7 @@ interface MediaCardProps {
   showContext?: boolean;
   projectLinks?: Array<{ id: string; title: string; slug: string }>;
   participantLinks?: Array<{ id: string; name: string; slug: string }>;
+  isLegacy?: boolean;
 }
 
 export const MediaCardSimple: React.FC<MediaCardProps> = ({
@@ -44,6 +45,7 @@ export const MediaCardSimple: React.FC<MediaCardProps> = ({
   showContext = false,
   projectLinks = [],
   participantLinks = [],
+  isLegacy = false,
 }) => {
   const isPlayable = isPlayableMedia(type);
   const navigate = useNavigate();
@@ -68,13 +70,20 @@ export const MediaCardSimple: React.FC<MediaCardProps> = ({
               )}
             </div>
 
-            <Badge
-              variant="outline"
-              className={cn("flex-shrink-0", getMediaTypeColor(type))}
-            >
-              {getMediaIcon(type, 'w-3 h-3')}
-              <span className="ml-1 text-xs uppercase">{type}</span>
-            </Badge>
+            <div className="flex gap-2">
+              {isLegacy && (
+                <Badge variant="secondary" className="flex-shrink-0 text-xs">
+                  Legacy
+                </Badge>
+              )}
+              <Badge
+                variant="outline"
+                className={cn("flex-shrink-0", getMediaTypeColor(type))}
+              >
+                {getMediaIcon(type, 'w-3 h-3')}
+                <span className="ml-1 text-xs uppercase">{type}</span>
+              </Badge>
+            </div>
           </div>
 
           {/* Preview */}

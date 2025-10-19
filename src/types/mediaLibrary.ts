@@ -50,6 +50,9 @@ export interface MediaLibraryItem {
   approved_at: string | null;
   created_at: string;
   updated_at: string;
+  
+  // Legacy flag for old media tables
+  is_legacy?: boolean;
 }
 
 export interface MediaFilters {
