@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
 import { format } from 'date-fns';
-import { RichMediaPreview } from '@/components/media/RichMediaPreview';
+import { RichMediaPreview } from '@/components/media/core/RichMediaPreview';
 import { formatFileSize } from '@/utils/formatFileSize';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,6 +34,8 @@ interface MediaPreviewPanelProps {
   onOpenChange: (open: boolean) => void;
   onUpdate?: (id: string, updates: Partial<MediaLibraryItem>) => void;
   onDelete?: (id: string) => void;
+  onApprove?: (id: string) => void;
+  onReject?: (id: string) => void;
   editable?: boolean;
 }
 
@@ -57,6 +59,8 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
   onOpenChange,
   onUpdate,
   onDelete,
+  onApprove,
+  onReject,
   editable = false,
 }) => {
   const [editedTitle, setEditedTitle] = React.useState('');
@@ -109,15 +113,25 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {item.status === 'pending' && editable && onApprove && (
+              <Button variant="default" size="sm" onClick={() => onApprove(item.id)}>
+                Godkänn
+              </Button>
+            )}
+            {item.status === 'pending' && editable && onReject && (
+              <Button variant="outline" size="sm" onClick={() => onReject(item.id)}>
+                Avvisa
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={handleDownload}>
               <Download className="h-4 w-4 mr-2" />
-              Download
+              Ladda ner
             </Button>
             <Button variant="outline" size="sm" asChild>
               <a href={item.public_url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Open
+                Öppna
               </a>
             </Button>
             {editable && onDelete && (
@@ -127,7 +141,7 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
                 onClick={() => onDelete(item.id)}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                Ta bort
               </Button>
             )}
           </div>

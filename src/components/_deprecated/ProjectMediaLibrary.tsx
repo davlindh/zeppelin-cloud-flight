@@ -7,7 +7,7 @@ import { Upload, Eye, Trash2, FileText, Filter, SortDesc } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { MediaGallery } from '@/components/multimedia/MediaGallery';
+import { MediaGallery } from '@/components/media/core/MediaGallery';
 import { FilterSystem, FilterBar, FilterResults, createSearchFilter, createMultiSelectFilter, createSingleSelectFilter, FilterConfig, useFilterSystem } from '@/components/common/FilterSystem';
 import { FilterOption } from '@/components/common/FilterComponents';
 
@@ -135,7 +135,7 @@ export const ProjectMediaLibrary: React.FC<ProjectMediaLibraryProps> = ({
   const [newMediaDescription, setNewMediaDescription] = useState('');
 
   const fileUpload = useFileUpload({
-    bucketName: 'project-media',
+    bucketName: 'media-files',
     maxSizeMB: 50,
     allowedTypes: ['image/*', 'video/*', 'audio/*', 'application/*']
   });
@@ -144,25 +144,42 @@ export const ProjectMediaLibrary: React.FC<ProjectMediaLibraryProps> = ({
     if (!projectId) return;
 
     try {
+      // Get media IDs linked to this project
+      const { data: links, error: linksError } = await supabase
+        .from('media_project_links')
+        .select('media_id')
+        .eq('project_id', projectId);
+
+      if (linksError) throw linksError;
+      if (!links || links.length === 0) {
+        setMediaItems([]);
+        return;
+      }
+
+      const mediaIds = links.map(link => link.media_id);
+
+      // Fetch media from media_library
       const { data, error } = await supabase
-        .from('project_media')
+        .from('media_library')
         .select('*')
-        .eq('project_id', projectId)
+        .in('id', mediaIds)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       const media = data.map(item => ({
         id: item.id,
-        project_id: item.project_id,
-        type: item.type,
-        url: item.url,
+        project_id: projectId,
+        type: item.type as 'image' | 'video' | 'document' | 'audio',
+        url: item.public_url,
         title: item.title || 'Untitled',
         description: item.description,
+        created_at: item.created_at
       } as ProjectMedia));
 
       setMediaItems(media);
     } catch (error) {
+      console.error('Error loading project media:', error);
       toast({
         title: 'Error loading media',
         description: 'Failed to load project media.',
@@ -181,32 +198,56 @@ export const ProjectMediaLibrary: React.FC<ProjectMediaLibraryProps> = ({
 
     setIsUploading(true);
     try {
+      console.log('Starting upload:', file.name, file.type);
       const { url } = await fileUpload.uploadFile(file);
+      console.log('File uploaded to:', url);
 
-      const { data, error } = await supabase
-        .from('project_media')
+      // Insert into media_library
+      const { data: mediaData, error: mediaError } = await supabase
+        .from('media_library')
         .insert([{
-          project_id: projectId,
           type: getMediaType(file.type),
-          url,
+          filename: file.name,
+          original_filename: file.name,
           title: newMediaTitle || file.name,
-          description: newMediaDescription
+          description: newMediaDescription,
+          public_url: url,
+          storage_path: url,
+          mime_type: file.type,
+          file_size: file.size,
+          bucket: 'media-files',
+          source: 'admin_upload',
+          status: 'approved',
+          is_public: true
         }])
         .select()
         .single();
 
-      if (error) throw error;
+      if (mediaError) throw mediaError;
+      console.log('Media created in library:', mediaData);
+
+      // Link to project
+      const { error: linkError } = await supabase
+        .from('media_project_links')
+        .insert([{
+          media_id: mediaData.id,
+          project_id: projectId
+        }]);
+
+      if (linkError) throw linkError;
+      console.log('Media linked to project');
 
       toast({ title: 'Media uploaded successfully' });
-      loadProjectMedia(); // Refresh the media list
+      loadProjectMedia();
 
       setNewMediaTitle('');
       setNewMediaDescription('');
       e.target.value = '';
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: 'Upload failed',
-        description: 'Failed to upload media file.',
+        description: error instanceof Error ? error.message : 'Failed to upload media file.',
         variant: 'destructive'
       });
     } finally {
@@ -216,19 +257,22 @@ export const ProjectMediaLibrary: React.FC<ProjectMediaLibraryProps> = ({
 
   const handleDeleteMedia = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('project_media')
+      // Delete link first
+      const { error: linkError } = await supabase
+        .from('media_project_links')
         .delete()
-        .eq('id', id);
+        .eq('media_id', id)
+        .eq('project_id', projectId);
 
-      if (error) throw error;
+      if (linkError) throw linkError;
 
-      toast({ title: 'Media deleted' });
+      toast({ title: 'Media unlinked from project' });
       loadProjectMedia();
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         title: 'Delete failed',
-        description: 'Failed to delete media file.',
+        description: 'Failed to unlink media file.',
         variant: 'destructive'
       });
     }

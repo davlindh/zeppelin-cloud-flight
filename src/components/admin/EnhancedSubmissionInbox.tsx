@@ -34,7 +34,7 @@ import { useSubmissionData } from './submission-inbox/hooks/useSubmissionData';
 import { useSubmissionActions } from './submission-inbox/hooks/useSubmissionActions';
 import { SubmissionEditModal } from './SubmissionEditModal';
 import { ConversionModal } from './ConversionModal';
-import { MediaGallery } from '@/components/multimedia/MediaGallery';
+import { MediaGallery } from '@/components/media/core/MediaGallery';
 import { cn } from '@/lib/utils';
 import type { EnhancedSubmission } from './submission-inbox/hooks/useSubmissionData';
 

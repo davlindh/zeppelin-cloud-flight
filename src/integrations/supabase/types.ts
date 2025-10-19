@@ -510,6 +510,13 @@ export type Database = {
             referencedRelation: "media_library"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "media_audit_log_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_migration_status"
+            referencedColumns: ["ml_id"]
+          },
         ]
       }
       media_items: {
@@ -701,6 +708,264 @@ export type Database = {
             columns: ["submission_id"]
             isOneToOne: false
             referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_library_backup_20251018: {
+        Row: {
+          approved_at: string | null
+          bucket: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          duration: number | null
+          file_size: number | null
+          filename: string | null
+          height: number | null
+          id: string | null
+          is_featured: boolean | null
+          is_public: boolean | null
+          mime_type: string | null
+          original_filename: string | null
+          participant_id: string | null
+          project_id: string | null
+          public_url: string | null
+          search_vector: unknown | null
+          source: string | null
+          status: string | null
+          storage_path: string | null
+          submission_id: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string | null
+          type: string | null
+          updated_at: string | null
+          uploaded_at: string | null
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          approved_at?: string | null
+          bucket?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          filename?: string | null
+          height?: number | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          mime_type?: string | null
+          original_filename?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          public_url?: string | null
+          search_vector?: unknown | null
+          source?: string | null
+          status?: string | null
+          storage_path?: string | null
+          submission_id?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          approved_at?: string | null
+          bucket?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          filename?: string | null
+          height?: number | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          mime_type?: string | null
+          original_filename?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          public_url?: string | null
+          search_vector?: unknown | null
+          source?: string | null
+          status?: string | null
+          storage_path?: string | null
+          submission_id?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Relationships: []
+      }
+      media_participant_links: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          display_order: number | null
+          id: string
+          media_id: string
+          participant_id: string
+          updated_at: string | null
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          media_id: string
+          participant_id: string
+          updated_at?: string | null
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          media_id?: string
+          participant_id?: string
+          updated_at?: string | null
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_participant_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_participant_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_migration_status"
+            referencedColumns: ["ml_id"]
+          },
+          {
+            foreignKeyName: "media_participant_links_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_project_links: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          id: string
+          media_id: string
+          project_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          media_id: string
+          project_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          media_id?: string
+          project_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_project_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_project_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_migration_status"
+            referencedColumns: ["ml_id"]
+          },
+          {
+            foreignKeyName: "media_project_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_sponsor_links: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_primary: boolean | null
+          media_id: string
+          media_type: string | null
+          sponsor_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_primary?: boolean | null
+          media_id: string
+          media_type?: string | null
+          sponsor_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_primary?: boolean | null
+          media_id?: string
+          media_type?: string | null
+          sponsor_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_sponsor_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_sponsor_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_migration_status"
+            referencedColumns: ["ml_id"]
+          },
+          {
+            foreignKeyName: "media_sponsor_links_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
             referencedColumns: ["id"]
           },
         ]
@@ -1062,6 +1327,45 @@ export type Database = {
           },
         ]
       }
+      participant_media_backup_20251018: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          participant_id: string | null
+          thumbnail_url: string | null
+          title: string | null
+          type: string | null
+          url: string | null
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          participant_id?: string | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string | null
+          url?: string | null
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          participant_id?: string | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string | null
+          url?: string | null
+          year?: string | null
+        }
+        Relationships: []
+      }
       participant_media_links: {
         Row: {
           created_at: string | null
@@ -1088,6 +1392,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "media_library"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participant_media_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_migration_status"
+            referencedColumns: ["ml_id"]
           },
           {
             foreignKeyName: "participant_media_links_participant_id_fkey"
@@ -1558,6 +1869,39 @@ export type Database = {
           },
         ]
       }
+      project_media_backup_20251018: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          project_id: string | null
+          thumbnail_url: string | null
+          title: string | null
+          type: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          project_id?: string | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          project_id?: string | null
+          thumbnail_url?: string | null
+          title?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       project_media_links: {
         Row: {
           created_at: string | null
@@ -1584,6 +1928,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "media_library"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_media_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_migration_status"
+            referencedColumns: ["ml_id"]
           },
           {
             foreignKeyName: "project_media_links_project_id_fkey"
@@ -2343,7 +2694,32 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      media_migration_status: {
+        Row: {
+          ml_id: string | null
+          ml_project_id: string | null
+          pm_id: string | null
+          pm_project_id: string | null
+          public_url: string | null
+          status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_library_project_id_fkey"
+            columns: ["ml_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_media_project_id_fkey"
+            columns: ["pm_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       can_claim_participant: {

@@ -50,6 +50,9 @@ export interface MediaLibraryItem {
   approved_at: string | null;
   created_at: string;
   updated_at: string;
+  
+  // Legacy flag for old media tables
+  is_legacy?: boolean;
 }
 
 export interface MediaFilters {
@@ -64,6 +67,12 @@ export interface MediaFilters {
   search?: string;
   is_featured?: boolean;
   is_public?: boolean;
+  
+  // Advanced filters
+  date_from?: string;
+  date_to?: string;
+  file_size_min?: number;
+  file_size_max?: number;
 }
 
 export interface MediaUploadOptions {

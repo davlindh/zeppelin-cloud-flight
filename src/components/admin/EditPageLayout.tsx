@@ -6,13 +6,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import NotFound from '@/pages/NotFound';
 import { EditPageError } from './EditPageError';
 import { EditPageLoading } from './EditPageLoading';
+import { EnhancedBreadcrumb } from './EnhancedBreadcrumb';
 
 interface EditPageLayoutProps {
   entityType: 'project' | 'participant' | 'sponsor';
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   isLoading?: boolean;
   error?: Error | null;
+  breadcrumbs?: Array<{ label: string; href?: string }>;
 }
 
 // Standard navigation mapping for better UX
@@ -37,9 +40,11 @@ const getEntityTypeDisplay = (entityType: 'project' | 'participant' | 'sponsor')
 export function EditPageLayout({
   entityType,
   title,
+  subtitle,
   children,
   isLoading = false,
   error = null,
+  breadcrumbs,
 }: EditPageLayoutProps) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -65,33 +70,36 @@ export function EditPageLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-6 py-4">
+      <div className="bg-card shadow-sm border-b sticky top-0 z-30">
+        <div className="container mx-auto px-6 py-4 space-y-3">
+          {/* Breadcrumbs */}
+          {breadcrumbs && breadcrumbs.length > 0 && (
+            <EnhancedBreadcrumb segments={breadcrumbs} />
+          )}
+          
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={handleBack}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Tillbaka till {getEntityTypeDisplay(entityType)}
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold">{title}</h1>
-                <p className="text-muted-foreground">
-                  Uppdatera {getEntityTypeDisplay(entityType)}information och profil
-                </p>
-              </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold">{title}</h1>
+              {subtitle && (
+                <p className="text-sm text-muted-foreground">{subtitle}</p>
+              )}
             </div>
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Tillbaka
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-6 py-8 max-w-4xl">
+      <div className="container mx-auto px-6 py-6 space-y-6">
         {children}
       </div>
     </div>

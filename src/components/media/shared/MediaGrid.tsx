@@ -1,5 +1,5 @@
 import { MediaLibraryItem } from "@/types/mediaLibrary";
-import { MediaCard } from "./MediaCard";
+import { MediaCardAdmin } from "./MediaCardAdmin";
 import { cn } from "@/lib/utils";
 
 interface MediaGridProps {
@@ -99,7 +99,7 @@ export function MediaGrid({
       )}
     >
       {mediaItems.map((item) => (
-        <MediaCard
+        <MediaCardAdmin
           key={item.id}
           item={item}
           selected={selectedIds.has(item.id)}

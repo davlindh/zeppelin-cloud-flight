@@ -35,7 +35,7 @@ import {
   Plus,
   Settings
 } from 'lucide-react';
-import { MediaGallery } from '@/components/multimedia/MediaGallery';
+import { MediaGallery } from '@/components/media/core/MediaGallery';
 import { FileUpload } from './FileUpload';
 import { cn } from '@/lib/utils';
 
@@ -91,7 +91,7 @@ export const AdminMediaManager: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<MediaFilters>(initialFilters);
   const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'gallery'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
@@ -400,7 +400,6 @@ export const AdminMediaManager: React.FC = () => {
                 <SelectContent>
                   <SelectItem value="grid">Rutnät</SelectItem>
                   <SelectItem value="list">Lista</SelectItem>
-                  <SelectItem value="gallery">Galleri</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -562,18 +561,6 @@ export const AdminMediaManager: React.FC = () => {
               <div className="flex items-center justify-center p-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            ) : viewMode === 'gallery' ? (
-              <MediaGallery 
-                media={filteredMediaItems.map(item => ({
-                  id: item.id,
-                  title: item.original_name || item.filename,
-                  url: item.url,
-                  thumbnail: item.thumbnail_url,
-                  type: item.mime_type.split('/')[0] as any,
-                  description: `${formatFileSize(item.size)} • ${item.category}`,
-                }))} 
-                viewMode="gallery" 
-              />
             ) : (
               <div className={cn(
                 viewMode === 'grid' 

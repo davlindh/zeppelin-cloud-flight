@@ -220,7 +220,14 @@ export function ProjectDetailPage() {
       participants: transformParticipants(projectData.project_participants),
       sponsors: transformSponsors(projectData.project_sponsors),
       links: projectData.project_links || [],
-      media: projectData.project_media || [],
+      media: projectData.media_project_links?.map(link => ({
+        id: link.media_library.id,
+        type: link.media_library.type,
+        url: link.media_library.public_url,
+        title: link.media_library.title,
+        description: link.media_library.description,
+        thumbnail_url: link.media_library.thumbnail_url
+      })) || projectData.project_media || [],
       budget: transformBudget(projectData.project_budget),
       timeline: transformTimeline(projectData.project_timeline),
       access: transformAccess(projectData.project_access),

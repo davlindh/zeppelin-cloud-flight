@@ -20,7 +20,7 @@ interface MediaFilterPanelProps {
   onClose?: () => void;
 }
 
-export const MediaFilterPanel: React.FC<MediaFilterPanelProps> = ({
+export const MediaFilterPanelBasic: React.FC<MediaFilterPanelProps> = ({
   filters,
   onChange,
   onClose,

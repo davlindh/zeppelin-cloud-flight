@@ -5,11 +5,11 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { MediaProvider } from "@/contexts/MediaContext";
-import { UnifiedMediaProvider } from "@/contexts/UnifiedMediaContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PermissionProvider } from "@/components/providers/PermissionProvider";
 import { MediaErrorBoundary } from "@/components/ui/MediaErrorBoundary";
+import { PersistentMediaPlayer } from "@/components/media/core/PersistentMediaPlayer";
 import { RootLayout } from "./components/layout";
 import { HomePage } from "./pages/HomePage";
 import { ShowcasePage } from "./pages/ShowcasePage";
@@ -69,8 +69,9 @@ const SettingsPage = lazy(() => import("./pages/admin/SettingsPage").then(m => (
 const ParticipantsManagementPage = lazy(() => import("./pages/admin/ParticipantsManagementPage").then(m => ({ default: m.ParticipantsManagementPage })));
 const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManagementPage").then(m => ({ default: m.ProjectsManagementPage })));
 const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManagementPage").then(m => ({ default: m.SponsorsManagementPage })));
-const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage").then(m => ({ default: m.MediaLibraryPage })));
+const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage"));
 const SubmissionManagementPage = lazy(() => import("./pages/admin/SubmissionManagementPage"));
+const MediaSubmissionsPage = lazy(() => import("./pages/admin/MediaSubmissionsPage").then(m => ({ default: m.MediaSubmissionsPage })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-96">
@@ -83,7 +84,6 @@ const App = () => (
     <TooltipProvider>
       <AdminAuthProvider>
         <MediaProvider>
-          <UnifiedMediaProvider>
           <PermissionProvider>
             <Toaster />
             <BrowserRouter
@@ -252,6 +252,11 @@ const App = () => (
                       <SubmissionManagementPage />
                     </Suspense>
                   } />
+                  <Route path="media/submissions" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <MediaSubmissionsPage />
+                    </Suspense>
+                  } />
                 </Route>
                 
                 {/* Direct Admin Edit Routes (outside nested layout) */}
@@ -289,12 +294,12 @@ const App = () => (
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <PersistentMediaPlayer />
             </BrowserRouter>
             <MediaErrorBoundary>
               <div />
             </MediaErrorBoundary>
           </PermissionProvider>
-          </UnifiedMediaProvider>
         </MediaProvider>
       </AdminAuthProvider>
     </TooltipProvider>

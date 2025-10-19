@@ -1,15 +1,18 @@
 import React from 'react';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 import { MediaGrid } from '@/components/media/shared/MediaGrid';
-import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
-import { MediaUploadDialog } from '@/components/media/MediaUploadDialog';
-import { MediaFilterPanel } from '@/components/media/MediaFilterPanel';
-import { MediaBulkActionsToolbar } from '@/components/media/MediaBulkActionsToolbar';
+import { MediaPreviewPanel } from '@/components/media/admin/MediaPreviewPanel';
+import { MediaUploadDialog } from '@/components/media/admin/MediaUploadDialog';
+import { MediaFilterPanel } from '@/components/media/admin/MediaFilterPanel';
+import { MediaBulkActionsToolbar } from '@/components/media/admin/MediaBulkActionsToolbar';
 import { MediaViewModeToggle, ViewMode } from '@/components/media/MediaViewModeToggle';
 import { MediaStorageStats } from '@/components/media/MediaStorageStats';
 import { StorageExplorer } from '@/components/media/StorageExplorer';
 import { TagEditor } from '@/components/media/TagEditor';
 import { MediaLinkDialog } from '@/components/media/MediaLinkDialog';
+import { WorkflowProgress } from '@/components/media/admin/WorkflowProgress';
+import { WorkflowStageCard } from '@/components/media/admin/WorkflowStageCard';
+import type { WorkflowStage } from '@/components/media/admin/WorkflowStageCard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +34,7 @@ import { Image, Video, Music, FileText, Upload, Filter, X } from 'lucide-react';
 import { formatFileSize } from '@/utils/formatFileSize';
 import { format } from 'date-fns';
 
-export const MediaLibraryPage: React.FC = () => {
+const MediaLibraryPage: React.FC = () => {
   const [filters, setFilters] = React.useState<MediaFilters>({});
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
@@ -41,6 +44,7 @@ export const MediaLibraryPage: React.FC = () => {
   const [showFilters, setShowFilters] = React.useState(false);
   const [showTagEditor, setShowTagEditor] = React.useState(false);
   const [showLinkDialog, setShowLinkDialog] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'library' | 'workflow' | 'storage'>('library');
 
   const { 
     media, 
@@ -57,6 +61,7 @@ export const MediaLibraryPage: React.FC = () => {
 
   // Statistics
   const stats = React.useMemo(() => {
+    // Simplified stats - published and orphaned require separate queries for accuracy
     return {
       total: media.length,
       images: media.filter(m => m.type === 'image').length,
@@ -65,6 +70,8 @@ export const MediaLibraryPage: React.FC = () => {
       documents: media.filter(m => m.type === 'document').length,
       pending: media.filter(m => m.status === 'pending').length,
       approved: media.filter(m => m.status === 'approved').length,
+      published: 0, // TODO: Requires separate query for linked media count
+      orphaned: 0, // TODO: Requires separate query for unlinked old media
       totalSize: media.reduce((sum, item) => sum + (item.file_size || 0), 0),
     };
   }, [media]);
@@ -202,13 +209,47 @@ export const MediaLibraryPage: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="library" className="w-full">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
           <TabsList>
-            <TabsTrigger value="library">Media Library</TabsTrigger>
-            <TabsTrigger value="storage">Storage Explorer</TabsTrigger>
+            <TabsTrigger value="library">Mediabibliotek</TabsTrigger>
+            <TabsTrigger value="workflow">Arbetsflöde</TabsTrigger>
+            <TabsTrigger value="storage">Lagringsutforskare</TabsTrigger>
           </TabsList>
 
           <TabsContent value="library" className="space-y-6">
+          
+          {/* Quick Stats Badges */}
+          <div className="flex gap-2 flex-wrap">
+            <Badge 
+              variant="outline" 
+              className="cursor-pointer hover:bg-accent"
+              onClick={() => setFilters({ status: 'pending' })}
+            >
+              {stats.pending} Väntande granskning
+            </Badge>
+            <Badge 
+              variant="outline" 
+              className="cursor-pointer hover:bg-accent"
+              onClick={() => setFilters({ status: 'approved' })}
+            >
+              {stats.approved} Godkända
+            </Badge>
+            <Badge 
+              variant={stats.orphaned > 0 ? "destructive" : "outline"}
+              className="cursor-pointer hover:opacity-80"
+              onClick={() => {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                setFilters({ 
+                  project_id: 'none',
+                  participant_id: 'none',
+                  date_to: thirtyDaysAgo.toISOString()
+                });
+              }}
+            >
+              {stats.orphaned} Föräldralösa
+            </Badge>
+          </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
@@ -395,9 +436,75 @@ export const MediaLibraryPage: React.FC = () => {
         onOpenChange={(open) => !open && setPreviewItem(null)}
         onUpdate={(id, updates) => updateMedia({ id, updates })}
         onDelete={handleDelete}
+        onApprove={(id) => updateMedia({ id, updates: { status: 'approved' } })}
+        onReject={(id) => updateMedia({ id, updates: { status: 'rejected' } })}
         editable
       />
 
+          </TabsContent>
+
+          <TabsContent value="workflow" className="space-y-6">
+            <WorkflowProgress stats={{
+              total: stats.total,
+              pending: stats.pending,
+              approved: stats.approved,
+              published: stats.published,
+              orphaned: stats.orphaned,
+            }} />
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <WorkflowStageCard
+                stage="review"
+                count={stats.pending}
+                total={stats.total}
+                canPromote
+                onViewItems={() => {
+                  setFilters({ status: 'pending' });
+                  setActiveTab('library');
+                }}
+                onPromote={() => {
+                  handleBulkApprove();
+                }}
+              />
+              <WorkflowStageCard
+                stage="approved"
+                count={stats.approved}
+                total={stats.total}
+                canDemote
+                onViewItems={() => {
+                  setFilters({ status: 'approved' });
+                  setActiveTab('library');
+                }}
+                onDemote={() => {
+                  bulkChangeStatus({ ids: Array.from(selectedIds), status: 'pending' });
+                  setSelectedIds(new Set());
+                }}
+              />
+              <WorkflowStageCard
+                stage="published"
+                count={stats.published}
+                total={stats.total}
+                onViewItems={() => {
+                  setFilters({ project_id: 'any' });
+                  setActiveTab('library');
+                }}
+              />
+              <WorkflowStageCard
+                stage="orphaned"
+                count={stats.orphaned}
+                total={stats.total}
+                onViewItems={() => {
+                  const thirtyDaysAgo = new Date();
+                  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                  setFilters({ 
+                    project_id: 'none',
+                    participant_id: 'none',
+                    date_to: thirtyDaysAgo.toISOString()
+                  });
+                  setActiveTab('library');
+                }}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="storage">
@@ -450,3 +557,5 @@ export const MediaLibraryPage: React.FC = () => {
     </div>
   );
 };
+
+export default MediaLibraryPage;

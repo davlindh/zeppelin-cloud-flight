@@ -2,7 +2,7 @@ import React from 'react';
 import { ProjectDetailHero } from './ProjectDetailHero';
 import { ProjectPurposeImpact } from './ProjectPurposeImpact';
 import { ProjectTimelineBudget } from './ProjectTimelineBudget';
-import { ProjectMediaSection } from './ProjectMediaSection';
+import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { ProjectLinksSection } from './ProjectLinksSection';
 import { ProjectInfoSidebar } from './ProjectInfoSidebar';
 
@@ -108,13 +108,11 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
               budget={project.budget}
             />
 
-            {/* Media Gallery - NOW SHOWING ALL DATABASE DATA */}
-            <ProjectMediaSection
-              media={project.media}
-              projectId={project.id}
-              rawData={{
-                project_media: project.project_media // Raw database media data
-              }}
+            {/* Media Gallery - Dynamic loading from media_library */}
+            <UnifiedMediaManager
+              entityType="project"
+              entityId={project.id}
+              mode="public"
             />
 
             {/* Project Links */}

@@ -8,7 +8,10 @@ import { useClaimableParticipant } from '@/hooks/useClaimableParticipant';
 import { ClaimProfileBanner } from '@/components/participants/ClaimProfileBanner';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, User, Award, Mail, Image as ImageIcon, Briefcase, Settings } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AdminFormSections, FormSection } from '@/components/admin/AdminFormSections';
+import { ParticipantMediaEditor, VisibilitySettings } from '@/components/admin/editors';
 
 export const ParticipantEditPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -127,16 +130,107 @@ export const ParticipantEditPage: React.FC = () => {
     );
   }
 
+  // Fetch full participant data for settings
+  const [participantData, setParticipantData] = useState<any>(null);
+  
+  useEffect(() => {
+    const fetchParticipant = async () => {
+      if (!participantId) return;
+      const { data } = await supabase
+        .from('participants')
+        .select('*')
+        .eq('id', participantId)
+        .single();
+      setParticipantData(data);
+    };
+    fetchParticipant();
+  }, [participantId]);
+
   // Show edit form if user has permission
   return (
-    <EditPageLayout entityType="participant" title="Redigera deltagare">
+    <EditPageLayout
+      entityType="participant"
+      title={`Redigera: ${participantName}`}
+      subtitle="Uppdatera profil, media, projekt och inställningar"
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Deltagare', href: '/admin/participants-management' },
+        { label: participantName },
+        { label: 'Redigera' },
+      ]}
+    >
       {participantId && (
-        <AdminFormFactory
-          entityType="participant"
-          entityId={participantId}
-          onClose={() => window.history.back()}
-          onSuccess={() => window.history.back()}
-        />
+        <Tabs defaultValue="basic" className="space-y-6">
+          <div className="sticky top-[73px] z-20 bg-background pb-2">
+            <TabsList className="grid w-full grid-cols-4 bg-muted">
+              <TabsTrigger value="basic" className="data-[state=active]:bg-background">
+                <User className="h-4 w-4 mr-2" />
+                Basinformation
+              </TabsTrigger>
+              <TabsTrigger value="media" className="data-[state=active]:bg-background">
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Media & Portfolio
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="data-[state=active]:bg-background">
+                <Briefcase className="h-4 w-4 mr-2" />
+                Projekt
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="data-[state=active]:bg-background">
+                <Settings className="h-4 w-4 mr-2" />
+                Inställningar
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="basic" className="space-y-6">
+            <AdminFormSections>
+              <FormSection 
+                title="Personlig information" 
+                description="Grundläggande information om deltagaren"
+                icon={User}
+                defaultOpen={true}
+              >
+                <AdminFormFactory
+                  entityType="participant"
+                  entityId={participantId}
+                  onClose={() => window.history.back()}
+                  onSuccess={() => window.history.back()}
+                />
+              </FormSection>
+            </AdminFormSections>
+          </TabsContent>
+
+          <TabsContent value="media" className="space-y-6">
+            <ParticipantMediaEditor 
+              participantId={participantId}
+              participantName={participantName}
+            />
+          </TabsContent>
+
+          <TabsContent value="projects" className="space-y-6">
+            <div className="rounded-lg border p-8 text-center">
+              <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Projekthantering</h3>
+              <p className="text-muted-foreground">
+                Projektlänkning för deltagare kommer snart
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            {participantData && (
+              <VisibilitySettings
+                entityType="participant"
+                entityId={participantId}
+                currentSettings={{
+                  is_public: participantData.is_public,
+                  is_featured: participantData.is_featured,
+                  show_contact_info: participantData.show_contact_info,
+                }}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
       )}
     </EditPageLayout>
   );

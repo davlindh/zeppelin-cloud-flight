@@ -122,6 +122,16 @@ export const useProject = (slugOrId: string) => {
             )
           ),
           project_links (type, url),
+          media_project_links (
+            media_library (
+              id,
+              type,
+              public_url,
+              title,
+              description,
+              thumbnail_url
+            )
+          ),
           project_media (
             id,
             type,

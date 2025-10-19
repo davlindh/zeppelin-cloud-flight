@@ -97,7 +97,7 @@ const cleanTitle = (title: string): string => {
   return cleaned.replace(/^[-\s]+|[-\s]+$/g, '').trim() || title;
 };
 
-export function MediaCard({
+export function MediaCardAdmin({
   item,
   selected = false,
   onSelect,
