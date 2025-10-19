@@ -71,17 +71,35 @@ export const SponsorEditPage: React.FC = () => {
   return (
     <EditPageLayout
       entityType="sponsor"
-      title="Redigera sponsor"
+      title={`Redigera: ${sponsorData?.name || 'Sponsor'}`}
+      subtitle="Uppdatera sponsorinformation, projekt och media"
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Partners', href: '/partners' },
+        { label: sponsorData?.name || 'Sponsor' },
+        { label: 'Redigera' },
+      ]}
     >
       {id && sponsorData && (
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="basic">Basinformation</TabsTrigger>
-            <TabsTrigger value="projects">Projekt</TabsTrigger>
-            <TabsTrigger value="media">Media & Logotyp</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="basic" className="space-y-6">
+          <div className="sticky top-[73px] z-20 bg-background pb-2">
+            <TabsList className="grid w-full grid-cols-3 bg-muted">
+              <TabsTrigger value="basic" className="data-[state=active]:bg-background">
+                <Building className="h-4 w-4 mr-2" />
+                Basinformation
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="data-[state=active]:bg-background">
+                <Briefcase className="h-4 w-4 mr-2" />
+                Projekt
+              </TabsTrigger>
+              <TabsTrigger value="media" className="data-[state=active]:bg-background">
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Media & Logotyp
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="basic" className="mt-6">
+          <TabsContent value="basic" className="space-y-6">
             <AdminFormSections>
               <FormSection
                 title="Organisation"

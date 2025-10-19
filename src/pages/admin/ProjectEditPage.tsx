@@ -234,26 +234,35 @@ export const ProjectEditPage: React.FC = () => {
     <EditPageLayout
       entityType="project"
       title={pageTitle}
+      subtitle="Uppdatera projektinformation, tidslinje, budget och media"
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Showcase', href: '/showcase' },
+        { label: projectData?.title || 'Projekt' },
+        { label: 'Redigera' },
+      ]}
     >
       <Tabs defaultValue="basic" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="basic">
-            <FileText className="h-4 w-4 mr-2" />
-            Basinformation
-          </TabsTrigger>
-          <TabsTrigger value="timeline" disabled={!projectId}>
-            <Calendar className="h-4 w-4 mr-2" />
-            Timeline & Budget
-          </TabsTrigger>
-          <TabsTrigger value="media" disabled={!projectId}>
-            <Image className="h-4 w-4 mr-2" />
-            Media
-          </TabsTrigger>
-          <TabsTrigger value="sponsors" disabled={!projectId}>
-            <Users className="h-4 w-4 mr-2" />
-            Sponsorer
-          </TabsTrigger>
-        </TabsList>
+        <div className="sticky top-[73px] z-20 bg-background pb-2">
+          <TabsList className="grid w-full grid-cols-4 bg-muted">
+            <TabsTrigger value="basic" className="data-[state=active]:bg-background">
+              <FileText className="h-4 w-4 mr-2" />
+              Basinformation
+            </TabsTrigger>
+            <TabsTrigger value="timeline" disabled={!projectId} className="data-[state=active]:bg-background">
+              <Calendar className="h-4 w-4 mr-2" />
+              Tidslinje & Budget
+            </TabsTrigger>
+            <TabsTrigger value="media" disabled={!projectId} className="data-[state=active]:bg-background">
+              <Image className="h-4 w-4 mr-2" />
+              Media
+            </TabsTrigger>
+            <TabsTrigger value="sponsors" disabled={!projectId} className="data-[state=active]:bg-background">
+              <Users className="h-4 w-4 mr-2" />
+              Sponsorer
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Basic Information */}
         <TabsContent value="basic" className="space-y-6">

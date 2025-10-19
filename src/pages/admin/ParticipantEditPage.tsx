@@ -148,17 +148,41 @@ export const ParticipantEditPage: React.FC = () => {
 
   // Show edit form if user has permission
   return (
-    <EditPageLayout entityType="participant" title="Redigera deltagare">
+    <EditPageLayout
+      entityType="participant"
+      title={`Redigera: ${participantName}`}
+      subtitle="Uppdatera profil, media, projekt och inställningar"
+      breadcrumbs={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Deltagare', href: '/participants' },
+        { label: participantName },
+        { label: 'Redigera' },
+      ]}
+    >
       {participantId && (
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="basic">Basinformation</TabsTrigger>
-            <TabsTrigger value="media">Media & Portfolio</TabsTrigger>
-            <TabsTrigger value="projects">Projekt</TabsTrigger>
-            <TabsTrigger value="settings">Inställningar</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="basic" className="space-y-6">
+          <div className="sticky top-[73px] z-20 bg-background pb-2">
+            <TabsList className="grid w-full grid-cols-4 bg-muted">
+              <TabsTrigger value="basic" className="data-[state=active]:bg-background">
+                <User className="h-4 w-4 mr-2" />
+                Basinformation
+              </TabsTrigger>
+              <TabsTrigger value="media" className="data-[state=active]:bg-background">
+                <ImageIcon className="h-4 w-4 mr-2" />
+                Media & Portfolio
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="data-[state=active]:bg-background">
+                <Briefcase className="h-4 w-4 mr-2" />
+                Projekt
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="data-[state=active]:bg-background">
+                <Settings className="h-4 w-4 mr-2" />
+                Inställningar
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="basic" className="mt-6">
+          <TabsContent value="basic" className="space-y-6">
             <AdminFormSections>
               <FormSection 
                 title="Personlig information" 
@@ -176,14 +200,14 @@ export const ParticipantEditPage: React.FC = () => {
             </AdminFormSections>
           </TabsContent>
 
-          <TabsContent value="media" className="mt-6">
+          <TabsContent value="media" className="space-y-6">
             <ParticipantMediaEditor 
               participantId={participantId}
               participantName={participantName}
             />
           </TabsContent>
 
-          <TabsContent value="projects" className="mt-6">
+          <TabsContent value="projects" className="space-y-6">
             <div className="rounded-lg border p-8 text-center">
               <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">Projekthantering</h3>
@@ -193,7 +217,7 @@ export const ParticipantEditPage: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="mt-6">
+          <TabsContent value="settings" className="space-y-6">
             {participantData && (
               <VisibilitySettings
                 entityType="participant"
