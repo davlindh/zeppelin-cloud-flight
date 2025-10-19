@@ -6,3 +6,4 @@ export { MediaGridSkeleton } from './MediaGridSkeleton';
 export { MediaPlayer } from './MediaPlayer';
 export { MediaLightbox } from './MediaLightbox';
 export { RichMediaPreview } from './RichMediaPreview';
+export { PersistentMediaPlayer } from './PersistentMediaPlayer';

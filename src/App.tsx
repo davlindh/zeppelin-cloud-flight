@@ -9,6 +9,7 @@ import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PermissionProvider } from "@/components/providers/PermissionProvider";
 import { MediaErrorBoundary } from "@/components/ui/MediaErrorBoundary";
+import { PersistentMediaPlayer } from "@/components/media/core/PersistentMediaPlayer";
 import { RootLayout } from "./components/layout";
 import { HomePage } from "./pages/HomePage";
 import { ShowcasePage } from "./pages/ShowcasePage";
@@ -293,6 +294,7 @@ const App = () => (
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <PersistentMediaPlayer />
             </BrowserRouter>
             <MediaErrorBoundary>
               <div />
