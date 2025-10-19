@@ -1,5 +1,5 @@
 import React from 'react';
-import { MediaCard } from './MediaCard';
+import { MediaCardSimple } from './MediaCardSimple';
 import { MediaGridSkeleton } from './MediaGridSkeleton';
 import { ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -65,7 +65,7 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
   return (
     <div className={containerClass}>
       {media.map((item) => (
-        <MediaCard
+        <MediaCardSimple
           key={item.id}
           {...item}
           onPlay={() => onPlay?.(item)}

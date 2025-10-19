@@ -16,7 +16,7 @@ import {
   ImageOff,
   Link2Off,
 } from 'lucide-react';
-import { MediaCard } from '@/components/media/shared/MediaCard';
+import { MediaCardAdmin } from '@/components/media/shared/MediaCardAdmin';
 import { findMediaWithMissingMetadata, reprocessBulkMetadata } from '@/utils/mediaMetadataReprocessor';
 import { Progress } from '@/components/ui/progress';
 
@@ -214,7 +214,7 @@ export function MediaHealthPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {missingMetadataItems.slice(0, 12).map((item) => (
-                <MediaCard key={item.id} item={item as any} showActions={false} />
+                <MediaCardAdmin key={item.id} item={item as any} showActions={false} />
               ))}
             </div>
           </CardContent>

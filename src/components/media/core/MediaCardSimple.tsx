@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,9 +22,12 @@ interface MediaCardProps {
   showPlayButton?: boolean;
   showAddToQueue?: boolean;
   showDownload?: boolean;
+  showContext?: boolean;
+  projectLinks?: Array<{ id: string; title: string; slug: string }>;
+  participantLinks?: Array<{ id: string; name: string; slug: string }>;
 }
 
-export const MediaCard: React.FC<MediaCardProps> = ({
+export const MediaCardSimple: React.FC<MediaCardProps> = ({
   id,
   type,
   title,
@@ -37,8 +41,12 @@ export const MediaCard: React.FC<MediaCardProps> = ({
   showPlayButton = true,
   showAddToQueue = true,
   showDownload = true,
+  showContext = false,
+  projectLinks = [],
+  participantLinks = [],
 }) => {
   const isPlayable = isPlayableMedia(type);
+  const navigate = useNavigate();
 
   return (
     <Card className={cn(
@@ -90,6 +98,46 @@ export const MediaCard: React.FC<MediaCardProps> = ({
                 </div>
                 <p className="text-xs text-muted-foreground">Klicka för att spela</p>
               </div>
+            </div>
+          )}
+
+          {/* Context badges - Show project/participant links */}
+          {showContext && (projectLinks.length > 0 || participantLinks.length > 0) && (
+            <div className="flex flex-wrap gap-1">
+              {projectLinks.map(link => (
+                <div 
+                  key={link.id}
+                  className="cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/showcase/${link.slug}`);
+                  }}
+                >
+                  <Badge 
+                    variant="outline"
+                    className="hover:bg-primary/10 transition-colors text-xs"
+                  >
+                    📁 {link.title}
+                  </Badge>
+                </div>
+              ))}
+              {participantLinks.map(link => (
+                <div 
+                  key={link.id}
+                  className="cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/participant/${link.slug}`);
+                  }}
+                >
+                  <Badge 
+                    variant="secondary"
+                    className="hover:bg-secondary/80 transition-colors text-xs"
+                  >
+                    👤 {link.name}
+                  </Badge>
+                </div>
+              ))}
             </div>
           )}
 

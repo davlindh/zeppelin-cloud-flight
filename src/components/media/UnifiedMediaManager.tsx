@@ -25,8 +25,8 @@ import type { UnifiedMediaItem, MediaFilters } from '@/types/unified-media';
 import { cn } from '@/lib/utils';
 
 interface UnifiedMediaManagerProps {
-  entityType: 'project' | 'participant' | 'sponsor';
-  entityId: string;
+  entityType: 'project' | 'participant' | 'sponsor' | 'global';
+  entityId?: string;
   entityName?: string;
   mode: 'admin' | 'public';
   showUpload?: boolean;
@@ -60,10 +60,12 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
   const [activeTab, setActiveTab] = useState<'all' | 'images' | 'videos' | 'audio' | 'documents'>('all');
 
   // Build filter based on entity type
-  const baseFilters: MediaFilters = {
-    [`${entityType}_id`]: entityId,
-    ...(mode === 'public' && { status: 'approved' }),
-  } as MediaFilters;
+  const baseFilters: MediaFilters = entityType === 'global'
+    ? {} as MediaFilters
+    : {
+        [`${entityType}_id`]: entityId,
+        ...(mode === 'public' && { status: 'approved' }),
+      } as MediaFilters;
 
   const [filters, setFilters] = useState<MediaFilters>(baseFilters);
 
@@ -148,7 +150,13 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
     );
   }
 
-  const entityLabel = entityType === 'project' ? 'projektet' : entityType === 'participant' ? 'deltagaren' : 'sponsorn';
+  const entityLabel = entityType === 'global' 
+    ? 'det globala galleriet' 
+    : entityType === 'project' 
+    ? 'projektet' 
+    : entityType === 'participant' 
+    ? 'deltagaren' 
+    : 'sponsorn';
 
   return (
     <div className="space-y-6">
