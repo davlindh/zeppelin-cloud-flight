@@ -1,12 +1,12 @@
-export { BaseMediaItem } from './BaseMediaItem';
-export { MediaFilters } from './MediaFilters';
-export { MediaGallery } from './MediaGallery';
+export { BaseMediaItem } from './_deprecated/BaseMediaItem';
+export { MediaFilters } from './_deprecated/MediaFilters';
+export { MediaGallery } from './_deprecated/MediaGallery';
 export { MediaCardPreview } from './MediaCardPreview';
-export { MediaGridSkeleton } from './MediaGridSkeleton';
+export { MediaGridSkeleton } from './_deprecated/MediaGridSkeleton';
 
-// Unified components (new architecture)
-export { UnifiedMediaGrid } from './UnifiedMediaGrid';
-export { PersistentPlayer } from './PersistentPlayer';
+// Deprecated components - use new media system from @/components/media
+// export { UnifiedMediaGrid } from './UnifiedMediaGrid';
+// export { PersistentPlayer } from './PersistentPlayer';
 
 // Deprecated - Use OptimizedImage from @/components/ui/OptimizedImage instead
 export { EnhancedImage } from './_deprecated/EnhancedImage';

@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
 import { format } from 'date-fns';
-import { RichMediaPreview } from '@/components/media/RichMediaPreview';
+import { RichMediaPreview } from '@/components/media/core/RichMediaPreview';
 import { formatFileSize } from '@/utils/formatFileSize';
 import { useToast } from '@/hooks/use-toast';
 
