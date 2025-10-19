@@ -75,7 +75,7 @@ export const SponsorEditPage: React.FC = () => {
       subtitle="Uppdatera sponsorinformation, projekt och media"
       breadcrumbs={[
         { label: 'Admin', href: '/admin' },
-        { label: 'Partners', href: '/partners' },
+        { label: 'Sponsorer', href: '/admin/sponsors-management' },
         { label: sponsorData?.name || 'Sponsor' },
         { label: 'Redigera' },
       ]}

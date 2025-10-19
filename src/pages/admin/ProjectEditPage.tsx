@@ -11,6 +11,7 @@ import { useCanEditProject } from '@/hooks/useCanEditProject';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ShieldAlert, FileText, Calendar, DollarSign, Image, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -237,32 +238,55 @@ export const ProjectEditPage: React.FC = () => {
       subtitle="Uppdatera projektinformation, tidslinje, budget och media"
       breadcrumbs={[
         { label: 'Admin', href: '/admin' },
-        { label: 'Showcase', href: '/showcase' },
+        { label: 'Projekt', href: '/admin/projects-management' },
         { label: projectData?.title || 'Projekt' },
         { label: 'Redigera' },
       ]}
     >
       <Tabs defaultValue="basic" className="space-y-6">
-        <div className="sticky top-[73px] z-20 bg-background pb-2">
-          <TabsList className="grid w-full grid-cols-4 bg-muted">
-            <TabsTrigger value="basic" className="data-[state=active]:bg-background">
-              <FileText className="h-4 w-4 mr-2" />
-              Basinformation
-            </TabsTrigger>
-            <TabsTrigger value="timeline" disabled={!projectId} className="data-[state=active]:bg-background">
-              <Calendar className="h-4 w-4 mr-2" />
-              Tidslinje & Budget
-            </TabsTrigger>
-            <TabsTrigger value="media" disabled={!projectId} className="data-[state=active]:bg-background">
-              <Image className="h-4 w-4 mr-2" />
-              Media
-            </TabsTrigger>
-            <TabsTrigger value="sponsors" disabled={!projectId} className="data-[state=active]:bg-background">
-              <Users className="h-4 w-4 mr-2" />
-              Sponsorer
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        <TooltipProvider>
+          <div className="sticky top-[73px] z-20 bg-background pb-2">
+            <TabsList className="grid w-full grid-cols-4 bg-muted">
+              <TabsTrigger value="basic" className="data-[state=active]:bg-background">
+                <FileText className="h-4 w-4 mr-2" />
+                Basinformation
+              </TabsTrigger>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="timeline" disabled={!projectId} className="data-[state=active]:bg-background">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Tidslinje & Budget
+                  </TabsTrigger>
+                </TooltipTrigger>
+                {!projectId && (
+                  <TooltipContent>Spara grundinformation först</TooltipContent>
+                )}
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="media" disabled={!projectId} className="data-[state=active]:bg-background">
+                    <Image className="h-4 w-4 mr-2" />
+                    Media
+                  </TabsTrigger>
+                </TooltipTrigger>
+                {!projectId && (
+                  <TooltipContent>Spara grundinformation först</TooltipContent>
+                )}
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="sponsors" disabled={!projectId} className="data-[state=active]:bg-background">
+                    <Users className="h-4 w-4 mr-2" />
+                    Sponsorer
+                  </TabsTrigger>
+                </TooltipTrigger>
+                {!projectId && (
+                  <TooltipContent>Spara grundinformation först</TooltipContent>
+                )}
+              </Tooltip>
+            </TabsList>
+          </div>
+        </TooltipProvider>
 
         {/* Basic Information */}
         <TabsContent value="basic" className="space-y-6">
@@ -344,6 +368,7 @@ export const ProjectEditPage: React.FC = () => {
                 <UnifiedMediaManager
                   entityType="project"
                   entityId={projectId}
+                  entityName={projectData?.title}
                   mode="admin"
                   showUpload
                   showLinking

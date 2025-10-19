@@ -154,7 +154,7 @@ export const ParticipantEditPage: React.FC = () => {
       subtitle="Uppdatera profil, media, projekt och inställningar"
       breadcrumbs={[
         { label: 'Admin', href: '/admin' },
-        { label: 'Deltagare', href: '/participants' },
+        { label: 'Deltagare', href: '/admin/participants-management' },
         { label: participantName },
         { label: 'Redigera' },
       ]}
