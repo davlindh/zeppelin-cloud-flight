@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useForm, SubmitHandler, Path, PathValue, DefaultValues, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { X } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { AdminFormConfig, FileUploadResult } from '@/types/admin';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { logError } from '@/utils/adminApi';
@@ -19,6 +21,46 @@ interface GenericAdminFormProps<T extends Record<string, unknown>> {
   entityId?: string;
   isUpdate?: boolean;
   renderMode?: 'modal' | 'page';
+}
+
+// Create dynamic validation schema based on form config
+function createValidationSchema(config: AdminFormConfig) {
+  const schemaFields: Record<string, z.ZodTypeAny> = {};
+
+  config.fields.forEach(field => {
+    let fieldSchema: z.ZodTypeAny;
+
+    switch (field.type) {
+      case 'email':
+        fieldSchema = z.string().email('Ogiltig e-postadress');
+        break;
+      case 'url':
+        fieldSchema = z.string().url('Ogiltig URL').or(z.literal(''));
+        break;
+      case 'number':
+        fieldSchema = z.coerce.number().positive('Måste vara större än 0');
+        break;
+      case 'tel':
+        fieldSchema = z.string().regex(/^[\d\s+()-]+$/, 'Ogiltigt telefonnummer').or(z.literal(''));
+        break;
+      default:
+        fieldSchema = z.string();
+    }
+
+    if (field.required) {
+      if (field.type === 'number') {
+        fieldSchema = z.coerce.number().min(0.01, `${field.label} är obligatoriskt`);
+      } else {
+        fieldSchema = z.string().min(1, `${field.label} är obligatoriskt`);
+      }
+    } else {
+      fieldSchema = fieldSchema.optional().or(z.literal(''));
+    }
+
+    schemaFields[field.name] = fieldSchema;
+  });
+
+  return z.object(schemaFields);
 }
 
 export const GenericAdminForm = <T extends Record<string, unknown>>({
@@ -38,15 +80,20 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
   const [uploadedFileUrl, setUploadedFileUrl] = useState<string>('');
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  // Initialize file upload hook - always call hook, let it handle no bucket case
+  // Initialize file upload hook
   const fileUpload = useFileUpload({
     bucketName: config.bucketName || '',
     maxSizeMB: 10,
     allowedTypes: ['image/*', 'video/*', 'audio/*', 'application/*']
   });
 
+  // Create validation schema
+  const validationSchema = createValidationSchema(config);
+
   const form = useForm<T>({
-    defaultValues: defaultValues as DefaultValues<T>
+    defaultValues: defaultValues as DefaultValues<T>,
+    resolver: zodResolver(validationSchema),
+    mode: 'onBlur',
   });
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
@@ -61,7 +108,6 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
 
     if (result.success) {
       setUploadedFileUrl(result.url as string);
-      // Set the file URL in the form data based on the file field name
       const fileField = config.fields.find(f => f.type === 'file');
       if (fileField) {
         setValue(fileField.name as Path<T>, result.url as PathValue<T, Path<T>>);
@@ -102,7 +148,6 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
   const renderField = (field: any) => {
     const fieldName = field.name as keyof T;
 
-    // Convert admin field config to StandardFormField props
     const fieldOptions: FieldOption[] = field.options?.map((option: any) => ({
       value: option.value,
       label: option.label,
@@ -131,7 +176,17 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
         <CardContent className="space-y-6">
           {error && (
             <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          {Object.keys(errors).length > 0 && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Det finns fel i formuläret. Kontrollera fälten nedan.
+              </AlertDescription>
             </Alert>
           )}
 
@@ -140,14 +195,15 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
               {renderField(field)}
 
               {errors[field.name as Path<T>] && (
-                <p className="text-sm text-destructive">
-                  {String(errors[field.name as Path<T>]?.message) || `${field.label} is required`}
+                <p className="text-sm text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {String(errors[field.name as Path<T>]?.message) || `${field.label} är obligatoriskt`}
                 </p>
               )}
 
               {field.type === 'file' && config.bucketName && (
                 <p className="text-xs text-muted-foreground">
-                  Supported formats: Images, Videos, Audio, Documents. Max size: 10MB
+                  Format som stöds: Bilder, Videos, Ljud, Dokument. Max storlek: 10MB
                 </p>
               )}
             </div>
@@ -156,15 +212,15 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
 
         <CardFooter className="flex gap-3">
           <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
+            Avbryt
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || isUploadingFile || fileUpload?.isUploading}
           >
             {isSubmitting
-              ? (isUpdate ? 'Updating...' : 'Creating...')
-              : (isUpdate ? 'Update' : 'Create')
+              ? (isUpdate ? 'Uppdaterar...' : 'Skapar...')
+              : (isUpdate ? 'Uppdatera' : 'Skapa')
             } {config.entityName}
           </Button>
         </CardFooter>
@@ -172,13 +228,12 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
     </form>
   );
 
-  // Render as modal or page based on renderMode
   if (renderMode === 'page') {
     return (
       <Card className="w-full">
         <CardHeader>
           <CardTitle>
-            {isUpdate ? `Edit ${config.entityName}` : `Add New ${config.entityName}`}
+            {isUpdate ? `Redigera ${config.entityName}` : `Lägg till ${config.entityName}`}
           </CardTitle>
         </CardHeader>
         {formContent}
@@ -186,13 +241,12 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
     );
   }
 
-  // Default modal rendering
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
-            {isUpdate ? `Edit ${config.entityName}` : `Add New ${config.entityName}`}
+            {isUpdate ? `Redigera ${config.entityName}` : `Lägg till ${config.entityName}`}
           </CardTitle>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-4 w-4" />

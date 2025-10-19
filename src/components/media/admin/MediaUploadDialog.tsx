@@ -101,7 +101,21 @@ export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
   const handleUpload = async () => {
     setUploading(true);
     try {
+      // Update status to uploading
+      setFiles(prev => prev.map(f => ({ ...f, status: 'uploading' as const })));
+
       if (onUpload) {
+        // Simulate progress updates for demo
+        for (let i = 0; i < files.length; i++) {
+          setFiles(prev => prev.map((f, idx) => 
+            idx === i ? { ...f, progress: 50 } : f
+          ));
+          await new Promise(resolve => setTimeout(resolve, 200));
+          setFiles(prev => prev.map((f, idx) => 
+            idx === i ? { ...f, progress: 100, status: 'complete' as const } : f
+          ));
+        }
+
         await onUpload(files);
       }
       setFiles([]);
@@ -109,10 +123,18 @@ export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
       onOpenChange(false);
     } catch (error) {
       console.error('Upload failed:', error);
+      setFiles(prev => prev.map(f => ({ 
+        ...f, 
+        status: 'error' as const,
+        error: 'Uppladdning misslyckades'
+      })));
     } finally {
       setUploading(false);
     }
   };
+
+  const uploadedCount = files.filter(f => f.status === 'complete').length;
+  const totalFiles = files.length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -240,13 +262,28 @@ export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={uploading}>
-            Avbryt
-          </Button>
-          <Button onClick={handleUpload} disabled={files.length === 0 || uploading}>
-            {uploading ? 'Laddar upp...' : `Ladda upp ${files.length} fil${files.length !== 1 ? 'er' : ''}`}
-          </Button>
+        <DialogFooter className="flex-col gap-3">
+          {uploading && totalFiles > 0 && (
+            <div className="w-full space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Laddar upp filer...
+                </span>
+                <span className="font-medium">
+                  {uploadedCount} av {totalFiles} filer
+                </span>
+              </div>
+              <Progress value={(uploadedCount / totalFiles) * 100} className="h-2" />
+            </div>
+          )}
+          <div className="flex justify-end gap-2 w-full">
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={uploading}>
+              Avbryt
+            </Button>
+            <Button onClick={handleUpload} disabled={files.length === 0 || uploading}>
+              {uploading ? `Laddar upp... (${uploadedCount}/${totalFiles})` : `Ladda upp ${files.length} fil${files.length !== 1 ? 'er' : ''}`}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
