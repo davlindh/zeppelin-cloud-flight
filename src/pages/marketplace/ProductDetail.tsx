@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ShoppingCart, Heart, Star, Share2, Minus, Plus, Eye } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 import { Badge } from '@/components/ui/badge';
+import { formatCurrency, formatDiscountPercentage, formatDiscountAmount } from '@/utils/currency';
 import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
 import { ProductReviewsSection } from '@/components/marketplace/reviews/ProductReviewsSection';
 import { featureConfig } from '@/config/features.config';
@@ -26,6 +28,7 @@ import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { t } = useTranslation();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<{
     size?: string;
@@ -209,12 +212,12 @@ const ProductDetail = () => {
               />
               {(!product.image || product.image.trim() === '') && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <p className="text-muted-foreground text-sm">No image available</p>
+                  <p className="text-muted-foreground text-sm">{t('product.noImageAvailable')}</p>
                 </div>
               )}
               {product.originalPrice && (
                 <Badge className="absolute top-6 left-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 shadow-lg text-sm px-3 py-1">
-                  Save ${product.originalPrice - product.price}
+                  Spara {formatDiscountAmount(product.originalPrice, product.price)}
                 </Badge>
               )}
               {!isInStock && (
@@ -303,22 +306,22 @@ const ProductDetail = () => {
             <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl p-6 border border-primary/10">
               <div className="flex items-center gap-4 mb-2">
                 <span className="text-4xl lg:text-5xl font-bold text-foreground">
-                  ${product.price.toLocaleString()}
+                  {formatCurrency(product.price)}
                 </span>
                 {product.originalPrice && (
                   <>
                     <span className="text-2xl text-muted-foreground line-through">
-                      ${product.originalPrice.toLocaleString()}
+                      {formatCurrency(product.originalPrice)}
                     </span>
                     <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 text-sm">
-                      {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                      {formatDiscountPercentage(product.originalPrice, product.price)} rabatt
                     </Badge>
                   </>
                 )}
               </div>
               {product.originalPrice && (
                 <p className="text-sm text-green-600 font-medium">
-                  You save ${(product.originalPrice - product.price).toLocaleString()}
+                  Du sparar {formatDiscountAmount(product.originalPrice, product.price)}
                 </p>
               )}
             </div>
@@ -326,7 +329,7 @@ const ProductDetail = () => {
             {/* Variant Selection */}
             {availableOptions.sizes.length > 0 && (
               <div>
-                <h3 className="font-medium text-slate-900 mb-3">Size</h3>
+                <h3 className="font-medium text-slate-900 mb-3">{t('product.size')}</h3>
                 <div className="flex gap-2 flex-wrap">
                   {availableOptions.sizes.map((size) => (
                     <button
@@ -347,7 +350,7 @@ const ProductDetail = () => {
 
             {availableOptions.colors.length > 0 && (
               <div>
-                <h3 className="font-medium text-slate-900 mb-3">Color</h3>
+                <h3 className="font-medium text-slate-900 mb-3">{t('product.color')}</h3>
                 <div className="flex gap-2 flex-wrap">
                   {availableOptions.colors.map((color) => (
                     <button
@@ -368,7 +371,7 @@ const ProductDetail = () => {
 
             {availableOptions.materials.length > 0 && (
               <div>
-                <h3 className="font-medium text-slate-900 mb-3">Material</h3>
+                <h3 className="font-medium text-slate-900 mb-3">{t('product.material')}</h3>
                 <div className="flex gap-2 flex-wrap">
                   {availableOptions.materials.map((material) => (
                     <button
@@ -389,7 +392,7 @@ const ProductDetail = () => {
 
             {/* Quantity */}
             <div>
-              <h3 className="font-medium text-slate-900 mb-3">Quantity</h3>
+              <h3 className="font-medium text-slate-900 mb-3">{t('product.quantity')}</h3>
               <div className="flex items-center gap-3">
                 <div className="flex items-center border border-slate-300 rounded-lg">
                   <button
@@ -409,7 +412,7 @@ const ProductDetail = () => {
                   </button>
                 </div>
                 <span className="text-metadata">
-                  {stockCount} in stock
+                  {t('product.inStockCount', { count: stockCount })}
                 </span>
               </div>
             </div>
@@ -428,7 +431,7 @@ const ProductDetail = () => {
                   disabled={!isInStock || addingToCart}
                 >
                   <ShoppingCart className="h-6 w-6 mr-3 inline" />
-                  {addingToCart ? 'Adding to Cart...' : (isInStock ? `Add to Cart - $${product.price}` : 'Out of Stock')}
+                  {addingToCart ? 'Lägger till i varukorg...' : (isInStock ? `Lägg i varukorg - ${formatCurrency(product.price)}` : 'Slut i lager')}
                 </button>
                 
                 {/* Secondary Actions */}
@@ -438,11 +441,11 @@ const ProductDetail = () => {
                     onClick={handleWishlistToggle}
                   >
                     <Heart className={`h-5 w-5 mr-2 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
-                    <span className="text-sm font-medium">{isWishlisted ? 'Saved' : 'Save'}</span>
+                    <span className="text-sm font-medium">{isWishlisted ? t('product.saved') : t('product.save')}</span>
                   </button>
                   <button className="flex items-center justify-center px-4 py-3 border border-border rounded-xl text-foreground hover:bg-muted/50 transition-colors">
                     <Share2 className="h-5 w-5 mr-2" />
-                    <span className="text-sm font-medium">Share</span>
+                    <span className="text-sm font-medium">{t('product.share')}</span>
                   </button>
                 </div>
 
@@ -475,7 +478,7 @@ const ProductDetail = () => {
             {/* Product Specifications in Tabs */}
             {product.features && product.features.length > 0 && (
               <div className="bg-muted/30 rounded-2xl p-6">
-                <h3 className="text-xl font-semibold text-foreground mb-4">Product Features</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-4">{t('product.productFeatures')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {product.features.map((feature, index) => (
                     <div key={index} className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border">

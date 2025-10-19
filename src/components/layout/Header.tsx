@@ -5,6 +5,7 @@ import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, LogOut } from 'lucide-react';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -84,6 +85,7 @@ export const Header: React.FC = () => {
                                 ))}
                             </nav>
                             <div className="hidden md:flex items-center space-x-4">
+                                <LanguageSwitcher />
                                 <a href="#kontakt" onClick={(e) => handleNavClick(e, '#kontakt')} className="bg-gray-800 text-white font-bold px-5 py-2 rounded-lg hover:bg-gray-900 transition text-sm">Kontakta Oss</a>
                                 {isAdmin && (
                                     <div className="flex items-center space-x-2">
@@ -118,6 +120,9 @@ export const Header: React.FC = () => {
                          <a key={link.href} href={link.href} onClick={(e) => handleNavClick(e, link.href)} className="block py-3 px-6 text-sm text-gray-700 hover:bg-gray-50">{link.label}</a>
                     ))}
                     <a href="#kontakt" onClick={(e) => handleNavClick(e, '#kontakt')} className="block py-3 px-6 text-sm text-gray-700 hover:bg-gray-50">Kontakta Oss</a>
+                    <div className="px-6 py-3 border-t border-gray-200">
+                        <LanguageSwitcher />
+                    </div>
                 </div>
             )}
         </header>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWishlist } from '@/contexts/marketplace/WishlistContext';
 import { useCart } from '@/contexts/marketplace/CartProvider';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, ShoppingCart, Trash2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency, formatDiscountPercentage } from '@/utils/currency';
 
 interface ProductDetails {
   id: string;
@@ -21,6 +23,7 @@ interface ProductDetails {
 }
 
 export const WishlistPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { state, removeItem, clearWishlist } = useWishlist();
@@ -76,16 +79,16 @@ export const WishlistPage = () => {
 
     addItem(productId, product.title, product.selling_price, 1, {}, product.image);
     toast({
-      title: 'Added to cart',
-      description: `${product.title} has been added to your cart`,
+      title: t('marketplace.addedToCart'),
+      description: `${product.title} ${t('marketplace.hasBeenAddedToCart')}`,
     });
   };
 
   const handleRemoveFromWishlist = async (productId: string) => {
     await removeItem(productId);
     toast({
-      title: 'Removed from wishlist',
-      description: 'Item has been removed from your wishlist',
+      title: t('marketplace.removedFromWishlist'),
+      description: t('marketplace.itemRemovedFromWishlist'),
     });
   };
 
@@ -105,10 +108,10 @@ export const WishlistPage = () => {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <Heart className="h-24 w-24 text-muted-foreground mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Your wishlist is empty</h2>
-            <p className="text-muted-foreground mb-6">Save items you love for later</p>
+            <h2 className="text-2xl font-bold mb-2">{t('marketplace.wishlistEmpty')}</h2>
+            <p className="text-muted-foreground mb-6">{t('marketplace.saveItemsForLater')}</p>
             <Button onClick={() => navigate('/marketplace/shop')}>
-              Browse Products
+              {t('marketplace.browseProducts')}
             </Button>
           </CardContent>
         </Card>
@@ -120,15 +123,15 @@ export const WishlistPage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">My Wishlist</h1>
+          <h1 className="text-3xl font-bold">{t('marketplace.myWishlist')}</h1>
           <p className="text-muted-foreground">
-            {state.items.length} {state.items.length === 1 ? 'item' : 'items'} saved
+            {t('marketplace.itemsSaved', { count: state.items.length })}
           </p>
         </div>
         {state.items.length > 0 && (
           <Button variant="outline" onClick={clearWishlist}>
             <Trash2 className="mr-2 h-4 w-4" />
-            Clear All
+            {t('marketplace.clearAll')}
           </Button>
         )}
       </div>
@@ -157,7 +160,7 @@ export const WishlistPage = () => {
                 </Button>
                 {product.original_price && product.original_price > product.selling_price && (
                   <Badge className="absolute top-2 left-2" variant="destructive">
-                    Save {Math.round(((product.original_price - product.selling_price) / product.original_price) * 100)}%
+                    Spara {formatDiscountPercentage(product.original_price, product.selling_price)}
                   </Badge>
                 )}
               </div>
@@ -176,11 +179,11 @@ export const WishlistPage = () => {
 
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-primary">
-                    {product.selling_price.toLocaleString('sv-SE')} kr
+                    {formatCurrency(product.selling_price)}
                   </span>
                   {product.original_price && product.original_price > product.selling_price && (
                     <span className="text-sm text-muted-foreground line-through">
-                      {product.original_price.toLocaleString('sv-SE')} kr
+                      {formatCurrency(product.original_price)}
                     </span>
                   )}
                 </div>
@@ -188,11 +191,11 @@ export const WishlistPage = () => {
                 <div className="flex items-center justify-between">
                   {product.in_stock ? (
                     <Badge variant="outline" className="text-green-600">
-                      In Stock ({product.stock_quantity})
+                      {t('product.inStock')} ({product.stock_quantity})
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="text-destructive">
-                      Out of Stock
+                      {t('product.outOfStock')}
                     </Badge>
                   )}
                 </div>
@@ -203,7 +206,7 @@ export const WishlistPage = () => {
                   className="w-full"
                 >
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  Add to Cart
+                  {t('marketplace.addToCart')}
                 </Button>
               </CardContent>
             </Card>
