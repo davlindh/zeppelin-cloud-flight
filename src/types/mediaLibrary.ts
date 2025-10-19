@@ -64,6 +64,12 @@ export interface MediaFilters {
   search?: string;
   is_featured?: boolean;
   is_public?: boolean;
+  
+  // Advanced filters
+  date_from?: string;
+  date_to?: string;
+  file_size_min?: number;
+  file_size_max?: number;
 }
 
 export interface MediaUploadOptions {

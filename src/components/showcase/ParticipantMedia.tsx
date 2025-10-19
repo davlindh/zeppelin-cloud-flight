@@ -29,7 +29,7 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
     status: 'approved' // Only show approved media for public view
   });
   
-  const { unlinkFromParticipant } = useLinkMedia();
+  const { unlinkFromParticipant, linkToProject, linkToParticipant, linkToSponsor } = useLinkMedia();
 
   const handleUnlinkMedia = async (mediaId: string) => {
     try {
@@ -151,8 +151,18 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
           onOpenChange={setShowLinkManager}
           selectedMediaIds={[]}
           onLink={async (entityType, entityIds) => {
-            // Media is already linked via useUnifiedMedia query
-            setShowLinkManager(false);
+            try {
+              if (entityType === 'project') {
+                await linkToProject({ mediaIds: [], projectIds: entityIds });
+              } else if (entityType === 'participant') {
+                await linkToParticipant({ mediaIds: [], participantIds: entityIds });
+              } else if (entityType === 'sponsor') {
+                await linkToSponsor({ mediaIds: [], sponsorIds: entityIds });
+              }
+              setShowLinkManager(false);
+            } catch (error) {
+              console.error('Failed to link media:', error);
+            }
           }}
         />
       )}

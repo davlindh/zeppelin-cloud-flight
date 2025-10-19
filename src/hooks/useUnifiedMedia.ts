@@ -10,6 +10,54 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
   const [filters, setFilters] = useState<MediaFilters>(initialFilters || {});
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
+  // Helper function to apply common filters
+  const applyFilters = (query: any) => {
+    // Type filter
+    if (filters.type && !Array.isArray(filters.type)) {
+      query = query.eq('type', filters.type);
+    } else if (filters.type && Array.isArray(filters.type)) {
+      query = query.in('type', filters.type);
+    }
+    
+    // Status filter
+    if (filters.status && !Array.isArray(filters.status)) {
+      query = query.eq('status', filters.status);
+    } else if (filters.status && Array.isArray(filters.status)) {
+      query = query.in('status', filters.status);
+    }
+    
+    // Boolean filters
+    if (filters.is_public !== undefined) {
+      query = query.eq('is_public', filters.is_public);
+    }
+    if (filters.is_featured !== undefined) {
+      query = query.eq('is_featured', filters.is_featured);
+    }
+    
+    // Search filter
+    if (filters.search) {
+      query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,filename.ilike.%${filters.search}%`);
+    }
+    
+    // Date range filters
+    if (filters.date_from) {
+      query = query.gte('created_at', filters.date_from);
+    }
+    if (filters.date_to) {
+      query = query.lte('created_at', filters.date_to);
+    }
+    
+    // File size filters
+    if (filters.file_size_min !== undefined) {
+      query = query.gte('file_size', filters.file_size_min);
+    }
+    if (filters.file_size_max !== undefined) {
+      query = query.lte('file_size', filters.file_size_max);
+    }
+    
+    return query;
+  };
+
   // Fetch media items
   const { data: media = [], isLoading, error } = useQuery({
     queryKey: ['unified-media', filters],
@@ -30,20 +78,7 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
           .in('id', mediaIds)
           .order('created_at', { ascending: false });
         
-        // Apply additional filters
-        if (filters.type && !Array.isArray(filters.type)) {
-          query = query.eq('type', filters.type);
-        } else if (filters.type && Array.isArray(filters.type)) {
-          query = query.in('type', filters.type);
-        }
-        if (filters.status && !Array.isArray(filters.status)) {
-          query = query.eq('status', filters.status);
-        } else if (filters.status && Array.isArray(filters.status)) {
-          query = query.in('status', filters.status);
-        }
-        if (filters.is_public !== undefined) {
-          query = query.eq('is_public', filters.is_public);
-        }
+        query = applyFilters(query);
         
         const { data, error } = await query;
         if (error) throw error;
@@ -65,20 +100,7 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
           .in('id', mediaIds)
           .order('created_at', { ascending: false });
         
-        // Apply additional filters
-        if (filters.type && !Array.isArray(filters.type)) {
-          query = query.eq('type', filters.type);
-        } else if (filters.type && Array.isArray(filters.type)) {
-          query = query.in('type', filters.type);
-        }
-        if (filters.status && !Array.isArray(filters.status)) {
-          query = query.eq('status', filters.status);
-        } else if (filters.status && Array.isArray(filters.status)) {
-          query = query.in('status', filters.status);
-        }
-        if (filters.is_public !== undefined) {
-          query = query.eq('is_public', filters.is_public);
-        }
+        query = applyFilters(query);
         
         const { data, error } = await query;
         if (error) throw error;
@@ -91,26 +113,7 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Apply filters
-      if (filters.type && !Array.isArray(filters.type)) {
-        query = query.eq('type', filters.type);
-      } else if (filters.type && Array.isArray(filters.type)) {
-        query = query.in('type', filters.type);
-      }
-      if (filters.status && !Array.isArray(filters.status)) {
-        query = query.eq('status', filters.status);
-      } else if (filters.status && Array.isArray(filters.status)) {
-        query = query.in('status', filters.status);
-      }
-      if (filters.is_public !== undefined) {
-        query = query.eq('is_public', filters.is_public);
-      }
-      if (filters.is_featured !== undefined) {
-        query = query.eq('is_featured', filters.is_featured);
-      }
-      if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,filename.ilike.%${filters.search}%`);
-      }
+      query = applyFilters(query);
 
       const { data, error } = await query;
       

@@ -127,7 +127,7 @@ export const MediaLinkManager: React.FC<MediaLinkManagerProps> = ({
     
     setLinking(true);
     try {
-      await onLink(activeTab, selectedEntities);
+      await onLink(activeTab as 'project' | 'participant' | 'sponsor', selectedEntities);
       setSelectedEntities([]);
       onOpenChange(false);
     } catch (error) {

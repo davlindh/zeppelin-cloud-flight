@@ -66,7 +66,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
     status: 'approved' // Only show approved media for public view
   });
   
-  const { unlinkFromProject } = useLinkMedia();
+  const { unlinkFromProject, linkToProject, linkToParticipant, linkToSponsor } = useLinkMedia();
 
   const handleUnlinkMedia = async (mediaId: string) => {
     try {
@@ -409,7 +409,18 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
           onOpenChange={setShowLinkManager}
           selectedMediaIds={[]}
           onLink={async (entityType, entityIds) => {
-            setShowLinkManager(false);
+            try {
+              if (entityType === 'project') {
+                await linkToProject({ mediaIds: [], projectIds: entityIds });
+              } else if (entityType === 'participant') {
+                await linkToParticipant({ mediaIds: [], participantIds: entityIds });
+              } else if (entityType === 'sponsor') {
+                await linkToSponsor({ mediaIds: [], sponsorIds: entityIds });
+              }
+              setShowLinkManager(false);
+            } catch (error) {
+              console.error('Failed to link media:', error);
+            }
           }}
         />
       )}

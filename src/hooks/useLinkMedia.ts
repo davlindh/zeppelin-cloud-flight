@@ -112,13 +112,68 @@ export const useLinkMedia = () => {
     },
   });
 
+  // Link media to sponsor
+  const linkToSponsorMutation = useMutation({
+    mutationFn: async ({ mediaIds, sponsorIds }: { mediaIds: string[]; sponsorIds: string[] }) => {
+      const links = mediaIds.flatMap(mediaId =>
+        sponsorIds.map(sponsorId => ({ media_id: mediaId, sponsor_id: sponsorId }))
+      );
+
+      const { error } = await supabase
+        .from('media_sponsor_links')
+        .upsert(links, { onConflict: 'media_id,sponsor_id' });
+      
+      if (error) throw error;
+    },
+    onSuccess: (_, { mediaIds, sponsorIds }) => {
+      queryClient.invalidateQueries({ queryKey: ['unified-media'] });
+      queryClient.invalidateQueries({ queryKey: ['media-library'] });
+      queryClient.invalidateQueries({ queryKey: ['sponsor-media'] });
+      toast({
+        title: 'Media länkade',
+        description: `${mediaIds.length} mediafil${mediaIds.length !== 1 ? 'er' : ''} har länkats till ${sponsorIds.length} sponsor${sponsorIds.length !== 1 ? 'er' : ''}.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Fel',
+        description: 'Kunde inte länka media till sponsor.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Unlink media from sponsor
+  const unlinkFromSponsorMutation = useMutation({
+    mutationFn: async ({ mediaId, sponsorId }: { mediaId: string; sponsorId: string }) => {
+      const { error } = await supabase
+        .from('media_sponsor_links')
+        .delete()
+        .eq('media_id', mediaId)
+        .eq('sponsor_id', sponsorId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['unified-media'] });
+      queryClient.invalidateQueries({ queryKey: ['media-library'] });
+      queryClient.invalidateQueries({ queryKey: ['sponsor-media'] });
+      toast({
+        title: 'Länk borttagen',
+        description: 'Media har avlänkats från sponsorn.',
+      });
+    },
+  });
+
   return {
     linkToProject: linkToProjectMutation.mutateAsync,
     linkToParticipant: linkToParticipantMutation.mutateAsync,
+    linkToSponsor: linkToSponsorMutation.mutateAsync,
     unlinkFromProject: unlinkFromProjectMutation.mutateAsync,
     unlinkFromParticipant: unlinkFromParticipantMutation.mutateAsync,
+    unlinkFromSponsor: unlinkFromSponsorMutation.mutateAsync,
     
-    isLinking: linkToProjectMutation.isPending || linkToParticipantMutation.isPending,
-    isUnlinking: unlinkFromProjectMutation.isPending || unlinkFromParticipantMutation.isPending,
+    isLinking: linkToProjectMutation.isPending || linkToParticipantMutation.isPending || linkToSponsorMutation.isPending,
+    isUnlinking: unlinkFromProjectMutation.isPending || unlinkFromParticipantMutation.isPending || unlinkFromSponsorMutation.isPending,
   };
 };
