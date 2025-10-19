@@ -71,6 +71,7 @@ const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManageme
 const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManagementPage").then(m => ({ default: m.SponsorsManagementPage })));
 const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage").then(m => ({ default: m.MediaLibraryPage })));
 const SubmissionManagementPage = lazy(() => import("./pages/admin/SubmissionManagementPage"));
+const MediaSubmissionsPage = lazy(() => import("./pages/admin/MediaSubmissionsPage").then(m => ({ default: m.MediaSubmissionsPage })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-96">
@@ -250,6 +251,11 @@ const App = () => (
                   <Route path="submissions" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SubmissionManagementPage />
+                    </Suspense>
+                  } />
+                  <Route path="media/submissions" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <MediaSubmissionsPage />
                     </Suspense>
                   } />
                 </Route>
