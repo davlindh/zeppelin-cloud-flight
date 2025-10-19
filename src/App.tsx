@@ -69,8 +69,7 @@ const SettingsPage = lazy(() => import("./pages/admin/SettingsPage").then(m => (
 const ParticipantsManagementPage = lazy(() => import("./pages/admin/ParticipantsManagementPage").then(m => ({ default: m.ParticipantsManagementPage })));
 const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManagementPage").then(m => ({ default: m.ProjectsManagementPage })));
 const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManagementPage").then(m => ({ default: m.SponsorsManagementPage })));
-const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage").then(m => ({ default: m.MediaLibraryPage })));
-const MediaWorkflowPage = lazy(() => import("./pages/admin/MediaWorkflowPage").then(m => ({ default: m.MediaWorkflowPage })));
+const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage"));
 const SubmissionManagementPage = lazy(() => import("./pages/admin/SubmissionManagementPage"));
 const MediaSubmissionsPage = lazy(() => import("./pages/admin/MediaSubmissionsPage").then(m => ({ default: m.MediaSubmissionsPage })));
 
@@ -246,11 +245,6 @@ const App = () => (
                   <Route path="media" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <MediaLibraryPage />
-                    </Suspense>
-                  } />
-                  <Route path="media-workflow" element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <MediaWorkflowPage />
                     </Suspense>
                   } />
                   <Route path="submissions" element={

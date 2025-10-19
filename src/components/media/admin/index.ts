@@ -3,7 +3,7 @@ export { MediaSubmissionApproval } from './MediaSubmissionApproval';
 export { MediaPreviewPanel } from './MediaPreviewPanel';
 export { MediaBulkActionsToolbar } from './MediaBulkActionsToolbar';
 export { MediaFilterPanel } from './MediaFilterPanel';
-export { MediaFilterPanelEnhanced } from './MediaFilterPanelEnhanced';
+export { MediaFilterPanelBasic } from './MediaFilterPanelBasic';
 export { MediaUploadDialog } from './MediaUploadDialog';
 export { MediaLinkManager } from './MediaLinkManager';
 export { StorageImportDialog } from './StorageImportDialog';
