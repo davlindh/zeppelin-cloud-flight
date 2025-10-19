@@ -8,10 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { ParticipantAvatar } from '@/components/showcase/ParticipantAvatar';
-import { MediaGrid } from '@/components/media/core/MediaGrid';
+import { ParticipantMedia } from '@/components/showcase/ParticipantMedia';
 import { useToast } from '@/hooks/use-toast';
-import type { UnifiedMediaItem } from '@/types/unified-media';
-import { generateMediaId } from '@/utils/mediaHelpers';
 import { useParticipantData } from '@/hooks/useParticipantData';
 import type { Participant } from '../types/unified';
 
@@ -319,25 +317,12 @@ export const ParticipantDetailPage: React.FC = () => {
             </Card>
           )}
 
-          {/* Featured Media Section */}
-          {participant.media && participant.media.length > 0 && (
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-foreground mb-6">Media</h2>
-                <MediaGrid
-                  media={participant.media.map(item => ({
-                    id: item.id ?? generateMediaId(item),
-                    type: item.type as 'image' | 'video' | 'audio' | 'document',
-                    url: item.url,
-                    title: item.title,
-                    description: item.description,
-                    thumbnail: item.type === 'image' ? item.url : undefined
-                  }))}
-                  viewMode="grid"
-                />
-              </CardContent>
-            </Card>
-          )}
+          {/* Media Section - Dynamic loading from media_library */}
+          <ParticipantMedia
+            participantId={participant.id}
+            participantName={participant.name}
+            showAdminControls={isAdmin}
+          />
 
           {/* Social Links Section */}
           {((participant.personalLinks && participant.personalLinks.length > 0) || (participant.socialLinks && participant.socialLinks.length > 0)) && (

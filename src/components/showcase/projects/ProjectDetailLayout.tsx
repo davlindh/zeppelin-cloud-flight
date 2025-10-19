@@ -2,7 +2,7 @@ import React from 'react';
 import { ProjectDetailHero } from './ProjectDetailHero';
 import { ProjectPurposeImpact } from './ProjectPurposeImpact';
 import { ProjectTimelineBudget } from './ProjectTimelineBudget';
-import { ProjectMediaSection } from './ProjectMediaSection';
+import { ProjectMediaDisplay } from '../ProjectMediaDisplay';
 import { ProjectLinksSection } from './ProjectLinksSection';
 import { ProjectInfoSidebar } from './ProjectInfoSidebar';
 
@@ -108,13 +108,10 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
               budget={project.budget}
             />
 
-            {/* Media Gallery - NOW SHOWING ALL DATABASE DATA */}
-            <ProjectMediaSection
-              media={project.media}
+            {/* Media Gallery - Dynamic loading from media_library */}
+            <ProjectMediaDisplay
               projectId={project.id}
-              rawData={{
-                project_media: project.project_media // Raw database media data
-              }}
+              showAdminControls={isAdmin}
             />
 
             {/* Project Links */}
