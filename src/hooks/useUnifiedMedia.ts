@@ -14,6 +14,78 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
   const { data: media = [], isLoading, error } = useQuery({
     queryKey: ['unified-media', filters],
     queryFn: async () => {
+      // Handle project/participant filtering through link tables
+      if (filters.project_id) {
+        const { data: links } = await supabase
+          .from('media_project_links')
+          .select('media_id')
+          .eq('project_id', filters.project_id);
+        
+        if (!links || links.length === 0) return [];
+        
+        const mediaIds = links.map(link => link.media_id);
+        let query = supabase
+          .from('media_library')
+          .select('*')
+          .in('id', mediaIds)
+          .order('created_at', { ascending: false });
+        
+        // Apply additional filters
+        if (filters.type && !Array.isArray(filters.type)) {
+          query = query.eq('type', filters.type);
+        } else if (filters.type && Array.isArray(filters.type)) {
+          query = query.in('type', filters.type);
+        }
+        if (filters.status && !Array.isArray(filters.status)) {
+          query = query.eq('status', filters.status);
+        } else if (filters.status && Array.isArray(filters.status)) {
+          query = query.in('status', filters.status);
+        }
+        if (filters.is_public !== undefined) {
+          query = query.eq('is_public', filters.is_public);
+        }
+        
+        const { data, error } = await query;
+        if (error) throw error;
+        return data as MediaLibraryItem[];
+      }
+      
+      if (filters.participant_id) {
+        const { data: links } = await supabase
+          .from('media_participant_links')
+          .select('media_id')
+          .eq('participant_id', filters.participant_id);
+        
+        if (!links || links.length === 0) return [];
+        
+        const mediaIds = links.map(link => link.media_id);
+        let query = supabase
+          .from('media_library')
+          .select('*')
+          .in('id', mediaIds)
+          .order('created_at', { ascending: false });
+        
+        // Apply additional filters
+        if (filters.type && !Array.isArray(filters.type)) {
+          query = query.eq('type', filters.type);
+        } else if (filters.type && Array.isArray(filters.type)) {
+          query = query.in('type', filters.type);
+        }
+        if (filters.status && !Array.isArray(filters.status)) {
+          query = query.eq('status', filters.status);
+        } else if (filters.status && Array.isArray(filters.status)) {
+          query = query.in('status', filters.status);
+        }
+        if (filters.is_public !== undefined) {
+          query = query.eq('is_public', filters.is_public);
+        }
+        
+        const { data, error } = await query;
+        if (error) throw error;
+        return data as MediaLibraryItem[];
+      }
+      
+      // Default query without project/participant filtering
       let query = supabase
         .from('media_library')
         .select('*')

@@ -1,93 +1,119 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { MediaGrid } from '@/components/media/core/MediaGrid';
-import { MediaFilters } from '@/components/media/core/MediaFilters';
-import { useMediaFiltering } from '@/hooks/useMediaFiltering';
-import type { UnifiedMediaItem } from '@/types/unified-media';
+import { useUnifiedMedia } from '@/hooks/useUnifiedMedia';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import { generateMediaId } from '@/utils/mediaHelpers';
-import { getImageUrl } from '@/utils/imageUtils';
+import { Link as LinkIcon, Unlink } from 'lucide-react';
+import type { UnifiedMediaItem } from '@/types/unified-media';
+import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
+import { useState } from 'react';
 
 interface ProjectMediaDisplayProps {
-  media?: Array<{
-    type: string;
-    url: string;
-    title: string;
-    description?: string;
-    project_id?: string;
-  }>;
-  showPreview?: boolean;
-  allowCategorization?: boolean;
+  projectId: string;
+  showAdminControls?: boolean;
 }
 
 export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
-  media = [], 
-  showPreview = true,
-  allowCategorization = true 
+  projectId,
+  showAdminControls = false
 }) => {
-  // Transform media into UnifiedMediaItem format with optimized URLs
-  const unifiedMedia: UnifiedMediaItem[] = useMemo(() => 
-    media.map((item) => ({
-      id: generateMediaId(item),
-      type: item.type as UnifiedMediaItem['type'],
-      url: getImageUrl(item.url), // Optimize URL handling
-      title: item.title,
-      description: item.description,
-    })), [media]
-  );
+  const { isAdmin } = useAdminAuth();
+  const [showLinkManager, setShowLinkManager] = useState(false);
+  
+  // Fetch media dynamically based on project_id
+  const { media, isLoading } = useUnifiedMedia({ 
+    project_id: projectId,
+    status: 'approved' // Only show approved media for public view
+  });
+  
+  const { unlinkFromProject } = useLinkMedia();
 
-  const {
-    viewMode,
-    typeFilter,
-    availableTypes,
-    filteredMedia,
-    setViewMode,
-    setTypeFilter,
-    resetFilters,
-    totalCount,
-    filteredCount,
-    hasFilters
-  } = useMediaFiltering({ media: unifiedMedia });
+  const handleUnlinkMedia = async (mediaId: string) => {
+    try {
+      await unlinkFromProject({ mediaId, projectId });
+    } catch (error) {
+      console.error('Failed to unlink media:', error);
+    }
+  };
 
-  // Convert viewMode to match UnifiedMediaGrid's expected type
-  const gridViewMode = viewMode === 'gallery' ? 'grid' : viewMode;
+  // Convert to UnifiedMediaItem format
+  const unifiedMedia: UnifiedMediaItem[] = media.map(item => ({
+    id: item.id,
+    type: item.type as UnifiedMediaItem['type'],
+    url: item.public_url,
+    title: item.title,
+    description: item.description,
+    thumbnail: item.thumbnail_url,
+  }));
 
-  if (media.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Media</h3>
+        </div>
+        <div className="text-center py-8 text-muted-foreground">
+          Laddar media...
+        </div>
+      </div>
+    );
+  }
+
+  if (unifiedMedia.length === 0 && !showAdminControls) {
     return null;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Media ({totalCount})</h3>
+        <h3 className="text-lg font-semibold">Media ({unifiedMedia.length})</h3>
+        
+        {showAdminControls && isAdmin && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowLinkManager(true)}
+          >
+            <LinkIcon className="h-4 w-4 mr-2" />
+            Länka Media
+          </Button>
+        )}
       </div>
 
-      {(allowCategorization && hasFilters) && (
-        <div className="text-sm text-muted-foreground">
-          Visar {filteredMedia.length} av {totalCount} objekt
-        </div>
-      )}
-
-      {filteredMedia.length > 0 ? (
+      {unifiedMedia.length > 0 ? (
         <MediaGrid
-          media={filteredMedia.map(item => ({
+          media={unifiedMedia.map(item => ({
             ...item,
             type: item.type as 'image' | 'video' | 'audio' | 'document'
           }))}
-          viewMode={gridViewMode}
+          viewMode="grid"
           className="mt-4"
         />
       ) : (
         <div className="text-center py-8">
           <p className="text-muted-foreground mb-4">
-            Inga mediafiler hittades{typeFilter !== 'all' ? ' för vald typ' : ''}.
+            Inga mediafiler länkade till detta projekt än.
           </p>
-          {typeFilter !== 'all' && (
-            <Button variant="outline" onClick={resetFilters}>
-              Återställ filter
+          {showAdminControls && isAdmin && (
+            <Button variant="outline" onClick={() => setShowLinkManager(true)}>
+              <LinkIcon className="h-4 w-4 mr-2" />
+              Länka Media
             </Button>
           )}
         </div>
+      )}
+
+      {showLinkManager && (
+        <MediaLinkManager
+          open={showLinkManager}
+          onOpenChange={setShowLinkManager}
+          selectedMediaIds={[]}
+          onLink={async (entityType, entityIds) => {
+            // Media is already linked via useUnifiedMedia query
+            setShowLinkManager(false);
+          }}
+        />
       )}
     </div>
   );
