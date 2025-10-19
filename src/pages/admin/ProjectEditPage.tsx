@@ -4,18 +4,27 @@ import { EditPageLayout } from '@/components/admin/EditPageLayout';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
 import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { SponsorSelector } from '@/components/admin/project/SponsorSelector';
+import { TimelineEditor, BudgetEditor } from '@/components/admin/editors';
+import { AdminFormSections, FormSection } from '@/components/admin/AdminFormSections';
 import { supabase } from '@/integrations/supabase/client';
 import { useCanEditProject } from '@/hooks/useCanEditProject';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ShieldAlert } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ShieldAlert, FileText, Calendar, DollarSign, Image, Users } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export const ProjectEditPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
+  const { toast } = useToast();
   const [projectId, setProjectId] = useState<string | undefined>();
   const [isLoadingId, setIsLoadingId] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [timelineData, setTimelineData] = useState<any>(null);
+  const [budgetData, setBudgetData] = useState<any>(null);
+  const [isLoadingTimeline, setIsLoadingTimeline] = useState(false);
+  const [isLoadingBudget, setIsLoadingBudget] = useState(false);
 
   // Get project data from navigation state if available
   const projectData = location.state?.projectData;
@@ -77,6 +86,105 @@ export const ProjectEditPage: React.FC = () => {
     resolveProjectId();
   }, [slug, projectData]);
 
+  // Fetch timeline and budget data when projectId is available
+  useEffect(() => {
+    const fetchTimelineAndBudget = async () => {
+      if (!projectId) return;
+
+      try {
+        // Fetch timeline
+        const { data: timeline } = await supabase
+          .from('project_timeline')
+          .select('*')
+          .eq('project_id', projectId)
+          .maybeSingle();
+        
+        setTimelineData(timeline || {});
+
+        // Fetch budget
+        const { data: budget } = await supabase
+          .from('project_budget')
+          .select('*')
+          .eq('project_id', projectId)
+          .maybeSingle();
+        
+        setBudgetData(budget || {});
+      } catch (error) {
+        console.error('Error fetching timeline/budget:', error);
+      }
+    };
+
+    fetchTimelineAndBudget();
+  }, [projectId]);
+
+  const handleTimelineSave = async (timeline: any) => {
+    if (!projectId) return;
+    
+    setIsLoadingTimeline(true);
+    try {
+      const { error } = await supabase
+        .from('project_timeline')
+        .upsert({
+          project_id: projectId,
+          start_date: timeline.start_date,
+          end_date: timeline.end_date,
+          milestones: timeline.milestones || []
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Sparad',
+        description: 'Timeline har uppdaterats',
+      });
+      
+      setTimelineData(timeline);
+    } catch (error) {
+      console.error('Error saving timeline:', error);
+      toast({
+        title: 'Fel',
+        description: 'Kunde inte spara timeline',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingTimeline(false);
+    }
+  };
+
+  const handleBudgetSave = async (budget: any) => {
+    if (!projectId) return;
+    
+    setIsLoadingBudget(true);
+    try {
+      const { error } = await supabase
+        .from('project_budget')
+        .upsert({
+          project_id: projectId,
+          amount: budget.amount,
+          currency: budget.currency || 'SEK',
+          breakdown: budget.breakdown || []
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Sparad',
+        description: 'Budget har uppdaterats',
+      });
+      
+      setBudgetData(budget);
+    } catch (error) {
+      console.error('Error saving budget:', error);
+      toast({
+        title: 'Fel',
+        description: 'Kunde inte spara budget',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingBudget(false);
+    }
+  };
+
   const { data: user, isLoading: isLoadingUser } = useAuthenticatedUser();
   const { canEdit, isLoading: isLoadingPermission } = useCanEditProject(projectId);
 
@@ -127,42 +235,132 @@ export const ProjectEditPage: React.FC = () => {
       entityType="project"
       title={pageTitle}
     >
-      <div className="space-y-8">
-        {/* Main project form */}
-        <div className="max-w-none">
-          <AdminFormFactory
-            entityType="project"
-            entityId={projectId}
-            initialData={projectData}
-            renderMode="page"
-            onClose={() => window.history.back()}
-            onSuccess={() => window.history.back()}
-          />
-        </div>
+      <Tabs defaultValue="basic" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="basic">
+            <FileText className="h-4 w-4 mr-2" />
+            Basinformation
+          </TabsTrigger>
+          <TabsTrigger value="timeline" disabled={!projectId}>
+            <Calendar className="h-4 w-4 mr-2" />
+            Timeline & Budget
+          </TabsTrigger>
+          <TabsTrigger value="media" disabled={!projectId}>
+            <Image className="h-4 w-4 mr-2" />
+            Media
+          </TabsTrigger>
+          <TabsTrigger value="sponsors" disabled={!projectId}>
+            <Users className="h-4 w-4 mr-2" />
+            Sponsorer
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Project media library - only shown if we have a project ID */}
-        {projectId && (
-          <>
-            <div className="max-w-none">
-              <UnifiedMediaManager
+        {/* Basic Information */}
+        <TabsContent value="basic" className="space-y-6">
+          <AdminFormSections>
+            <FormSection 
+              title="Projektinformation" 
+              description="Grundläggande information om projektet"
+              icon={FileText}
+              collapsible={false}
+            >
+              <AdminFormFactory
                 entityType="project"
                 entityId={projectId}
-                mode="admin"
-                showUpload
-                showLinking
-                showFilters
+                initialData={projectData}
+                renderMode="page"
+                onClose={() => window.history.back()}
+                onSuccess={() => {
+                  toast({
+                    title: 'Sparat',
+                    description: 'Projektet har uppdaterats',
+                  });
+                }}
               />
-            </div>
+            </FormSection>
+          </AdminFormSections>
+        </TabsContent>
 
-            {/* Sponsor selector */}
-            <div className="max-w-none">
-              <SponsorSelector
-                projectId={projectId}
-              />
-            </div>
-          </>
-        )}
-      </div>
+        {/* Timeline & Budget */}
+        <TabsContent value="timeline" className="space-y-6">
+          <AdminFormSections>
+            <FormSection
+              title="Projektets timeline"
+              description="Hantera projektets tidsplan och milstolpar"
+              icon={Calendar}
+              defaultOpen={true}
+            >
+              {timelineData ? (
+                <TimelineEditor
+                  value={timelineData}
+                  onChange={handleTimelineSave}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Laddar timeline...</p>
+                </div>
+              )}
+            </FormSection>
+
+            <FormSection
+              title="Projektbudget"
+              description="Hantera projektets ekonomi och kostnadsfördelning"
+              icon={DollarSign}
+              defaultOpen={true}
+            >
+              {budgetData ? (
+                <BudgetEditor
+                  value={budgetData}
+                  onChange={handleBudgetSave}
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Laddar budget...</p>
+                </div>
+              )}
+            </FormSection>
+          </AdminFormSections>
+        </TabsContent>
+
+        {/* Media */}
+        <TabsContent value="media" className="space-y-6">
+          <AdminFormSections>
+            <FormSection
+              title="Projektets media"
+              description="Hantera bilder, videos och andra mediafiler"
+              icon={Image}
+              collapsible={false}
+            >
+              {projectId && (
+                <UnifiedMediaManager
+                  entityType="project"
+                  entityId={projectId}
+                  mode="admin"
+                  showUpload
+                  showLinking
+                  showFilters
+                />
+              )}
+            </FormSection>
+          </AdminFormSections>
+        </TabsContent>
+
+        {/* Sponsors */}
+        <TabsContent value="sponsors" className="space-y-6">
+          <AdminFormSections>
+            <FormSection
+              title="Projektsponsorer"
+              description="Hantera sponsorer och partners för projektet"
+              icon={Users}
+              collapsible={false}
+            >
+              {projectId && (
+                <SponsorSelector projectId={projectId} />
+              )}
+            </FormSection>
+          </AdminFormSections>
+        </TabsContent>
+      </Tabs>
     </EditPageLayout>
   );
 };
