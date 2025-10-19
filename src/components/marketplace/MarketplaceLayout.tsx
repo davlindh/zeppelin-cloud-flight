@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, ShoppingCart, Heart, Bell, User, Package, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +14,18 @@ import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { getUserInitials } from '@/utils/transforms/profile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { CartSidebar } from './cart/CartSidebar';
+import { FloatingCartButton } from './FloatingCartButton';
+import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useState } from 'react';
 
 export default function MarketplaceLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { data: user, isLoading } = useAuthenticatedUser();
+  const { state } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
   
   const isActive = (path: string) => location.pathname.includes(path);
 
@@ -60,11 +67,22 @@ export default function MarketplaceLayout() {
                   <Bell className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link to="/marketplace/cart">
-                <Button variant="ghost" size="icon">
-                  <ShoppingCart className="w-5 h-5" />
-                </Button>
-              </Link>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="relative"
+                onClick={() => setIsCartOpen(true)}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {state.itemCount > 0 && (
+                  <Badge 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    variant="destructive"
+                  >
+                    {state.itemCount}
+                  </Badge>
+                )}
+              </Button>
               
               {/* User Widget */}
               {!isLoading && user ? (
@@ -199,6 +217,12 @@ export default function MarketplaceLayout() {
           </div>
         </div>
       </footer>
+
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      
+      {/* Floating Cart Button (Mobile) */}
+      <FloatingCartButton onClick={() => setIsCartOpen(true)} />
     </div>
   );
 }
