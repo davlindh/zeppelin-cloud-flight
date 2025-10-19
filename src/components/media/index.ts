@@ -1,6 +1,9 @@
 // Core components - used everywhere
 export * from './core';
 
+// Unified media manager - main component for entity media
+export { UnifiedMediaManager } from './UnifiedMediaManager';
+
 // Admin components - only for /admin routes
 export { MediaSubmissionApproval } from './admin/MediaSubmissionApproval';
 export { MediaPreviewPanel } from './admin/MediaPreviewPanel';

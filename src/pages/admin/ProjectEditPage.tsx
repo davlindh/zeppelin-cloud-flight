@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { EditPageLayout } from '@/components/admin/EditPageLayout';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
-import { ProjectMediaLibrary } from '@/components/admin/ProjectMediaLibrary';
+import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { SponsorSelector } from '@/components/admin/project/SponsorSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { useCanEditProject } from '@/hooks/useCanEditProject';
@@ -144,8 +144,13 @@ export const ProjectEditPage: React.FC = () => {
         {projectId && (
           <>
             <div className="max-w-none">
-              <ProjectMediaLibrary
-                projectId={projectId}
+              <UnifiedMediaManager
+                entityType="project"
+                entityId={projectId}
+                mode="admin"
+                showUpload
+                showLinking
+                showFilters
               />
             </div>
 

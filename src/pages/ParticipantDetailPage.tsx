@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { ParticipantAvatar } from '@/components/showcase/ParticipantAvatar';
-import { ParticipantMedia } from '@/components/showcase/ParticipantMedia';
+import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { useToast } from '@/hooks/use-toast';
 import { useParticipantData } from '@/hooks/useParticipantData';
 import type { Participant } from '../types/unified';
@@ -318,10 +318,11 @@ export const ParticipantDetailPage: React.FC = () => {
           )}
 
           {/* Media Section - Dynamic loading from media_library */}
-          <ParticipantMedia
-            participantId={participant.id}
-            participantName={participant.name}
-            showAdminControls={isAdmin}
+          <UnifiedMediaManager
+            entityType="participant"
+            entityId={participant.id}
+            entityName={participant.name}
+            mode="public"
           />
 
           {/* Social Links Section */}

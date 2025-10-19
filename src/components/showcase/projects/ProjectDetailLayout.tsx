@@ -2,7 +2,7 @@ import React from 'react';
 import { ProjectDetailHero } from './ProjectDetailHero';
 import { ProjectPurposeImpact } from './ProjectPurposeImpact';
 import { ProjectTimelineBudget } from './ProjectTimelineBudget';
-import { ProjectMediaDisplay } from '../ProjectMediaDisplay';
+import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { ProjectLinksSection } from './ProjectLinksSection';
 import { ProjectInfoSidebar } from './ProjectInfoSidebar';
 
@@ -109,9 +109,10 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
             />
 
             {/* Media Gallery - Dynamic loading from media_library */}
-            <ProjectMediaDisplay
-              projectId={project.id}
-              showAdminControls={isAdmin}
+            <UnifiedMediaManager
+              entityType="project"
+              entityId={project.id}
+              mode="public"
             />
 
             {/* Project Links */}

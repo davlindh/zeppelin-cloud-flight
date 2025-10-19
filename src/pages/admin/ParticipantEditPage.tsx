@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { EditPageLayout } from '@/components/admin/EditPageLayout';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
+import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
 import { supabase } from '@/integrations/supabase/client';
 import { useCanEditParticipant } from '@/hooks/useCanEditParticipant';
 import { useClaimableParticipant } from '@/hooks/useClaimableParticipant';
@@ -130,14 +131,34 @@ export const ParticipantEditPage: React.FC = () => {
   // Show edit form if user has permission
   return (
     <EditPageLayout entityType="participant" title="Redigera deltagare">
-      {participantId && (
-        <AdminFormFactory
-          entityType="participant"
-          entityId={participantId}
-          onClose={() => window.history.back()}
-          onSuccess={() => window.history.back()}
-        />
-      )}
+      <div className="space-y-8">
+        {/* Main participant form */}
+        {participantId && (
+          <div className="max-w-none">
+            <AdminFormFactory
+              entityType="participant"
+              entityId={participantId}
+              onClose={() => window.history.back()}
+              onSuccess={() => window.history.back()}
+            />
+          </div>
+        )}
+
+        {/* Participant media management */}
+        {participantId && (
+          <div className="max-w-none">
+            <UnifiedMediaManager
+              entityType="participant"
+              entityId={participantId}
+              entityName={participantName}
+              mode="admin"
+              showUpload
+              showLinking
+              showFilters
+            />
+          </div>
+        )}
+      </div>
     </EditPageLayout>
   );
 };
