@@ -12,7 +12,7 @@ import { SubmissionListItem } from '@/components/admin/submission-management/Sub
 import { SubmissionContentPreview } from '@/components/admin/submission-management/SubmissionContentPreview';
 import { MigrationTools } from '@/components/admin/submission-management/MigrationTools';
 import { MediaGrid } from '@/components/media/shared/MediaGrid';
-import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
+import { MediaPreviewPanel } from '@/components/media/admin/MediaPreviewPanel';
 import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';

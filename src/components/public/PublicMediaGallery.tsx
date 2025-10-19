@@ -26,7 +26,7 @@ import {
   X
 } from 'lucide-react';
 import { getMediaIcon, getMediaTypeColor, getCategoryColor, formatFileSize } from '@/utils/mediaHelpers';
-import { MediaGridSkeleton } from '@/components/multimedia/MediaGridSkeleton';
+import { MediaGridSkeleton } from '@/components/media/core/MediaGridSkeleton';
 
 interface MediaItem {
   id: string;

@@ -5,7 +5,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { MediaProvider } from "@/contexts/MediaContext";
-import { UnifiedMediaProvider } from "@/contexts/UnifiedMediaContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { PermissionProvider } from "@/components/providers/PermissionProvider";
@@ -84,7 +83,6 @@ const App = () => (
     <TooltipProvider>
       <AdminAuthProvider>
         <MediaProvider>
-          <UnifiedMediaProvider>
           <PermissionProvider>
             <Toaster />
             <BrowserRouter
@@ -300,7 +298,6 @@ const App = () => (
               <div />
             </MediaErrorBoundary>
           </PermissionProvider>
-          </UnifiedMediaProvider>
         </MediaProvider>
       </AdminAuthProvider>
     </TooltipProvider>

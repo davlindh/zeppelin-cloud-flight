@@ -34,7 +34,8 @@ interface UploadFile {
 interface MediaUploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpload: (files: UploadFile[]) => Promise<void>;
+  onUpload?: (files: UploadFile[]) => Promise<void>;
+  onUploadComplete?: () => void;
   acceptedTypes?: string[];
   maxFiles?: number;
   maxSizeMB?: number;
@@ -44,6 +45,7 @@ export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
   open,
   onOpenChange,
   onUpload,
+  onUploadComplete,
   acceptedTypes = ['image/*', 'video/*', 'audio/*', 'application/pdf'],
   maxFiles = 10,
   maxSizeMB = 50,
@@ -95,8 +97,11 @@ export const MediaUploadDialog: React.FC<MediaUploadDialogProps> = ({
   const handleUpload = async () => {
     setUploading(true);
     try {
-      await onUpload(files);
+      if (onUpload) {
+        await onUpload(files);
+      }
       setFiles([]);
+      onUploadComplete?.();
       onOpenChange(false);
     } catch (error) {
       console.error('Upload failed:', error);

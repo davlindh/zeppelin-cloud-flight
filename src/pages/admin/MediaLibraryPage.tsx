@@ -1,10 +1,10 @@
 import React from 'react';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
 import { MediaGrid } from '@/components/media/shared/MediaGrid';
-import { MediaPreviewPanel } from '@/components/media/MediaPreviewPanel';
-import { MediaUploadDialog } from '@/components/media/MediaUploadDialog';
-import { MediaFilterPanel } from '@/components/media/MediaFilterPanel';
-import { MediaBulkActionsToolbar } from '@/components/media/MediaBulkActionsToolbar';
+import { MediaPreviewPanel } from '@/components/media/admin/MediaPreviewPanel';
+import { MediaUploadDialog } from '@/components/media/admin/MediaUploadDialog';
+import { MediaFilterPanel } from '@/components/media/admin/MediaFilterPanel';
+import { MediaBulkActionsToolbar } from '@/components/media/admin/MediaBulkActionsToolbar';
 import { MediaViewModeToggle, ViewMode } from '@/components/media/MediaViewModeToggle';
 import { MediaStorageStats } from '@/components/media/MediaStorageStats';
 import { StorageExplorer } from '@/components/media/StorageExplorer';

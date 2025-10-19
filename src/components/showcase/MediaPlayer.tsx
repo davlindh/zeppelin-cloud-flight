@@ -1,9 +1,16 @@
 import React from 'react';
-import { UnifiedMediaGrid } from '../multimedia/UnifiedMediaGrid';
-import type { UnifiedMediaItem } from '../../types/unified-media';
+import { MediaGrid } from '@/components/media/core/MediaGrid';
+import type { MediaType } from '@/types/media';
 
 interface MediaPlayerProps {
-    media: UnifiedMediaItem[];
+    media: Array<{
+        id: string;
+        type: MediaType;
+        url: string;
+        title: string;
+        description?: string;
+        thumbnail?: string;
+    }>;
     viewMode?: 'grid' | 'list';
     showPreview?: boolean;
     showPlayButton?: boolean;
@@ -42,17 +49,13 @@ export const MediaPlayer: React.FC<MediaPlayerProps> = ({
         return (
             <div className={`space-y-4 ${className}`}>
                 <h3 className="text-xl font-semibold">Media Collection ({media.length})</h3>
-                <UnifiedMediaGrid
-                    media={media}
+                <MediaGrid
+                    media={media.map(item => ({
+                        ...item,
+                        type: item.type as 'image' | 'video' | 'audio' | 'document'
+                    }))}
                     viewMode={viewMode}
-                    showPreview={showPreview}
-                    showPlayButton={showPlayButton}
-                    showAddToQueue={showAddToQueue}
-                    showDownloadButton={showDownloadButton}
-                    showMetadata={showMetadata}
-                    enableSearch={enableSearch}
-                    enableFilters={enableFilters}
-                    emptyStateMessage="Inga mediafiler tillgängliga."
+                    emptyMessage="Inga mediafiler tillgängliga."
                     className="mt-4"
                 />
             </div>
@@ -63,17 +66,13 @@ export const MediaPlayer: React.FC<MediaPlayerProps> = ({
     return (
         <div className={`space-y-4 ${className}`}>
             <h3 className="text-xl font-semibold">Media ({playableMedia.length})</h3>
-            <UnifiedMediaGrid
-                media={playableMedia}
+            <MediaGrid
+                media={playableMedia.map(item => ({
+                    ...item,
+                    type: item.type as 'image' | 'video' | 'audio' | 'document'
+                }))}
                 viewMode={viewMode}
-                showPreview={showPreview}
-                showPlayButton={showPlayButton}
-                showAddToQueue={showAddToQueue}
-                showDownloadButton={showDownloadButton}
-                showMetadata={showMetadata}
-                enableSearch={enableSearch}
-                enableFilters={enableFilters}
-                emptyStateMessage="Inga spelbara mediafiler tillgängliga."
+                emptyMessage="Inga spelbara mediafiler tillgängliga."
                 className="mt-4"
             />
         </div>

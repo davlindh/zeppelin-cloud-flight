@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
-import { MediaFilters } from '@/components/multimedia/MediaFilters';
+import { MediaGrid } from '@/components/media/core/MediaGrid';
+import { MediaFilters } from '@/components/media/core/MediaFilters';
 import { useMediaFiltering } from '@/hooks/useMediaFiltering';
 import type { UnifiedMediaItem } from '@/types/unified-media';
 import { Button } from '@/components/ui/button';
@@ -63,22 +63,18 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
       </div>
 
       {(allowCategorization && hasFilters) && (
-        <MediaFilters
-          availableTypes={availableTypes}
-          activeTypeFilter={typeFilter}
-          viewMode={viewMode}
-          totalCount={totalCount}
-          filteredCount={filteredMedia.length}
-          onTypeFilterChange={setTypeFilter}
-          onViewModeChange={setViewMode}
-        />
+        <div className="text-sm text-muted-foreground">
+          Visar {filteredMedia.length} av {totalCount} objekt
+        </div>
       )}
 
       {filteredMedia.length > 0 ? (
-        <UnifiedMediaGrid
-          media={filteredMedia as UnifiedMediaItem[]}
+        <MediaGrid
+          media={filteredMedia.map(item => ({
+            ...item,
+            type: item.type as 'image' | 'video' | 'audio' | 'document'
+          }))}
           viewMode={gridViewMode}
-          showPreview={showPreview}
           className="mt-4"
         />
       ) : (

@@ -7,7 +7,7 @@ import { Upload, Eye, Trash2, FileText, Filter, SortDesc } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { MediaGallery } from '@/components/multimedia/MediaGallery';
+import { MediaGallery } from '@/components/media/core/MediaGallery';
 import { FilterSystem, FilterBar, FilterResults, createSearchFilter, createMultiSelectFilter, createSingleSelectFilter, FilterConfig, useFilterSystem } from '@/components/common/FilterSystem';
 import { FilterOption } from '@/components/common/FilterComponents';
 

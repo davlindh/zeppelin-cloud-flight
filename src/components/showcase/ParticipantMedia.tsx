@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User, Calendar } from 'lucide-react';
-import { UnifiedMediaGrid } from '../multimedia/UnifiedMediaGrid';
-import { MediaFilters } from '../multimedia/MediaFilters';
+import { MediaGrid } from '@/components/media/core/MediaGrid';
+import { MediaFilters } from '@/components/media/core/MediaFilters';
 import { getCategoryIcon, getCategoryColor, getCategoryLabel, generateMediaId } from '@/utils/mediaHelpers';
 import type { MediaCategory, UnifiedMediaItem } from '@/types/unified-media';
 
@@ -69,21 +69,11 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
         </h3>
       </div>
       
-      {/* Filters */}
+      {/* Show filter count */}
       {(availableTypes.length > 1 || availableCategories.length > 1) && (
-        <MediaFilters
-          availableTypes={availableTypes}
-          availableCategories={availableCategories}
-          activeTypeFilter={typeFilter}
-          activeCategoryFilter={categoryFilter}
-          viewMode={viewMode === 'gallery' ? 'grid' : viewMode}
-          totalCount={mediaItems.length}
-          filteredCount={filteredMedia.length}
-          onTypeFilterChange={setTypeFilter}
-          onCategoryFilterChange={setCategoryFilter}
-          onViewModeChange={(mode) => setViewMode(mode === 'gallery' ? 'grid' : mode)}
-          showCategoryFilter={true}
-        />
+        <div className="text-sm text-muted-foreground">
+          Visar {filteredMedia.length} av {mediaItems.length} objekt
+        </div>
       )}
       
       {/* Grouped Media by Category */}
@@ -99,8 +89,11 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
             </span>
           </div>
           
-          <UnifiedMediaGrid
-            media={items}
+          <MediaGrid
+            media={items.map(item => ({
+              ...item,
+              type: item.type as 'image' | 'video' | 'audio' | 'document'
+            }))}
             viewMode={viewMode === 'gallery' ? 'grid' : viewMode}
           />
         </div>

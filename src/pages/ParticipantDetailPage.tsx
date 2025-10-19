@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { ParticipantAvatar } from '@/components/showcase/ParticipantAvatar';
-import { UnifiedMediaGrid } from '@/components/multimedia/UnifiedMediaGrid';
+import { MediaGrid } from '@/components/media/core/MediaGrid';
 import { useToast } from '@/hooks/use-toast';
 import type { UnifiedMediaItem } from '@/types/unified-media';
 import { generateMediaId } from '@/utils/mediaHelpers';
@@ -324,24 +324,16 @@ export const ParticipantDetailPage: React.FC = () => {
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-foreground mb-6">Media</h2>
-                <UnifiedMediaGrid
+                <MediaGrid
                   media={participant.media.map(item => ({
                     id: item.id ?? generateMediaId(item),
-                    type: item.type as UnifiedMediaItem['type'],
-                    category: 'featured',
+                    type: item.type as 'image' | 'video' | 'audio' | 'document',
                     url: item.url,
                     title: item.title,
                     description: item.description,
-                    participantId: participant.id
+                    thumbnail: item.type === 'image' ? item.url : undefined
                   }))}
                   viewMode="grid"
-                  showPreview
-                  showPlayButton
-                  showAddToQueue
-                  showDownloadButton
-                  showMetadata
-                  enableSearch
-                  enableFilters
                 />
               </CardContent>
             </Card>
