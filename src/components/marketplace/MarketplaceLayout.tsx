@@ -1,42 +1,19 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, ShoppingCart, Heart, Bell, User, Package, LogOut } from 'lucide-react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
-import { getUserInitials } from '@/utils/transforms/profile';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { CartSidebar } from './cart/CartSidebar';
 import { FloatingCartButton } from './FloatingCartButton';
 import { useCart } from '@/contexts/marketplace/CartProvider';
+import { UserMenu } from '@/components/common/UserMenu';
+import { MarketplaceActions } from '@/components/common/MarketplaceActions';
 import { useState } from 'react';
 
 export default function MarketplaceLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { data: user, isLoading } = useAuthenticatedUser();
   const { state } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
   
   const isActive = (path: string) => location.pathname.includes(path);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Utloggad",
-      description: "Du har loggats ut.",
-    });
-    navigate('/marketplace');
-  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -57,73 +34,8 @@ export default function MarketplaceLayout() {
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-2">
-              <Link to="/marketplace/wishlist">
-                <Button variant="ghost" size="icon">
-                  <Heart className="w-5 h-5" />
-                </Button>
-              </Link>
-              <Link to="/marketplace/notifications">
-                <Button variant="ghost" size="icon">
-                  <Bell className="w-5 h-5" />
-                </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="relative"
-                onClick={() => setIsCartOpen(true)}
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {state.itemCount > 0 && (
-                  <Badge 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                    variant="destructive"
-                  >
-                    {state.itemCount}
-                  </Badge>
-                )}
-              </Button>
-              
-              {/* User Widget */}
-              {!isLoading && user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src="" alt={user.full_name || user.email} />
-                        <AvatarFallback>
-                          {getUserInitials({ full_name: user.full_name } as any, user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <div className="px-2 py-1.5">
-                      <p className="text-sm font-medium">{user.full_name || 'Kund'}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/marketplace/account')}>
-                      <User className="mr-2 h-4 w-4" />
-                      Mitt konto
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/marketplace/orders')}>
-                      <Package className="mr-2 h-4 w-4" />
-                      Mina beställningar
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logga ut
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : !isLoading ? (
-                <Button onClick={() => navigate('/auth?redirect=/marketplace')} size="sm">
-                  Logga in
-                </Button>
-              ) : null}
-
+              <MarketplaceActions onCartClick={() => setIsCartOpen(true)} />
+              <UserMenu variant="compact" />
               <Link to="/home">
                 <Button variant="outline" size="sm">
                   <Home className="w-4 h-4 mr-2" />
