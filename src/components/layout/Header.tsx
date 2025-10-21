@@ -54,6 +54,7 @@ export const Header: React.FC = () => {
         
         return () => {
             document.body.style.overflow = 'unset';
+            setIsMenuOpen(false); // Force close on unmount
         };
     }, [isMenuOpen]);
 
@@ -155,7 +156,7 @@ export const Header: React.FC = () => {
                     role="menu" 
                     aria-label="Mobile navigation" 
                     className={cn(
-                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto",
+                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto z-50",
                         isMenuOpen ? "translate-x-0" : "translate-x-full"
                     )}
                 >
@@ -280,7 +281,7 @@ export const Header: React.FC = () => {
             {/* Mobile Menu Overlay */}
             {isMenuOpen && !isAdminPage && (
                 <div 
-                    className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-[-1]"
+                    className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
                     onClick={closeMenu}
                     aria-hidden="true"
                 />
