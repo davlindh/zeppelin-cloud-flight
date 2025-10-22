@@ -124,9 +124,46 @@ export default function OrderDetailPage() {
                 </p>
               </div>
             )}
+            <div>
+              <p className="text-sm text-muted-foreground">Account Status</p>
+              <Badge variant={order.user_id ? "default" : "secondary"}>
+                {order.user_id ? "Registered User" : "Guest Checkout"}
+              </Badge>
+            </div>
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Payment Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Payment Status</p>
+              <Badge variant={order.payment_status === 'paid' ? "default" : "secondary"}>
+                {order.payment_status || 'pending'}
+              </Badge>
+            </div>
+            {order.payment_method && (
+              <div>
+                <p className="text-sm text-muted-foreground">Payment Method</p>
+                <p className="font-medium">{order.payment_method}</p>
+              </div>
+            )}
+            {order.payment_intent_id && (
+              <div>
+                <p className="text-sm text-muted-foreground">Payment Intent ID</p>
+                <p className="font-mono text-xs">{order.payment_intent_id}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -144,28 +181,73 @@ export default function OrderDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Billing Address
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {typeof order.billing_address === 'object' && order.billing_address ? (
+              <div className="space-y-1">
+                <p>{(order.billing_address as any).street}</p>
+                <p>{(order.billing_address as any).city}, {(order.billing_address as any).zip}</p>
+                <p>{(order.billing_address as any).country}</p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Same as shipping address</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Order Items
+            Order Items ({order.order_items?.length || 0})
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {order.order_items?.map((item: any) => (
-              <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                <div className="flex-1">
-                  <p className="font-medium">{item.item_title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {item.item_type} • Qty: {item.quantity}
-                  </p>
+              <div key={item.id} className="flex items-start gap-4 p-4 border rounded-lg">
+                <div className="flex-1 space-y-2">
+                  <div>
+                    <p className="font-medium">{item.item_title}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline">{item.item_type}</Badge>
+                      <span className="text-sm text-muted-foreground">Qty: {item.quantity}</span>
+                    </div>
+                  </div>
+                  {item.item_sku && (
+                    <p className="text-sm text-muted-foreground">SKU: {item.item_sku}</p>
+                  )}
+                  {item.variant_details && (
+                    <div className="text-sm">
+                      <p className="text-muted-foreground">Variant:</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {item.variant_details.size && (
+                          <Badge variant="secondary">Size: {item.variant_details.size}</Badge>
+                        )}
+                        {item.variant_details.color && (
+                          <Badge variant="secondary">Color: {item.variant_details.color}</Badge>
+                        )}
+                        {item.variant_details.material && (
+                          <Badge variant="secondary">Material: {item.variant_details.material}</Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="font-bold">{formatCurrency(item.total_price)}</p>
                   <p className="text-sm text-muted-foreground">{formatCurrency(item.unit_price)} each</p>
+                  {item.tax_rate && (
+                    <p className="text-xs text-muted-foreground">Tax: {item.tax_rate}%</p>
+                  )}
                 </div>
               </div>
             ))}
@@ -272,12 +354,87 @@ export default function OrderDetailPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Order Timeline
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-3 border rounded">
+              <div className="flex-1">
+                <p className="font-medium">Order Created</p>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(order.created_at), 'PPP p')}
+                </p>
+              </div>
+              <Badge>pending</Badge>
+            </div>
+            
+            {order.paid_at && (
+              <div className="flex items-start gap-3 p-3 border rounded bg-green-50">
+                <div className="flex-1">
+                  <p className="font-medium">Payment Received</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(order.paid_at), 'PPP p')}
+                  </p>
+                </div>
+                <Badge className="bg-green-500">paid</Badge>
+              </div>
+            )}
+            
+            {order.shipped_at && (
+              <div className="flex items-start gap-3 p-3 border rounded bg-purple-50">
+                <div className="flex-1">
+                  <p className="font-medium">Order Shipped</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(order.shipped_at), 'PPP p')}
+                  </p>
+                  {order.tracking_number && (
+                    <p className="text-sm mt-1">
+                      Tracking: <span className="font-mono">{order.tracking_number}</span>
+                    </p>
+                  )}
+                </div>
+                <Badge className="bg-purple-500">shipped</Badge>
+              </div>
+            )}
+            
+            {order.delivered_at && (
+              <div className="flex items-start gap-3 p-3 border rounded bg-blue-50">
+                <div className="flex-1">
+                  <p className="font-medium">Order Delivered</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(order.delivered_at), 'PPP p')}
+                  </p>
+                </div>
+                <Badge className="bg-blue-500">delivered</Badge>
+              </div>
+            )}
+            
+            {order.cancelled_at && (
+              <div className="flex items-start gap-3 p-3 border rounded bg-red-50">
+                <div className="flex-1">
+                  <p className="font-medium">Order Cancelled</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(order.cancelled_at), 'PPP p')}
+                  </p>
+                </div>
+                <Badge className="bg-red-500">cancelled</Badge>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {order.order_status_history && order.order_status_history.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Status History
+              Status Change History
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -292,13 +449,39 @@ export default function OrderDetailPage() {
                       {format(new Date(history.created_at), 'PPP p')}
                     </p>
                     {history.notes && (
-                      <p className="text-sm mt-1">{history.notes}</p>
+                      <p className="text-sm mt-1 bg-muted p-2 rounded">{history.notes}</p>
                     )}
                   </div>
                   <Badge variant="outline">{history.changed_by_type}</Badge>
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {(order.admin_notes || order.customer_notes) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Notes</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {order.customer_notes && (
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Customer Notes</p>
+                <p className="text-sm bg-blue-50 p-3 rounded border border-blue-200">
+                  {order.customer_notes}
+                </p>
+              </div>
+            )}
+            {order.admin_notes && (
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Admin Notes</p>
+                <p className="text-sm bg-amber-50 p-3 rounded border border-amber-200">
+                  {order.admin_notes}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

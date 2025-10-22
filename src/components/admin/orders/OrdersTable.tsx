@@ -75,6 +75,18 @@ const getStatusVariant = (status: string) => {
   }
 };
 
+const handleEmailCustomer = (email?: string) => {
+  if (email) {
+    window.open(`mailto:${email}`, '_blank');
+  }
+};
+
+const handleCallCustomer = (phone?: string) => {
+  if (phone) {
+    window.open(`tel:${phone}`, '_blank');
+  }
+};
+
 export function OrdersTable() {
   const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState<DatabaseOrder | null>(null);
@@ -130,18 +142,6 @@ export function OrdersTable() {
 
   const handleViewDetails = (orderId: string) => {
     navigate(`/admin/orders/${orderId}`);
-  };
-
-  const handleEmailCustomer = (email?: string) => {
-    if (email) {
-      window.open(`mailto:${email}`, '_blank');
-    }
-  };
-
-  const handleCallCustomer = (phone?: string) => {
-    if (phone) {
-      window.open(`tel:${phone}`, '_blank');
-    }
   };
 
   if (isLoading) {
@@ -200,51 +200,77 @@ export function OrdersTable() {
               <TableRow>
                 <TableHead>Order Number</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Item</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Items</TableHead>
                 <TableHead>Amount</TableHead>
+                <TableHead>Payment</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">
-                    {order.order_number}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">
-                        {order.customer_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {order.customer_email}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{order.order_items?.[0]?.item_title || 'N/A'}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Qty: {order.order_items?.[0]?.quantity || 0}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{order.order_items?.[0]?.item_type || 'N/A'}</Badge>
-                  </TableCell>
-                  <TableCell>${order.total_amount.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(order.status)}>
-                      {order.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(order.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
+              {filteredOrders.map((order) => {
+                const itemCount = order.order_items?.length || 0;
+                const firstItem = order.order_items?.[0];
+                return (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">
+                      <div>
+                        <p>{order.order_number}</p>
+                        {order.user_id ? (
+                          <Badge variant="outline" className="text-xs mt-1">Registered</Badge>
+                        ) : (
+                          <Badge variant="secondary" className="text-xs mt-1">Guest</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">
+                          {order.customer_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {order.customer_email}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{firstItem?.item_title || 'N/A'}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {firstItem?.item_type || 'N/A'}
+                          </Badge>
+                          {itemCount > 1 && (
+                            <Badge variant="secondary" className="text-xs">
+                              +{itemCount - 1} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-bold">${order.total_amount.toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {itemCount} item{itemCount !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={order.payment_status === 'paid' ? "default" : "secondary"}>
+                        {order.payment_status || 'pending'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -272,7 +298,8 @@ export function OrdersTable() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              );
+              })}
             </TableBody>
           </Table>
         </CardContent>
