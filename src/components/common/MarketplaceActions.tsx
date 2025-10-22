@@ -16,7 +16,7 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
   showLabels = false,
   variant = 'default',
 }) => {
-  // Access cart state - component must be wrapped in CartProvider
+  // Access cart state - CartProvider must be available from App.tsx
   const { state } = useCart();
   const itemCount = state?.itemCount || 0;
 
