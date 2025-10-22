@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Minus, Plus, Trash2, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useCart } from '@/contexts/marketplace/CartContext';
 import { useProduct } from '@/hooks/marketplace/useProducts';
 
 interface CartSidebarProps {
@@ -12,12 +11,20 @@ interface CartSidebarProps {
   onClose: () => void;
 }
 
+const formatVariants = (variants: any) => {
+  const parts = [];
+  if (variants?.size) parts.push(variants.size);
+  if (variants?.color) parts.push(variants.color);
+  if (variants?.material) parts.push(variants.material);
+  return parts.join(', ');
+};
+
 const CartProductItem = ({ item, updateQuantity, removeItem }: {
   item: any;
   updateQuantity: (id: string, variants: any, quantity: number) => void;
   removeItem: (id: string, variants: any) => void;
 }) => {
-  const { data: product, isLoading } = useProduct(item.id);
+  const { data: product, isLoading } = useProduct(item.productId);
 
   if (isLoading) {
     return (
@@ -43,7 +50,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => removeItem(item.id, item.variant)}
+            onClick={() => removeItem(item.productId, item.selectedVariants)}
             className="text-red-500 hover:text-red-700 p-0 h-auto"
           >
             Remove from cart
@@ -52,14 +59,6 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
       </div>
     );
   }
-
-  const formatVariants = (variants: any) => {
-    const parts = [];
-    if (variants?.size) parts.push(variants.size);
-    if (variants?.color) parts.push(variants.color);
-    if (variants?.material) parts.push(variants.material);
-    return parts.join(', ');
-  };
 
   return (
     <div className="flex gap-3 p-3 border border-slate-200 rounded-lg">
@@ -79,9 +78,9 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
         <h4 className="font-medium text-sm text-slate-900 truncate">
           {product.title}
         </h4>
-        {formatVariants(item.variant) && (
+        {formatVariants(item.selectedVariants) && (
           <p className="text-xs text-slate-500 mt-1">
-            {formatVariants(item.variant)}
+            {formatVariants(item.selectedVariants)}
           </p>
         )}
         <div className="flex items-center justify-between mt-2">
@@ -93,7 +92,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
               variant="outline"
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
+              onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity - 1)}
             >
               <Minus className="h-3 w-3" />
             </Button>
@@ -102,7 +101,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
               variant="outline"
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => updateQuantity(item.id, item.variant, item.quantity + 1)}
+              onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity + 1)}
             >
               <Plus className="h-3 w-3" />
             </Button>
@@ -110,7 +109,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-              onClick={() => removeItem(item.id, item.variant)}
+              onClick={() => removeItem(item.productId, item.selectedVariants)}
             >
               <Trash2 className="h-3 w-3" />
             </Button>
@@ -170,7 +169,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
           <div className="flex-1 overflow-y-auto py-4 space-y-4">
             {state.items.map((item, index) => (
               <CartProductItem
-                key={`${item.id}-${JSON.stringify(item.variant)}-${index}`}
+                key={`${item.id}-${JSON.stringify(item.selectedVariants)}-${index}`}
                 item={item}
                 updateQuantity={updateQuantity}
                 removeItem={removeItem}

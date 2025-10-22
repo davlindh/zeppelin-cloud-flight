@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Plus, Trash2, TrendingUp } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DollarSign, Plus, Trash2, TrendingUp, Save, RotateCcw, AlertCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
   Select,
@@ -12,6 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
+import { sv } from 'date-fns/locale';
 
 interface BudgetItem {
   item: string;
@@ -29,45 +34,99 @@ interface BudgetEditorProps {
   onChange: (value: BudgetValue) => void;
 }
 
-export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange }) => {
+export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value, onChange }) => {
+  const { toast } = useToast();
+  const [localValue, setLocalValue] = useState<BudgetValue>(value || {});
+  const [savedValue, setSavedValue] = useState<BudgetValue>(value || {});
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [newItem, setNewItem] = useState<BudgetItem>({ item: '', cost: 0 });
+
+  const hasUnsavedChanges = JSON.stringify(localValue) !== JSON.stringify(savedValue);
+  useUnsavedChanges(hasUnsavedChanges);
+
+  useEffect(() => {
+    if (value) {
+      setLocalValue(value);
+      setSavedValue(value);
+    }
+  }, [value]);
+
+  const handleSave = async () => {
+    // Validation
+    if (localValue.amount && localValue.amount <= 0) {
+      toast({
+        variant: "destructive",
+        title: "Ogiltigt belopp",
+        description: "Budgeten måste vara större än 0 SEK.",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      onChange(localValue);
+      setSavedValue(localValue);
+      setLastSaved(new Date());
+      toast({
+        title: "Ändringar sparade",
+        description: "Budgeten har uppdaterats.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Kunde inte spara",
+        description: "Ett fel uppstod när ändringarna skulle sparas.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleReset = () => {
+    setLocalValue(savedValue);
+    toast({
+      title: "Ändringar återställda",
+      description: "Alla osparade ändringar har ångrats.",
+    });
+  };
 
   const handleAmountChange = (amount: string) => {
     const numAmount = parseFloat(amount) || 0;
-    onChange({ ...value, amount: numAmount });
+    setLocalValue({ ...localValue, amount: numAmount });
   };
 
   const handleCurrencyChange = (currency: string) => {
-    onChange({ ...value, currency });
+    setLocalValue({ ...localValue, currency });
   };
 
   const handleAddItem = () => {
     if (!newItem.item || newItem.cost <= 0) return;
     
-    const breakdown = [...(value.breakdown || []), newItem];
-    onChange({ ...value, breakdown });
+    const breakdown = [...(localValue.breakdown || []), newItem];
+    setLocalValue({ ...localValue, breakdown });
     
     setNewItem({ item: '', cost: 0 });
   };
 
   const handleDeleteItem = (index: number) => {
-    const breakdown = [...(value.breakdown || [])];
+    const breakdown = [...(localValue.breakdown || [])];
     breakdown.splice(index, 1);
-    onChange({ ...value, breakdown });
+    setLocalValue({ ...localValue, breakdown });
   };
 
   const handleUpdateItem = (index: number, field: keyof BudgetItem, newValue: string | number) => {
-    const breakdown = [...(value.breakdown || [])];
+    const breakdown = [...(localValue.breakdown || [])];
     breakdown[index] = { ...breakdown[index], [field]: newValue };
-    onChange({ ...value, breakdown });
+    setLocalValue({ ...localValue, breakdown });
   };
 
   const calculateTotal = () => {
-    return (value.breakdown || []).reduce((sum, item) => sum + item.cost, 0);
+    return (localValue.breakdown || []).reduce((sum, item) => sum + item.cost, 0);
   };
 
   const getPercentage = (cost: number) => {
-    const total = value.amount || calculateTotal();
+    const total = localValue.amount || calculateTotal();
     if (total === 0) return 0;
     return (cost / total) * 100;
   };
@@ -81,11 +140,21 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
   };
 
   const breakdownTotal = calculateTotal();
-  const hasAmount = value.amount && value.amount > 0;
-  const isOverBudget = hasAmount && breakdownTotal > value.amount!;
+  const hasAmount = localValue.amount && localValue.amount > 0;
+  const isOverBudget = hasAmount && breakdownTotal > localValue.amount!;
 
   return (
     <div className="space-y-6">
+      {/* Unsaved Changes Warning */}
+      {hasUnsavedChanges && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Du har osparade ändringar. Glöm inte att spara!
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Total Amount */}
       <Card>
         <CardHeader>
@@ -106,7 +175,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
                 type="number"
                 min="0"
                 step="1000"
-                value={value.amount || ''}
+                value={localValue.amount || ''}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="50000"
               />
@@ -114,7 +183,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
             <div className="space-y-2">
               <Label htmlFor="currency">Valuta</Label>
               <Select
-                value={value.currency || 'SEK'}
+                value={localValue.currency || 'SEK'}
                 onValueChange={handleCurrencyChange}
               >
                 <SelectTrigger id="currency">
@@ -134,7 +203,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">Total budget:</span>
                 <span className="text-lg font-bold">
-                  {formatCurrency(value.amount!)} {value.currency || 'SEK'}
+                  {formatCurrency(localValue.amount!)} {localValue.currency || 'SEK'}
                 </span>
               </div>
             </div>
@@ -173,13 +242,13 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
           </div>
 
           {/* Budget Items List */}
-          {!value.breakdown || value.breakdown.length === 0 ? (
+          {!localValue.breakdown || localValue.breakdown.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
               Inga kostnadsposter tillagda ännu. Lägg till poster ovan.
             </p>
           ) : (
             <div className="space-y-3">
-              {value.breakdown.map((item, index) => (
+              {localValue.breakdown.map((item, index) => (
                 <Card key={index}>
                   <CardContent className="pt-4">
                     <div className="space-y-3">
@@ -212,7 +281,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
                             {getPercentage(item.cost).toFixed(1)}% av total
                           </span>
                           <span className="font-medium">
-                            {formatCurrency(item.cost)} {value.currency || 'SEK'}
+                            {formatCurrency(item.cost)} {localValue.currency || 'SEK'}
                           </span>
                         </div>
                         <Progress value={getPercentage(item.cost)} className="h-2" />
@@ -225,14 +294,14 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
           )}
 
           {/* Summary */}
-          {value.breakdown && value.breakdown.length > 0 && (
+          {localValue.breakdown && localValue.breakdown.length > 0 && (
             <Card className={isOverBudget ? 'border-destructive' : 'border-primary'}>
               <CardContent className="pt-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Summa poster:</span>
                     <span className="text-lg font-bold">
-                      {formatCurrency(breakdownTotal)} {value.currency || 'SEK'}
+                      {formatCurrency(breakdownTotal)} {localValue.currency || 'SEK'}
                     </span>
                   </div>
                   
@@ -241,14 +310,14 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Kvar av budget:</span>
                         <span className={isOverBudget ? 'text-destructive font-medium' : 'text-muted-foreground'}>
-                          {formatCurrency(value.amount! - breakdownTotal)} {value.currency || 'SEK'}
+                          {formatCurrency(localValue.amount! - breakdownTotal)} {localValue.currency || 'SEK'}
                         </span>
                       </div>
                       
                       {isOverBudget && (
                         <div className="flex items-center gap-2 text-sm text-destructive mt-2">
                           <TrendingUp className="h-4 w-4" />
-                          <span>Över budget med {formatCurrency(breakdownTotal - value.amount!)} {value.currency || 'SEK'}</span>
+                          <span>Över budget med {formatCurrency(breakdownTotal - localValue.amount!)} {localValue.currency || 'SEK'}</span>
                         </div>
                       )}
                     </>
@@ -261,7 +330,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
       </Card>
 
       {/* Preview */}
-      {(hasAmount || (value.breakdown && value.breakdown.length > 0)) && (
+      {(hasAmount || (localValue.breakdown && localValue.breakdown.length > 0)) && (
         <Card className="bg-muted/50">
           <CardHeader>
             <CardTitle className="text-sm">Förhandsgranskning</CardTitle>
@@ -269,18 +338,18 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
           <CardContent className="space-y-2 text-sm">
             {hasAmount && (
               <p>
-                <strong>Total budget:</strong> {formatCurrency(value.amount!)} {value.currency || 'SEK'}
+                <strong>Total budget:</strong> {formatCurrency(localValue.amount!)} {localValue.currency || 'SEK'}
               </p>
             )}
-            {value.breakdown && value.breakdown.length > 0 && (
+            {localValue.breakdown && localValue.breakdown.length > 0 && (
               <div>
                 <strong>Fördelning:</strong>
                 <ul className="mt-2 space-y-1 ml-4">
-                  {value.breakdown.map((item, i) => (
+                  {localValue.breakdown.map((item, i) => (
                     <li key={i} className="flex items-center justify-between">
                       <span>{item.item}</span>
                       <span className="font-medium ml-4">
-                        {formatCurrency(item.cost)} {value.currency || 'SEK'} ({getPercentage(item.cost).toFixed(0)}%)
+                        {formatCurrency(item.cost)} {localValue.currency || 'SEK'} ({getPercentage(item.cost).toFixed(0)}%)
                       </span>
                     </li>
                   ))}
@@ -290,6 +359,34 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({ value = {}, onChange
           </CardContent>
         </Card>
       )}
+
+      {/* Sticky Save Controls */}
+      <div className="sticky bottom-0 z-10 bg-background border-t pt-4 pb-2 flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {lastSaved ? (
+            <span>Senast sparad {formatDistanceToNow(lastSaved, { addSuffix: true, locale: sv })}</span>
+          ) : (
+            <span>Inga ändringar sparade ännu</span>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            disabled={!hasUnsavedChanges || isSaving}
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Ångra ändringar
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={!hasUnsavedChanges || isSaving}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isSaving ? 'Sparar...' : 'Spara ändringar'}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

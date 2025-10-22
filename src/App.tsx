@@ -44,7 +44,7 @@ import { NotificationsPage } from "./pages/marketplace/NotificationsPage";
 import { ProfilePage } from "./pages/marketplace/ProfilePage";
 import { OrdersPage as CustomerOrdersPage } from "./pages/marketplace/OrdersPage";
 import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
-import { CartProvider } from "./contexts/marketplace/CartProvider";
+import { CartProvider } from "./contexts/marketplace/CartContext";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
 
@@ -85,13 +85,16 @@ const App = () => (
       <AdminAuthProvider>
         <MediaProvider>
           <PermissionProvider>
-            <Toaster />
-            <BrowserRouter
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true
-              }}
-            >
+            <WishlistProvider>
+              <CartProvider>
+                <NotificationProvider>
+                  <Toaster />
+                  <BrowserRouter
+                    future={{
+                      v7_startTransition: true,
+                      v7_relativeSplatPath: true
+                    }}
+                  >
               <Routes>
                 <Route path="/" element={<RootLayout />}>
                   <Route index element={<Navigate to="/home" replace />} />
@@ -117,15 +120,7 @@ const App = () => (
                 <Route path="/participant/complete-profile" element={<CompleteParticipantProfilePage />} />
 
                 {/* Marketplace Routes */}
-                <Route path="/marketplace" element={
-                  <WishlistProvider>
-                    <CartProvider>
-                      <NotificationProvider>
-                        <MarketplaceLayout />
-                      </NotificationProvider>
-                    </CartProvider>
-                  </WishlistProvider>
-                }>
+                <Route path="/marketplace" element={<MarketplaceLayout />}>
                   <Route index element={<MarketplaceIndex />} />
                   <Route path="auctions" element={<Auctions />} />
                   <Route path="auctions/:id" element={<AuctionDetail />} />
@@ -299,6 +294,9 @@ const App = () => (
             <MediaErrorBoundary>
               <div />
             </MediaErrorBoundary>
+                </NotificationProvider>
+              </CartProvider>
+            </WishlistProvider>
           </PermissionProvider>
         </MediaProvider>
       </AdminAuthProvider>

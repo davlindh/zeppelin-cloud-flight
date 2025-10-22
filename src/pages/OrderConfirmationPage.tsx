@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Package, Truck, Calendar, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
+import { formatCurrency } from "@/utils/currency";
 
 export default function OrderConfirmationPage() {
   const [searchParams] = useSearchParams();
@@ -148,8 +149,8 @@ export default function OrderConfirmationPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold">${item.total_price}</p>
-                  <p className="text-sm text-muted-foreground">${item.unit_price} each</p>
+                  <p className="font-bold">{formatCurrency(item.total_price)}</p>
+                  <p className="text-sm text-muted-foreground">{formatCurrency(item.unit_price)} each</p>
                 </div>
               </div>
             ))}
@@ -160,26 +161,26 @@ export default function OrderConfirmationPage() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
-              <span>${order.subtotal}</span>
+              <span>{formatCurrency(order.subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Tax</span>
-              <span>${order.tax_amount}</span>
+              <span>{formatCurrency(order.tax_amount)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Shipping</span>
-              <span>${order.shipping_amount}</span>
+              <span>{formatCurrency(order.shipping_amount)}</span>
             </div>
             {order.discount_amount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Discount</span>
-                <span>-${order.discount_amount}</span>
+                <span>-{formatCurrency(order.discount_amount)}</span>
               </div>
             )}
             <Separator />
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span>${order.total_amount}</span>
+              <span>{formatCurrency(order.total_amount)}</span>
             </div>
           </div>
         </CardContent>

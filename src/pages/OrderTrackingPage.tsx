@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Package, Truck, CheckCircle2, XCircle, Clock, Search } from "lucide-react";
 import { format } from "date-fns";
+import { formatCurrency } from "@/utils/currency";
 
 export default function OrderTrackingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -186,10 +187,10 @@ export default function OrderTrackingPage() {
                         <div className="flex-1">
                           <p className="font-medium">{item.item_title}</p>
                           <p className="text-sm text-muted-foreground">
-                            Qty: {item.quantity} • ${item.unit_price} each
+                            Qty: {item.quantity} • {formatCurrency(item.unit_price)} each
                           </p>
                         </div>
-                        <p className="font-bold">${item.total_price}</p>
+                        <p className="font-bold">{formatCurrency(item.total_price)}</p>
                       </div>
                     ))}
                   </div>
@@ -199,7 +200,7 @@ export default function OrderTrackingPage() {
 
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>${order.total_amount}</span>
+                  <span>{formatCurrency(order.total_amount)}</span>
                 </div>
               </div>
             </CardContent>
