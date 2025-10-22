@@ -49,7 +49,7 @@ export const CartPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           {state.items.map((item) => (
-            <Card key={`${item.id}-${JSON.stringify(item.variant)}`}>
+            <Card key={`${item.id}-${JSON.stringify(item.selectedVariants)}`}>
               <CardContent className="p-6">
                 <div className="flex gap-4">
                   <img
@@ -59,16 +59,16 @@ export const CartPage = () => {
                   />
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                    {item.variant && (
+                    {item.selectedVariants && (
                       <div className="flex gap-2 mb-2">
-                        {item.variant.color && (
-                          <Badge variant="outline">{t('product.color')}: {item.variant.color}</Badge>
+                        {item.selectedVariants.color && (
+                          <Badge variant="outline">{t('product.color')}: {item.selectedVariants.color}</Badge>
                         )}
-                        {item.variant.size && (
-                          <Badge variant="outline">{t('product.size')}: {item.variant.size}</Badge>
+                        {item.selectedVariants.size && (
+                          <Badge variant="outline">{t('product.size')}: {item.selectedVariants.size}</Badge>
                         )}
-                        {item.variant.material && (
-                          <Badge variant="outline">{t('product.material')}: {item.variant.material}</Badge>
+                        {item.selectedVariants.material && (
+                          <Badge variant="outline">{t('product.material')}: {item.selectedVariants.material}</Badge>
                         )}
                       </div>
                     )}
@@ -80,7 +80,7 @@ export const CartPage = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => removeItem(item.id, item.variant)}
+                      onClick={() => removeItem(item.productId, item.selectedVariants)}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -88,7 +88,7 @@ export const CartPage = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity - 1)}
                         disabled={item.quantity <= 1}
                       >
                         <Minus className="h-4 w-4" />
@@ -97,7 +97,7 @@ export const CartPage = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => updateQuantity(item.id, item.variant, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity + 1)}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
