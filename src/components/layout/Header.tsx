@@ -50,11 +50,15 @@ export const Header: React.FC = () => {
 
     // Prevent background scroll when mobile menu is open
     useEffect(() => {
-        document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
         
+        // Cleanup: Always reset on unmount
         return () => {
             document.body.style.overflow = 'unset';
-            setIsMenuOpen(false); // Force close on unmount
         };
     }, [isMenuOpen]);
 
@@ -131,12 +135,17 @@ export const Header: React.FC = () => {
 
                             {/* Mobile Menu Button */}
                             <button 
-                                onClick={toggleMenu} 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    toggleMenu();
+                                }} 
                                 id="mobile-menu-button" 
                                 aria-controls="mobile-menu" 
                                 aria-expanded={isMenuOpen} 
-                                className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors" 
+                                className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors relative z-[60]" 
                                 aria-label="Toggle menu"
+                                style={{ pointerEvents: 'auto' }}
                             >
                                 {isMenuOpen ? (
                                     <X className="h-6 w-6" />
@@ -156,7 +165,7 @@ export const Header: React.FC = () => {
                     role="menu" 
                     aria-label="Mobile navigation" 
                     className={cn(
-                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto z-50",
+                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto z-[55]",
                         isMenuOpen ? "translate-x-0" : "translate-x-full"
                     )}
                 >
@@ -281,8 +290,11 @@ export const Header: React.FC = () => {
             {/* Mobile Menu Overlay */}
             {isMenuOpen && !isAdminPage && (
                 <div 
-                    className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-                    onClick={closeMenu}
+                    className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-[45] pointer-events-auto"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        closeMenu();
+                    }}
                     aria-hidden="true"
                 />
             )}
