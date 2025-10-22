@@ -5,7 +5,7 @@ import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, LogOut, Menu, X, Home, ShoppingBag, Gavel, Store, Wrench, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, LogOut, Menu, X, Home, ShoppingBag, Gavel, Store, Wrench, ShieldCheck, Layers, Users, Handshake, Image as ImageIcon } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { UserMenu } from '@/components/common/UserMenu';
 import { NavigationDropdown } from '@/components/common/NavigationDropdown';
@@ -29,7 +29,7 @@ const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `transition ${isActive ? 'text-amber-500' : 'text-gray-600 hover:text-amber-500'}`;
 
 const mobileNavLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 py-3 px-6 text-base hover:bg-gray-50 transition-colors ${
+    `flex items-center gap-3 py-3 px-6 text-lg hover:bg-gray-50 transition-colors min-h-[48px] ${
         isActive ? 'text-amber-500 font-semibold bg-amber-50' : 'text-gray-700'
     }`;
 
@@ -50,11 +50,7 @@ export const Header: React.FC = () => {
 
     // Prevent background scroll when mobile menu is open
     useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
+        document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
         
         // Cleanup: Always reset on unmount
         return () => {
@@ -143,7 +139,12 @@ export const Header: React.FC = () => {
                                 id="mobile-menu-button" 
                                 aria-controls="mobile-menu" 
                                 aria-expanded={isMenuOpen} 
-                                className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors relative z-[60]" 
+                                className={cn(
+                                    "lg:hidden p-2 rounded-md transition-colors relative z-[60]",
+                                    isMenuOpen 
+                                        ? "bg-amber-50 text-amber-600" 
+                                        : "text-gray-600 hover:bg-gray-100"
+                                )}
                                 aria-label="Toggle menu"
                                 style={{ pointerEvents: 'auto' }}
                             >
@@ -165,8 +166,8 @@ export const Header: React.FC = () => {
                     role="menu" 
                     aria-label="Mobile navigation" 
                     className={cn(
-                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto z-[55]",
-                        isMenuOpen ? "translate-x-0" : "translate-x-full"
+                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto z-[55] will-change-transform",
+                        isMenuOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
                     )}
                 >
                     <div className="container mx-auto px-4 py-6">
@@ -186,25 +187,38 @@ export const Header: React.FC = () => {
                                 Utforska
                             </h3>
                         </div>
-                        {NAV_LINKS.map(link => (
-                            link.href.startsWith('/') ?
-                            <NavLink 
-                                key={link.href} 
-                                to={link.href} 
-                                className={mobileNavLinkClasses} 
-                                onClick={closeMenu}
-                            >
-                                {link.label}
-                            </NavLink> :
-                            <a 
-                                key={link.href} 
-                                href={link.href} 
-                                onClick={(e) => handleNavClick(e, link.href)} 
-                                className="flex items-center gap-3 py-3 px-6 text-base text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                                {link.label}
-                            </a>
-                        ))}
+                        <NavLink 
+                            to="/showcase" 
+                            className={mobileNavLinkClasses}
+                            onClick={closeMenu}
+                        >
+                            <Layers className="h-5 w-5" />
+                            Showcase
+                        </NavLink>
+                        <NavLink 
+                            to="/participants" 
+                            className={mobileNavLinkClasses}
+                            onClick={closeMenu}
+                        >
+                            <Users className="h-5 w-5" />
+                            Deltagare
+                        </NavLink>
+                        <NavLink 
+                            to="/partners" 
+                            className={mobileNavLinkClasses}
+                            onClick={closeMenu}
+                        >
+                            <Handshake className="h-5 w-5" />
+                            Partners
+                        </NavLink>
+                        <NavLink 
+                            to="/media" 
+                            className={mobileNavLinkClasses}
+                            onClick={closeMenu}
+                        >
+                            <ImageIcon className="h-5 w-5" />
+                            Mediagalleri
+                        </NavLink>
 
                         {/* Marketplace Section */}
                         <div className="mt-6 mb-2 px-6 border-t border-gray-200 pt-6">
@@ -213,6 +227,14 @@ export const Header: React.FC = () => {
                                 Marketplace
                             </h3>
                         </div>
+                        <NavLink 
+                            to="/marketplace" 
+                            className={mobileNavLinkClasses}
+                            onClick={closeMenu}
+                        >
+                            <ShoppingBag className="h-5 w-5" />
+                            Marketplace Hem
+                        </NavLink>
                         <NavLink 
                             to="/marketplace/auctions" 
                             className={mobileNavLinkClasses}
@@ -290,7 +312,7 @@ export const Header: React.FC = () => {
             {/* Mobile Menu Overlay */}
             {isMenuOpen && !isAdminPage && (
                 <div 
-                    className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-[45] pointer-events-auto"
+                    className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[45] pointer-events-auto"
                     onClick={(e) => {
                         e.stopPropagation();
                         closeMenu();
