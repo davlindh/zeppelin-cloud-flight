@@ -26,10 +26,11 @@ export const useAuthenticatedUser = () => {
           .from('users')
           .select('full_name, phone')
           .eq('auth_user_id', user.id)
-          .single();
+          .maybeSingle();
 
+        // maybeSingle() returns null if no row exists (instead of throwing 406 error)
         if (userError) {
-          console.log('No additional user data found, using auth data only');
+          console.warn('Error fetching user profile:', userError);
         }
 
         return {

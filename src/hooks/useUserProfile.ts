@@ -106,9 +106,44 @@ export const useUserProfile = () => {
       if (profileError) throw profileError;
 
       if (!profileData) {
-        console.warn('No profile found for user, this should not happen with the new trigger');
-        setProfile(null);
-        setStats(null);
+        // Profile doesn't exist - try to create it
+        console.info('Profile not found, creating new profile for user');
+        
+        const { data: newProfile, error: createError } = await supabase
+          .from('users')
+          .insert({
+            auth_user_id: userId,
+            email: user?.email,
+            full_name: user?.user_metadata?.full_name,
+            phone: user?.user_metadata?.phone,
+            email_verified: !!user?.email_confirmed_at
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.warn('Could not create user profile:', createError);
+          setProfile(null);
+          setStats(null);
+          return;
+        }
+
+        setProfile(newProfile as UserProfile);
+        // Set default stats for new user
+        setStats({
+          auctionsWon: 0,
+          averageRating: 0,
+          productsPurchased: 0,
+          bidsPlaced: 0,
+          itemsSold: 0,
+          daysActive: 0,
+          totalOrders: 0,
+          totalBids: 0,
+          watchlistItems: 0,
+          favoriteItems: 0,
+          totalSpent: 0,
+          memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        });
         return;
       }
 
