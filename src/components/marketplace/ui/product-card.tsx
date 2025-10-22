@@ -27,7 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FloatingActionButtons } from '@/components/marketplace/ui/floating-action-buttons';
-import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useCart } from '@/contexts/marketplace/CartContext';
 import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
 import { useToast } from '@/hooks/use-toast';
 import { getProductStatusBadge, calculateProductAnalytics } from '@/utils/marketplace/productUtils';

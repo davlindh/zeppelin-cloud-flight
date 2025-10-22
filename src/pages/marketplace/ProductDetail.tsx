@@ -14,7 +14,7 @@ import { ProductImageZoom } from '@/components/marketplace/ui/product-image-zoom
 import { BackToTop } from '@/components/marketplace/ui/back-to-top';
 import { StockAlerts } from '@/components/marketplace/shop/StockAlerts';
 import { EnhancedBreadcrumb } from '@/components/marketplace/ui/enhanced-breadcrumb';
-import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useCart } from '@/contexts/marketplace/CartContext';
 import { useWishlist } from '@/contexts/marketplace/WishlistContext';
 import { useRecentlyViewed } from '@/hooks/marketplace/useRecentlyViewed';
 import { useToast } from '@/hooks/use-toast';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWishlist } from '@/contexts/marketplace/WishlistContext';
-import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useCart } from '@/contexts/marketplace/CartContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

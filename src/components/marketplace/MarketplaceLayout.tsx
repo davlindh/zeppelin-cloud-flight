@@ -3,7 +3,7 @@ import { Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CartSidebar } from './cart/CartSidebar';
 import { FloatingCartButton } from './FloatingCartButton';
-import { useCart } from '@/contexts/marketplace/CartProvider';
+import { useCart } from '@/contexts/marketplace/CartContext';
 import { UserMenu } from '@/components/common/UserMenu';
 import { MarketplaceActions } from '@/components/common/MarketplaceActions';
 import { useState } from 'react';

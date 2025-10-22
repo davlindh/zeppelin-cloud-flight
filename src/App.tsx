@@ -44,7 +44,7 @@ import { NotificationsPage } from "./pages/marketplace/NotificationsPage";
 import { ProfilePage } from "./pages/marketplace/ProfilePage";
 import { OrdersPage as CustomerOrdersPage } from "./pages/marketplace/OrdersPage";
 import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
-import { CartProvider } from "./contexts/marketplace/CartProvider";
+import { CartProvider } from "./contexts/marketplace/CartContext";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
 
