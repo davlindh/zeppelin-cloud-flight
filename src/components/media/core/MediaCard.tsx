@@ -65,7 +65,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
       const mediaItem = {
         id: item.id,
         type: item.type as 'video' | 'audio',
-        url: item.public_url || item.url,
+        url: item.public_url,
         title: item.title,
         description: item.description,
         thumbnail: item.thumbnail_url,
@@ -88,7 +88,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     } else {
       try {
         const link = document.createElement('a');
-        const url = item.public_url || item.url || '';
+        const url = item.public_url || '';
         const fileExtension = url.split('.').pop()?.split('?')[0] || 'file';
         const cleanTitle = item.title.replace(/[^a-z0-9\-_\s]/gi, '').replace(/\s+/g, '_').substring(0, 50);
         const filename = `${cleanTitle}_${item.id}.${fileExtension}`;
@@ -106,18 +106,9 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     }
   };
 
-  // Get related data from project/participant links
-  const projectLinks = item.media_project_links?.map(link => ({
-    id: link.projects.id,
-    title: link.projects.title,
-    slug: link.projects.slug
-  })) || [];
-
-  const participantLinks = item.media_participant_links?.map(link => ({
-    id: link.participants.id,
-    name: link.participants.name,
-    slug: link.participants.slug
-  })) || [];
+  // Context data (would come from joins in actual queries)
+  const projectLinks: Array<{id: string, title: string, slug: string}> = [];
+  const participantLinks: Array<{id: string, name: string, slug: string}> = [];
 
   return (
     <Card
@@ -174,7 +165,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
 
           {/* Media Preview using RichMediaPreview */}
           <RichMediaPreview
-            item={{...item, url: item.public_url}}
+            item={item}
             className="aspect-video"
           />
 

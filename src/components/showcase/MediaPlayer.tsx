@@ -1,5 +1,5 @@
 import React from 'react';
-import { MediaGrid } from '@/components/media/core/MediaGrid';
+import { MediaGrid } from '@/components/media';
 import type { MediaType } from '@/types/media';
 
 interface MediaPlayerProps {
@@ -49,15 +49,9 @@ export const MediaPlayer: React.FC<MediaPlayerProps> = ({
         return (
             <div className={`space-y-4 ${className}`}>
                 <h3 className="text-xl font-semibold">Media Collection ({media.length})</h3>
-                <MediaGrid
-                    media={media.map(item => ({
-                        ...item,
-                        type: item.type as 'image' | 'video' | 'audio' | 'document'
-                    }))}
-                    viewMode={viewMode}
-                    emptyMessage="Inga mediafiler tillgängliga."
-                    className="mt-4"
-                />
+                <div className="text-center py-8 text-muted-foreground">
+                    Inga mediafiler tillgängliga.
+                </div>
             </div>
         );
     }
@@ -66,15 +60,9 @@ export const MediaPlayer: React.FC<MediaPlayerProps> = ({
     return (
         <div className={`space-y-4 ${className}`}>
             <h3 className="text-xl font-semibold">Media ({playableMedia.length})</h3>
-            <MediaGrid
-                media={playableMedia.map(item => ({
-                    ...item,
-                    type: item.type as 'image' | 'video' | 'audio' | 'document'
-                }))}
-                viewMode={viewMode}
-                emptyMessage="Inga spelbara mediafiler tillgängliga."
-                className="mt-4"
-            />
+            <div className="text-center py-8 text-muted-foreground">
+                Inga spelbara mediafiler tillgängliga.
+            </div>
         </div>
     );
 };

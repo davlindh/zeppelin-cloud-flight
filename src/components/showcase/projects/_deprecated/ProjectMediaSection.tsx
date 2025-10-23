@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { MediaItem } from '@/types/unified-media';
-import { generateMediaId } from '@/utils/mediaHelpers';
+import { generateMediaId } from '@/utils/media';
 import { 
   Search, 
   Filter, 

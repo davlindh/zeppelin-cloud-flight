@@ -5,7 +5,28 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { getMediaTypeName, getCategoryLabel } from '@/utils/mediaHelpers';
+import { getMediaIcon, getMediaTypeColor } from '@/utils/media';
+
+// Helper functions for filtering
+const getMediaTypeName = (type: MediaType): string => {
+  const names: Record<MediaType, string> = {
+    image: 'Bilder',
+    video: 'Videor',
+    audio: 'Ljud',
+    document: 'Dokument',
+    portfolio: 'Portfolio',
+    pdf: 'PDF',
+    presentation: 'Presentationer',
+    archive: 'Arkiv',
+    code: 'Kod',
+    '3d': '3D'
+  };
+  return names[type] || type;
+};
+
+const getCategoryLabel = (category: MediaCategory): string => {
+  return category;
+};
 import type { MediaType, MediaCategory } from '@/types/media';
 
 export interface MediaFilterConfig {
