@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { UNIFIED_STORAGE } from '../../constants/storage';
+import { UNIFIED_STORAGE } from '../../../constants/storage';
 import type { MediaLibraryItem, MediaUploadOptions } from '@/types/mediaLibrary';
 
 /**

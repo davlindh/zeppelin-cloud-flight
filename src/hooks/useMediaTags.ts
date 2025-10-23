@@ -1,10 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase-extensions';
-
-const supabaseUrl = 'https://paywaomkmjssbtkzwnwd.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBheXdhb21rbWpzc2J0a3p3bndkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0NDg0NDIsImV4cCI6MjA3MzAyNDQ0Mn0.NkWnQCMJA3bZQy5746C_SmlWsT3pLnNOOLUNjlPv0tI';
-const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+import { supabase } from '@/integrations/supabase/client';
 
 export interface TagStats {
   tag: string;

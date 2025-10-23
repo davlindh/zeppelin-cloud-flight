@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { User, Link as LinkIcon } from 'lucide-react';
 import { MediaGrid } from '@/components/media/core/MediaGrid';
-import { useUnifiedMedia } from '@/hooks/useUnifiedMedia';
+import { useMedia } from '@/hooks/useMedia';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { Button } from '@/components/ui/button';
 import { getCategoryIcon, getCategoryColor, getCategoryLabel } from '@/utils/mediaHelpers';
-import type { MediaCategory, UnifiedMediaItem } from '@/types/unified-media';
+import type { MediaCategory, MediaItem } from '@/types/unified-media';
 import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
 
 interface ParticipantMediaProps {
@@ -24,7 +24,7 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
   const [showLinkManager, setShowLinkManager] = useState(false);
   
   // Fetch media dynamically based on participant_id
-  const { media, isLoading } = useUnifiedMedia({ 
+  const { media, isLoading } = useMedia({ 
     participant_id: participantId,
     status: 'approved' // Only show approved media for public view
   });
@@ -39,10 +39,10 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
     }
   };
 
-  // Convert to UnifiedMediaItem format
-  const mediaItems: UnifiedMediaItem[] = media.map(item => ({
+  // Convert to MediaItem format
+  const mediaItems: MediaItem[] = media.map(item => ({
     id: item.id,
-    type: item.type as UnifiedMediaItem['type'],
+    type: item.type as MediaItem['type'],
     url: item.public_url,
     title: item.title,
     description: item.description,
@@ -78,7 +78,7 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
     }
     acc[cat].push(item);
     return acc;
-  }, {} as Record<string, UnifiedMediaItem[]>);
+  }, {} as Record<string, MediaItem[]>);
 
   return (
     <div className="space-y-6">

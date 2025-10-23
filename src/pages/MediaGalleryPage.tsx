@@ -1,5 +1,5 @@
 import React from 'react';
-import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
+import { MediaManager } from '@/components/media/MediaManager';
 import { ImageIcon, Video, Music } from 'lucide-react';
 
 const MediaGalleryPage: React.FC = () => {
@@ -28,7 +28,7 @@ const MediaGalleryPage: React.FC = () => {
         
         {/* Gallery */}
         <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <UnifiedMediaManager
+          <MediaManager
             mode="public"
             entityType="global"
             showFilters={true}

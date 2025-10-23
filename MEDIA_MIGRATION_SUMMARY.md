@@ -166,14 +166,14 @@ ORDER BY ml.created_at DESC;
 ## Next Steps
 
 ### Immediate (Already Functional):
-- ✅ Admin interface can read from new tables via `useUnifiedMedia` hook
+- ✅ Admin interface can read from new tables via `useMedia` hook
 - ✅ New uploads will use the new system
 - ✅ Performance optimized with indexes
 
 ### Recommended Follow-ups:
 
 1. **Frontend Updates** (Optional - for hybrid support):
-   - Add dual-read fallback in `useUnifiedMedia` hook for legacy data
+   - Add dual-read fallback in `useMedia` hook for legacy data
    - Add "Legacy" badges in admin UI
    - Add one-click re-migration button
 

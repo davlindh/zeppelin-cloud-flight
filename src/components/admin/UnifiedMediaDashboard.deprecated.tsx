@@ -7,5 +7,5 @@
  * This file is kept for reference only.
  */
 
-// Original file moved to UnifiedMediaDashboard.deprecated.tsx
+// Original file moved to MediaDashboard.deprecated.tsx
 // See MediaLibraryPage and SubmissionManagementPage for new implementation

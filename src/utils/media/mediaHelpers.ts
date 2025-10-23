@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play, FileText, Image, Headphones, Video, File, User, Palette, Settings, Star, Archive, Code, Box, Monitor } from 'lucide-react';
 import type { MediaType, MediaCategory } from '@/types/media';
-import type { UnifiedMediaItem, MediaFilters, MediaCollection } from '@/types/unified-media';
+import type { MediaItem, MediaFilters, MediaCollection } from '@/types/unified-media';
 
 export const getMediaIcon = (type: MediaType, size: string = 'w-5 h-5') => {
   const props = { className: size };
@@ -141,8 +141,8 @@ export const generateMediaId = (media: { url: string; title: string }): string =
 
 
 
-export const organizeMediaByCategory = (media: UnifiedMediaItem[]): MediaCollection[] => {
-  const categoryGroups: Record<string, UnifiedMediaItem[]> = {};
+export const organizeMediaByCategory = (media: MediaItem[]): MediaCollection[] => {
+  const categoryGroups: Record<string, MediaItem[]> = {};
 
   media.forEach(item => {
     if (!categoryGroups[item.category]) {
@@ -161,7 +161,7 @@ export const organizeMediaByCategory = (media: UnifiedMediaItem[]): MediaCollect
   }));
 };
 
-export const filterAndSortMedia = (media: UnifiedMediaItem[], filters: MediaFilters): UnifiedMediaItem[] => {
+export const filterAndSortMedia = (media: MediaItem[], filters: MediaFilters): MediaItem[] => {
   let filtered = [...media];
 
   // Type filter

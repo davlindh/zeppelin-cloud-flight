@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { formatFileSize } from '@/utils/formatFileSize';
+import { formatFileSize } from '@/utils/media';
 import { Image, Video, Music, FileText, HardDrive } from 'lucide-react';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
 

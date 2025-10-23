@@ -19,7 +19,7 @@ export { default as MediaStorageManager } from './MediaStorageManager';
 export { default as StorageCleanupManager } from './StorageCleanupManager';
 
 // Deprecated - use new media system
-// export { default as UnifiedMediaDashboard } from './UnifiedMediaDashboard';
+// export { default as MediaDashboard } from './MediaDashboard';
 // export { AdminMediaManager } from './AdminMediaManager';
 // export { SubmissionMediaManager } from './SubmissionMediaManager';
 // export { ProjectMediaLibrary } from './ProjectMediaLibrary';

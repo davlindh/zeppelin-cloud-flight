@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import type { UnifiedMediaItem } from '@/types/unified-media';
+import type { MediaItem } from '@/types/unified-media';
 
 interface UseMediaFilteringProps {
-  media: UnifiedMediaItem[];
+  media: MediaItem[];
 }
 
 export const useMediaFiltering = ({ media }: UseMediaFilteringProps) => {

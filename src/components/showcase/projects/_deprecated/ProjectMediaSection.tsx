@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import type { UnifiedMediaItem } from '@/types/unified-media';
+import type { MediaItem } from '@/types/unified-media';
 import { generateMediaId } from '@/utils/mediaHelpers';
 import { 
   Search, 

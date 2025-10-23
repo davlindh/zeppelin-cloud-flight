@@ -1,5 +1,5 @@
 import React from 'react';
-import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { Image } from '@/components/media/Image';
 import { cn } from '@/lib/utils';
 
 interface ParticipantAvatarProps {
@@ -26,7 +26,7 @@ export const ParticipantAvatar: React.FC<ParticipantAvatarProps> = ({
 }) => {
   return (
     <div className={cn('relative rounded-full overflow-hidden', sizeClasses[size], className)}>
-      <OptimizedImage
+      <Image
         src={src}
         alt={`${name}'s avatar`}
         fallbackSrc="/images/participants/placeholder-avatar.svg"

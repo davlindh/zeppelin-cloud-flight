@@ -25,7 +25,7 @@ The persistent media player has been fully integrated into the Zeppelin Cloud Fl
    - Integrated with MediaContext hooks
    - Supports images, videos, audio, documents
 
-4. **UnifiedMediaManager** (`src/components/media/UnifiedMediaManager.tsx`)
+4. **MediaManager** (`src/components/media/MediaManager.tsx`)
    - Gallery view with "Play All" and "Add All to Queue" buttons
    - Tab-based filtering (all, images, videos, audio, documents)
    - Entity-specific media display (projects, participants, sponsors)
@@ -135,7 +135,7 @@ interface MediaItem {
 ### Project Detail Page
 
 **File:** `src/pages/ProjectDetailPage.tsx`
-**Component:** Uses `UnifiedMediaManager` in public mode
+**Component:** Uses `MediaManager` in public mode
 **Features:**
 - Displays all media linked to project
 - Play All / Add All to Queue buttons
@@ -144,7 +144,7 @@ interface MediaItem {
 ### Participant Detail Page
 
 **File:** `src/pages/ParticipantDetailPage.tsx`  
-**Component:** Uses `UnifiedMediaManager` in public mode
+**Component:** Uses `MediaManager` in public mode
 **Features:**
 - Shows participant's media portfolio
 - Same playback controls as project pages
@@ -152,7 +152,7 @@ interface MediaItem {
 ### Media Gallery Page
 
 **File:** `src/pages/MediaGalleryPage.tsx`
-**Component:** Uses `UnifiedMediaManager` in global mode
+**Component:** Uses `MediaManager` in global mode
 **Features:**
 - Browse all media across platform
 - Admin features if logged in

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { EditPageLayout } from '@/components/admin/EditPageLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminFormSections, FormSection } from '@/components/admin/AdminFormSections';
-import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
+import { MediaManager } from '@/components/media/MediaManager';
 import { SponsorSelector } from '@/components/admin/project/SponsorSelector';
 import { TimelineEditor, BudgetEditor } from '@/components/admin/editors';
 import { AdminFormFactory } from '@/components/admin/AdminFormFactory';
@@ -253,7 +253,7 @@ export const ProjectEditContent: React.FC<ProjectEditContentProps> = ({
               icon={Image}
               collapsible={false}
             >
-              <UnifiedMediaManager
+              <MediaManager
                 entityType="project"
                 entityId={projectId}
                 entityName={projectTitle}

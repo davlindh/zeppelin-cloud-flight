@@ -1,17 +1,20 @@
 import React from 'react';
 import { useMediaLibrary } from '@/hooks/useMediaLibrary';
-import { MediaGrid } from '@/components/media/shared/MediaGrid';
-import { MediaPreviewPanel } from '@/components/media/admin/MediaPreviewPanel';
-import { MediaUploadDialog } from '@/components/media/admin/MediaUploadDialog';
-import { MediaFilterPanel } from '@/components/media/admin/MediaFilterPanel';
-import { MediaBulkActionsToolbar } from '@/components/media/admin/MediaBulkActionsToolbar';
-import { MediaViewModeToggle, ViewMode } from '@/components/media/MediaViewModeToggle';
-import { MediaStorageStats } from '@/components/media/MediaStorageStats';
+import {
+  MediaGrid,
+  MediaPreviewPanel,
+  MediaUploadDialog,
+  MediaFilterPanel,
+  MediaBulkActionsToolbar,
+  MediaViewModeToggle,
+  MediaStorageStats,
+  TagEditor,
+  MediaLinkDialog,
+  WorkflowProgress,
+  WorkflowStageCard,
+  ViewMode
+} from '@/components/media';
 import { StorageExplorer } from '@/components/media/StorageExplorer';
-import { TagEditor } from '@/components/media/TagEditor';
-import { MediaLinkDialog } from '@/components/media/MediaLinkDialog';
-import { WorkflowProgress } from '@/components/media/admin/WorkflowProgress';
-import { WorkflowStageCard } from '@/components/media/admin/WorkflowStageCard';
 import type { WorkflowStage } from '@/components/media/admin/WorkflowStageCard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -30,7 +33,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import type { MediaFilters, MediaLibraryItem } from '@/types/mediaLibrary';
-import { Image, Video, Music, FileText, Upload, Filter, X } from 'lucide-react';
+import { Image, Video, Music, FileText, Upload, Filter, X, Link as LinkIcon, Clock, CheckCircle2 } from 'lucide-react';
 import { formatFileSize } from '@/utils/formatFileSize';
 import { format } from 'date-fns';
 
@@ -208,7 +211,70 @@ const MediaLibraryPage: React.FC = () => {
           </Button>
         </div>
 
-        {/* Tabs */}
+        {/* Primary Actions Header */}
+        <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg p-6 border">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Media Management</h2>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setActiveTab('library')}>
+                <LinkIcon className="h-4 w-4 mr-2" />
+                Global Media Library
+              </Button>
+              <Button onClick={() => setShowUploadDialog(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload New Media
+              </Button>
+            </div>
+          </div>
+
+          {/* Media Type Overview */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-2">
+                <Image className="h-6 w-6 text-blue-500" />
+              </div>
+              <div className="text-lg font-bold">{stats.images}</div>
+              <div className="text-xs text-muted-foreground">Images</div>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-2">
+                <Video className="h-6 w-6 text-purple-500" />
+              </div>
+              <div className="text-lg font-bold">{stats.videos}</div>
+              <div className="text-xs text-muted-foreground">Videos</div>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-2">
+                <Music className="h-6 w-6 text-green-500" />
+              </div>
+              <div className="text-lg font-bold">{stats.audio}</div>
+              <div className="text-xs text-muted-foreground">Audio</div>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-2">
+                <FileText className="h-6 w-6 text-orange-500" />
+              </div>
+              <div className="text-lg font-bold">{stats.documents}</div>
+              <div className="text-xs text-muted-foreground">Documents</div>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-2">
+                <Clock className="h-6 w-6 text-yellow-500" />
+              </div>
+              <div className="text-lg font-bold">{stats.pending}</div>
+              <div className="text-xs text-muted-foreground">Pending</div>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-2">
+                <CheckCircle2 className="h-6 w-6 text-green-500" />
+              </div>
+              <div className="text-lg font-bold">{stats.approved}</div>
+              <div className="text-xs text-muted-foreground">Approved</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content with Tabs */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
           <TabsList>
             <TabsTrigger value="library">Mediabibliotek</TabsTrigger>
@@ -217,8 +283,7 @@ const MediaLibraryPage: React.FC = () => {
           </TabsList>
 
           <TabsContent value="library" className="space-y-6">
-          
-          {/* Quick Stats Badges */}
+            {/* Quick Stats Badges */}
           <div className="flex gap-2 flex-wrap">
             <Badge 
               variant="outline" 
@@ -380,10 +445,17 @@ const MediaLibraryPage: React.FC = () => {
                     {format(new Date(date), 'MMMM d, yyyy')}
                   </h3>
                    <MediaGrid
-                    media={items}
+                    media={items.map(item => ({
+                      id: item.id,
+                      type: item.type as 'image' | 'video' | 'audio' | 'document',
+                      title: item.title,
+                      description: item.description,
+                      url: item.public_url,
+                      thumbnail: item.thumbnail_url
+                    }))}
                     selectedIds={selectedIds}
                     onSelect={handleSelect}
-                    onPreview={setPreviewItem}
+                    onPlay={(item) => setPreviewItem(item as any)}
                     onDownload={handleDownload}
                     showCheckboxes
                     columns={getViewColumns()}
@@ -394,11 +466,18 @@ const MediaLibraryPage: React.FC = () => {
             </div>
           ) : (
             <MediaGrid
-              media={media}
+              media={media.map(item => ({
+                id: item.id,
+                type: item.type as 'image' | 'video' | 'audio' | 'document',
+                title: item.title,
+                description: item.description,
+                url: item.public_url,
+                thumbnail: item.thumbnail_url
+              }))}
               selectedIds={selectedIds}
               onSelect={handleSelect}
-              onPreview={setPreviewItem}
-              onDownload={handleDownload}
+              onPlay={(item) => setPreviewItem(item as any)}
+              onDownload={(item) => handleDownload(item as any)}
               showCheckboxes
               compact={viewMode === 'list'}
               columns={getViewColumns()}
@@ -496,7 +575,7 @@ const MediaLibraryPage: React.FC = () => {
                 onViewItems={() => {
                   const thirtyDaysAgo = new Date();
                   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                  setFilters({ 
+                  setFilters({
                     project_id: 'none',
                     participant_id: 'none',
                     date_to: thirtyDaysAgo.toISOString()
@@ -526,7 +605,7 @@ const MediaLibraryPage: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Media Files?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {selectedIds.size} selected file(s)? 
+              Are you sure you want to delete {selectedIds.size} selected file(s)?
               This action cannot be undone and will remove the files from storage.
             </AlertDialogDescription>
           </AlertDialogHeader>

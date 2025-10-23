@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { getThumbnailUrl, generateSrcSet } from '@/utils/thumbnailHelpers';
-import { getImageUrl } from '@/utils/imageUtils';
+import { getThumbnailUrl, generateSrcSet } from '@/utils/media';
+import { getImageUrl } from '../../utils/imageUtils';
 
-interface OptimizedImageProps {
+interface ImageProps {
   src?: string | null;
   alt: string;
   className?: string;
@@ -24,7 +24,7 @@ interface OptimizedImageProps {
   height?: number;
 }
 
-export const OptimizedImage: React.FC<OptimizedImageProps> = ({
+export const Image: React.FC<ImageProps> = ({
   src,
   alt,
   className = '',
@@ -86,7 +86,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       const imgSrc = thumbnail && processedSrc.includes('supabase.co/storage')
         ? getThumbnailUrl(processedSrc, { width: width || 800, quality: 85 })
         : processedSrc;
-      
+
       setCurrentSrc(imgSrc);
     }
   }, [isInView, processedSrc, thumbnail, width]);
@@ -132,10 +132,10 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     >
       {/* Loading skeleton or blur placeholder */}
       {isLoading && (
-        <div 
+        <div
           className={cn(
             "absolute inset-0",
-            placeholder === 'blur' 
+            placeholder === 'blur'
               ? "bg-gradient-to-br from-muted/80 to-muted backdrop-blur-sm animate-pulse"
               : "bg-muted animate-pulse"
           )}

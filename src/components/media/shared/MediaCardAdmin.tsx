@@ -31,9 +31,7 @@ import {
 import type { MediaLibraryItem } from "@/types/mediaLibrary";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { formatFileSize } from "@/utils/formatFileSize";
-import { getMediaColorScheme, getStatusColorScheme } from "@/utils/mediaColorScheme";
-import { getThumbnailUrl } from "@/utils/thumbnailHelpers";
+import { formatFileSize, getMediaColorScheme, getStatusColorScheme, getThumbnailUrl } from "@/utils/media";
 
 interface MediaCardProps {
   item: MediaLibraryItem;
@@ -126,20 +124,27 @@ export function MediaCardAdmin({
   const statusScheme = getStatusColorScheme(item.status);
   const displayTitle = cleanTitle(item.title);
   
-  // Smart thumbnail generation
+  // Smart thumbnail generation with type-specific handling
   const thumbnailUrl = React.useMemo(() => {
     if (item.type === 'image') {
       // Use thumbnail_url if available
       if (item.thumbnail_url) return item.thumbnail_url;
-      
+
       // Generate thumbnail from public_url if available
       if (item.public_url) {
         return getThumbnailUrl(item.public_url, { width: 400, quality: 75 });
       }
-      
+
       return '/placeholder.svg';
+    } else if (item.type === 'video') {
+      // Use thumbnail_url for videos, fallback to placeholder
+      return item.thumbnail_url || '/placeholder.svg';
+    } else if (item.type === 'audio') {
+      return '/placeholder.svg'; // Audio uses overlay
+    } else if (item.type === 'document') {
+      return '/placeholder.svg'; // Document uses icon overlay
     }
-    return item.thumbnail_url || item.public_url;
+    return item.thumbnail_url || item.public_url || '/placeholder.svg';
   }, [item]);
 
   return (

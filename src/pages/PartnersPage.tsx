@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { Image } from '@/components/media/Image';
 import { useToast } from '@/hooks/use-toast';
 import { CollaborationInquiryForm } from '@/components/public/forms/CollaborationInquiryForm';
 import {
@@ -261,7 +261,7 @@ export const PartnersPage: React.FC = () => {
                     </div>
 
                     <div className="aspect-video bg-gradient-to-br from-muted/50 to-background rounded-lg flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                      <OptimizedImage
+                      <Image
                         src={partner.logo || partner.src || '/images/partners/placeholder-logo.png'}
                         alt={partner.name || partner.alt || 'Partner logo'}
                         className="max-w-full max-h-full group-hover:brightness-110 transition-all duration-300"
@@ -397,7 +397,7 @@ export const PartnersPage: React.FC = () => {
                   {selectedPartner && (
                     <>
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                        <OptimizedImage
+                        <Image
                           src={selectedPartner.logo || selectedPartner.src || '/images/partners/placeholder-logo.png'}
                           alt={selectedPartner.name || selectedPartner.alt || 'Partner logo'}
                           className="w-full h-full"

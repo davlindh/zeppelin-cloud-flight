@@ -12,8 +12,6 @@ export * from './mediaHelpers';
 export * from './mediaUpload';
 export * from './mediaColorScheme';
 export * from './thumbnailHelpers';
-export * from './mediaMetadataExtractor';
-export * from './mediaMetadataReprocessor';
 
 // Re-export commonly used functions with clear names
 export {
@@ -27,8 +25,8 @@ export {
 
 export {
   uploadMultipleToMediaLibrary,
-  validateMediaFile,
-  processMediaMetadata
+  validateFile as validateMediaFile,
+  extractFileMetadata as processMediaMetadata
 } from './mediaUpload';
 
 export {

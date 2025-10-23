@@ -1,5 +1,5 @@
 import React from 'react';
-import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { Image } from '@/components/media/Image';
 import { cn } from '@/lib/utils';
 
 interface ProjectImageProps {
@@ -18,14 +18,15 @@ export const ProjectImage: React.FC<ProjectImageProps> = ({
   aspectRatio = '16/9'
 }) => {
   return (
-    <OptimizedImage
+    <Image
       src={src}
       alt={`${title} project image`}
       fallbackSrc="/images/projects/placeholder-project.svg"
       priority={priority}
       thumbnail
       objectFit="cover"
-      aspectRatio={aspectRatio}
+      // Removed aspectRatio as it's handled by the component itself
+      // aspectRatio={aspectRatio}
       className={cn('rounded-lg', className)}
     />
   );

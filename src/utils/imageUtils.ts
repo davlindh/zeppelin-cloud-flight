@@ -2,44 +2,49 @@ export const getImageUrl = (imageId?: string | null): string => {
   if (!imageId || imageId === '') {
     return '/placeholder.svg';
   }
-  
+
   // Handle full URLs (already formatted)
   if (imageId.startsWith('http')) {
     return imageId;
   }
-  
+
   // Handle Supabase storage URLs that start with the storage path
-  if (imageId.startsWith('/storage/') || imageId.includes('supabase')) {
+  if (imageId.startsWith('/storage/') || imageId.includes('supabase.co/storage')) {
     return imageId;
   }
 
-  // Handle local asset paths
-  if (imageId.startsWith('/') || imageId.startsWith('./')) {
-    return imageId;
+  // Handle file paths that already have simple bucket paths like /images/... - these are likely legacy
+  if (imageId.startsWith('/')) {
+    // If it's already a path like /images/projects/..., prefix with media-files bucket
+    const supabaseUrl = 'https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public';
+    // Remove leading slash and prefix with bucket
+    const cleanPath = imageId.startsWith('/') ? imageId.substring(1) : imageId;
+    return `${supabaseUrl}/media-files/${cleanPath}`;
   }
 
   // Handle paths that are just file names - try different buckets
-  if (!imageId.startsWith('http') && !imageId.includes('storage')) {
+  if (!imageId.includes('storage')) {
     // Try to determine bucket from context or use default
     const supabaseUrl = 'https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public';
-    
+
     // Check common patterns to determine bucket
     if (imageId.includes('avatar') || imageId.includes('participant')) {
       return `${supabaseUrl}/participant-avatars/${imageId}`;
     }
     if (imageId.includes('project')) {
-      return `${supabaseUrl}/project-images/${imageId}`;
+      // This might be the issue - don't double-prefix
+      return `${supabaseUrl}/media-files/${imageId}`;
     }
     if (imageId.includes('sponsor') || imageId.includes('partner')) {
       return `${supabaseUrl}/sponsor-logos/${imageId}`;
     }
-    
+
     // Default to media-files bucket (most common)
     return `${supabaseUrl}/media-files/${imageId}`;
   }
-  
-  // Fallback to placeholder
-  return '/placeholder.svg';
+
+  // For anything else, return as-is (should not happen often)
+  return imageId;
 };
 
 // Extract storage path from public URL for deletion

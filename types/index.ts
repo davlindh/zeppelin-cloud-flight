@@ -19,7 +19,7 @@ export type {
 
 // Re-export unified media types
 export type {
-  UnifiedMediaItem,
+  MediaItem,
   MediaType,
   MediaCategory,
   MediaCollection,

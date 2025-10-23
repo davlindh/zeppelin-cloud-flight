@@ -10,7 +10,7 @@ import { ShieldAlert, Building, Mail, Briefcase, ImageIcon } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminFormSections, FormSection } from '@/components/admin/AdminFormSections';
 import { SponsorProjectLinkingEditor, VisibilitySettings } from '@/components/admin/editors';
-import { UnifiedMediaManager } from '@/components/media/UnifiedMediaManager';
+import { MediaManager } from '@/components/media/MediaManager';
 import { supabase } from '@/integrations/supabase/client';
 
 export const SponsorEditPage: React.FC = () => {
@@ -135,7 +135,7 @@ export const SponsorEditPage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="media" className="mt-6">
-            <UnifiedMediaManager
+            <MediaManager
               entityType="sponsor"
               entityId={id}
               entityName={sponsorData.name}

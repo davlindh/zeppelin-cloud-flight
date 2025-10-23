@@ -1,2 +1,2 @@
 // Public media components - for public-facing media galleries
-export { PublicMediaGallery } from './PublicMediaGallery';
+// PublicMediaGallery was removed - use MediaGallery from core instead

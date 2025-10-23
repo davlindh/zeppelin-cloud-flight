@@ -30,6 +30,7 @@ export interface ProjectSchema {
   description: string;
   full_description?: string;
   image_path?: string;
+  location?: string; // Added via migration - default "Karlskrona, Sverige"
   purpose?: string;
   expected_impact?: string;
   associations?: string[];

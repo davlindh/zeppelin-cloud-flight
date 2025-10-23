@@ -78,7 +78,7 @@ const getStageColor = (stage: string) => {
   return colors[stage as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
 };
 
-const UnifiedMediaDashboard: React.FC = () => {
+const MediaDashboard: React.FC = () => {
   const { toast } = useToast();
   const [mediaItems, setMediaItems] = useState<MediaWorkflowItem[]>([]);
   const [workflowStats, setWorkflowStats] = useState<WorkflowStats | null>(null);
@@ -95,10 +95,10 @@ const UnifiedMediaDashboard: React.FC = () => {
     { id: 'orphaned', name: 'Orphaned', icon: AlertTriangle, color: 'red' }
   ];
 
-  const loadUnifiedMediaData = useCallback(async () => {
+  const loadMediaData = useCallback(async () => {
     setLoading(true);
     try {
-      const unifiedMedia: MediaWorkflowItem[] = [];
+      const Media: MediaWorkflowItem[] = [];
 
       // 1. Get media from submissions
       const { data: submissions } = await supabase
@@ -115,7 +115,7 @@ const UnifiedMediaDashboard: React.FC = () => {
                 const fileName = urlParts[urlParts.length - 1];
                 const fileType = getFileTypeFromName(fileName);
 
-                unifiedMedia.push({
+                Media.push({
                   id: `sub-${submission.id}-${index}`,
                   name: fileName,
                   type: fileType,
@@ -148,24 +148,24 @@ const UnifiedMediaDashboard: React.FC = () => {
           const fileType = getFileTypeFromName(fileName);
 
           // Check if this file is already in submissions (to avoid duplicates)
-          const existingIndex = unifiedMedia.findIndex(item =>
+          const existingIndex = Media.findIndex(item =>
             item.name === fileName && item.bucket === 'project-media'
           );
 
           if (existingIndex >= 0) {
             // Update existing item
-            unifiedMedia[existingIndex] = {
-              ...unifiedMedia[existingIndex],
+            Media[existingIndex] = {
+              ...Media[existingIndex],
               status: 'published',
               stage: 'published',
               project_id: media.project_id,
               workflow_progress: 100,
-              tags: [...unifiedMedia[existingIndex].tags, `project-${media.project_id}`],
-              usage_count: (unifiedMedia[existingIndex].usage_count || 0) + 1
+              tags: [...Media[existingIndex].tags, `project-${media.project_id}`],
+              usage_count: (Media[existingIndex].usage_count || 0) + 1
             };
           } else {
             // Add new item
-            unifiedMedia.push({
+            Media.push({
               id: `proj-${media.id}`,
               name: fileName,
               type: fileType,
@@ -185,8 +185,8 @@ const UnifiedMediaDashboard: React.FC = () => {
         });
       }
 
-      setMediaItems(unifiedMedia);
-      calculateWorkflowStats(unifiedMedia);
+      setMediaItems(Media);
+      calculateWorkflowStats(Media);
     } catch (error) {
       console.error('Error loading unified media data:', error);
       toast({
@@ -248,8 +248,8 @@ const UnifiedMediaDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    loadUnifiedMediaData();
-  }, [loadUnifiedMediaData]);
+    loadMediaData();
+  }, [loadMediaData]);
 
   const filteredItems = selectedStage === 'all'
     ? mediaItems
@@ -426,4 +426,4 @@ const UnifiedMediaDashboard: React.FC = () => {
   );
 };
 
-export default UnifiedMediaDashboard;
+export default MediaDashboard;

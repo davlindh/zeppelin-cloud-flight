@@ -10,7 +10,7 @@ export type { MediaType, MediaCategory } from './media';
  * Unified MediaItem interface based on database schema
  * Consolidates project_media and participant_media tables
  */
-export interface UnifiedMediaItem {
+export interface MediaItem {
   id: string;
   type: MediaType;
   category?: MediaCategory; // Optional for project media, required for participant media
@@ -43,7 +43,7 @@ export interface MediaCollection {
   id: string;
   title: string;
   description?: string;
-  items: UnifiedMediaItem[];
+  items: MediaItem[];
   category: MediaCategory;
   thumbnail?: string;
 }

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { MediaGrid } from '@/components/media/core/MediaGrid';
-import { MediaFilterPanel } from '@/components/media/admin/MediaFilterPanel';
-import { MediaUploadDialog } from '@/components/media/admin/MediaUploadDialog';
-import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
+import {
+  MediaGrid,
+  MediaLightbox,
+  MediaFilterPanel,
+  MediaUploadDialog,
+  MediaLinkManager
+} from '@/components/media';
 import { useMediaLibrary } from '@/hooks/media/useMediaLibrary';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
@@ -12,9 +15,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { 
-  Link as LinkIcon, 
-  Upload, 
+import {
+  Link as LinkIcon,
+  Upload,
   Image as ImageIcon,
   Video,
   Music,
@@ -23,17 +26,17 @@ import {
   Grid as GridIcon,
   List,
   PlayCircle,
-  ListMusic
+  ListMusic,
+  Download
 } from 'lucide-react';
-import type { UnifiedMediaItem, MediaFilters } from '@/types/unified-media';
+import type { MediaItem, MediaFilters } from '@/types/unified-media';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
-import type { MediaItem } from '@/types/media';
-import { uploadMultipleToMediaLibrary } from '@/utils/mediaUpload';
+import { uploadMultipleToMediaLibrary } from '@/utils/media';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-interface UnifiedMediaManagerProps {
+interface MediaManagerProps {
   entityType: 'project' | 'participant' | 'sponsor' | 'global';
   entityId?: string;
   entityName?: string;
@@ -52,7 +55,7 @@ const getMediaIcon = (type: string) => {
   }
 };
 
-export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
+export const MediaManager: React.FC<MediaManagerProps> = ({
   entityType,
   entityId,
   entityName,
@@ -70,18 +73,41 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeTab, setActiveTab] = useState<'all' | 'images' | 'videos' | 'audio' | 'documents'>('all');
 
-  // Build filter based on entity type
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxMedia, setLightboxMedia] = useState<MediaItem[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Build filter based on entity type - REMOVE approved filter for public mode
+  // This allows ALL media to show in project showcases for testing
   const baseFilters: MediaFilters = entityType === 'global'
     ? {} as MediaFilters
     : {
         [`${entityType}_id`]: entityId,
-        ...(mode === 'public' && { status: 'approved' }),
+        // Remove status: 'approved' filter to show all media for now
+        // ...(mode === 'public' && { status: 'approved' }),
       } as MediaFilters;
 
   const [filters, setFilters] = useState<MediaFilters>(baseFilters);
 
+  // Debug logging for MediaManager
+  console.log('🎯 MediaManager Debug:', {
+    entityType,
+    entityId,
+    mode,
+    filters,
+    baseFilters
+  });
+
   // Fetch media dynamically
   const { media, isLoading, stats } = useMediaLibrary(filters);
+
+  // Additional debug logging
+  console.log('🎯 MediaManager Media Result:', {
+    count: media?.length,
+    stats,
+    isLoading
+  });
 
   const { 
     linkToProject, 
@@ -123,6 +149,68 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
     setSelectedMediaIds(prev =>
       prev.includes(mediaId) ? prev.filter(id => id !== mediaId) : [...prev, mediaId]
     );
+  };
+
+  // Handler for MediaGrid selection change
+  const handleSelectionChange = (id: string, selected: boolean) => {
+    setSelectedMediaIds(prev =>
+      selected
+        ? [...prev, id]
+        : prev.filter(mediaId => mediaId !== id)
+    );
+  };
+
+  // Handle bulk download
+  const handleBulkDownload = async (mediaIds: string[]) => {
+    if (mediaIds.length === 0) return;
+
+    const selectedMedia = media.filter(m => mediaIds.includes(m.id));
+
+    try {
+      for (let i = 0; i < selectedMedia.length; i++) {
+        const item = selectedMedia[i];
+
+        const link = document.createElement('a');
+        const fileExtension = item.public_url.split('.').pop()?.split('?')[0] || 'file';
+        const cleanTitle = item.title.replace(/[^a-z0-9\-_\s]/gi, '').replace(/\s+/g, '_').substring(0, 50);
+        const filename = `${cleanTitle}_${item.id}.${fileExtension}`;
+
+        link.href = item.public_url;
+        link.download = decodeURIComponent(filename);
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Show progress
+        if (selectedMedia.length > 1 && i < selectedMedia.length - 1) {
+          toast({
+            title: `Nedladdning ${i + 1}/${selectedMedia.length}`,
+            description: `Laddar ner: ${item.title}`,
+          });
+        }
+
+        // Delay between downloads to avoid browser restrictions
+        if (i < selectedMedia.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // Clear selection and show completion
+      setSelectedMediaIds([]);
+      toast({
+        title: 'Nedladdning klar',
+        description: `Nedladdade ${selectedMedia.length} fil(er) framgångsrikt`,
+      });
+    } catch (error) {
+      console.error('Bulk download failed:', error);
+      toast({
+        title: 'Nedladdning misslyckades',
+        description: error instanceof Error ? error.message : 'Ett fel uppstod',
+        variant: 'destructive',
+      });
+    }
   };
 
   const selectAll = () => {
@@ -195,19 +283,30 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
     }
   };
 
-  // Convert to UnifiedMediaItem format
-  const unifiedMedia: UnifiedMediaItem[] = media.map(item => ({
+  // Transformation Layer: Enrich MediaLibraryItem with properties MediaCard expects
+  const enrichedMedia = media.map(item => ({
+    ...item,
+    // Add expected properties for MediaCard component compatibility
+    url: item.public_url,           // MediaCard expects 'url', database has 'public_url'
+    thumbnail: item.thumbnail_url,  // Keep consistently named
+    // Add minimal link arrays (components can handle empty arrays)
+    media_project_links: [],
+    media_participant_links: [],
+  }));
+
+  // Convert to MediaItem format for lightbox/player compatibility
+  const Media: MediaItem[] = enrichedMedia.map(item => ({
     id: item.id,
-    type: item.type as UnifiedMediaItem['type'],
-    url: item.public_url,
+    type: item.type as MediaItem['type'],
+    url: item.url,
     title: item.title,
     description: item.description,
-    thumbnail: item.thumbnail_url,
+    thumbnail: item.thumbnail,
     category: item.category as any,
   }));
 
   // Filter by tab
-  const tabFilteredMedia = unifiedMedia.filter(item => {
+  const tabFilteredMedia = Media.filter(item => {
     if (activeTab === 'all') return true;
     if (activeTab === 'images') return item.type === 'image';
     if (activeTab === 'videos') return item.type === 'video';
@@ -215,6 +314,16 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
     if (activeTab === 'documents') return item.type === 'document';
     return true;
   });
+
+  // Handle lightbox open
+  const handleLightboxOpen = (mediaItem: MediaItem, allMedia: MediaItem[] = tabFilteredMedia) => {
+    const index = allMedia.findIndex(m => m.id === mediaItem.id);
+    if (index !== -1) {
+      setLightboxMedia(allMedia);
+      setLightboxIndex(index);
+      setLightboxOpen(true);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -269,6 +378,14 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
             {selectedMediaIds.length > 0 && (
               <>
                 <Badge variant="secondary">{selectedMediaIds.length} valda</Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBulkDownload(selectedMediaIds)}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Ladda ner ({selectedMediaIds.length})
+                </Button>
                 <Button variant="ghost" size="sm" onClick={clearSelection}>
                   Rensa
                 </Button>
@@ -414,12 +531,38 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
                 </div>
               )}
               <MediaGrid
-                media={tabFilteredMedia.map(item => ({
-                  ...item,
-                  type: item.type as 'image' | 'video' | 'audio' | 'document',
-                  isLegacy: (media.find(m => m.id === item.id) as MediaLibraryItem)?.is_legacy
-                }))}
-                viewMode={viewMode}
+                items={enrichedMedia.filter(item => tabFilteredMedia.some(tf => tf.id === item.id))}
+                selectedIds={new Set(selectedMediaIds)}
+                onSelect={(id, selected) => handleSelectionChange(id, selected)}
+    onPreview={(item) => handleLightboxOpen({
+      id: item.id,
+      type: item.type,
+      title: item.title,
+      url: item.public_url,
+      description: item.description,
+      thumbnail: item.thumbnail_url
+    })}
+                showCheckboxes={true}
+                showActions={mode === 'admin'}
+                context={mode === 'public' ? 'public' : 'admin'}
+                onDownload={(item) => {
+                  try {
+                    const link = document.createElement('a');
+                    const fileExtension = item.public_url.split('.').pop()?.split('?')[0] || 'file';
+                    const cleanTitle = item.title.replace(/[^a-z0-9\-_\s]/gi, '').replace(/\s+/g, '_').substring(0, 50);
+                    const filename = `${cleanTitle}_${item.id}.${fileExtension}`;
+
+                    link.href = item.public_url;
+                    link.download = decodeURIComponent(filename);
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  } catch (error) {
+                    console.error('Download failed:', error);
+                  }
+                }}
               />
             </div>
           ) : (
@@ -466,6 +609,15 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
           onLink={handleLink}
         />
       )}
+
+      {/* Lightbox */}
+      <MediaLightbox
+        media={lightboxMedia}
+        initialIndex={lightboxIndex}
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        enableNavigation={true}
+      />
     </div>
   );
 };

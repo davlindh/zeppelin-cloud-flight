@@ -5,5 +5,6 @@ export { MediaCardAdmin } from './MediaCardAdmin';
 export { MediaLinkingSelector } from './MediaLinkingSelector';
 export { MediaUploadZone } from './MediaUploadZone';
 export { MediaViewModeToggle } from './MediaViewModeToggle';
+export type { ViewMode } from './MediaViewModeToggle';
 export { PopularTags } from './PopularTags';
 export { TagAutocomplete } from './TagAutocomplete';

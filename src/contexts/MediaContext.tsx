@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback, useRef } from 'react';
 import type { MediaContextValue, MediaPlayerState, MediaItem } from '@/types/media';
-import { generateMediaId } from '@/utils/mediaHelpers';
+import { generateMediaId } from '@/utils/media';
 
 type MediaAction =
   | { type: 'PLAY_MEDIA'; payload: MediaItem }

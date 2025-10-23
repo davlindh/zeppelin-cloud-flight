@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, X, FileIcon, CheckCircle2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
-import { formatFileSize } from '@/utils/formatFileSize';
+import { formatFileSize } from '@/utils/media';
 
 interface UploadFile {
   file: File;

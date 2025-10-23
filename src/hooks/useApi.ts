@@ -54,30 +54,53 @@ export const useProjects = () => {
 
 /**
  * Unified Media Fetching System - Single Source for All Media Operations
+ * Now uses the new media_library system with project/participant relationships
  */
-export const useUnifiedMedia = () => {
+export const useMedia = () => {
   return useQuery({
     queryKey: ['unified-media'],
     queryFn: async () => {
-      console.log('🔍 useUnifiedMedia: Fetching all media from database');
+      console.log('🔍 useMedia: Fetching all media from new media_library system');
 
-      // Fetch all media from database
+      // Fetch all media from the new unified media library
       const { data, error } = await supabase
-        .from('project_media')
-        .select('*')
+        .from('media_library')
+        .select(`
+          *,
+          media_project_links (projects!inner(id, slug, title)),
+          media_participant_links (participants!inner(id, slug, name)),
+          media_sponsor_links (sponsors!inner(id, name))
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('🔍 useUnifiedMedia: Error fetching media:', error);
+        console.error('🔍 useMedia: Error fetching media:', error);
         throw error;
       }
 
-      console.log('🔍 useUnifiedMedia: Raw media data:', data);
-      console.log('🔍 useUnifiedMedia: Media count:', data?.length || 0);
+      console.log('🔍 useMedia: Raw media data:', data);
+      console.log('🔍 useMedia: Media count:', data?.length || 0);
+
+      // Add relationship metadata for each media item
+      const enrichedMedia = (data || []).map(item => ({
+        ...item,
+        linkedProjects: item.media_project_links?.map(link => link.projects) || [],
+        linkedParticipants: item.media_participant_links?.map(link => link.participants) || [],
+        linkedSponsors: item.media_sponsor_links?.map(link => link.sponsors) || [],
+        totalLinks: (item.media_project_links?.length || 0) +
+                   (item.media_participant_links?.length || 0) +
+                   (item.media_sponsor_links?.length || 0)
+      }));
 
       return {
-        all: data || [],
-        totalCount: data?.length || 0
+        all: enrichedMedia,
+        totalCount: enrichedMedia.length,
+        byType: {
+          image: enrichedMedia.filter(m => m.type === 'image'),
+          video: enrichedMedia.filter(m => m.type === 'video'),
+          audio: enrichedMedia.filter(m => m.type === 'audio'),
+          document: enrichedMedia.filter(m => m.type === 'document'),
+        }
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -169,10 +192,50 @@ export const useProject = (slugOrId: string) => {
       }
 
       console.log('🔍 useProject: Raw data received:', data);
-      console.log('🔍 useProject: project_media:', data?.project_media);
-      console.log('🔍 useProject: project_media length:', data?.project_media?.length);
+      console.log('🔍 useProject: new media_project_links:', data?.media_project_links);
+      console.log('🔍 useProject: legacy project_media:', data?.project_media);
 
-      return data;
+      // Create unified media format combining new and legacy systems
+      const unifiedMedia = [
+        // New system media (media_project_links)
+        ...(data.media_project_links?.map(link => ({
+          id: link.media_library.id,
+          type: link.media_library.type as 'image' | 'video' | 'audio' | 'document',
+          url: link.media_library.public_url,
+          title: link.media_library.title || 'Untitled Media',
+          description: link.media_library.description,
+          thumbnail: link.media_library.thumbnail_url,
+          source: 'new' as const,
+          // For frontend compatibility
+          isLegacy: false
+        })) || []),
+
+        // Legacy system media (project_media) for backward compatibility
+        ...(data.project_media?.map(media => ({
+          id: media.id,
+          type: media.type as 'image' | 'video' | 'audio' | 'document',
+          url: media.url,
+          title: media.title || 'Legacy Media',
+          description: media.description,
+          thumbnail: null, // Legacy media may not have thumbnails
+          source: 'legacy' as const,
+          isLegacy: true
+        })) || [])
+      ];
+
+      console.log('🔍 useProject: Unified media created:', unifiedMedia);
+      console.log('🔍 useProject: Unified media count:', unifiedMedia.length);
+
+      return {
+        ...data,
+        // Override image_path with first available media if none exists
+        image_path: data.image_path || unifiedMedia.find(m => m.type === 'image')?.url || null,
+        // Provide unified media array
+        unifiedMedia,
+        // Keep legacy fields for backward compatibility
+        project_media: data.project_media,
+        media_project_links: data.media_project_links
+      };
     },
     enabled: !!slugOrId,
     staleTime: 5 * 60 * 1000,

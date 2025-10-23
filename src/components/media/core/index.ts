@@ -1,9 +1,8 @@
-export { MediaCardSimple } from './MediaCardSimple';
-export { MediaGrid } from './MediaGrid';
+export { MediaCard } from './MediaCard';
 export { MediaGallery } from './MediaGallery';
 export { MediaFilters } from './MediaFilters';
 export { MediaGridSkeleton } from './MediaGridSkeleton';
-export { MediaPlayer } from './MediaPlayer';
+// Removed MediaPlayer - only contains PersistentMediaPlayer which is exported through main media index
 export { MediaLightbox } from './MediaLightbox';
 export { RichMediaPreview } from './RichMediaPreview';
-export { PersistentMediaPlayer } from './PersistentMediaPlayer';
+// Removed PersistentMediaPlayer - now exported from MediaPlayer.tsx

@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SubmissionListItem } from '@/components/admin/submission-management/SubmissionListItem';
 import { SubmissionContentPreview } from '@/components/admin/submission-management/SubmissionContentPreview';
 import { MigrationTools } from '@/components/admin/submission-management/MigrationTools';
-import { MediaGrid } from '@/components/media/shared/MediaGrid';
+import { MediaGrid } from '@/components/media';
 import { MediaPreviewPanel } from '@/components/media/admin/MediaPreviewPanel';
 import { CheckCircle, XCircle, Users, FolderOpen, AlertCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -314,8 +314,10 @@ export const SubmissionManagementPage: React.FC = () => {
                       Bifogad Media ({submissionMedia.length})
                     </h3>
                     <MediaGrid
-                      media={submissionMedia}
-                      onPreview={setPreviewMedia}
+                      items={submissionMedia}
+                      onPreview={(item) => setPreviewMedia(item)}
+                      showActions={false}
+                      context="public"
                     />
                   </div>
                 )}

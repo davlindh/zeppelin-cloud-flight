@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MediaGrid } from '@/components/media/core/MediaGrid';
-import { useUnifiedMedia } from '@/hooks/useUnifiedMedia';
+import { useMedia } from '@/hooks/useMedia';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ import {
   Music,
   Camera
 } from 'lucide-react';
-import type { UnifiedMediaItem } from '@/types/unified-media';
+import type { MediaItem } from '@/types/unified-media';
 import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
 import { cn } from '@/lib/utils';
 
@@ -61,7 +61,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
   const [selectedType, setSelectedType] = useState<string>('all');
   
   // Fetch media dynamically based on project_id
-  const { media, isLoading } = useUnifiedMedia({ 
+  const { media, isLoading } = useMedia({ 
     project_id: projectId,
     status: 'approved' // Only show approved media for public view
   });
@@ -76,10 +76,10 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
     }
   };
 
-  // Convert to UnifiedMediaItem format
-  const unifiedMedia: UnifiedMediaItem[] = media.map(item => ({
+  // Convert to MediaItem format
+  const Media: MediaItem[] = media.map(item => ({
     id: item.id,
-    type: item.type as UnifiedMediaItem['type'],
+    type: item.type as MediaItem['type'],
     url: item.public_url,
     title: item.title,
     description: item.description,
@@ -88,14 +88,14 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
 
   // Calculate media stats
   const mediaStats = {
-    images: unifiedMedia.filter(m => m.type === 'image').length,
-    videos: unifiedMedia.filter(m => m.type === 'video').length,
-    audio: unifiedMedia.filter(m => m.type === 'audio').length,
-    documents: unifiedMedia.filter(m => m.type === 'document').length
+    images: Media.filter(m => m.type === 'image').length,
+    videos: Media.filter(m => m.type === 'video').length,
+    audio: Media.filter(m => m.type === 'audio').length,
+    documents: Media.filter(m => m.type === 'document').length
   };
 
   // Filter media based on search and type
-  const filteredMedia = unifiedMedia.filter((item) => {
+  const filteredMedia = Media.filter((item) => {
     const matchesSearch = item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          item.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || item.type === selectedType;
@@ -103,9 +103,9 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
   });
 
   // Get unique media types for filtering
-  const mediaTypes = Array.from(new Set(unifiedMedia.map(item => item.type)));
+  const mediaTypes = Array.from(new Set(Media.map(item => item.type)));
 
-  const handleMediaAction = (item: UnifiedMediaItem) => {
+  const handleMediaAction = (item: MediaItem) => {
     window.open(item.url, '_blank', 'noopener,noreferrer');
   };
 
@@ -122,7 +122,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
     );
   }
 
-  if (unifiedMedia.length === 0 && !showAdminControls) {
+  if (Media.length === 0 && !showAdminControls) {
     return null;
   }
 
@@ -196,7 +196,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
       </div>
 
       {/* Search and Filters */}
-      {unifiedMedia.length > 0 && (
+      {Media.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="relative flex-1">
@@ -389,11 +389,11 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
             <p className="text-sm text-muted-foreground">
               {searchQuery || selectedType !== 'all' 
                 ? 'Prova att ändra dina sökkriterier eller filter' 
-                : unifiedMedia.length === 0 
+                : Media.length === 0 
                   ? 'Det finns inga mediafiler för detta projekt än'
                   : 'Inga matchande mediafiler'}
             </p>
-            {unifiedMedia.length === 0 && showAdminControls && isAdmin && (
+            {Media.length === 0 && showAdminControls && isAdmin && (
               <Button variant="outline" onClick={() => setShowLinkManager(true)} className="mt-4">
                 <LinkIcon className="h-4 w-4 mr-2" />
                 Länka Media

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Video, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Camera, Video, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useMediaPlayer } from '@/hooks/useMediaPlayer';
-import type { MediaItem } from '@/types/media';
+import { cn } from '@/lib/utils';
+import { useMediaPlayer, MediaItem } from '@/media';
 
 interface ProjectDetailHeroProps {
   project: {
@@ -47,7 +47,15 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
   onDelete
 }) => {
   const navigate = useNavigate();
+  const mediaSectionRef = useRef<HTMLDivElement>(null);
   const { playMedia } = useMediaPlayer();
+
+  // Track loaded images to avoid displaying placeholders
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+
+  const handleImageLoad = (index: number) => {
+    setLoadedImages(prev => new Set([...prev, index]));
+  };
 
   // Create MediaItem from project media data
   const createMediaItem = (media: { type: string; url: string; title: string }): MediaItem => ({
@@ -58,8 +66,24 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
     description: `Media från ${project.title}`,
   });
 
-  // Handle media thumbnail click
+  // Handle media thumbnail click - Scroll to MediaManager section
   const handleMediaClick = (media: { type: string; url: string; title: string }) => {
+    const mediaSection = document.getElementById('project-media-section');
+    if (mediaSection) {
+      // Smooth scroll to the MediaManager section
+      mediaSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      // Optional: Add a highlight animation to draw attention
+      mediaSection.classList.add('ring-2', 'ring-primary/50', 'transition-all', 'duration-500');
+      setTimeout(() => {
+        mediaSection.classList.remove('ring-2', 'ring-primary/50');
+      }, 2000);
+    }
+
+    // Still play the media if it's available (for visual feedback)
     const mediaItem = createMediaItem(media);
     playMedia(mediaItem);
   };
@@ -152,26 +176,41 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
                   </Badge>
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                  {displayMedia.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer border border-border/20 hover:border-primary/40 transition-all duration-300"
-                      onClick={() => handleMediaClick(item)}
-                    >
-                      <img
-                        src={item.url}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                        {item.type === 'video' ? (
-                          <Video className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        ) : (
-                          <ImageIcon className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {displayMedia.map((item, idx) => {
+                    const isLoaded = loadedImages.has(idx);
+                    return (
+                      <div
+                        key={idx}
+                        className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer border border-border/20 hover:border-primary/40 transition-all duration-300"
+                        onClick={() => handleMediaClick(item)}
+                      >
+                        {!isLoaded && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-muted animate-pulse">
+                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                          </div>
                         )}
+                        <img
+                          src={item.url}
+                          alt={item.title}
+                          loading="lazy"
+                          onLoad={() => handleImageLoad(idx)}
+                          className={cn(
+                            "w-full h-full object-cover transition-all duration-300",
+                            isLoaded
+                              ? "opacity-100 group-hover:scale-110"
+                              : "opacity-0"
+                          )}
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                          {item.type === 'video' ? (
+                            <Video className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          ) : (
+                            <ImageIcon className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {project.media.length > 6 && (
                     <div className="aspect-square rounded-lg bg-background/30 backdrop-blur-sm flex items-center justify-center text-foreground/80 text-sm font-medium border border-border/30 hover:border-primary/40 hover:bg-background/40 transition-all duration-300 cursor-pointer">
                       +{project.media.length - 6}

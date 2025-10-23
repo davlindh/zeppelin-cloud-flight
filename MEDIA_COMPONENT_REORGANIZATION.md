@@ -48,7 +48,7 @@ src/components/media/
 ├── public/                  # Public-facing components
 │   ├── PublicMediaGallery.tsx
 │   └── index.ts
-├── UnifiedMediaManager.tsx  # Main unified component
+├── MediaManager.tsx  # Main unified component
 └── index.ts                 # Main export file
 ```
 
@@ -152,7 +152,7 @@ export * from './admin';
 export * from './public';
 
 // Unified media manager - main component for entity media
-export { UnifiedMediaManager } from './UnifiedMediaManager';
+export { MediaManager } from './MediaManager';
 ```
 
 ## Import Guidelines
@@ -234,7 +234,7 @@ Fixed imports in:
 - Only exported from `/core/index.ts` to avoid duplication conflicts
 - The `/shared/MediaGrid.tsx` may be for a specialized admin version (requires verification)
 
-### UnifiedMediaManager
+### MediaManager
 - Lives at `/media` root level (not in subdirectories)
 - Main component for entity-based media management
 - Exported directly from main index
@@ -242,7 +242,7 @@ Fixed imports in:
 ## Related Files
 
 ### Hooks
-- `src/hooks/media/useMediaLibrary.ts` - Main data fetching hook with filtering and selection (renamed from useUnifiedMedia)
+- `src/hooks/media/useMediaLibrary.ts` - Main data fetching hook with filtering and selection (renamed from useMedia)
 - `src/hooks/useLinkMedia.ts` - Entity linking operations
 - `src/hooks/useMediaTags.ts` - Tag management and statistics
 - `src/hooks/useAdminMedia.ts` - Admin-specific operations
