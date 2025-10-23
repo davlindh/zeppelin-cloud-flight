@@ -1,16 +1,14 @@
 // Core components - used everywhere
 export * from './core';
 
-// Unified media manager - main component for entity media
-export { UnifiedMediaManager } from './UnifiedMediaManager';
+// Shared components - used by both admin and public contexts
+export * from './shared';
 
 // Admin components - only for /admin routes
-export { MediaSubmissionApproval } from './admin/MediaSubmissionApproval';
-export { MediaPreviewPanel } from './admin/MediaPreviewPanel';
-export { MediaBulkActionsToolbar } from './admin/MediaBulkActionsToolbar';
-export { MediaFilterPanel } from './admin/MediaFilterPanel';
-export { MediaUploadDialog } from './admin/MediaUploadDialog';
-export { MediaLinkManager } from './admin/MediaLinkManager';
+export * from './admin';
 
-// Public components
-export { PublicMediaGallery } from './public/PublicMediaGallery';
+// Public components - for public-facing pages
+export * from './public';
+
+// Unified media manager - main component for entity media
+export { UnifiedMediaManager } from './UnifiedMediaManager';

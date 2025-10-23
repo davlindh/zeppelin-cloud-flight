@@ -7,7 +7,7 @@ const SystemStep: React.FC<{ icon: React.ReactNode; title: string; children: Rea
             {icon}
         </div>
         <h3 className="text-xl font-bold mb-2">{title}</h3>
-        <p className="text-gray-600">{children}</p>
+        <div className="text-gray-600">{children}</div>
     </div>
 );
 

@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { X, AlertCircle } from 'lucide-react';
-import { AdminFormConfig, FileUploadResult } from '@/types/admin';
+import { X, AlertCircle, User, Mail, Briefcase, Image, Settings } from 'lucide-react';
+import { AdminFormConfig, FileUploadResult, FormSection } from '@/types/admin';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { logError } from '@/utils/adminApi';
 import { StandardFormField, FieldOption } from '@/components/ui/standard-form-field';
@@ -145,6 +145,17 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
     }
   };
 
+  const getSectionIcon = (iconName?: string) => {
+    switch (iconName) {
+      case 'User': return <User className="h-5 w-5" />;
+      case 'Mail': return <Mail className="h-5 w-5" />;
+      case 'Briefcase': return <Briefcase className="h-5 w-5" />;
+      case 'Image': return <Image className="h-5 w-5" />;
+      case 'Settings': return <Settings className="h-5 w-5" />;
+      default: return null;
+    }
+  };
+
   const renderField = (field: any) => {
     const fieldName = field.name as keyof T;
 
@@ -162,6 +173,7 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
         label={field.label}
         type={field.type}
         placeholder={field.placeholder}
+        description={field.description}
         required={field.required}
         options={fieldOptions}
         accept={isImageField ? 'image/*' : field.type === 'file' ? 'image/*,video/*,audio/*,.pdf,.doc,.docx' : undefined}
@@ -169,6 +181,38 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
       />
     );
   };
+
+  const renderSection = (section: FormSection) => (
+    <div key={section.title} className="space-y-4">
+      <div className="flex items-center gap-2 pb-2 border-b">
+        {getSectionIcon(section.icon)}
+        <h3 className="text-lg font-semibold">{section.title}</h3>
+      </div>
+      {section.description && (
+        <p className="text-sm text-muted-foreground">{section.description}</p>
+      )}
+      <div className="space-y-4 pl-4">
+        {section.fields.map((field) => (
+          <div key={field.name} className="space-y-2">
+            {renderField(field)}
+
+            {errors[field.name as Path<T>] && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {String(errors[field.name as Path<T>]?.message) || `${field.label} är obligatoriskt`}
+              </p>
+            )}
+
+            {field.type === 'file' && config.bucketName && (
+              <p className="text-xs text-muted-foreground">
+                Format som stöds: Bilder, Videos, Ljud, Dokument. Max storlek: 10MB
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   const formContent = (
     <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -180,7 +224,7 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
+
           {Object.keys(errors).length > 0 && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -190,24 +234,33 @@ export const GenericAdminForm = <T extends Record<string, unknown>>({
             </Alert>
           )}
 
-          {config.fields.map((field) => (
-            <div key={field.name} className="space-y-2">
-              {renderField(field)}
-
-              {errors[field.name as Path<T>] && (
-                <p className="text-sm text-destructive flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {String(errors[field.name as Path<T>]?.message) || `${field.label} är obligatoriskt`}
-                </p>
-              )}
-
-              {field.type === 'file' && config.bucketName && (
-                <p className="text-xs text-muted-foreground">
-                  Format som stöds: Bilder, Videos, Ljud, Dokument. Max storlek: 10MB
-                </p>
-              )}
+          {/* Render sections if available, otherwise fall back to flat fields */}
+          {config.sections ? (
+            <div className="space-y-8">
+              {config.sections.map((section) => renderSection(section))}
             </div>
-          ))}
+          ) : (
+            <div className="space-y-6">
+              {config.fields.map((field) => (
+                <div key={field.name} className="space-y-2">
+                  {renderField(field)}
+
+                  {errors[field.name as Path<T>] && (
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {String(errors[field.name as Path<T>]?.message) || `${field.label} är obligatoriskt`}
+                    </p>
+                  )}
+
+                  {field.type === 'file' && config.bucketName && (
+                    <p className="text-xs text-muted-foreground">
+                      Format som stöds: Bilder, Videos, Ljud, Dokument. Max storlek: 10MB
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="flex gap-3">

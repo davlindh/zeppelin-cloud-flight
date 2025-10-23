@@ -183,8 +183,8 @@ export function OrdersTable() {
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All statuses</SelectItem>
+      <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
                 <SelectItem value="processing">Processing</SelectItem>

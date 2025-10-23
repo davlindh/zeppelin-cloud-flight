@@ -8,9 +8,24 @@ import { ShippingForm } from '@/components/marketplace/checkout/ShippingForm';
 import { PaymentForm } from '@/components/marketplace/checkout/PaymentForm';
 import { OrderReview } from '@/components/marketplace/checkout/OrderReview';
 import { useCheckout } from '@/hooks/marketplace/useCheckout';
+import { checkoutConfig, getTaxRate, getShippingCost, calculateTax } from '@/config/checkout.config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+
+// Utility function to calculate pricing based on configuration
+const calculatePricing = (subtotal: number, country: string) => {
+  const taxAmount = calculateTax(subtotal, country);
+  const shippingAmount = getShippingCost(subtotal);
+  const totalAmount = subtotal + taxAmount + shippingAmount;
+
+  return {
+    subtotal,
+    taxAmount,
+    shippingAmount,
+    totalAmount
+  };
+};
 
 export type CheckoutStep = 'shipping' | 'payment' | 'review';
 
@@ -60,14 +75,16 @@ export const CheckoutPage = () => {
   const handlePlaceOrder = async () => {
     if (!shippingInfo || !paymentInfo) return;
 
+    const pricing = calculatePricing(state.total, shippingInfo.country);
+
     const success = await placeOrder({
       shippingInfo,
       paymentInfo,
       items: state.items,
-      subtotal: state.total,
-      taxAmount: state.total * 0.25,
-      shippingAmount: 99,
-      totalAmount: state.total * 1.25 + 99,
+      subtotal: pricing.subtotal,
+      taxAmount: pricing.taxAmount,
+      shippingAmount: pricing.shippingAmount,
+      totalAmount: pricing.totalAmount,
     });
 
     if (success) {
@@ -124,20 +141,23 @@ export const CheckoutPage = () => {
               />
             )}
 
-            {currentStep === 'review' && shippingInfo && paymentInfo && (
-              <OrderReview
-                shippingInfo={shippingInfo}
-                paymentInfo={paymentInfo}
-                items={state.items}
-                subtotal={state.total}
-                taxAmount={state.total * 0.25}
-                shippingAmount={99}
-                totalAmount={state.total * 1.25 + 99}
-                onPlaceOrder={handlePlaceOrder}
-                isPlacing={isPlacing}
-                onEdit={(step) => setCurrentStep(step)}
-              />
-            )}
+            {currentStep === 'review' && shippingInfo && paymentInfo && (() => {
+              const pricing = calculatePricing(state.total, shippingInfo.country);
+              return (
+                <OrderReview
+                  shippingInfo={shippingInfo}
+                  paymentInfo={paymentInfo}
+                  items={state.items}
+                  subtotal={pricing.subtotal}
+                  taxAmount={pricing.taxAmount}
+                  shippingAmount={pricing.shippingAmount}
+                  totalAmount={pricing.totalAmount}
+                  onPlaceOrder={handlePlaceOrder}
+                  isPlacing={isPlacing}
+                  onEdit={(step) => setCurrentStep(step)}
+                />
+              );
+            })()}
           </CardContent>
         </Card>
       </main>

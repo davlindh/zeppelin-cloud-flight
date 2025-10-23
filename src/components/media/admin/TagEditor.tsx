@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { TagAutocomplete } from './TagAutocomplete';
+import { TagAutocomplete } from '../shared/TagAutocomplete';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
 
 interface TagEditorProps {

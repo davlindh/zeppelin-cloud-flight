@@ -159,7 +159,7 @@ export const SingleSelectFilter: React.FC<SingleSelectFilterProps> = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="">All</SelectItem>
+        <SelectItem value="all">All</SelectItem>
         {options.map((option) => (
           <SelectItem key={option.id} value={option.id}>
             {option.icon && <span className="mr-2">{option.icon}</span>}

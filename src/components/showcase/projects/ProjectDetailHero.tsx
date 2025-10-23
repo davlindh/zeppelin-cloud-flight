@@ -4,6 +4,8 @@ import { ArrowLeft, Camera, Video, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useMediaPlayer } from '@/hooks/useMediaPlayer';
+import type { MediaItem } from '@/types/media';
 
 interface ProjectDetailHeroProps {
   project: {
@@ -23,6 +25,21 @@ interface ProjectDetailHeroProps {
   onDelete?: () => void;
 }
 
+// Helper function to get image URL
+const getImageUrl = (imagePath?: string) => {
+  if (!imagePath) return '/images/ui/placeholder-project.jpg';
+
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+
+  const { data } = supabase.storage
+    .from('project-images')
+    .getPublicUrl(imagePath);
+
+  return data.publicUrl;
+};
+
 export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
   project,
   isAdmin,
@@ -30,19 +47,21 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
   onDelete
 }) => {
   const navigate = useNavigate();
+  const { playMedia } = useMediaPlayer();
 
-  const getImageUrl = (imagePath?: string) => {
-    if (!imagePath) return '/images/ui/placeholder-project.jpg';
+  // Create MediaItem from project media data
+  const createMediaItem = (media: { type: string; url: string; title: string }): MediaItem => ({
+    id: `${project.id}-${media.url}`,
+    type: media.type as MediaItem['type'],
+    url: media.url,
+    title: media.title,
+    description: `Media från ${project.title}`,
+  });
 
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-
-    const { data } = supabase.storage
-      .from('project-images')
-      .getPublicUrl(imagePath);
-
-    return data.publicUrl;
+  // Handle media thumbnail click
+  const handleMediaClick = (media: { type: string; url: string; title: string }) => {
+    const mediaItem = createMediaItem(media);
+    playMedia(mediaItem);
   };
 
   return (
@@ -134,11 +153,15 @@ export const ProjectDetailHero: React.FC<ProjectDetailHeroProps> = ({
                 </div>
                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                   {displayMedia.map((item, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer border border-border/20 hover:border-primary/40 transition-all duration-300">
-                      <img 
-                        src={item.url} 
+                    <div
+                      key={idx}
+                      className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer border border-border/20 hover:border-primary/40 transition-all duration-300"
+                      onClick={() => handleMediaClick(item)}
+                    >
+                      <img
+                        src={item.url}
                         alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                         {item.type === 'video' ? (

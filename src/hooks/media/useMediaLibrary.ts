@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { MediaLibraryItem, MediaFilters, MediaType } from '@/types/mediaLibrary';
 
-export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
+export const useMediaLibrary = (initialFilters?: MediaFilters) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<MediaFilters>(initialFilters || {});
@@ -109,38 +109,45 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
           .eq('project_id', filters.project_id);
         
         // Transform legacy media to MediaLibraryItem format
-        const transformedLegacy: MediaLibraryItem[] = (legacyMedia || []).map(pm => ({
-          id: `legacy-${pm.id}`,
-          type: pm.type as MediaLibraryItem['type'],
-          title: pm.title,
-          description: pm.description || null,
-          filename: pm.url.split('/').pop() || pm.title,
-          original_filename: pm.title,
-          public_url: pm.url,
-          storage_path: pm.url,
-          thumbnail_url: pm.thumbnail_url,
-          mime_type: pm.type === 'video' ? 'video/mp4' : pm.type === 'image' ? 'image/jpeg' : 'application/octet-stream',
-          status: 'approved' as MediaLibraryItem['status'],
-          source: 'legacy_project_media' as MediaLibraryItem['source'],
-          bucket: 'media-files',
-          is_public: true,
-          is_featured: false,
-          uploaded_at: pm.created_at,
-          approved_at: pm.created_at,
-          created_at: pm.created_at,
-          updated_at: pm.created_at,
-          project_id: pm.project_id,
-          participant_id: null,
-          submission_id: null,
-          uploaded_by: null,
-          tags: [],
-          category: null,
-          file_size: null,
-          width: null,
-          height: null,
-          duration: null,
-          is_legacy: true,
-        }));
+        const transformedLegacy: MediaLibraryItem[] = (legacyMedia || []).map(pm => {
+          // Fix URL construction - ensure proper Supabase URL format
+          const fixedUrl = pm.url.startsWith('http')
+            ? pm.url
+            : `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/media-files/media/${pm.url}`;
+
+          return {
+            id: `legacy-${pm.id}`,
+            type: pm.type as MediaLibraryItem['type'],
+            title: pm.title,
+            description: pm.description || null,
+            filename: pm.url.split('/').pop() || pm.title,
+            original_filename: pm.title,
+            public_url: fixedUrl,
+            storage_path: pm.url,
+            thumbnail_url: pm.thumbnail_url,
+            mime_type: pm.type === 'video' ? 'video/mp4' : pm.type === 'image' ? 'image/jpeg' : 'application/octet-stream',
+            status: 'approved' as MediaLibraryItem['status'],
+            source: 'legacy_project_media' as MediaLibraryItem['source'],
+            bucket: 'media-files',
+            is_public: true,
+            is_featured: false,
+            uploaded_at: pm.created_at,
+            approved_at: pm.created_at,
+            created_at: pm.created_at,
+            updated_at: pm.created_at,
+            project_id: pm.project_id,
+            participant_id: null,
+            submission_id: null,
+            uploaded_by: null,
+            tags: [],
+            category: null,
+            file_size: null,
+            width: null,
+            height: null,
+            duration: null,
+            is_legacy: true,
+          };
+        });
         
         // Merge with new media and deduplicate by public_url
         const allMediaWithLegacy = [...uniqueMedia, ...transformedLegacy];
@@ -198,38 +205,45 @@ export const useUnifiedMedia = (initialFilters?: MediaFilters) => {
           .eq('participant_id', filters.participant_id);
         
         // Transform legacy media to MediaLibraryItem format
-        const transformedLegacy: MediaLibraryItem[] = (legacyMedia || []).map(pm => ({
-          id: `legacy-${pm.id}`,
-          type: pm.type as MediaLibraryItem['type'],
-          title: pm.title,
-          description: pm.description || null,
-          filename: pm.url.split('/').pop() || pm.title,
-          original_filename: pm.title,
-          public_url: pm.url,
-          storage_path: pm.url,
-          thumbnail_url: pm.thumbnail_url,
-          mime_type: pm.type === 'video' ? 'video/mp4' : pm.type === 'image' ? 'image/jpeg' : 'application/octet-stream',
-          status: 'approved' as MediaLibraryItem['status'],
-          source: 'legacy_participant_media' as MediaLibraryItem['source'],
-          bucket: 'media-files',
-          is_public: true,
-          is_featured: false,
-          uploaded_at: pm.created_at,
-          approved_at: pm.created_at,
-          created_at: pm.created_at,
-          updated_at: pm.created_at,
-          project_id: null,
-          participant_id: pm.participant_id,
-          submission_id: null,
-          uploaded_by: null,
-          tags: [],
-          category: pm.category,
-          file_size: null,
-          width: null,
-          height: null,
-          duration: null,
-          is_legacy: true,
-        }));
+        const transformedLegacy: MediaLibraryItem[] = (legacyMedia || []).map(pm => {
+          // Fix URL construction - ensure proper Supabase URL format
+          const fixedUrl = pm.url.startsWith('http')
+            ? pm.url
+            : `https://paywaomkmjssbtkzwnwd.supabase.co/storage/v1/object/public/media-files/media/${pm.url}`;
+
+          return {
+            id: `legacy-${pm.id}`,
+            type: pm.type as MediaLibraryItem['type'],
+            title: pm.title,
+            description: pm.description || null,
+            filename: pm.url.split('/').pop() || pm.title,
+            original_filename: pm.title,
+            public_url: fixedUrl,
+            storage_path: pm.url,
+            thumbnail_url: pm.thumbnail_url,
+            mime_type: pm.type === 'video' ? 'video/mp4' : pm.type === 'image' ? 'image/jpeg' : 'application/octet-stream',
+            status: 'approved' as MediaLibraryItem['status'],
+            source: 'legacy_participant_media' as MediaLibraryItem['source'],
+            bucket: 'media-files',
+            is_public: true,
+            is_featured: false,
+            uploaded_at: pm.created_at,
+            approved_at: pm.created_at,
+            created_at: pm.created_at,
+            updated_at: pm.created_at,
+            project_id: null,
+            participant_id: pm.participant_id,
+            submission_id: null,
+            uploaded_by: null,
+            tags: [],
+            category: pm.category,
+            file_size: null,
+            width: null,
+            height: null,
+            duration: null,
+            is_legacy: true,
+          };
+        });
         
         // Merge with new media and deduplicate by public_url
         const allMediaWithLegacy = [...uniqueMedia, ...transformedLegacy];

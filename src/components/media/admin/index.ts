@@ -9,3 +9,8 @@ export { MediaLinkManager } from './MediaLinkManager';
 export { StorageImportDialog } from './StorageImportDialog';
 export { WorkflowStageCard } from './WorkflowStageCard';
 export { WorkflowProgress } from './WorkflowProgress';
+export { MediaToolbar } from './MediaToolbar';
+export { MediaUsagePanel } from './MediaUsagePanel';
+export { MediaStorageStats } from './MediaStorageStats';
+export { TagEditor } from './TagEditor';
+export { MediaLinkDialog } from './MediaLinkDialog';

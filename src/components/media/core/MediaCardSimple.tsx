@@ -4,9 +4,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { Play, Download, ExternalLink, Plus } from 'lucide-react';
+import { Play, Download, ExternalLink, Plus, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getMediaIcon, getMediaTypeColor, isPlayableMedia } from '@/utils/mediaHelpers';
+import { useMediaPlayer } from '@/hooks/useMediaPlayer';
+import type { MediaItem } from '@/types/media';
 
 interface MediaCardProps {
   id: string;
@@ -49,6 +51,37 @@ export const MediaCardSimple: React.FC<MediaCardProps> = ({
 }) => {
   const isPlayable = isPlayableMedia(type);
   const navigate = useNavigate();
+  const { playMedia, addToQueue } = useMediaPlayer();
+
+  // Create MediaItem object for the media player
+  const createMediaItem = (): MediaItem => ({
+    id,
+    type,
+    url,
+    title,
+    description,
+    thumbnail,
+  });
+
+  // Handle play button click
+  const handlePlay = () => {
+    if (onPlay) {
+      onPlay();
+    } else {
+      const mediaItem = createMediaItem();
+      playMedia(mediaItem);
+    }
+  };
+
+  // Handle add to queue
+  const handleAddToQueue = () => {
+    if (onAddToQueue) {
+      onAddToQueue();
+    } else if (isPlayable) {
+      const mediaItem = createMediaItem();
+      addToQueue(mediaItem);
+    }
+  };
 
   return (
     <Card className={cn(
@@ -155,7 +188,7 @@ export const MediaCardSimple: React.FC<MediaCardProps> = ({
             {showPlayButton && (
               <Button
                 size="sm"
-                onClick={onPlay}
+                onClick={handlePlay}
                 className="flex-1"
                 variant="outline"
               >
@@ -170,7 +203,7 @@ export const MediaCardSimple: React.FC<MediaCardProps> = ({
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={onAddToQueue}
+                onClick={handleAddToQueue}
                 className="px-2"
                 title="Lägg till i kö"
               >

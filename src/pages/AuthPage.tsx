@@ -4,13 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Shield } from 'lucide-react';
-import { LoginForm, SignupForm, ForgotPasswordForm, SocialAuthButtons } from '@/components/auth';
+import { LoginForm, SignupForm, ForgotPasswordForm, SocialAuthButtons, ResetPasswordForm } from '@/components/auth';
 
 export const AuthPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const redirect = searchParams.get('redirect') || '/';
 
   useEffect(() => {
@@ -20,6 +21,13 @@ export const AuthPage: React.FC = () => {
       }
     });
   }, [navigate, redirect]);
+
+  useEffect(() => {
+    // Check if we should show the password reset form
+    if (searchParams.get('reset') === 'true') {
+      setShowResetPassword(true);
+    }
+  }, [searchParams]);
 
   if (showForgotPassword) {
     return (
@@ -32,11 +40,19 @@ export const AuthPage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ForgotPasswordForm 
+            <ForgotPasswordForm
               onBack={() => setShowForgotPassword(false)}
             />
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  if (showResetPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+        <ResetPasswordForm />
       </div>
     );
   }

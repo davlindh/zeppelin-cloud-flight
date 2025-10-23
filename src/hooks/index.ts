@@ -72,3 +72,6 @@ export * from './useImageUpload';
 
 // Security hooks
 export * from './useSecureSubmission';
+
+// Media hooks
+export * from './media';

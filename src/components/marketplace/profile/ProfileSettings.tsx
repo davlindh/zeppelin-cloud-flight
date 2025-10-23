@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ChangePasswordForm } from './ChangePasswordForm';
 
 interface ProfileSettingsProps {
   userId: string;
@@ -22,20 +23,33 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ userId }) => {
 
   useEffect(() => {
     const fetchPreferences = async () => {
-      const { data } = await supabase
-        .from('notification_preferences')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('notification_preferences')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
 
-      if (data) {
-        setEmailNotifications(data.email_notifications);
-        setPriceAlerts(data.price_drop_alerts);
-        setStockAlerts(data.stock_alerts);
+        if (error) {
+          console.warn('Error fetching notification preferences:', error);
+          // Don't show error to user, just use defaults
+          return;
+        }
+
+        if (data) {
+          setEmailNotifications(data.email_notifications ?? true);
+          setPriceAlerts(data.price_drop_alerts ?? true);
+          setStockAlerts(data.stock_alerts ?? true);
+        }
+      } catch (error) {
+        console.warn('Failed to fetch notification preferences:', error);
+        // Use default values and continue silently
       }
     };
 
-    fetchPreferences();
+    if (userId) {
+      fetchPreferences();
+    }
   }, [userId]);
 
   const handleSaveSettings = async () => {
@@ -136,6 +150,8 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ userId }) => {
           </Button>
         </CardContent>
       </Card>
+
+      <ChangePasswordForm userId={userId} />
 
       <Card>
         <CardHeader>

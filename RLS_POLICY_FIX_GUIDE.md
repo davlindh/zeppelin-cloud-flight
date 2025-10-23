@@ -11,7 +11,11 @@ I've created a migration file at `supabase/migrations/20251022193800_fix_orders_
 3. **Updates the trigger function** to handle role checking more safely with proper error handling
 4. **Grants necessary permissions** to anonymous and authenticated users
 
-## How to Apply the Migration
+## How to Apply the Migrations
+
+**IMPORTANT**: There are now TWO migration files that need to be applied:
+1. `20251022193800_fix_orders_rls_policies.sql` - Main RLS policy fixes
+2. `20251022200500_fix_orders_insert_policy.sql` - Additional INSERT policy fix
 
 ### Option 1: Using Supabase CLI (Recommended)
 
@@ -20,19 +24,27 @@ I've created a migration file at `supabase/migrations/20251022193800_fix_orders_
    supabase link --project-ref bjffyadrmkdnmgwpsbnw
    ```
 
-2. Apply the migration:
+2. Apply both migrations:
    ```bash
    supabase db push
    ```
 
 ### Option 2: Using Supabase Dashboard (Manual)
 
+**Step 1 - Apply Main RLS Fixes:**
 1. Go to your Supabase Dashboard: https://supabase.com/dashboard/project/bjffyadrmkdnmgwpsbnw
 2. Navigate to **SQL Editor**
 3. Create a new query
 4. Copy the entire contents of `supabase/migrations/20251022193800_fix_orders_rls_policies.sql`
 5. Paste it into the SQL Editor
 6. Click **Run** to execute the migration
+
+**Step 2 - Apply INSERT Policy Fix:**
+1. In the SQL Editor, create another new query
+2. Copy the entire contents of `supabase/migrations/20251022200500_fix_orders_insert_policy.sql`
+3. Paste it into the SQL Editor
+4. Click **Run** to execute this migration
+5. You should see a success message: "Policy 'Allow order creation for all users' created successfully"
 
 ### Option 3: Using the Supabase Studio Migration Runner
 

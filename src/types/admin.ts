@@ -145,6 +145,7 @@ export interface FormField {
   type: 'text' | 'textarea' | 'url' | 'select' | 'file' | 'email' | 'tel' | 'number' | 'date';
   required?: boolean;
   placeholder?: string;
+  description?: string; // Help text for the field
   options?: { value: string; label: string }[];
   validation?: {
     pattern?: RegExp;
@@ -152,9 +153,17 @@ export interface FormField {
   };
 }
 
+export interface FormSection {
+  title: string;
+  description?: string;
+  icon?: string;
+  fields: FormField[];
+}
+
 export interface AdminFormConfig {
   title: string;
   fields: FormField[];
+  sections?: FormSection[]; // Optional sections for organized form layout
   entityName: string;
   bucketName?: string; // for file uploads
   submitEndpoint: string;

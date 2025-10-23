@@ -1,6 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ensureUserProfile } from '@/utils/profileUtils';
 
 interface AuthenticatedUserData {
   id: string;
@@ -16,7 +17,7 @@ export const useAuthenticatedUser = () => {
       try {
         // Get the current auth user
         const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
+
         if (authError || !user) {
           return null;
         }
@@ -28,7 +29,17 @@ export const useAuthenticatedUser = () => {
           .eq('auth_user_id', user.id)
           .maybeSingle();
 
-        // maybeSingle() returns null if no row exists (instead of throwing 406 error)
+        // If profile doesn't exist, try to create it
+        if (!userData && !userError) {
+          try {
+            await ensureUserProfile(user.id, user.email || '');
+            console.log('Created missing user profile');
+          } catch (profileError) {
+            console.warn('Could not create user profile:', profileError);
+          }
+        }
+
+        // If there's still an error after trying to create profile, log it
         if (userError) {
           console.warn('Error fetching user profile:', userError);
         }

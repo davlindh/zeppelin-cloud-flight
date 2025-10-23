@@ -16,17 +16,17 @@ export const Breadcrumbs: React.FC = () => {
   // Create pathnames array, but exclude 'home' from the trail itself.
   const pathnames = location.pathname.split('/').filter((x) => x && x !== 'home');
 
-  // Do not show breadcrumbs on the homepage
-  if (location.pathname === '/home' || location.pathname === '/') {
-    return null;
-  }
-
   // Check if we're on a project detail page
   const isProjectDetail = pathnames.length >= 2 && pathnames[0] === 'showcase' && pathnames[1];
   const projectSlug = isProjectDetail ? pathnames[1] : null;
 
-  // Always call the hook, but only use the data when needed
+  // Always call the hook at the top level to maintain hook order
   const { data: projectData } = useProject(projectSlug || '');
+
+  // Do not show breadcrumbs on the homepage
+  if (location.pathname === '/home' || location.pathname === '/') {
+    return null;
+  }
 
   return (
     <nav aria-label="breadcrumb" className="bg-white/90 backdrop-blur-md border-b border-t border-gray-200">

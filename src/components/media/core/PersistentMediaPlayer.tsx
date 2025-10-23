@@ -3,12 +3,20 @@ import { X, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, ChevronUp, Che
 import { useMediaPlayer } from '@/hooks/useMediaPlayer';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { generateMediaId } from '@/utils/mediaHelpers';
+
+// Helper function to format time display
+const formatTime = (seconds: number) => {
+  if (!seconds || isNaN(seconds)) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
 
 export const PersistentMediaPlayer: React.FC = () => {
   const {
@@ -37,12 +45,10 @@ export const PersistentMediaPlayer: React.FC = () => {
 
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
 
-  // Hide player if no media
-  if (!currentMedia) return null;
-
+  // Move all hooks before any conditional returns
   // Sync media element with state
   useEffect(() => {
-    if (!mediaRef.current) return;
+    if (!mediaRef.current || !currentMedia) return;
 
     if (isPlaying) {
       mediaRef.current.play().catch(() => {
@@ -51,33 +57,28 @@ export const PersistentMediaPlayer: React.FC = () => {
     } else {
       mediaRef.current.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, currentMedia]);
 
   useEffect(() => {
-    if (!mediaRef.current) return;
+    if (!mediaRef.current || !currentMedia) return;
     mediaRef.current.volume = isMuted ? 0 : volume / 100;
-  }, [volume, isMuted]);
+  }, [volume, isMuted, currentMedia]);
 
   useEffect(() => {
-    if (!mediaRef.current) return;
+    if (!mediaRef.current || !currentMedia) return;
     mediaRef.current.playbackRate = playbackRate;
-  }, [playbackRate]);
+  }, [playbackRate, currentMedia]);
 
   useEffect(() => {
-    if (!mediaRef.current || !duration) return;
+    if (!mediaRef.current || !duration || !currentMedia) return;
     const seekTime = (progress / 100) * duration;
     if (Math.abs(mediaRef.current.currentTime - seekTime) > 1) {
       mediaRef.current.currentTime = seekTime;
     }
-  }, [progress, duration]);
+  }, [progress, duration, currentMedia]);
 
-  // Format time display
-  const formatTime = (seconds: number) => {
-    if (!seconds || isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Hide player if no media
+  if (!currentMedia) return null;
 
   const currentTime = (progress / 100) * duration;
   const isVideo = currentMedia.type === 'video';
@@ -326,6 +327,9 @@ export const PersistentMediaPlayer: React.FC = () => {
                   <SheetContent side="right" className="w-96">
                     <SheetHeader>
                       <SheetTitle>Queue ({queue.length})</SheetTitle>
+                      <SheetDescription>
+                        Manage your media playback queue. Click items to play them, or use the X button to remove them.
+                      </SheetDescription>
                     </SheetHeader>
                     <ScrollArea className="h-[calc(100vh-8rem)] mt-4">
                       <div className="space-y-2">

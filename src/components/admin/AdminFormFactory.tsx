@@ -11,7 +11,160 @@ export const adminFormConfigs: Record<string, AdminFormConfig> = {
     entityName: 'Participant',
     bucketName: 'participant-avatars',
     submitEndpoint: 'participants',
+    sections: [
+      {
+        title: 'Personal Information',
+        description: 'Basic information about the participant',
+        icon: 'User',
+        fields: [
+          {
+            name: 'name',
+            label: 'Full Name',
+            type: 'text',
+            required: true,
+            placeholder: 'Enter participant\'s full name'
+          },
+          {
+            name: 'slug',
+            label: 'URL Slug',
+            type: 'text',
+            required: true,
+            placeholder: 'auto-generated-from-name',
+            description: 'This will be auto-generated from the name, but you can customize it'
+          },
+          {
+            name: 'bio',
+            label: 'Biography',
+            type: 'textarea',
+            placeholder: 'Tell us about this participant...',
+            description: 'A brief description of the participant\'s background and expertise'
+          },
+          {
+            name: 'location',
+            label: 'Location',
+            type: 'text',
+            placeholder: 'City, Country',
+            description: 'Where is this participant located?'
+          }
+        ]
+      },
+      {
+        title: 'Contact Information',
+        description: 'How to reach this participant',
+        icon: 'Mail',
+        fields: [
+          {
+            name: 'contact_email',
+            label: 'Contact Email',
+            type: 'email',
+            placeholder: 'participant@example.com',
+            description: 'Primary email address for contact'
+          },
+          {
+            name: 'contact_phone',
+            label: 'Contact Phone',
+            type: 'tel',
+            placeholder: '+46 123 456 789',
+            description: 'Phone number for direct contact'
+          },
+          {
+            name: 'website',
+            label: 'Website',
+            type: 'url',
+            placeholder: 'https://example.com',
+            description: 'Personal website or portfolio URL'
+          },
+          {
+            name: 'social_links',
+            label: 'Social Media Links',
+            type: 'textarea',
+            placeholder: 'Enter links separated by commas (e.g., https://instagram.com/username, https://twitter.com/username)',
+            description: 'Social media profiles - one URL per line'
+          }
+        ]
+      },
+      {
+        title: 'Professional Profile',
+        description: 'Skills, experience, and professional background',
+        icon: 'Briefcase',
+        fields: [
+          {
+            name: 'skills',
+            label: 'Skills',
+            type: 'textarea',
+            placeholder: 'Enter skills separated by commas (e.g., JavaScript, Design, Project Management)',
+            description: 'Technical and professional skills'
+          },
+          {
+            name: 'interests',
+            label: 'Interests',
+            type: 'textarea',
+            placeholder: 'Enter interests separated by commas (e.g., Sustainability, Art, Technology)',
+            description: 'Personal and professional interests'
+          },
+          {
+            name: 'contributions',
+            label: 'Contributions',
+            type: 'textarea',
+            placeholder: 'Enter contributions separated by commas (e.g., Development, Design, Research)',
+            description: 'Areas where this participant can contribute'
+          },
+          {
+            name: 'experience_level',
+            label: 'Experience Level',
+            type: 'select',
+            options: [
+              { value: 'beginner', label: 'Beginner' },
+              { value: 'intermediate', label: 'Intermediate' },
+              { value: 'advanced', label: 'Advanced' },
+              { value: 'expert', label: 'Expert' }
+            ],
+            description: 'Overall experience level'
+          },
+          {
+            name: 'time_commitment',
+            label: 'Time Commitment',
+            type: 'select',
+            options: [
+              { value: 'part-time', label: 'Part-time' },
+              { value: 'full-time', label: 'Full-time' },
+              { value: 'volunteer', label: 'Volunteer' },
+              { value: 'project-based', label: 'Project-based' }
+            ],
+            description: 'How much time can this participant commit?'
+          },
+          {
+            name: 'availability',
+            label: 'Availability',
+            type: 'textarea',
+            placeholder: 'Describe your availability (e.g., Weekends, Evenings, Flexible)',
+            description: 'When is this participant typically available?'
+          }
+        ]
+      },
+      {
+        title: 'Discovery & Media',
+        description: 'How they found us and profile media',
+        icon: 'Image',
+        fields: [
+          {
+            name: 'how_found_us',
+            label: 'How did you find us?',
+            type: 'textarea',
+            placeholder: 'Tell us how you discovered this project...',
+            description: 'How did this participant discover the project?'
+          },
+          {
+            name: 'avatarFile',
+            label: 'Profile Avatar',
+            type: 'file',
+            description: 'Upload a profile picture (recommended: square image, at least 400x400px)'
+          }
+        ]
+      }
+    ],
     fields: [
+      // Keep the flat fields array for backward compatibility
       {
         name: 'name',
         label: 'Full Name',

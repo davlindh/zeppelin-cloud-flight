@@ -3,9 +3,10 @@ import { MediaGrid } from '@/components/media/core/MediaGrid';
 import { MediaFilterPanel } from '@/components/media/admin/MediaFilterPanel';
 import { MediaUploadDialog } from '@/components/media/admin/MediaUploadDialog';
 import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
-import { useUnifiedMedia } from '@/hooks/useUnifiedMedia';
+import { useMediaLibrary } from '@/hooks/media/useMediaLibrary';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useMediaPlayer } from '@/contexts/MediaContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,10 +21,13 @@ import {
   FileText,
   Camera,
   Grid as GridIcon,
-  List
+  List,
+  PlayCircle,
+  ListMusic
 } from 'lucide-react';
 import type { UnifiedMediaItem, MediaFilters } from '@/types/unified-media';
 import type { MediaLibraryItem } from '@/types/mediaLibrary';
+import type { MediaItem } from '@/types/media';
 import { uploadMultipleToMediaLibrary } from '@/utils/mediaUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -77,7 +81,7 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
   const [filters, setFilters] = useState<MediaFilters>(baseFilters);
 
   // Fetch media dynamically
-  const { media, isLoading, stats } = useUnifiedMedia(filters);
+  const { media, isLoading, stats } = useMediaLibrary(filters);
 
   const { 
     linkToProject, 
@@ -87,6 +91,9 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
     unlinkFromParticipant,
     unlinkFromSponsor,
   } = useLinkMedia();
+
+  // Media player integration
+  const { playMedia, addToQueue, clearQueue } = useMediaPlayer();
 
   // Handle media linking
   const handleLink = async (targetEntityType: 'project' | 'participant' | 'sponsor', entityIds: string[]) => {
@@ -327,6 +334,75 @@ export const UnifiedMediaManager: React.FC<UnifiedMediaManagerProps> = ({
         <TabsContent value={activeTab} className="mt-6">
           {tabFilteredMedia.length > 0 ? (
             <div className="space-y-4">
+              {/* Playback Controls */}
+              {(() => {
+                const playableMedia = tabFilteredMedia.filter(item => 
+                  item.type === 'video' || item.type === 'audio'
+                );
+                
+                if (playableMedia.length > 0) {
+                  const handlePlayAll = () => {
+                    const mediaItems: MediaItem[] = playableMedia.map(item => ({
+                      id: item.id,
+                      type: item.type as 'video' | 'audio',
+                      url: item.url,
+                      title: item.title,
+                      description: item.description,
+                      thumbnail: item.thumbnail,
+                    }));
+                    
+                    if (mediaItems.length > 0) {
+                      clearQueue();
+                      addToQueue(mediaItems);
+                      playMedia(mediaItems[0]);
+                      toast({
+                        title: 'Spellista skapad',
+                        description: `${mediaItems.length} mediafil(er) tillagda i kön`,
+                      });
+                    }
+                  };
+
+                  const handleAddAllToQueue = () => {
+                    const mediaItems: MediaItem[] = playableMedia.map(item => ({
+                      id: item.id,
+                      type: item.type as 'video' | 'audio',
+                      url: item.url,
+                      title: item.title,
+                      description: item.description,
+                      thumbnail: item.thumbnail,
+                    }));
+                    
+                    addToQueue(mediaItems);
+                    toast({
+                      title: 'Tillagd i kö',
+                      description: `${mediaItems.length} mediafil(er) tillagda`,
+                    });
+                  };
+
+                  return (
+                    <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">
+                          {playableMedia.length} mediafil(er) kan spelas
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Lägg till alla i spelarkön eller starta direkt
+                        </p>
+                      </div>
+                      <Button size="sm" onClick={handlePlayAll} className="gap-2">
+                        <PlayCircle className="h-4 w-4" />
+                        Spela alla
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={handleAddAllToQueue} className="gap-2">
+                        <ListMusic className="h-4 w-4" />
+                        Lägg till alla
+                      </Button>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
               {mode === 'admin' && selectedMediaIds.length > 0 && (
                 <div className="flex items-center gap-2">
                   <Button size="sm" onClick={selectAll}>

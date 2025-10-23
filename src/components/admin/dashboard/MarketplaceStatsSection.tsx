@@ -30,7 +30,7 @@ export const MarketplaceStatsSection = ({ stats }: MarketplaceStatsSectionProps)
               ? { value: Math.round(Math.abs(revenueGrowth)), isPositive: revenueGrowth > 0 }
               : undefined
           }
-          onClick={() => navigate('/admin/marketplace/orders')}
+          onClick={() => navigate('/admin/orders')}
         />
         
         <StatCard
@@ -43,7 +43,7 @@ export const MarketplaceStatsSection = ({ stats }: MarketplaceStatsSectionProps)
               ? { label: `${stats.products.low_stock} lågt`, variant: 'destructive' }
               : undefined
           }
-          onClick={() => navigate('/admin/marketplace/products')}
+          onClick={() => navigate('/admin/products')}
         />
         
         <StatCard
@@ -56,7 +56,7 @@ export const MarketplaceStatsSection = ({ stats }: MarketplaceStatsSectionProps)
               ? { label: `${stats.auctions.ending_today} slutar idag`, variant: 'secondary' }
               : undefined
           }
-          onClick={() => navigate('/admin/marketplace/auctions')}
+          onClick={() => navigate('/admin/auctions')}
         />
         
         <StatCard
@@ -69,7 +69,7 @@ export const MarketplaceStatsSection = ({ stats }: MarketplaceStatsSectionProps)
               ? { label: `${stats.orders.pending} väntande`, variant: 'destructive' }
               : undefined
           }
-          onClick={() => navigate('/admin/marketplace/orders')}
+          onClick={() => navigate('/admin/orders')}
         />
       </div>
     </div>
