@@ -1,0 +1,26 @@
+{
+  "navid": "admin.orders.2ef243b1.49",
+  "description": "Omniframez navigator for orders",
+  "generated": 1761446148.8091164,
+  "complexity_score": 5.3,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/badge",
+    "lucide-react",
+    "@/components/ui/card",
+    "react-router-dom",
+    "react",
+    "@/components/ui/input",
+    "@/components/ui/button",
+    "@/integrations/supabase/client",
+    "@/components/ui/select",
+    "@tanstack/react-query"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 44
+}

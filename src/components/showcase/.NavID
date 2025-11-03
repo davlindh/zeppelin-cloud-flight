@@ -1,0 +1,34 @@
+{
+  "navid": "components.showcase.10e306bc.45",
+  "description": "Omniframez navigator for showcase",
+  "generated": 1761446149.0906713,
+  "complexity_score": 11.3,
+  "language_distribution": {
+    "typescript": 19
+  },
+  "purpose_tags": [],
+  "file_count": 19,
+  "subdirectory_count": 1,
+  "dependencies": [
+    "lucide-react",
+    "@/utils/participantHelpers",
+    "@/types/unified",
+    "@/components/ui/card",
+    "react-router-dom",
+    "@/components/ui/input",
+    "@/types/unified-media",
+    "@/integrations/supabase/client",
+    "@/components/ui/badge",
+    "@/components/ui/OptimizedImage",
+    "@/lib/utils",
+    "react",
+    "@/media",
+    "@/components/ui/button",
+    "@/components/media/core/MediaGrid",
+    "@/components/media/Image",
+    "@/types/media",
+    "@/utils/mediaHelpers"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

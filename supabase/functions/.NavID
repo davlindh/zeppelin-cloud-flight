@@ -1,0 +1,17 @@
+{
+  "navid": "supabase.functions.e3b0c442.40",
+  "description": "Omniframez navigator for functions",
+  "generated": 1761446184.603211,
+  "complexity_score": 1.7,
+  "language_distribution": {},
+  "purpose_tags": [],
+  "file_count": 0,
+  "subdirectory_count": 3,
+  "dependencies": [
+    "https://deno.land/std@0.190.0/http/server.ts",
+    "https://esm.sh/@supabase/supabase-js@2",
+    "npm:resend@2.0.0"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 47
+}

@@ -1,0 +1,15 @@
+{
+  "navid": "images.participants.614b7fb6.48",
+  "description": "Omniframez navigator for participants",
+  "generated": 1761446165.384083,
+  "complexity_score": 0.5,
+  "language_distribution": {
+    "unknown": 3
+  },
+  "purpose_tags": [],
+  "file_count": 3,
+  "subdirectory_count": 0,
+  "dependencies": [],
+  "parent_relationships": [],
+  "learning_sequence_rank": 50
+}

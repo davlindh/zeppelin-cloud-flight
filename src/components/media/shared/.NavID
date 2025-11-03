@@ -1,0 +1,33 @@
+{
+  "navid": "media.shared.f790b4b1.49",
+  "description": "Omniframez navigator for shared",
+  "generated": 1761446149.0373533,
+  "complexity_score": 9.6,
+  "language_distribution": {
+    "typescript": 9
+  },
+  "purpose_tags": [],
+  "file_count": 9,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "@/components/ui/badge",
+    "@/utils/media",
+    "@/components/ui/progress",
+    "@/components/ui/card",
+    "@/lib/utils",
+    "react-dropzone",
+    "@/components/ui/input",
+    "react",
+    "date-fns",
+    "@/components/ui/button",
+    "@/components/ui/checkbox",
+    "@/hooks/useMediaTags",
+    "@/types/mediaLibrary",
+    "@/integrations/supabase/client",
+    "@/components/ui/label",
+    "@tanstack/react-query"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 44
+}

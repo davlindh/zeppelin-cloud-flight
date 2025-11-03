@@ -1,0 +1,36 @@
+{
+  "navid": "admin.providers.c49801ce.52",
+  "description": "Omniframez navigator for providers",
+  "generated": 1761446148.8364427,
+  "complexity_score": 11.4,
+  "language_distribution": {
+    "typescript": 2
+  },
+  "purpose_tags": [],
+  "file_count": 2,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useImageUpload",
+    "@/config/storage.config",
+    "@/types/unified",
+    "@/components/ui/textarea",
+    "@/components/marketplace/ui/service-error",
+    "@/components/ui/alert",
+    "@/hooks/use-toast",
+    "@/components/ui/avatar",
+    "@/components/ui/badge",
+    "react-hook-form",
+    "@/components/ui/button",
+    "@/utils/imageUtils",
+    "@/hooks/useServiceProviders",
+    "@/hooks/useServiceProviderMutations",
+    "zod",
+    "@/components/admin/CameraCapture",
+    "lucide-react",
+    "@/components/ui/input",
+    "react",
+    "@/hooks/useAdminAuditLog"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 47
+}

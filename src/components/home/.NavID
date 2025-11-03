@@ -1,0 +1,32 @@
+{
+  "navid": "components.home.f1ac72be.41",
+  "description": "Omniframez navigator for home",
+  "generated": 1761446148.9220173,
+  "complexity_score": 8.3,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/badge",
+    "lucide-react",
+    "@/components/ui/OptimizedImage",
+    "@/components/public/PublicMediaUpload",
+    "@/components/sections/SystematicsSection",
+    "@/components/sections/EngagementSection",
+    "@/components/sections/EventMediaSection",
+    "@/components/public/forms",
+    "react",
+    "framer-motion",
+    "@/components/ui",
+    "@/components/sections/PartnerSection",
+    "@/components/ui/dialog",
+    "@/components/sections/VisionSection",
+    "@/contexts/HomePageContext",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 42
+}

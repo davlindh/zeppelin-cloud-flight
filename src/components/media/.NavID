@@ -1,0 +1,36 @@
+{
+  "navid": "components.media.09ea1d94.42",
+  "description": "Omniframez navigator for media",
+  "generated": 1761446149.010433,
+  "complexity_score": 21.3,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [],
+  "file_count": 4,
+  "subdirectory_count": 4,
+  "dependencies": [
+    "@/hooks/useLinkMedia",
+    "@/components/ui/calendar",
+    "@/components/ui/card",
+    "@/hooks/useMediaPlayer",
+    "@/types/unified-media",
+    "@/components/ui/textarea",
+    "@/types/mediaLibrary",
+    "@/integrations/supabase/client",
+    "@/components/ui/skeleton",
+    "@/components/ui/slider",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/lib/utils",
+    "date-fns",
+    "@/components/ui/button",
+    "@supabase/supabase-js",
+    "@/components/media/Image",
+    "@/components/ui/tabs",
+    "@/components/ui/scroll-area",
+    "@/components/ui/label"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

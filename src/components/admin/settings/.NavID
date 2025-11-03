@@ -1,0 +1,28 @@
+{
+  "navid": "admin.settings.8d94220e.51",
+  "description": "Omniframez navigator for settings",
+  "generated": 1761446148.8504703,
+  "complexity_score": 6.7,
+  "language_distribution": {
+    "typescript": 5
+  },
+  "purpose_tags": [],
+  "file_count": 5,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "@/components/ui/card",
+    "@/components/ui/switch",
+    "react",
+    "@/components/ui/select",
+    "@/components/ui/input",
+    "@/components/ui/textarea",
+    "@/components/ui/button",
+    "@/integrations/supabase/client",
+    "@/components/ui/alert",
+    "@/components/ui/label",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

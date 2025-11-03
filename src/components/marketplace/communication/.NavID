@@ -1,0 +1,31 @@
+{
+  "navid": "marketplace.communication.bed3148e.62",
+  "description": "Omniframez navigator for communication",
+  "generated": 1761446148.9756777,
+  "complexity_score": 8.4,
+  "language_distribution": {
+    "typescript": 7
+  },
+  "purpose_tags": [],
+  "file_count": 7,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/types/marketplace/communication",
+    "@/components/ui/badge",
+    "lucide-react",
+    "@/hooks/marketplace/useCustomerInfo",
+    "@/components/marketplace/security/SecurityNotice",
+    "@/components/ui/card",
+    "@/components/ui/input",
+    "react",
+    "@/components/ui/textarea",
+    "@/components/ui/button",
+    "@/hooks/marketplace/useServiceProvider",
+    "@/hooks/marketplace/useCommunicationTracking",
+    "@/components/ui/tabs",
+    "@/components/ui/select",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 51
+}

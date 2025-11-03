@@ -1,0 +1,36 @@
+{
+  "navid": "media.admin.99c86f2a.48",
+  "description": "Omniframez navigator for admin",
+  "generated": 1761446149.0233884,
+  "complexity_score": 16.8,
+  "language_distribution": {
+    "typescript": 16
+  },
+  "purpose_tags": [],
+  "file_count": 16,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/calendar",
+    "@/components/ui/card",
+    "@/components/ui/textarea",
+    "@/types/mediaLibrary",
+    "@/integrations/supabase/client",
+    "@/components/ui/slider",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/lib/utils",
+    "date-fns",
+    "@/components/ui/button",
+    "@supabase/supabase-js",
+    "@/components/ui/tabs",
+    "@/components/ui/scroll-area",
+    "@/components/ui/label",
+    "@tanstack/react-query",
+    "lucide-react",
+    "@/components/ui/progress",
+    "react-dropzone",
+    "@/components/ui/input"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

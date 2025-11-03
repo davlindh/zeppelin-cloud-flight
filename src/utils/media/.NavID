@@ -1,0 +1,23 @@
+{
+  "navid": "utils.media.4d63f155.37",
+  "description": "Omniframez navigator for media",
+  "generated": 1761446149.1473305,
+  "complexity_score": 4.2,
+  "language_distribution": {
+    "typescript": 5
+  },
+  "purpose_tags": [],
+  "file_count": 5,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "@/utils/media",
+    "@/types/unified-media",
+    "react",
+    "@/types/mediaLibrary",
+    "@/integrations/supabase/client",
+    "@/types/media"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

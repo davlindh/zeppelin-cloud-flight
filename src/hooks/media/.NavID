@@ -1,0 +1,21 @@
+{
+  "navid": "hooks.media.2ba19fd1.37",
+  "description": "Omniframez navigator for media",
+  "generated": 1761446149.1983457,
+  "complexity_score": 2.9,
+  "language_distribution": {
+    "typescript": 2
+  },
+  "purpose_tags": [],
+  "file_count": 2,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@tanstack/react-query",
+    "react",
+    "@/types/mediaLibrary",
+    "@/integrations/supabase/client",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

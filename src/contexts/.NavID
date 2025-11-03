@@ -1,0 +1,31 @@
+{
+  "navid": "src.contexts.e380edc1.34",
+  "description": "Omniframez navigator for contexts",
+  "generated": 1761446149.1669397,
+  "complexity_score": 8.7,
+  "language_distribution": {
+    "typescript": 8
+  },
+  "purpose_tags": [],
+  "file_count": 8,
+  "subdirectory_count": 1,
+  "dependencies": [
+    "@/utils/media",
+    "@/integrations/supabase/types",
+    "@/utils/participantMappers",
+    "@tanstack/react-query",
+    "react-router-dom",
+    "react",
+    "@/utils/colorUtils",
+    "@supabase/supabase-js",
+    "@/hooks/useApi",
+    "@/hooks/useNotifications",
+    "@/config/brand.config",
+    "@/hooks/marketplace/useUserProfile",
+    "@/integrations/supabase/client",
+    "@/types/media",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

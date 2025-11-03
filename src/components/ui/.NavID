@@ -1,0 +1,37 @@
+{
+  "navid": "components.ui.5db9d22b.39",
+  "description": "Omniframez navigator for ui",
+  "generated": 1761446149.105997,
+  "complexity_score": 39.4,
+  "language_distribution": {
+    "typescript": 59,
+    "markdown": 1
+  },
+  "purpose_tags": [],
+  "file_count": 60,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@radix-ui/react-dropdown-menu",
+    "@radix-ui/react-separator",
+    "@/components/ui/card",
+    "@radix-ui/react-radio-group",
+    "@radix-ui/react-slot",
+    "@/components/ui/textarea",
+    "@radix-ui/react-toast",
+    "@/components/ui/dialog",
+    "@/components/ui/slider",
+    "@/components/ui/skeleton",
+    "@/components/ui/alert",
+    "@radix-ui/react-aspect-ratio",
+    "@/hooks/use-toast",
+    "@radix-ui/react-tabs",
+    "@/components/ui/badge",
+    "@/lib/utils",
+    "@radix-ui/react-switch",
+    "date-fns",
+    "react-hook-form",
+    "@/components/ui/select"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 40
+}

@@ -1,0 +1,31 @@
+{
+  "navid": "admin.participant-edit.3a994ebe.59",
+  "description": "Omniframez navigator for participant-edit",
+  "generated": 1761446148.8140113,
+  "complexity_score": 8.2,
+  "language_distribution": {
+    "typescript": 5
+  },
+  "purpose_tags": [],
+  "file_count": 5,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "@/components/admin/EditPageLayout",
+    "@/components/admin/AdminFormSections",
+    "@/components/admin/editors",
+    "@/components/participants/ClaimProfileBanner",
+    "react",
+    "@/hooks/useCanEditParticipant",
+    "@/hooks/useAuthenticatedUser",
+    "@/hooks/useClaimableParticipant",
+    "sonner",
+    "@/types/schema",
+    "@/components/admin/AdminFormFactory",
+    "@/integrations/supabase/client",
+    "@/components/ui/tabs",
+    "@/components/ui/alert"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 54
+}

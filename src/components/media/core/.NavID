@@ -1,0 +1,36 @@
+{
+  "navid": "media.core.828cdf3e.47",
+  "description": "Omniframez navigator for core",
+  "generated": 1761446149.0161083,
+  "complexity_score": 11.0,
+  "language_distribution": {
+    "typescript": 8
+  },
+  "purpose_tags": [],
+  "file_count": 8,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/card",
+    "@/hooks/useMediaPlayer",
+    "@/types/unified-media",
+    "@/types/mediaLibrary",
+    "@/components/ui/skeleton",
+    "@/components/ui/slider",
+    "@/components/ui/badge",
+    "@/lib/utils",
+    "@/components/ui/button",
+    "@/components/media/Image",
+    "@/components/ui/scroll-area",
+    "@/components/ui/label",
+    "lucide-react",
+    "react-router-dom",
+    "@/components/ui/input",
+    "@/components/ui/sheet",
+    "@/utils/media",
+    "react",
+    "@/components/ui/checkbox",
+    "@/components/ui/select"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 2
+}

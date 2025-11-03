@@ -1,0 +1,36 @@
+{
+  "navid": "admin.dashboard.df006b51.52",
+  "description": "Omniframez navigator for dashboard",
+  "generated": 1761446148.8016102,
+  "complexity_score": 17.2,
+  "language_distribution": {
+    "typescript": 10
+  },
+  "purpose_tags": [],
+  "file_count": 10,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/types/unified",
+    "@/components/ui/card",
+    "@/hooks/useServiceMutations",
+    "@/components/admin/shared/BulkImageUploadWizard",
+    "@/components/ui/dialog",
+    "@/integrations/supabase/client",
+    "@/hooks/useAuctionMutations",
+    "@/components/ui/alert",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "date-fns",
+    "@/hooks/useProductMutations",
+    "@/components/ui/button",
+    "@/utils/imageUtils",
+    "@/hooks/useUnifiedDashboardStats",
+    "@/hooks/useServiceProviders",
+    "@/hooks/useAuctions",
+    "@/components/ui/tabs",
+    "@/components/ui/scroll-area"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 47
+}

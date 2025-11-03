@@ -1,0 +1,36 @@
+{
+  "navid": "pages.admin.dab992a0.37",
+  "description": "Omniframez navigator for admin",
+  "generated": 1761446149.1143224,
+  "complexity_score": 46.3,
+  "language_distribution": {
+    "typescript": 26
+  },
+  "purpose_tags": [],
+  "file_count": 26,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/media/StorageExplorer",
+    "@/components/ui/card",
+    "@/components/admin/orders/OrdersTable",
+    "@/components/media/admin/WorkflowProgress",
+    "@/components/ui/badge",
+    "@/hooks/admin/useProductActions",
+    "@/components/admin/communications/CommunicationsTable",
+    "@/components/admin/dashboard/ZeppelStatsSection",
+    "date-fns",
+    "@/hooks/useUnifiedDashboardStats",
+    "@/components/admin/providers/ServiceProvidersTable",
+    "@/components/admin/SponsorManagementList",
+    "@supabase/supabase-js",
+    "@/components/admin/settings/NotificationSettings",
+    "@/components/admin/AdminFormFactory",
+    "@/components/ui/tabs",
+    "@/components/ui/scroll-area",
+    "lucide-react",
+    "@/hooks/admin/useAuctionActions",
+    "react-router-dom"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

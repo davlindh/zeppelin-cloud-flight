@@ -1,0 +1,17 @@
+{
+  "navid": "schemas.marketplace.465dcf31.45",
+  "description": "Omniframez navigator for marketplace",
+  "generated": 1761446149.2535136,
+  "complexity_score": 1.3,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [],
+  "file_count": 4,
+  "subdirectory_count": 1,
+  "dependencies": [
+    "zod"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

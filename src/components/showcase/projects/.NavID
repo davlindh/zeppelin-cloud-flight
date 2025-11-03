@@ -1,0 +1,29 @@
+{
+  "navid": "showcase.projects.ea9f922b.54",
+  "description": "Omniframez navigator for projects",
+  "generated": 1761446149.0958264,
+  "complexity_score": 7.6,
+  "language_distribution": {
+    "typescript": 7
+  },
+  "purpose_tags": [],
+  "file_count": 7,
+  "subdirectory_count": 1,
+  "dependencies": [
+    "lucide-react",
+    "@/components/ui/badge",
+    "@/components/ui/OptimizedImage",
+    "@/components/ui/card",
+    "@/lib/utils",
+    "react-router-dom",
+    "react",
+    "@/media",
+    "@/components/ui/input",
+    "@/types/unified-media",
+    "@/components/ui/button",
+    "@/integrations/supabase/client",
+    "@/utils/mediaHelpers"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

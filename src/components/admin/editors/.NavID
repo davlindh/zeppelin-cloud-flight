@@ -1,0 +1,36 @@
+{
+  "navid": "admin.editors.60a1bead.50",
+  "description": "Omniframez navigator for editors",
+  "generated": 1761446148.8057182,
+  "complexity_score": 11.3,
+  "language_distribution": {
+    "typescript": 6
+  },
+  "purpose_tags": [],
+  "file_count": 6,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/card",
+    "@/components/ui/textarea",
+    "@/components/ui/dialog",
+    "@/integrations/supabase/client",
+    "@/components/ui/alert",
+    "@/hooks/use-toast",
+    "@/hooks/useUnsavedChanges",
+    "@/components/ui/badge",
+    "date-fns",
+    "react-hook-form",
+    "@/components/ui/button",
+    "@/components/ui/tabs",
+    "@/components/ui/label",
+    "@tanstack/react-query",
+    "lucide-react",
+    "@/components/ui/progress",
+    "@/components/ui/input",
+    "date-fns/locale",
+    "@/components/ui/switch",
+    "react"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 45
+}

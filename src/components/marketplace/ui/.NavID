@@ -1,0 +1,36 @@
+{
+  "navid": "marketplace.ui.d8bcc56d.51",
+  "description": "Omniframez navigator for ui",
+  "generated": 1761446149.004986,
+  "complexity_score": 25.5,
+  "language_distribution": {
+    "typescript": 38
+  },
+  "purpose_tags": [],
+  "file_count": 38,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/types/unified",
+    "@/components/ui/card",
+    "@/utils/marketplace/imageUtils",
+    "@/components/ui/dialog",
+    "@/contexts/marketplace/CartContext",
+    "@/components/ui/skeleton",
+    "@/components/ui/alert",
+    "@/components/marketplace/ui/social-proof-badge",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/hooks/marketplace/useNotificationPreferences",
+    "@/lib/utils",
+    "@/components/marketplace/ui/error-fallback",
+    "@/types/errorBoundary",
+    "@/components/marketplace/ui/floating-action-buttons",
+    "@/components/ui/button",
+    "@/components/marketplace/ui/theme-provider",
+    "@/components/marketplace/auctions/EnhancedStatusBadges",
+    "@/hooks/marketplace/useQuickActions"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 40
+}

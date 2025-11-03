@@ -1,0 +1,36 @@
+{
+  "navid": "admin.products.b32ebe91.51",
+  "description": "Omniframez navigator for products",
+  "generated": 1761446148.8232226,
+  "complexity_score": 11.1,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [],
+  "file_count": 4,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useImageUpload",
+    "@/hooks/marketplace/useProducts",
+    "@/config/storage.config",
+    "@/types/unified",
+    "@/components/ui/card",
+    "@/components/ui/textarea",
+    "@/components/ui/dialog",
+    "@/hooks/useDynamicCategories",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/hooks/useProductMutations",
+    "@/components/ui/button",
+    "@/utils/imageUtils",
+    "@/components/admin/products/ProductImageUpload",
+    "@/components/ui/label",
+    "lucide-react",
+    "@/components/admin/CameraCapture",
+    "@/components/ui/progress",
+    "@/components/ui/input",
+    "react"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

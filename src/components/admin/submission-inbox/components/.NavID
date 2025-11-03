@@ -1,0 +1,25 @@
+{
+  "navid": "submission-inbox.components.c300549b.70",
+  "description": "Omniframez navigator for components",
+  "generated": 1761446148.8707783,
+  "complexity_score": 4.2,
+  "language_distribution": {
+    "typescript": 2
+  },
+  "purpose_tags": [
+    "ui_components"
+  ],
+  "file_count": 2,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/badge",
+    "@/utils/fileNaming",
+    "@/components/ui/card",
+    "@/hooks/useSendParticipantWelcome",
+    "react",
+    "@/components/ui/button",
+    "@/components/ui/separator"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 7
+}

@@ -1,0 +1,24 @@
+{
+  "navid": "contexts.marketplace.cd2465d6.46",
+  "description": "Omniframez navigator for marketplace",
+  "generated": 1761446149.1731508,
+  "complexity_score": 5.0,
+  "language_distribution": {
+    "typescript": 8
+  },
+  "purpose_tags": [],
+  "file_count": 8,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "react-router-dom",
+    "react",
+    "@/utils/colorUtils",
+    "@/hooks/useNotifications",
+    "@/config/brand.config",
+    "@/hooks/marketplace/useUserProfile",
+    "@/integrations/supabase/client",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

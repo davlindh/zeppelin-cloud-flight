@@ -1,0 +1,16 @@
+{
+  "navid": "src.integrations.e3b0c442.38",
+  "description": "Omniframez navigator for integrations",
+  "generated": 1761446149.230388,
+  "complexity_score": 1.2,
+  "language_distribution": {},
+  "purpose_tags": [],
+  "file_count": 0,
+  "subdirectory_count": 1,
+  "dependencies": [
+    "@/integrations/supabase/client",
+    "@supabase/supabase-js"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 50
+}

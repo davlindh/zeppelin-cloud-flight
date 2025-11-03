@@ -1,0 +1,19 @@
+{
+  "navid": "src.i18n.9a138d62.30",
+  "description": "Omniframez navigator for i18n",
+  "generated": 1761446149.2041533,
+  "complexity_score": 2.0,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 1,
+  "dependencies": [
+    "i18next-browser-languagedetector",
+    "i18next",
+    "react-i18next"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 42
+}

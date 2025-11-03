@@ -1,0 +1,33 @@
+{
+  "navid": "admin.auctions.c072eb73.51",
+  "description": "Omniframez navigator for auctions",
+  "generated": 1761446148.7767527,
+  "complexity_score": 9.0,
+  "language_distribution": {
+    "typescript": 3
+  },
+  "purpose_tags": [],
+  "file_count": 3,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useImageUpload",
+    "@/components/ui/badge",
+    "lucide-react",
+    "@/config/storage.config",
+    "@/types/unified",
+    "@/components/ui/card",
+    "@/lib/utils",
+    "@/components/ui/input",
+    "react",
+    "@/components/ui/textarea",
+    "@/components/ui/button",
+    "@/utils/imageUtils",
+    "@/components/ui/dialog",
+    "@/hooks/useAuctions",
+    "@/hooks/useAuctionMutations",
+    "@/components/ui/label",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

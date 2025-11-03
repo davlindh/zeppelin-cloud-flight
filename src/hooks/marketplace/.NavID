@@ -1,0 +1,36 @@
+{
+  "navid": "hooks.marketplace.e107bc14.43",
+  "description": "Omniframez navigator for marketplace",
+  "generated": 1761446149.1918128,
+  "complexity_score": 21.9,
+  "language_distribution": {
+    "typescript": 62
+  },
+  "purpose_tags": [],
+  "file_count": 62,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/config/storage.config",
+    "@/types/unified",
+    "@/utils/marketplace/imageUtils",
+    "@/hooks/useErrorHandler",
+    "@/types/cart",
+    "@/contexts/marketplace/CartContext",
+    "@/integrations/supabase/client",
+    "@/hooks/use-toast",
+    "@/integrations/supabase/types",
+    "@/hooks/marketplace/useAuctions",
+    "@/utils/marketplace/inputSanitization",
+    "@/hooks/useAuthenticatedUser",
+    "@supabase/supabase-js",
+    "@/contexts/marketplace/WishlistContext",
+    "zod",
+    "@/utils/serviceUtils",
+    "@tanstack/react-query",
+    "@/utils/marketplace/serviceTransforms",
+    "@/config/features.config",
+    "react-router-dom"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

@@ -1,0 +1,15 @@
+{
+  "navid": "zeppelin-cloud-flight.docs.229f10f7.26",
+  "description": "Omniframez navigator for docs",
+  "generated": 1761446149.2950294,
+  "complexity_score": 0.3,
+  "language_distribution": {
+    "markdown": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [],
+  "parent_relationships": [],
+  "learning_sequence_rank": 25
+}

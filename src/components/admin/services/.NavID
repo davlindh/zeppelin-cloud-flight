@@ -1,0 +1,38 @@
+{
+  "navid": "admin.services.19f7890c.51",
+  "description": "Omniframez navigator for services",
+  "generated": 1761446148.772842,
+  "complexity_score": 12.4,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [
+    "business_logic"
+  ],
+  "file_count": 4,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useImageUpload",
+    "@/config/storage.config",
+    "@/types/unified",
+    "@/components/ui/card",
+    "@/hooks/useServiceMutations",
+    "@tiptap/extension-placeholder",
+    "@/components/ui/dialog",
+    "@/hooks/useServiceCategories",
+    "@tiptap/extension-image",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/components/ui/button",
+    "@/utils/imageUtils",
+    "@tiptap/react",
+    "@/components/ui/label",
+    "lucide-react",
+    "@/components/admin/CameraCapture",
+    "@/components/ui/input",
+    "react",
+    "@/hooks/useServices"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 12
+}

@@ -1,0 +1,34 @@
+{
+  "navid": "components.participants.c53bc141.49",
+  "description": "Omniframez navigator for participants",
+  "generated": 1761446149.0446172,
+  "complexity_score": 9.9,
+  "language_distribution": {
+    "typescript": 7
+  },
+  "purpose_tags": [],
+  "file_count": 7,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/label",
+    "lucide-react",
+    "@/components/ui/badge",
+    "@/components/ui/progress",
+    "@/components/ui/card",
+    "@/lib/utils",
+    "react",
+    "@/components/participants/EnhancedParticipantFilters",
+    "react-hook-form",
+    "@/components/ui/textarea",
+    "@/components/ui/button",
+    "@/components/admin/AvatarUpload",
+    "@/components/ui/ChipInput",
+    "zod",
+    "@/integrations/supabase/client",
+    "@/components/ui/alert",
+    "@hookform/resolvers/zod",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 50
+}

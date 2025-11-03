@@ -1,0 +1,36 @@
+{
+  "navid": "pages.marketplace.b4300d8c.43",
+  "description": "Omniframez navigator for marketplace",
+  "generated": 1761446149.1185727,
+  "complexity_score": 42.5,
+  "language_distribution": {
+    "typescript": 13
+  },
+  "purpose_tags": [],
+  "file_count": 13,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/components/ui/card",
+    "@/components/marketplace/shop/MobileFilterBar",
+    "@/contexts/marketplace/CartContext",
+    "@/components/marketplace/shop/ShopContent",
+    "@/components/ui/badge",
+    "@/hooks/marketplace/useRecentlyViewed",
+    "@/contexts/marketplace/NotificationProvider",
+    "date-fns",
+    "@/hooks/marketplace/useProductComparison",
+    "@/components/ui/tabs",
+    "@/components/marketplace/auctions/BidHistorySection",
+    "lucide-react",
+    "@/hooks/marketplace/useSocialProof",
+    "@/components/marketplace/shop/OptimizedUnifiedSearchBar",
+    "react-router-dom",
+    "@/components/marketplace/shop/RecentlyViewedProducts",
+    "@/components/marketplace/ui/unified-service-card",
+    "@/components/marketplace/ui/back-to-top"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

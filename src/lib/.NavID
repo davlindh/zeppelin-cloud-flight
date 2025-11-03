@@ -1,0 +1,20 @@
+{
+  "navid": "src.lib.2ec850fa.29",
+  "description": "Omniframez navigator for lib",
+  "generated": 1761446148.7519195,
+  "complexity_score": 2.5,
+  "language_distribution": {
+    "typescript": 3
+  },
+  "purpose_tags": [],
+  "file_count": 3,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "clsx",
+    "zod",
+    "tailwind-merge",
+    "@tanstack/react-query"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 4
+}

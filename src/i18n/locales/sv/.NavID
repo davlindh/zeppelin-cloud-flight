@@ -1,0 +1,15 @@
+{
+  "navid": "locales.sv.6914a3c4.41",
+  "description": "Omniframez navigator for sv",
+  "generated": 1761446149.2230406,
+  "complexity_score": 0.3,
+  "language_distribution": {
+    "json": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [],
+  "parent_relationships": [],
+  "learning_sequence_rank": 40
+}

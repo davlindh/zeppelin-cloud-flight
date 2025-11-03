@@ -1,0 +1,36 @@
+{
+  "navid": "marketplace.shop.3557ed40.53",
+  "description": "Omniframez navigator for shop",
+  "generated": 1761446148.9992952,
+  "complexity_score": 20.1,
+  "language_distribution": {
+    "typescript": 24
+  },
+  "purpose_tags": [],
+  "file_count": 24,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/types/unified",
+    "@/components/ui/card",
+    "@/utils/marketplace/imageUtils",
+    "@/contexts/marketplace/ShopContext",
+    "@/components/ui/dialog",
+    "@/contexts/marketplace/CartContext",
+    "@/components/ui/skeleton",
+    "@/components/ui/slider",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/components/marketplace/ui/product-skeleton",
+    "@/lib/utils",
+    "@/hooks/marketplace/useRecentlyViewed",
+    "@/hooks/marketplace/useProductComparison",
+    "@/components/ui/button",
+    "@/contexts/marketplace/WishlistContext",
+    "@/hooks/use-mobile",
+    "@/hooks/marketplace/useCategoryStats"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 42
+}

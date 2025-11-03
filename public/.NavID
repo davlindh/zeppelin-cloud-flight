@@ -1,0 +1,15 @@
+{
+  "navid": "zeppelin-cloud-flight.public.49948c5e.28",
+  "description": "Omniframez navigator for public",
+  "generated": 1761446165.3730288,
+  "complexity_score": 0.7,
+  "language_distribution": {
+    "unknown": 3
+  },
+  "purpose_tags": [],
+  "file_count": 3,
+  "subdirectory_count": 1,
+  "dependencies": [],
+  "parent_relationships": [],
+  "learning_sequence_rank": 44
+}

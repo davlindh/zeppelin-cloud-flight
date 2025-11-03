@@ -1,0 +1,27 @@
+{
+  "navid": "marketplace.checkout.216c7ded.57",
+  "description": "Omniframez navigator for checkout",
+  "generated": 1761446148.9694395,
+  "complexity_score": 6.2,
+  "language_distribution": {
+    "typescript": 5
+  },
+  "purpose_tags": [],
+  "file_count": 5,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/pages/marketplace/CheckoutPage",
+    "lucide-react",
+    "@/components/ui/label",
+    "@/components/ui/input",
+    "@/types/cart",
+    "react-hook-form",
+    "@/components/ui/button",
+    "@/components/ui/separator",
+    "@/components/ui/radio-group",
+    "zod",
+    "@hookform/resolvers/zod"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

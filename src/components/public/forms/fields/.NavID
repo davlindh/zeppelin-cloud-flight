@@ -1,0 +1,24 @@
+{
+  "navid": "forms.fields.ab37e470.56",
+  "description": "Omniframez navigator for fields",
+  "generated": 1761446149.0781486,
+  "complexity_score": 4.9,
+  "language_distribution": {
+    "typescript": 7
+  },
+  "purpose_tags": [],
+  "file_count": 7,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "@/components/ui/badge",
+    "@/components/admin/FileUpload",
+    "react",
+    "react-hook-form",
+    "@/components/ui/standard-form-field",
+    "@/hooks/useAuthAwareForm",
+    "@/components/ui/alert"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 44
+}

@@ -1,0 +1,26 @@
+{
+  "navid": "projects._deprecated.43e0d6f7.66",
+  "description": "Omniframez navigator for _deprecated",
+  "generated": 1761446149.1001375,
+  "complexity_score": 5.1,
+  "language_distribution": {
+    "typescript": 1,
+    "markdown": 1
+  },
+  "purpose_tags": [],
+  "file_count": 2,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/badge",
+    "@/components/ui/OptimizedImage",
+    "@/components/ui/card",
+    "@/lib/utils",
+    "@/components/ui/input",
+    "react",
+    "@/types/unified-media",
+    "@/components/ui/button",
+    "@/utils/mediaHelpers"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

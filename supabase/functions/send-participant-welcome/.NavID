@@ -1,0 +1,19 @@
+{
+  "navid": "functions.send-participant-welcome.6841ad0a.65",
+  "description": "Omniframez navigator for send-participant-welcome",
+  "generated": 1761446184.6126926,
+  "complexity_score": 1.8,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "https://deno.land/std@0.190.0/http/server.ts",
+    "https://esm.sh/@supabase/supabase-js@2",
+    "npm:resend@2.0.0"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 62
+}

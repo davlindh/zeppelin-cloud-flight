@@ -1,0 +1,17 @@
+{
+  "navid": "submission-inbox.utils.f50c9098.65",
+  "description": "Omniframez navigator for utils",
+  "generated": 1761446148.8778396,
+  "complexity_score": 0.6,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [
+    "utilities"
+  ],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [],
+  "parent_relationships": [],
+  "learning_sequence_rank": 13
+}

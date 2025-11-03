@@ -1,0 +1,19 @@
+{
+  "navid": "utils.transforms.4d83bf0d.42",
+  "description": "Omniframez navigator for transforms",
+  "generated": 1761446149.1548247,
+  "complexity_score": 2.2,
+  "language_distribution": {
+    "typescript": 5
+  },
+  "purpose_tags": [],
+  "file_count": 5,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useCustomerInfo",
+    "@/hooks/useUserProfile",
+    "@/types/formData"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 48
+}

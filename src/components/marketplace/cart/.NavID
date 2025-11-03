@@ -1,0 +1,23 @@
+{
+  "navid": "marketplace.cart.48e0e6dc.53",
+  "description": "Omniframez navigator for cart",
+  "generated": 1761446148.962384,
+  "complexity_score": 3.8,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "@/hooks/marketplace/useProducts",
+    "react-router-dom",
+    "react",
+    "@/components/ui/button",
+    "@/contexts/marketplace/CartContext",
+    "@/components/ui/sheet"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 42
+}

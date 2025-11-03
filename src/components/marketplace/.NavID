@@ -1,0 +1,36 @@
+{
+  "navid": "components.marketplace.dd8c6f42.48",
+  "description": "Omniframez navigator for marketplace",
+  "generated": 1761446148.9346397,
+  "complexity_score": 52.6,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [],
+  "file_count": 4,
+  "subdirectory_count": 10,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/hooks/marketplace/useCustomerInfo",
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/components/ui/card",
+    "@/utils/marketplace/typeGuards",
+    "@/utils/marketplace/imageUtils",
+    "@/types/cart",
+    "@/contexts/marketplace/CartContext",
+    "@/components/marketplace/ui/service-error",
+    "@/components/ui/skeleton",
+    "@/components/marketplace/ui/social-proof-badge",
+    "@/components/ui/badge",
+    "@/components/marketplace/communication/CommunicationTracker",
+    "@/components/marketplace/ui/product-skeleton",
+    "@/hooks/marketplace/useAuctions",
+    "@/lib/utils",
+    "@/hooks/marketplace/useRecentlyViewed",
+    "date-fns",
+    "react-hook-form",
+    "@/hooks/marketplace/useProductComparison"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

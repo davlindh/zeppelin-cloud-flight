@@ -1,0 +1,19 @@
+{
+  "navid": "marketplace.security.9f1e37f9.57",
+  "description": "Omniframez navigator for security",
+  "generated": 1761446148.9927588,
+  "complexity_score": 1.8,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "lucide-react",
+    "react",
+    "@/components/ui/alert"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

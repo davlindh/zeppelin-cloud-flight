@@ -1,0 +1,36 @@
+{
+  "navid": "src.hooks.d8beeb66.31",
+  "description": "Omniframez navigator for hooks",
+  "generated": 1761446149.1799753,
+  "complexity_score": 36.4,
+  "language_distribution": {
+    "typescript": 85
+  },
+  "purpose_tags": [],
+  "file_count": 85,
+  "subdirectory_count": 3,
+  "dependencies": [
+    "@/utils/fileNaming",
+    "@/config/storage.config",
+    "@/types/unified",
+    "@/utils/marketplace/imageUtils",
+    "@/hooks/useErrorHandler",
+    "@/types/unified-media",
+    "@/hooks/useServiceMutations",
+    "@/types/cart",
+    "@/contexts/marketplace/CartContext",
+    "@/utils/serviceTransforms",
+    "@/types/mediaLibrary",
+    "@/integrations/supabase/client",
+    "@/hooks/useAuctionMutations",
+    "@/utils/profileUtils",
+    "@/utils/transforms/database",
+    "@/hooks/useCustomerInfo",
+    "@/hooks/use-toast",
+    "@/contexts/WishlistContext",
+    "@/utils/adminApi",
+    "@/integrations/supabase/types"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

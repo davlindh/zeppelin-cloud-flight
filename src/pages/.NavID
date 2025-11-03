@@ -1,0 +1,37 @@
+{
+  "navid": "src.pages.a7104f04.31",
+  "description": "Omniframez navigator for pages",
+  "generated": 1761446149.1104236,
+  "complexity_score": 87.4,
+  "language_distribution": {
+    "typescript": 12,
+    "unknown": 1
+  },
+  "purpose_tags": [],
+  "file_count": 13,
+  "subdirectory_count": 2,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/components/media/StorageExplorer",
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/components/ui/card",
+    "@/components/admin/orders/OrdersTable",
+    "@/components/marketplace/shop/MobileFilterBar",
+    "@/components/media/admin/WorkflowProgress",
+    "@/contexts/marketplace/CartContext",
+    "@/components/marketplace/shop/ShopContent",
+    "@/components/ui/badge",
+    "@/hooks/admin/useProductActions",
+    "@/components/admin/communications/CommunicationsTable",
+    "@/components/admin/dashboard/ZeppelStatsSection",
+    "@/hooks/marketplace/useRecentlyViewed",
+    "@/contexts/marketplace/NotificationProvider",
+    "date-fns",
+    "@/hooks/marketplace/useProductComparison",
+    "@/hooks/useUnifiedDashboardStats",
+    "@/components/admin/providers/ServiceProvidersTable",
+    "@/components/admin/SponsorManagementList"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 8
+}

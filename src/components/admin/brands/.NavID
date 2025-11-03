@@ -1,0 +1,21 @@
+{
+  "navid": "admin.brands.ff31f6c0.49",
+  "description": "Omniframez navigator for brands",
+  "generated": 1761446148.7878964,
+  "complexity_score": 2.8,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/components/ui/badge",
+    "@/components/ui/card",
+    "react",
+    "@/components/ui/button"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 44
+}

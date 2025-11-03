@@ -1,0 +1,36 @@
+{
+  "navid": "marketplace.auctions.1762b99f.57",
+  "description": "Omniframez navigator for auctions",
+  "generated": 1761446148.9550486,
+  "complexity_score": 14.9,
+  "language_distribution": {
+    "typescript": 12
+  },
+  "purpose_tags": [],
+  "file_count": 12,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/components/ui/card",
+    "@/utils/marketplace/imageUtils",
+    "@/components/ui/dialog",
+    "@/components/ui/alert",
+    "@/hooks/use-toast",
+    "@/hooks/marketplace/useCountdown",
+    "@/components/ui/badge",
+    "@/hooks/marketplace/useAuctions",
+    "@/lib/utils",
+    "react-hook-form",
+    "@/components/ui/button",
+    "@/hooks/marketplace/useRealTimeBidding",
+    "@/contexts/marketplace/WishlistContext",
+    "zod",
+    "@/components/ui/label",
+    "@/components/marketplace/ui/async-error-boundary",
+    "lucide-react",
+    "@/components/marketplace/ui/auction-skeleton",
+    "react-router-dom",
+    "@/components/ui/input"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

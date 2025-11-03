@@ -1,0 +1,36 @@
+{
+  "navid": "admin.project-edit.2481b77a.55",
+  "description": "Omniframez navigator for project-edit",
+  "generated": 1761446148.8327026,
+  "complexity_score": 11.8,
+  "language_distribution": {
+    "typescript": 6
+  },
+  "purpose_tags": [],
+  "file_count": 6,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useClaimableProject",
+    "@/components/admin/EditPageLayout",
+    "@/components/ui/card",
+    "@/components/admin/editors",
+    "@/integrations/supabase/client",
+    "@/components/ui/alert",
+    "@/hooks/use-toast",
+    "@/components/projects/ClaimProjectBanner",
+    "@/hooks/useUserRole",
+    "@/components/ui/button",
+    "@/hooks/useAuthenticatedUser",
+    "@/components/admin/AdminFormFactory",
+    "@/components/ui/tabs",
+    "@/components/ui/label",
+    "lucide-react",
+    "@/hooks/useCanEditProject",
+    "@/components/ui/input",
+    "@/components/media/MediaManager",
+    "@/components/admin/project/SponsorSelector",
+    "@/components/admin/AdminFormSections"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 50
+}

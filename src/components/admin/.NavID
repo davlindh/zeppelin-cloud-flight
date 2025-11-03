@@ -1,0 +1,36 @@
+{
+  "navid": "components.admin.454ee49b.42",
+  "description": "Omniframez navigator for admin",
+  "generated": 1761446148.768468,
+  "complexity_score": 61.2,
+  "language_distribution": {
+    "typescript": 44
+  },
+  "purpose_tags": [],
+  "file_count": 44,
+  "subdirectory_count": 21,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/components/ui/card",
+    "@/components/admin/editors",
+    "@/hooks/useServiceMutations",
+    "@/components/participants/ClaimProfileBanner",
+    "@/components/ui",
+    "@/hooks/useServiceCategories",
+    "@/components/marketplace/ui/service-error",
+    "@/components/ui/skeleton",
+    "@/pages/NotFound",
+    "@/hooks/useAuctionMutations",
+    "@/contexts/AdminContext",
+    "@/components/projects/ClaimProjectBanner",
+    "@/components/ui/badge",
+    "@/lib/utils",
+    "date-fns",
+    "react-hook-form",
+    "@/hooks/useProductMutations",
+    "@/components/ui/button",
+    "@/hooks/useUnifiedDashboardStats"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 43
+}

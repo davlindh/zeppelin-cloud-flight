@@ -1,0 +1,38 @@
+{
+  "navid": "src.components.357eb9cc.36",
+  "description": "Omniframez navigator for components",
+  "generated": 1761446148.7559206,
+  "complexity_score": 135.3,
+  "language_distribution": {
+    "typescript": 1
+  },
+  "purpose_tags": [
+    "ui_components"
+  ],
+  "file_count": 1,
+  "subdirectory_count": 17,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/components/ui/card",
+    "@/hooks/useMediaPlayer",
+    "@/utils/marketplace/typeGuards",
+    "@/utils/marketplace/imageUtils",
+    "@radix-ui/react-slot",
+    "@/hooks/useServiceMutations",
+    "@/components/ui",
+    "@/contexts/marketplace/CartContext",
+    "@/hooks/useAuctionMutations",
+    "@/pages/NotFound",
+    "@radix-ui/react-tabs",
+    "@/components/ui/badge",
+    "@/hooks/marketplace/useRecentlyViewed",
+    "date-fns",
+    "@/hooks/useProductMutations",
+    "@/hooks/marketplace/useProductComparison",
+    "@/hooks/useUnifiedDashboardStats",
+    "@/components/marketplace/ui/floating-action-buttons"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 7
+}

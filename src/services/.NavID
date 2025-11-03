@@ -1,0 +1,20 @@
+{
+  "navid": "src.services.ff60477f.34",
+  "description": "Omniframez navigator for services",
+  "generated": 1761446149.124396,
+  "complexity_score": 1.5,
+  "language_distribution": {
+    "typescript": 2,
+    "markdown": 1
+  },
+  "purpose_tags": [
+    "business_logic"
+  ],
+  "file_count": 3,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/integrations/supabase/client"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 12
+}

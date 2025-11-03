@@ -1,0 +1,36 @@
+{
+  "navid": "components._deprecated.af67e335.48",
+  "description": "Omniframez navigator for _deprecated",
+  "generated": 1761446148.7653892,
+  "complexity_score": 13.1,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [],
+  "file_count": 4,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useLinkMedia",
+    "@/components/media/core/MediaGallery",
+    "@/components/ui/card",
+    "@/types/unified-media",
+    "@/integrations/supabase/client",
+    "@/components/ui/alert",
+    "@/hooks/use-toast",
+    "@/components/ui/badge",
+    "@/lib/utils",
+    "@/components/ui/button",
+    "@/components/media/core/MediaGrid",
+    "@/components/ui/label",
+    "lucide-react",
+    "@/components/media/admin/MediaLinkManager",
+    "@/components/ui/input",
+    "@/hooks/useMedia",
+    "@/components/common/FilterComponents",
+    "@/contexts/AdminAuthContext",
+    "@/components/ui/OptimizedImage",
+    "@/hooks/useFileUpload"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 49
+}

@@ -1,0 +1,19 @@
+{
+  "navid": "zeppelin-cloud-flight.supabase.8fef1d75.30",
+  "description": "Omniframez navigator for supabase",
+  "generated": 1761446184.5980172,
+  "complexity_score": 2.0,
+  "language_distribution": {
+    "unknown": 1
+  },
+  "purpose_tags": [],
+  "file_count": 1,
+  "subdirectory_count": 2,
+  "dependencies": [
+    "https://deno.land/std@0.190.0/http/server.ts",
+    "https://esm.sh/@supabase/supabase-js@2",
+    "npm:resend@2.0.0"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 46
+}

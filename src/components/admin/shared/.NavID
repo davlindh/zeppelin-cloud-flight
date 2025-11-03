@@ -1,0 +1,31 @@
+{
+  "navid": "admin.shared.ff285fa4.49",
+  "description": "Omniframez navigator for shared",
+  "generated": 1761446148.8569224,
+  "complexity_score": 8.1,
+  "language_distribution": {
+    "typescript": 4
+  },
+  "purpose_tags": [],
+  "file_count": 4,
+  "subdirectory_count": 0,
+  "dependencies": [
+    "@/hooks/useImageUpload",
+    "@/components/ui/badge",
+    "lucide-react",
+    "@/components/ui/progress",
+    "@/components/admin/CameraCapture",
+    "@/components/ui/card",
+    "@/config/storage.config",
+    "@/components/ui/input",
+    "react",
+    "@/components/ui/button",
+    "@/components/ui/checkbox",
+    "@/utils/imageUtils",
+    "@/components/ui/dialog",
+    "@/components/ui/scroll-area",
+    "@/hooks/use-toast"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 44
+}

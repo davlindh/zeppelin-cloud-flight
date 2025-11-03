@@ -1,0 +1,37 @@
+{
+  "navid": "zeppelin-cloud-flight.src.8848538e.25",
+  "description": "Omniframez navigator for src",
+  "generated": 1761446148.7484002,
+  "complexity_score": 210.2,
+  "language_distribution": {
+    "css": 2,
+    "typescript": 3
+  },
+  "purpose_tags": [],
+  "file_count": 5,
+  "subdirectory_count": 13,
+  "dependencies": [
+    "@/hooks/marketplace/useProducts",
+    "@/utils/marketplace/dynamicCategoryUtils",
+    "@/utils/marketplace/typeGuards",
+    "@/utils/marketplace/imageUtils",
+    "@/hooks/useServiceMutations",
+    "@/components/ui",
+    "@/contexts/marketplace/CartContext",
+    "@/utils/serviceTransforms",
+    "@/hooks/useAuctionMutations",
+    "@/pages/NotFound",
+    "@/components/ui/badge",
+    "@/components/admin/communications/CommunicationsTable",
+    "@/hooks/marketplace/useRecentlyViewed",
+    "@/contexts/marketplace/NotificationProvider",
+    "date-fns",
+    "@/hooks/useProductMutations",
+    "@/components/marketplace/ui/floating-action-buttons",
+    "@/components/marketplace/ui/theme-provider",
+    "sonner",
+    "@/hooks/marketplace/useQuickActions"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 0
+}

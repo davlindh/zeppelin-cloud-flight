@@ -1,0 +1,45 @@
+{
+  "navid": "root.zeppelin-cloud-flight.bffc5fe9.21",
+  "description": "Omniframez navigator for zeppelin-cloud-flight",
+  "generated": 1761446148.7449126,
+  "complexity_score": 1513.4,
+  "language_distribution": {
+    "unknown": 4,
+    "markdown": 20,
+    "json": 7,
+    "typescript": 3,
+    "javascript": 2,
+    "html": 1,
+    "sql": 1
+  },
+  "purpose_tags": [
+    "database",
+    "nodejs"
+  ],
+  "file_count": 38,
+  "subdirectory_count": 11,
+  "dependencies": [
+    "highlight.js/lib/languages/less",
+    "core-js-pure/stable/instance/starts-with",
+    "@/components/auctions/BidSection",
+    "call-bind/callBound",
+    "@swagger-api/apidom-ns-json-schema-draft-6",
+    "highlight.js/lib/languages/mizar",
+    "@/pages/NotFound",
+    "@std/path/windows/is-absolute",
+    "core-js-pure/stable/symbol/unscopables",
+    "test/render/customRender",
+    "core-js-pure/stable/symbol/species",
+    "refractor/lang/psl.js",
+    "balanced-match",
+    "core-js-pure/features/math/rad-per-deg",
+    "core-js-pure/stable/symbol/to-primitive",
+    "core-js-pure/features/object/get-own-property-names.js",
+    "@/components/admin/settings/NotificationSettings",
+    "@/components/ui/tabs",
+    "@/components/ui/scroll-area",
+    "refractor/lang/hpkp.js"
+  ],
+  "parent_relationships": [],
+  "learning_sequence_rank": 59
+}
