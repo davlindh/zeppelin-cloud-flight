@@ -25,7 +25,18 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { EnhancedSubmission } from './submission-inbox/hooks/useSubmissionData';
-import { getMediaIcon, getMediaTypeColor, formatFileSize } from '@/utils/mediaHelpers';
+import { getMediaIcon, getMediaTypeColor } from '@/utils/media';
+
+// Helper function
+const formatFileSize = (bytes: number = 0): string => {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
+
+// Helper to get media type from MIME (moved to avoid duplicate)
 
 interface SubmissionFile {
   name: string;

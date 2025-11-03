@@ -19,7 +19,7 @@ export type Database = {
           action: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string
         }
@@ -27,7 +27,7 @@ export type Database = {
           action: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id: string
         }
@@ -35,7 +35,7 @@ export type Database = {
           action?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string
         }
@@ -610,7 +610,7 @@ export type Database = {
           participant_id: string | null
           project_id: string | null
           public_url: string
-          search_vector: unknown | null
+          search_vector: unknown
           source: string | null
           status: string
           storage_path: string
@@ -642,7 +642,7 @@ export type Database = {
           participant_id?: string | null
           project_id?: string | null
           public_url: string
-          search_vector?: unknown | null
+          search_vector?: unknown
           source?: string | null
           status?: string
           storage_path: string
@@ -674,7 +674,7 @@ export type Database = {
           participant_id?: string | null
           project_id?: string | null
           public_url?: string
-          search_vector?: unknown | null
+          search_vector?: unknown
           source?: string | null
           status?: string
           storage_path?: string
@@ -731,7 +731,7 @@ export type Database = {
           participant_id: string | null
           project_id: string | null
           public_url: string | null
-          search_vector: unknown | null
+          search_vector: unknown
           source: string | null
           status: string | null
           storage_path: string | null
@@ -763,7 +763,7 @@ export type Database = {
           participant_id?: string | null
           project_id?: string | null
           public_url?: string | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           source?: string | null
           status?: string | null
           storage_path?: string | null
@@ -795,7 +795,7 @@ export type Database = {
           participant_id?: string | null
           project_id?: string | null
           public_url?: string | null
-          search_vector?: unknown | null
+          search_vector?: unknown
           source?: string | null
           status?: string | null
           storage_path?: string | null
@@ -2122,12 +2122,19 @@ export type Database = {
       projects: {
         Row: {
           associations: string[] | null
+          auth_user_id: string | null
+          claimed_at: string | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           description: string
           expected_impact: string | null
           full_description: string | null
           id: string
           image_path: string | null
+          location: string | null
+          match_confidence: number | null
+          match_criteria: Json | null
           purpose: string | null
           slug: string
           title: string
@@ -2135,12 +2142,19 @@ export type Database = {
         }
         Insert: {
           associations?: string[] | null
+          auth_user_id?: string | null
+          claimed_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           description: string
           expected_impact?: string | null
           full_description?: string | null
           id?: string
           image_path?: string | null
+          location?: string | null
+          match_confidence?: number | null
+          match_criteria?: Json | null
           purpose?: string | null
           slug: string
           title: string
@@ -2148,12 +2162,19 @@ export type Database = {
         }
         Update: {
           associations?: string[] | null
+          auth_user_id?: string | null
+          claimed_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string
           expected_impact?: string | null
           full_description?: string | null
           id?: string
           image_path?: string | null
+          location?: string | null
+          match_confidence?: number | null
+          match_criteria?: Json | null
           purpose?: string | null
           slug?: string
           title?: string
@@ -2468,7 +2489,7 @@ export type Database = {
           files: Json | null
           how_found_us: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           language_preference: string | null
           location: string | null
           media_approved_at: string | null
@@ -2492,7 +2513,7 @@ export type Database = {
           files?: Json | null
           how_found_us?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           language_preference?: string | null
           location?: string | null
           media_approved_at?: string | null
@@ -2516,7 +2537,7 @@ export type Database = {
           files?: Json | null
           how_found_us?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           language_preference?: string | null
           location?: string | null
           media_approved_at?: string | null
@@ -2694,6 +2715,12 @@ export type Database = {
       }
     }
     Views: {
+      current_user_is_admin: {
+        Row: {
+          is_admin: boolean | null
+        }
+        Relationships: []
+      }
       media_migration_status: {
         Row: {
           ml_id: string | null
@@ -2730,26 +2757,18 @@ export type Database = {
         Args: { _participant_id: string }
         Returns: boolean
       }
-      can_edit_project: {
-        Args: { _project_id: string }
-        Returns: boolean
-      }
-      can_edit_sponsor: {
-        Args: { _sponsor_id: string }
-        Returns: boolean
-      }
+      can_edit_project: { Args: { _project_id: string }; Returns: boolean }
+      can_edit_sponsor: { Args: { _sponsor_id: string }; Returns: boolean }
       claim_participant_profile: {
         Args: { _participant_id: string; _user_email: string; _user_id: string }
         Returns: Json
       }
-      clean_media_title: {
-        Args: { filename: string }
-        Returns: string
+      claim_project_profile: {
+        Args: { _project_id: string; _user_email: string; _user_id: string }
+        Returns: Json
       }
-      cleanup_old_drafts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      clean_media_title: { Args: { filename: string }; Returns: string }
+      cleanup_old_drafts: { Args: never; Returns: undefined }
       complete_participant_profile: {
         Args: {
           _auth_user_id: string
@@ -2785,34 +2804,16 @@ export type Database = {
           success: boolean
         }[]
       }
-      generate_order_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_session_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      generate_slug: {
-        Args: { title: string }
-        Returns: string
-      }
+      current_user_email: { Args: never; Returns: string }
+      generate_session_id: { Args: never; Returns: string }
+      generate_slug: { Args: { title: string }; Returns: string }
       get_available_times: {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]
       }
-      get_total_users_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      get_unified_admin_dashboard_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      get_zeppel_admin_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_total_users_count: { Args: never; Returns: number }
+      get_unified_admin_dashboard_stats: { Args: never; Returns: Json }
+      get_zeppel_admin_stats: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -25,7 +25,27 @@ import {
   Loader2,
   X
 } from 'lucide-react';
-import { getMediaIcon, getMediaTypeColor, getCategoryColor, formatFileSize } from '@/utils/mediaHelpers';
+import { getMediaIcon, getMediaTypeColor } from '@/utils/media';
+
+// Helper functions
+const formatFileSize = (bytes: number = 0): string => {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
+
+const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    'presentation': 'bg-blue-100 text-blue-700',
+    'workshop': 'bg-purple-100 text-purple-700',
+    'networking': 'bg-green-100 text-green-700',
+    'performance': 'bg-pink-100 text-pink-700',
+    'discussion': 'bg-orange-100 text-orange-700'
+  };
+  return colors[category] || 'bg-gray-100 text-gray-700';
+};
 import { MediaGridSkeleton } from '@/components/media/core/MediaGridSkeleton';
 
 interface MediaItem {

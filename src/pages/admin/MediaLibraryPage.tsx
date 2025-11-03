@@ -445,17 +445,10 @@ const MediaLibraryPage: React.FC = () => {
                     {format(new Date(date), 'MMMM d, yyyy')}
                   </h3>
                    <MediaGrid
-                    media={items.map(item => ({
-                      id: item.id,
-                      type: item.type as 'image' | 'video' | 'audio' | 'document',
-                      title: item.title,
-                      description: item.description,
-                      url: item.public_url,
-                      thumbnail: item.thumbnail_url
-                    }))}
+                    media={items}
                     selectedIds={selectedIds}
                     onSelect={handleSelect}
-                    onPlay={(item) => setPreviewItem(item as any)}
+                    onPreview={(item) => setPreviewItem(item)}
                     onDownload={handleDownload}
                     showCheckboxes
                     columns={getViewColumns()}
@@ -466,18 +459,11 @@ const MediaLibraryPage: React.FC = () => {
             </div>
           ) : (
             <MediaGrid
-              media={media.map(item => ({
-                id: item.id,
-                type: item.type as 'image' | 'video' | 'audio' | 'document',
-                title: item.title,
-                description: item.description,
-                url: item.public_url,
-                thumbnail: item.thumbnail_url
-              }))}
+              media={media}
               selectedIds={selectedIds}
               onSelect={handleSelect}
-              onPlay={(item) => setPreviewItem(item as any)}
-              onDownload={(item) => handleDownload(item as any)}
+              onPreview={(item) => setPreviewItem(item)}
+              onDownload={handleDownload}
               showCheckboxes
               compact={viewMode === 'list'}
               columns={getViewColumns()}

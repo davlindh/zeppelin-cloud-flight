@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { User, Link as LinkIcon } from 'lucide-react';
-import { MediaGrid } from '@/components/media/core/MediaGrid';
-import { useMedia } from '@/hooks/useMedia';
+import { MediaGrid } from '@/components/media';
+import { useMediaLibrary } from '@/hooks/media/useMediaLibrary';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { Button } from '@/components/ui/button';
-import { getCategoryIcon, getCategoryColor, getCategoryLabel } from '@/utils/mediaHelpers';
+import { getMediaIcon } from '@/utils/media';
+// Deprecated component - helper functions inlined
+const getCategoryIcon = (category: any, size: string) => getMediaIcon('document', size);
+const getCategoryColor = () => 'bg-gray-100 text-gray-700';
+const getCategoryLabel = (category: any) => String(category);
 import type { MediaCategory, MediaItem } from '@/types/unified-media';
 import { MediaLinkManager } from '@/components/media/admin/MediaLinkManager';
 
@@ -24,7 +28,7 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
   const [showLinkManager, setShowLinkManager] = useState(false);
   
   // Fetch media dynamically based on participant_id
-  const { media, isLoading } = useMedia({ 
+  const { media, isLoading } = useMediaLibrary({ 
     participant_id: participantId,
     status: 'approved' // Only show approved media for public view
   });
@@ -112,9 +116,9 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
           {Object.entries(groupedMedia).map(([category, items]) => (
             <div key={category} className="space-y-3">
               <div className="flex items-center gap-2">
-                {getCategoryIcon(category as MediaCategory, 'w-4 h-4')}
-                <span className={`px-2 py-1 text-xs font-medium rounded-md border ${getCategoryColor(category as MediaCategory)}`}>
-                  {getCategoryLabel(category as MediaCategory)}
+                {getCategoryIcon(category, 'w-4 h-4')}
+                <span className={`px-2 py-1 text-xs font-medium rounded-md border ${getCategoryColor()}`}>
+                  {getCategoryLabel(category)}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {items.length} {items.length === 1 ? 'objekt' : 'objekt'}
@@ -122,11 +126,7 @@ export const ParticipantMedia: React.FC<ParticipantMediaProps> = ({
               </div>
               
               <MediaGrid
-                media={items.map(item => ({
-                  ...item,
-                  type: item.type as 'image' | 'video' | 'audio' | 'document'
-                }))}
-                viewMode="grid"
+                media={media.filter(m => m.category === category)}
               />
             </div>
           ))}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { MediaGrid } from '@/components/media/core/MediaGrid';
-import { useMedia } from '@/hooks/useMedia';
+import { MediaGrid } from '@/components/media';
+import { useMediaLibrary } from '@/hooks/media/useMediaLibrary';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useLinkMedia } from '@/hooks/useLinkMedia';
 import { Button } from '@/components/ui/button';
@@ -61,7 +61,7 @@ export const ProjectMediaDisplay: React.FC<ProjectMediaDisplayProps> = ({
   const [selectedType, setSelectedType] = useState<string>('all');
   
   // Fetch media dynamically based on project_id
-  const { media, isLoading } = useMedia({ 
+  const { media, isLoading } = useMediaLibrary({ 
     project_id: projectId,
     status: 'approved' // Only show approved media for public view
   });
