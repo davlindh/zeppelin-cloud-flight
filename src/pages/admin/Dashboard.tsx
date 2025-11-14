@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { SecurityMetricsCard } from '@/components/admin/dashboard/SecurityMetricsCard';
 import { LiveActivityFeed } from '@/components/admin/dashboard/LiveActivityFeed';
 import { AlertsCenter } from '@/components/admin/dashboard/AlertsCenter';
@@ -10,10 +11,20 @@ import { MarketplaceStatsSection } from '@/components/admin/dashboard/Marketplac
 import { ServicesStatsSection } from '@/components/admin/dashboard/ServicesStatsSection';
 import { useUnifiedDashboardStats } from '@/hooks/useUnifiedDashboardStats';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AdminActionShortcuts } from '@/components/admin/dashboard/AdminActionShortcuts';
+import { AdminAnalyticsSection } from '@/components/admin/dashboard/AdminAnalyticsSection';
+import { SystemHealthMonitor } from '@/components/admin/dashboard/SystemHealthMonitor';
+import { AdminPerformanceCard } from '@/components/admin/dashboard/AdminPerformanceCard';
+import { RecentChangesTimeline } from '@/components/admin/dashboard/RecentChangesTimeline';
+import { KeyboardShortcutsModal } from '@/components/admin/dashboard/KeyboardShortcutsModal';
+import { useKeyboardShortcuts } from '@/hooks/admin/useKeyboardShortcuts';
 
 export const Dashboard = () => {
   const { data: stats, isLoading, refetch } = useUnifiedDashboardStats();
   const { logAdminAction } = useAdminAuditLog();
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  
+  useKeyboardShortcuts(true, () => setShowShortcuts(true));
 
   const handleSecurityClick = () => {
     logAdminAction({
@@ -61,50 +72,73 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Hero Section */}
-      <DashboardHero
-        actionItemsCount={stats.action_items.total}
-        lastUpdated={stats.last_updated}
-        onRefresh={handleRefresh}
-        isRefreshing={isLoading}
-      />
-
-      {/* Quick Actions */}
-      {stats.action_items.total > 0 && (
-        <QuickActions
-          submissionsPending={stats.action_items.submissions_pending}
-          mediaPending={stats.action_items.media_pending}
-          lowStockCount={stats.action_items.low_stock_count}
-          endingTodayCount={stats.marketplace.auctions.ending_today}
-          unlinkedServices={stats.action_items.unlinked_services}
+    <>
+      <div className="space-y-6">
+        {/* Hero Section */}
+        <DashboardHero
+          actionItemsCount={stats.action_items.total}
+          lastUpdated={stats.last_updated}
+          onRefresh={handleRefresh}
+          isRefreshing={isLoading}
         />
-      )}
 
-      {/* Zeppel Stats */}
-      <ZeppelStatsSection stats={stats.zeppel} />
+        {/* Action Shortcuts */}
+        <AdminActionShortcuts />
 
-      {/* Marketplace Stats */}
-      <MarketplaceStatsSection stats={stats.marketplace} />
+        {/* Quick Actions */}
+        {stats.action_items.total > 0 && (
+          <QuickActions
+            submissionsPending={stats.action_items.submissions_pending}
+            mediaPending={stats.action_items.media_pending}
+            lowStockCount={stats.action_items.low_stock_count}
+            endingTodayCount={stats.marketplace.auctions.ending_today}
+            unlinkedServices={stats.action_items.unlinked_services}
+          />
+        )}
 
-      {/* Services Stats */}
-      {stats.services && <ServicesStatsSection stats={stats.services} />}
+        {/* Performance & Health Row */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <AdminPerformanceCard />
+          <SystemHealthMonitor />
+        </div>
 
-      {/* Security & Activity Row */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <SecurityMetricsCard 
-          onViewDetails={handleSecurityClick}
-        />
-        <LiveActivityFeed 
-          onViewAll={handleActivityViewAll}
-        />
-      </div>
+        {/* Analytics Section */}
+        <AdminAnalyticsSection />
 
-      {/* Alerts & Data Hub */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <AlertsCenter onAlertAction={handleAlertAction} />
+        {/* Zeppel Stats */}
+        <ZeppelStatsSection stats={stats.zeppel} />
+
+        {/* Marketplace Stats */}
+        <MarketplaceStatsSection stats={stats.marketplace} />
+
+        {/* Services Stats */}
+        {stats.services && <ServicesStatsSection stats={stats.services} />}
+
+        {/* Security & Activity Row */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <SecurityMetricsCard 
+            onViewDetails={handleSecurityClick}
+          />
+          <LiveActivityFeed 
+            onViewAll={handleActivityViewAll}
+          />
+        </div>
+
+        {/* Alerts & Timeline */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <AlertsCenter onAlertAction={handleAlertAction} />
+          <RecentChangesTimeline />
+        </div>
+
+        {/* Data Hub */}
         <AdminDataHub />
       </div>
-    </div>
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal 
+        open={showShortcuts} 
+        onOpenChange={setShowShortcuts} 
+      />
+    </>
   );
 };
