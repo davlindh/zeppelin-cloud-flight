@@ -7,11 +7,15 @@ import { useCart } from '@/contexts/marketplace/CartContext';
 import { UserMenu } from '@/components/common/UserMenu';
 import { MarketplaceActions } from '@/components/common/MarketplaceActions';
 import { useState } from 'react';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 export default function MarketplaceLayout() {
   const location = useLocation();
   const { state } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // Auto-scroll to top on navigation within marketplace
+  useScrollToTop({ behavior: 'smooth', threshold: 100 });
   
   const isActive = (path: string) => location.pathname.includes(path);
   
