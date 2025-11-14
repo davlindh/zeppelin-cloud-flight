@@ -11,7 +11,7 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
     'name' in dbService.service_providers;
 
   const providerDetails = hasValidProviderData ? {
-    id: dbService.service_providers!.id ?? dbService.provider_id ?? `provider-${dbService.id}`,
+    id: dbService.service_providers!.id,
     name: dbService.service_providers!.name,
     avatar: dbService.service_providers!.avatar ?? '',
     rating: dbService.service_providers!.rating ?? 4.5,
@@ -28,8 +28,8 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
     portfolio: [],
     recentReviews: []
   } : {
-    // Fallback provider details when no provider data is available
-    id: `provider-${dbService.id}`, // Generate a provider ID
+    // ⚠️ WARNING: No valid provider data - service must have valid provider_id
+    id: dbService.provider_id ?? '', // Use actual provider_id or empty string
     name: dbService.provider,
     avatar: '',
     rating: dbService.provider_rating ?? 4.5,
@@ -46,6 +46,11 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
     portfolio: [],
     recentReviews: []
   };
+
+  // Log warning if no valid provider ID
+  if (!providerDetails.id) {
+    console.warn(`⚠️ Service ${dbService.id} "${dbService.title}" has no valid provider_id`);
+  }
 
   return {
     id: dbService.id,

@@ -28,6 +28,11 @@ interface DatabaseService {
 }
 
 const transformDatabaseService = (dbService: DatabaseService): Service => {
+  // ⚠️ Log warning if no valid provider_id
+  if (!dbService.provider_id) {
+    console.warn(`⚠️ Service ${dbService.id} "${dbService.title}" has no valid provider_id`);
+  }
+
   return {
     id: dbService.id,
     title: dbService.title,
@@ -44,7 +49,7 @@ const transformDatabaseService = (dbService: DatabaseService): Service => {
     features: dbService.features,
     images: dbService.images,
     providerDetails: {
-      id: `provider-${dbService.id}`, // Generate a provider ID
+      id: dbService.provider_id ?? '', // Use actual provider_id or empty string
       name: dbService.provider,
       avatar: '',
       rating: dbService.provider_rating ?? dbService.rating,

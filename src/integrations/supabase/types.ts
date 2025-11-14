@@ -358,6 +358,7 @@ export type Database = {
         Row: {
           additional_data: Json | null
           created_at: string
+          created_by_guest: boolean | null
           customer_email: string
           customer_name: string
           customer_phone: string | null
@@ -382,6 +383,7 @@ export type Database = {
         Insert: {
           additional_data?: Json | null
           created_at?: string
+          created_by_guest?: boolean | null
           customer_email: string
           customer_name: string
           customer_phone?: string | null
@@ -406,6 +408,7 @@ export type Database = {
         Update: {
           additional_data?: Json | null
           created_at?: string
+          created_by_guest?: boolean | null
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
@@ -2363,10 +2366,10 @@ export type Database = {
       }
       service_reviews: {
         Row: {
-          client_email: string | null
-          client_name: string
           comment: string
           created_at: string
+          customer_email: string | null
+          customer_name: string
           date: string
           id: string
           rating: number
@@ -2374,10 +2377,10 @@ export type Database = {
           verified: boolean
         }
         Insert: {
-          client_email?: string | null
-          client_name: string
           comment: string
           created_at?: string
+          customer_email?: string | null
+          customer_name: string
           date?: string
           id?: string
           rating: number
@@ -2385,10 +2388,10 @@ export type Database = {
           verified?: boolean
         }
         Update: {
-          client_email?: string | null
-          client_name?: string
           comment?: string
           created_at?: string
+          customer_email?: string | null
+          customer_name?: string
           date?: string
           id?: string
           rating?: number
