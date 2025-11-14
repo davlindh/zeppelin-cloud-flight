@@ -107,6 +107,7 @@ export interface Service extends BaseEntity {
   providerRating?: number;
   responseTime?: string;
   slug?: string;
+  faqs?: { question: string; answer: string; }[];
   customizationOptions?: {
     name: string;
     type: 'select' | 'input' | 'textarea';

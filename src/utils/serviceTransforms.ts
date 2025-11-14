@@ -67,6 +67,7 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
     providerRating: dbService.provider_rating ?? dbService.rating ?? 4.5,
     responseTime: dbService.response_time ?? '24 hours',
     slug: dbService.slug ?? undefined,
+    faqs: (dbService as any).faqs || [],
     created_at: dbService.created_at,
     updated_at: dbService.updated_at
   };

@@ -2365,6 +2365,7 @@ export type Database = {
           created_at: string
           description: string
           duration: string
+          faqs: Json | null
           features: string[] | null
           id: string
           image: string
@@ -2388,6 +2389,7 @@ export type Database = {
           created_at?: string
           description: string
           duration: string
+          faqs?: Json | null
           features?: string[] | null
           id?: string
           image: string
@@ -2411,6 +2413,7 @@ export type Database = {
           created_at?: string
           description?: string
           duration?: string
+          faqs?: Json | null
           features?: string[] | null
           id?: string
           image?: string
