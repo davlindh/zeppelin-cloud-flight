@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +18,8 @@ import {
   Clock,
   MapPin,
   X,
-  User
+  User,
+  Info
 } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useServiceCategories } from '@/hooks/useServiceCategories';
@@ -43,6 +46,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   service,
   mode
 }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -70,6 +75,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const { toast } = useToast();
   
   const isUploading = uploadProgress.isUploading;
+  
+  // Get pre-selected provider info from URL
+  const preSelectedProviderId = searchParams.get('newProvider');
+  const preSelectedProvider = preSelectedProviderId 
+    ? providers?.find(p => p.id === preSelectedProviderId)
+    : null;
 
   useEffect(() => {
     if (service && mode === 'edit') {
@@ -89,7 +100,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         response_time: service.responseTime ?? '24 hours'
       });
     } else {
-      // Reset form for create mode
+      // Reset form for create mode and pre-select provider if available
       setFormData({
         title: '',
         description: '',
@@ -100,13 +111,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         image: '',
         images: [],
         features: [],
-        provider: '',
-        provider_id: '',
+        provider: preSelectedProvider?.name ?? '',
+        provider_id: preSelectedProviderId ?? '',
         available_times: [],
         response_time: '24 hours'
       });
     }
-  }, [service, mode, isOpen]);
+  }, [service, mode, isOpen, preSelectedProviderId, preSelectedProvider]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -312,6 +323,22 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
             {mode === 'create' ? 'Create a new service offering for your customers.' : 'Update the details of this service.'}
           </DialogDescription>
         </DialogHeader>
+
+        {mode === 'create' && preSelectedProvider && (
+          <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-700 dark:text-blue-300">
+              Creating service for <strong>{preSelectedProvider.name}</strong>.
+              <Button
+                variant="link"
+                className="px-2 h-auto text-blue-700 dark:text-blue-300"
+                onClick={() => navigate(`/admin/providers?id=${preSelectedProviderId}`)}
+              >
+                View provider profile
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

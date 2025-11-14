@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useServiceProviders } from '@/hooks/useServiceProviders';
 import { useServiceProviderMutations } from '@/hooks/useServiceProviderMutations';
 import { useAdminAuditLog } from '@/hooks/useAdminAuditLog';
@@ -43,12 +43,14 @@ interface ServiceProvidersTableProps {
   onEdit: (provider: ServiceProvider) => void;
   onView: (provider: ServiceProvider) => void;
   onDelete: (provider: ServiceProvider) => void;
+  highlightId?: string | null;
 }
 
 export const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
   onEdit,
   onView,
-  onDelete
+  onDelete,
+  highlightId,
 }) => {
   const { data: providers, isLoading, error } = useServiceProviders();
   const { deleteServiceProvider, isDeleting } = useServiceProviderMutations();
@@ -58,6 +60,22 @@ export const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [providerToDelete, setProviderToDelete] = useState<ServiceProvider | null>(null);
   const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
+
+  // Scroll to and highlight provider if highlightId is provided
+  useEffect(() => {
+    if (highlightId && providers) {
+      const element = document.getElementById(`provider-${highlightId}`);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+          setTimeout(() => {
+            element.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+          }, 2000);
+        }, 100);
+      }
+    }
+  }, [highlightId, providers]);
 
   const handleToggleExpanded = (providerId: string) => {
     setExpandedProvider(expandedProvider === providerId ? null : providerId);
@@ -147,7 +165,10 @@ export const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
           <TableBody>
             {providers.map((provider) => (
               <React.Fragment key={provider.id}>
-                <TableRow className="hover:bg-muted/50">
+                <TableRow 
+                  id={`provider-${provider.id}`}
+                  className="hover:bg-muted/50 transition-all duration-300"
+                >
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-10 w-10">
@@ -293,19 +314,29 @@ export const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
                   <TableRow>
                     <TableCell colSpan={7} className="bg-muted/30 p-0">
                       <div className="p-6 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-lg">
-                            Services by {provider.name}
-                          </h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-lg">
+                          Services by {provider.name}
+                        </h4>
+                        <div className="flex gap-2">
                           <Button
                             size="sm"
                             onClick={() => navigate(`/admin/services?provider=${provider.id}`)}
-                            variant="outline"
+                            variant="default"
                           >
                             <Eye className="h-4 w-4 mr-2" />
-                            View All in Services Page
+                            View in Services Page
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => navigate(`/admin/services?newProvider=${provider.id}`)}
+                            variant="outline"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add New Service
                           </Button>
                         </div>
+                      </div>
                         
                         {provider.services.length === 0 ? (
                           <div className="text-center py-8 text-muted-foreground">
