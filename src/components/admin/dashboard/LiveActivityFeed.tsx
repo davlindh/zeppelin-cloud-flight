@@ -110,7 +110,7 @@ export const LiveActivityFeed = ({ onViewAll }: LiveActivityFeedProps) => {
                       <div className="flex-1 space-y-1">
                         <p className="text-sm font-medium">{activity.action}</p>
                         <p className="text-xs text-muted-foreground">
-                          {activity.timestamp ? format(new Date(activity.timestamp), "HH:mm:ss", { locale: sv }) : 'Recent'}
+                          {activity.created_at ? format(new Date(activity.created_at), "HH:mm:ss", { locale: sv }) : 'Recent'}
                         </p>
                       </div>
                       <Badge variant={severity === 'high' ? 'destructive' : 'secondary'} className="text-xs">

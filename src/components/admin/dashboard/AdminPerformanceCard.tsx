@@ -23,12 +23,12 @@ export const AdminPerformanceCard = () => {
 
   const getGradeColor = (grade: string) => {
     switch (grade) {
-      case 'A': return 'bg-green-500 text-white';
-      case 'B': return 'bg-blue-500 text-white';
-      case 'C': return 'bg-yellow-500 text-white';
-      case 'D': return 'bg-orange-500 text-white';
-      case 'F': return 'bg-red-500 text-white';
-      default: return 'bg-gray-500 text-white';
+      case 'A': return 'bg-green-600 dark:bg-green-700 text-white';
+      case 'B': return 'bg-blue-600 dark:bg-blue-700 text-white';
+      case 'C': return 'bg-yellow-600 dark:bg-yellow-700 text-white';
+      case 'D': return 'bg-orange-600 dark:bg-orange-700 text-white';
+      case 'F': return 'bg-red-600 dark:bg-red-700 text-white';
+      default: return 'bg-muted text-foreground';
     }
   };
 
