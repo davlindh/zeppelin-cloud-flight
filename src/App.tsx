@@ -74,6 +74,10 @@ const MyProductsPage = lazy(() => import("./pages/provider/MyProductsPage").then
 const SellerOrdersPage = lazy(() => import("./pages/provider/SellerOrdersPage").then(m => ({ default: m.SellerOrdersPage })));
 const SellerRevenueAnalytics = lazy(() => import("./pages/provider/SellerRevenueAnalytics").then(m => ({ default: m.SellerRevenueAnalytics })));
 const EventStorefront = lazy(() => import("./pages/marketplace/EventStorefront").then(m => ({ default: m.EventStorefront })));
+const CommissionSettings = lazy(() => import("./pages/admin/settings/CommissionSettings").then(m => ({ default: m.CommissionSettings })));
+const SellerManagement = lazy(() => import("./pages/admin/commerce/SellerManagement").then(m => ({ default: m.SellerManagement })));
+const EventCommerceAnalytics = lazy(() => import("./pages/admin/commerce/EventCommerceAnalytics").then(m => ({ default: m.EventCommerceAnalytics })));
+const CommerceOverviewPage = lazy(() => import("./pages/admin/commerce/CommerceOverviewPage").then(m => ({ default: m.CommerceOverviewPage })));
 const ServicesPage = lazy(() => import("./pages/admin/ServicesPage").then(m => ({ default: m.ServicesPage })));
 const OrdersPage = lazy(() => import("./pages/admin/OrdersPage").then(m => ({ default: m.OrdersPage })));
 const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
@@ -333,6 +337,26 @@ const App = () => (
                   <Route path="settings" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SettingsPage />
+                    </Suspense>
+                  } />
+                  <Route path="settings/commissions" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CommissionSettings />
+                    </Suspense>
+                  } />
+                  <Route path="commerce/overview" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <CommerceOverviewPage />
+                    </Suspense>
+                  } />
+                  <Route path="commerce/sellers" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <SellerManagement />
+                    </Suspense>
+                  } />
+                  <Route path="commerce/events" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <EventCommerceAnalytics />
                     </Suspense>
                   } />
                   <Route path="data-cleanup" element={

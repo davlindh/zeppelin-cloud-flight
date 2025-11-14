@@ -67,3 +67,12 @@ export * from './useImageUpload';
 
 // Security hooks
 export * from './useSecureSubmission';
+
+// Commerce & Seller hooks
+export * from './useMyProducts';
+export * from './useSellerOrders';
+export * from './useSellerRevenue';
+export * from './useCommissionSettings';
+export * from './useSellerProductMutations';
+export * from './useProductsByEvent';
+export * from './useCommissionPreview';
