@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useScrollDetection } from '@/hooks/useScrollDetection';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, LogOut, Menu, X, ShieldCheck } from 'lucide-react';
@@ -32,6 +33,7 @@ export const Header: React.FC = () => {
     const navigate = useNavigate();
     const { isAdmin, logout } = useAdminAuth();
     const isAdminPage = location.pathname.startsWith('/admin');
+    const isScrolled = useScrollDetection({ threshold: 20 });
     
     const closeMenu = () => setIsMenuOpen(false);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -54,7 +56,12 @@ export const Header: React.FC = () => {
     const handleNavClick = useSmoothScroll(closeMenu);
 
     return (
-        <header className="bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-sm safe-area-inset-top">
+        <header className={cn(
+            "sticky top-0 left-0 right-0 z-50 safe-area-inset-top transition-all duration-300 motion-reduce:transition-none",
+            isScrolled 
+                ? "bg-white/95 backdrop-blur-lg shadow-md border-b border-gray-200/50" 
+                : "bg-white/90 backdrop-blur-md shadow-sm"
+        )}>
             <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
                 <div className="flex justify-between items-center">
                     {/* Logo */}
