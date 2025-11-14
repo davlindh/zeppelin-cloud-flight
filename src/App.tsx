@@ -54,7 +54,7 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import { ProviderPortfolioPage } from "./pages/marketplace/ProviderPortfolioPage";
 import PortfolioManagement from "./pages/marketplace/PortfolioManagement";
-import { UserDashboard } from "./pages/marketplace/UserDashboard";
+import { Dashboard as MarketplaceDashboard } from "./pages/marketplace/Dashboard";
 import { RoleApplicationsPage } from "./pages/admin/RoleApplicationsPage";
 
 // Lazy load admin pages
@@ -143,9 +143,14 @@ const App = () => (
                   <Route path="checkout" element={<CheckoutPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
                   <Route path="notifications" element={<NotificationsPage />} />
-                  <Route path="account" element={
+                  <Route path="profile" element={
                     <ProtectedRoute>
                       <ProfilePage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="dashboard" element={
+                    <ProtectedRoute>
+                      <MarketplaceDashboard />
                     </ProtectedRoute>
                   } />
                   <Route path="orders" element={

@@ -58,7 +58,23 @@ export const ServiceProvidersAdmin = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      // Fetch user roles for linked providers
+      const providersWithRoles = await Promise.all(
+        (data || []).map(async (provider) => {
+          if (provider.auth_user_id) {
+            const { data: roles } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', provider.auth_user_id);
+            
+            return { ...provider, userRoles: roles?.map(r => r.role) || [] };
+          }
+          return { ...provider, userRoles: [] };
+        })
+      );
+
+      return providersWithRoles;
     }
   });
 
@@ -231,6 +247,16 @@ export const ServiceProvidersAdmin = () => {
                     <div>
                       <p className="font-medium">{provider.name}</p>
                       <p className="text-sm text-muted-foreground">{provider.email}</p>
+                      {(provider as any).auth_user_id ? (
+                        <Badge variant="outline" className="text-xs mt-1 gap-1">
+                          <Users className="w-3 h-3" />
+                          Länkad
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs mt-1">
+                          Ej länkad
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </TableCell>

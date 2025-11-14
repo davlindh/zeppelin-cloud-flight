@@ -1,10 +1,12 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { RoleBadges } from '@/components/ui/role-badges';
 import { useUserRole } from '@/hooks/useUserRole';
 import { getUserInitials } from '@/utils/transforms/profile';
-import { Calendar } from 'lucide-react';
+import { Calendar, LayoutDashboard } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ProfileHeaderProps {
   user: {
@@ -29,9 +31,19 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
         </Avatar>
         
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">{displayName}</h1>
-            <RoleBadges roles={roles as string[]} size="sm" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold">{displayName}</h1>
+              <RoleBadges roles={roles as string[]} size="sm" />
+            </div>
+            {roles.length > 1 && (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/marketplace/dashboard">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Link>
+              </Button>
+            )}
           </div>
           <p className="text-muted-foreground mb-4">{user.email}</p>
           

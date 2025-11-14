@@ -35,21 +35,37 @@ export const useRoleApplicationActions = () => {
 
       // 2. If provider role, link or create service_provider record
       if (requestedRole === 'provider') {
-        // Check if service_provider already exists
-        const { data: existingProvider } = await supabase
-          .from('service_providers')
-          .select('id')
+        // Get user info first
+        const { data: userData } = await supabase
+          .from('users')
+          .select('email, full_name')
           .eq('auth_user_id', userId)
           .single();
 
-        if (!existingProvider) {
-          // Get user info for provider creation
-          const { data: userData } = await supabase
-            .from('users')
-            .select('email, full_name')
-            .eq('auth_user_id', userId)
-            .single();
+        // Check if service_provider already exists (by auth_user_id OR email match)
+        const { data: existingProviders } = await supabase
+          .from('service_providers')
+          .select('id, auth_user_id')
+          .or(`auth_user_id.eq.${userId},email.eq.${userData?.email || ''}`);
 
+        if (existingProviders && existingProviders.length > 0) {
+          // If provider exists but not linked, link it
+          const providerToLink = existingProviders[0];
+          if (!providerToLink.auth_user_id) {
+            const { error: linkError } = await supabase
+              .from('service_providers')
+              .update({ 
+                auth_user_id: userId,
+                verified: true,
+                approved_at: new Date().toISOString()
+              })
+              .eq('id', providerToLink.id);
+
+            if (linkError) {
+              console.error('Failed to link service_providers record:', linkError);
+            }
+          }
+        } else {
           // Create new service_provider record
           const { error: providerError } = await supabase
             .from('service_providers')
@@ -65,6 +81,8 @@ export const useRoleApplicationActions = () => {
               reviews: 0,
               location: '',
               experience: '',
+              verified: true,
+              approved_at: new Date().toISOString()
             }]);
 
           if (providerError) throw providerError;
