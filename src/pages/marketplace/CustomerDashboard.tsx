@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
+import { UnifiedDashboardLayout } from '@/components/layouts/UnifiedDashboardLayout';
 import { Loader2 } from 'lucide-react';
 import { CustomerHero } from '@/components/marketplace/customer/dashboard/CustomerHero';
 import { CustomerOrderTracking } from '@/components/marketplace/customer/dashboard/CustomerOrderTracking';
@@ -22,7 +23,8 @@ export const CustomerDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <UnifiedDashboardLayout role="customer">
+      <div className="space-y-6">
       {/* Hero Section */}
       <CustomerHero />
 
@@ -48,6 +50,7 @@ export const CustomerDashboard: React.FC = () => {
 
       {/* Activity Feed - Full Width */}
       <CustomerActivityFeed />
-    </div>
+      </div>
+    </UnifiedDashboardLayout>
   );
 };

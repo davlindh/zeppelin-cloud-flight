@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { UnifiedDashboardLayout } from '@/components/layouts/UnifiedDashboardLayout';
 import { Loader2 } from 'lucide-react';
 import { ParticipantHero } from '@/components/marketplace/participant/dashboard/ParticipantHero';
 import { ParticipantAnalyticsChart } from '@/components/marketplace/participant/dashboard/ParticipantAnalyticsChart';
@@ -67,7 +68,8 @@ export const ParticipantDashboard: React.FC = () => {
   const participantId = participant?.participant.id;
 
   return (
-    <div className="space-y-6">
+    <UnifiedDashboardLayout role="participant">
+      <div className="space-y-6">
       {/* Hero Section */}
       <ParticipantHero />
 
@@ -97,6 +99,7 @@ export const ParticipantDashboard: React.FC = () => {
         <ParticipantActivityFeed participantId={participantId} />
         <ParticipantSkillsMatrix participantId={participantId} />
       </div>
-    </div>
+      </div>
+    </UnifiedDashboardLayout>
   );
 };
