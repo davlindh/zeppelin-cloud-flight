@@ -64,6 +64,7 @@ import { ProviderDashboard } from "./pages/marketplace/ProviderDashboard";
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
 const ProductsPage = lazy(() => import("./pages/admin/ProductsPage").then(m => ({ default: m.ProductsPage })));
 const AuctionsPage = lazy(() => import("./pages/admin/AuctionsPage").then(m => ({ default: m.AuctionsPage })));
+const EventsPage = lazy(() => import("./pages/admin/EventsPage").then(m => ({ default: m.EventsPage })));
 const ServicesPage = lazy(() => import("./pages/admin/ServicesPage").then(m => ({ default: m.ServicesPage })));
 const OrdersPage = lazy(() => import("./pages/admin/OrdersPage").then(m => ({ default: m.OrdersPage })));
 const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
@@ -202,6 +203,11 @@ const App = () => (
                   <Route path="auctions" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <AuctionsPage />
+                    </Suspense>
+                  } />
+                  <Route path="events" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <EventsPage />
                     </Suspense>
                   } />
                   <Route path="services" element={
