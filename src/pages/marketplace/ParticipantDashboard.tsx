@@ -14,6 +14,7 @@ import { ParticipantCollaborationWidget } from '@/components/marketplace/partici
 import { ParticipantSkillsMatrix } from '@/components/marketplace/participant/dashboard/ParticipantSkillsMatrix';
 import { MyEventsSection } from '@/components/participant/events/MyEventsSection';
 import { useMyProducts } from '@/hooks/marketplace/useMyProducts';
+import { useMyCollaborationProjects } from '@/hooks/collaboration';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -21,6 +22,7 @@ import { Link } from 'react-router-dom';
 export const ParticipantDashboard: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
   const { data: myProducts = [] } = useMyProducts();
+  const { data: myProjects } = useMyCollaborationProjects({ is_archived: false });
 
   const { data: participant, isLoading } = useQuery({
     queryKey: ['participant-profile', user?.id],
@@ -143,6 +145,43 @@ export const ParticipantDashboard: React.FC = () => {
 
       {/* Upcoming Events */}
       <MyEventsSection />
+      
+      {/* Cohort Projects */}
+      <Card>
+        <CardHeader>
+          <CardTitle>My Cohort Projects</CardTitle>
+          <CardDescription>Collaborate on event-based projects</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {myProjects && myProjects.length > 0 ? (
+            <div className="space-y-3">
+              {myProjects.slice(0, 3).map(project => (
+                <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{project.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {project.stats?.member_count} members • {project.stats?.activity_count} updates
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to={`/collaboration/projects/${project.id}`}>View</Link>
+                  </Button>
+                </div>
+              ))}
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/collaboration/projects">View All</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-muted-foreground mb-4">Join or create a project</p>
+              <Button asChild>
+                <Link to="/collaboration/projects">Explore Projects</Link>
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Analytics Charts */}
       <ParticipantAnalyticsChart />
