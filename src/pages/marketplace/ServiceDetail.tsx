@@ -12,9 +12,13 @@ import { EnhancedGuestCommunication } from '@/components/marketplace/communicati
 import { ServiceLoading } from '@/components/marketplace/ui/service-loading';
 import { ServiceError } from '@/components/marketplace/ui/service-error';
 import { ShareServiceButton } from '@/components/marketplace/services/ShareServiceButton';
+import { ServiceRatingsSummary } from '@/components/marketplace/services/reviews/ServiceRatingsSummary';
+import { ServiceReviewsList } from '@/components/marketplace/services/reviews/ServiceReviewsList';
+import { ServiceReviewForm } from '@/components/marketplace/services/reviews/ServiceReviewForm';
 
 import { useService } from '@/hooks/marketplace/useService';
 import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
+import { useServiceReviews } from '@/hooks/marketplace/useServiceReviews';
 import React from 'react';
 
 const ServiceDetail = () => {
@@ -31,6 +35,12 @@ const ServiceDetail = () => {
 
   // Centralized view tracking
   const { recordView } = useSocialProof(id ?? '', 'service');
+  
+  // Fetch reviews for summary
+  const { data: reviews } = useServiceReviews(id ?? '');
+  
+  // Generate session ID for anonymous helpful voting
+  const [sessionId] = React.useState(() => `sess_${Math.random().toString(36).substr(2, 9)}`);
   
   // Record view once when service loads
   React.useEffect(() => {
@@ -143,6 +153,13 @@ const ServiceDetail = () => {
               }}
               category={service.category}
             />
+
+            {/* Reviews Section */}
+            <div className="space-y-6">
+              <ServiceRatingsSummary reviews={reviews || []} />
+              <ServiceReviewsList serviceId={service.id} sessionId={sessionId} />
+              <ServiceReviewForm serviceId={service.id} />
+            </div>
           </div>
 
           {/* Booking and Communication Sidebar */}
