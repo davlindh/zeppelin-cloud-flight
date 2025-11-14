@@ -1,5 +1,6 @@
 import * as React from "react";
-import { CalendarDays, MapPin, Users, Edit, Plus } from "lucide-react";
+import { CalendarDays, MapPin, Users, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useEvents } from "@/hooks/useEvents";
 import type { Event } from "@/types/events";
 import { Button } from "@/components/ui/button";
@@ -7,13 +8,12 @@ import { useRealtimeSubscription } from "@/hooks/shared/useRealtimeSubscription"
 
 interface AdminEventsTableProps {
   onCreate?: () => void;
-  onEdit?: (event: Event) => void;
 }
 
 export const AdminEventsTable: React.FC<AdminEventsTableProps> = ({
   onCreate,
-  onEdit,
 }) => {
+  const navigate = useNavigate();
   const { data: events = [], isLoading, error, refetch } = useEvents({ includePast: true });
 
   // Real-time updates for events
@@ -93,7 +93,7 @@ export const AdminEventsTable: React.FC<AdminEventsTableProps> = ({
               <button
                 key={event.id}
                 type="button"
-                onClick={() => onEdit?.(event)}
+                onClick={() => navigate(`/admin/events/${event.id}`)}
                 className="grid w-full grid-cols-1 gap-2 px-3 py-3 text-left text-sm hover:bg-slate-50 md:grid-cols-[2fr,1.5fr,1fr,1fr,auto]"
               >
                 <div>
@@ -126,7 +126,6 @@ export const AdminEventsTable: React.FC<AdminEventsTableProps> = ({
                 <div className="flex items-center justify-end gap-2 text-xs text-slate-400">
                   <Users className="h-3.5 w-3.5" />
                   {event.capacity} spots
-                  <Edit className="h-3.5 w-3.5" />
                 </div>
               </button>
             ))

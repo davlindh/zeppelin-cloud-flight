@@ -15,13 +15,6 @@ export const EventsPage: React.FC = () => {
     });
   };
 
-  const handleEdit = () => {
-    toast({
-      title: "Event editing",
-      description: "Event editing form will be implemented next.",
-    });
-  };
-
   return (
     <UnifiedDashboardLayout role="admin">
       <div className="space-y-6">
@@ -32,7 +25,7 @@ export const EventsPage: React.FC = () => {
           </p>
         </div>
 
-        <AdminEventsTable onCreate={handleCreate} onEdit={handleEdit} />
+        <AdminEventsTable onCreate={handleCreate} />
       </div>
     </UnifiedDashboardLayout>
   );

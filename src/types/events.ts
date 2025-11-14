@@ -30,7 +30,31 @@ export interface EventRegistration {
   status: EventRegistrationStatus;
   note?: string | null;
   checked_in_at?: string | null;
+  approved_by?: string | null;
+  approved_at?: string | null;
+  cancelled_at?: string | null;
+  cancelled_by?: string | null;
   created_at: string;
+}
+
+export interface EventRegistrationWithUser extends EventRegistration {
+  user?: {
+    id: string;
+    email?: string;
+    full_name?: string;
+  };
+}
+
+export interface EventStats {
+  total_capacity: number;
+  total_registrations: number;
+  confirmed_count: number;
+  pending_count: number;
+  waitlisted_count: number;
+  cancelled_count: number;
+  checked_in_count: number;
+  no_show_count: number;
+  available_spots: number;
 }
 
 export interface EventWithRegistrationCount extends Event {
