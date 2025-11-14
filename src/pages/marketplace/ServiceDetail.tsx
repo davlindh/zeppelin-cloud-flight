@@ -17,6 +17,7 @@ import { ServiceReviewsList } from '@/components/marketplace/services/reviews/Se
 import { ServiceReviewForm } from '@/components/marketplace/services/reviews/ServiceReviewForm';
 import { ServiceFAQ } from '@/components/marketplace/services/ServiceFAQ';
 import { ServiceProviderPortfolioSection } from '@/components/marketplace/services/portfolio/ServiceProviderPortfolioSection';
+import { ProviderProjectsSection } from '@/components/marketplace/services/portfolio/ProviderProjectsSection';
 
 import { useService } from '@/hooks/marketplace/useService';
 import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
@@ -174,6 +175,14 @@ const ServiceDetail = () => {
                 providerId={service.providerDetails.id}
                 showFilters={true}
                 layout="masonry"
+              />
+            )}
+
+            {/* Community Projects Section */}
+            {service.providerDetails?.id && (
+              <ProviderProjectsSection
+                providerId={service.providerDetails.id}
+                isOwner={false}
               />
             )}
           </div>
