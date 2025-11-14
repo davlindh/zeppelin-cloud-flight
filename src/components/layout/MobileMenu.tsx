@@ -107,7 +107,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isAdmin, closeMenu }) =>
       role="menu"
       aria-label="Mobile navigation"
       aria-live="polite"
-      className="lg:hidden fixed top-[72px] bottom-0 right-0 w-[90vw] sm:w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto z-[55]"
+      className="lg:hidden fixed top-[72px] bottom-0 right-0 w-[90vw] sm:w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto z-[55] pointer-events-auto will-change-transform"
     >
       <div className="container mx-auto px-4 py-6">
         {/* Home Link */}
