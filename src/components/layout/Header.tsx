@@ -6,11 +6,12 @@ import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, LogOut, Menu, X, Home, ShoppingBag, Gavel, Store, Wrench, ShieldCheck, Layers, Users, Handshake, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, LogOut, Menu, X, ShieldCheck } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 import { UserMenu } from '@/components/common/UserMenu';
 import { NavigationDropdown } from '@/components/common/NavigationDropdown';
 import { MarketplaceActions } from '@/components/common/MarketplaceActions';
+import { MobileMenu } from './MobileMenu';
 import { cn } from '@/lib/utils';
 
 const MARKETPLACE_ITEMS = [
@@ -163,157 +164,7 @@ export const Header: React.FC = () => {
             {/* Mobile Menu */}
             <AnimatePresence mode="wait">
                 {isMenuOpen && !isAdminPage && (
-                    <motion.div 
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
-                        transition={{ 
-                            type: 'tween',
-                            duration: 0.4,
-                            ease: [0.32, 0.72, 0, 1]
-                        }}
-                        id="mobile-menu" 
-                        role="menu" 
-                        aria-label="Mobile navigation" 
-                        className="lg:hidden fixed top-[72px] bottom-0 right-0 w-[90vw] sm:w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto z-[55]"
-                    >
-                    <div className="container mx-auto px-4 py-6">
-                        {/* Home Link */}
-                        <NavLink 
-                            to="/home" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Home className="h-5 w-5" />
-                            Hem
-                        </NavLink>
-
-                        {/* Site Navigation */}
-                        <div className="mt-6 mb-2 px-6">
-                            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Utforska
-                            </h3>
-                        </div>
-                        <NavLink 
-                            to="/showcase" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Layers className="h-5 w-5" />
-                            Showcase
-                        </NavLink>
-                        <NavLink 
-                            to="/participants" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Users className="h-5 w-5" />
-                            Deltagare
-                        </NavLink>
-                        <NavLink 
-                            to="/partners" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Handshake className="h-5 w-5" />
-                            Partners
-                        </NavLink>
-                        <NavLink 
-                            to="/media" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <ImageIcon className="h-5 w-5" />
-                            Mediagalleri
-                        </NavLink>
-
-                        {/* Marketplace Section */}
-                        <div className="mt-6 mb-2 px-6 border-t border-gray-200 pt-6">
-                            <h3 className="text-xs font-semibold text-amber-600 uppercase tracking-wider flex items-center gap-2">
-                                <ShoppingBag className="h-4 w-4" />
-                                Marketplace
-                            </h3>
-                        </div>
-                        <NavLink 
-                            to="/marketplace" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <ShoppingBag className="h-5 w-5" />
-                            Marketplace Hem
-                        </NavLink>
-                        <NavLink 
-                            to="/marketplace/auctions" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Gavel className="h-5 w-5" />
-                            Auktioner
-                        </NavLink>
-                        <NavLink 
-                            to="/marketplace/shop" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Store className="h-5 w-5" />
-                            Butik
-                        </NavLink>
-                        <NavLink 
-                            to="/marketplace/services" 
-                            className={mobileNavLinkClasses}
-                            onClick={closeMenu}
-                        >
-                            <Wrench className="h-5 w-5" />
-                            Tjänster
-                        </NavLink>
-
-                        {/* Marketplace Actions */}
-                        <div className="px-6 py-3">
-                            <MarketplaceActions showLabels variant="compact" />
-                        </div>
-
-                        {/* Admin Section */}
-                        {isAdmin && (
-                            <>
-                                <div className="mt-6 mb-2 px-6 border-t border-gray-200 pt-6">
-                                    <h3 className="text-xs font-semibold text-amber-600 uppercase tracking-wider flex items-center gap-2">
-                                        <ShieldCheck className="h-4 w-4" />
-                                        Administration
-                                    </h3>
-                                </div>
-                                <Link to="/admin" onClick={closeMenu}>
-                                    <Button variant="ghost" className="w-full justify-start gap-3 py-3 px-6">
-                                        <ShieldCheck className="h-5 w-5" />
-                                        <span>Admin Panel</span>
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
-
-                        {/* Contact & Settings */}
-                        <div className="mt-6 mb-2 px-6 border-t border-gray-200 pt-6">
-                            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Inställningar
-                            </h3>
-                        </div>
-                        <a 
-                            href="#kontakt" 
-                            onClick={(e) => handleNavClick(e, '#kontakt')} 
-                            className="flex items-center gap-3 py-3 px-6 text-base text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                            Kontakta Oss
-                        </a>
-                        <div className="px-6 py-3 flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Språk</span>
-                            <LanguageSwitcher />
-                        </div>
-
-                        {/* User Section */}
-                        <div className="mt-6 px-6 border-t border-gray-200 pt-6">
-                            <UserMenu variant="compact" />
-                        </div>
-                    </div>
-                </motion.div>
+                    <MobileMenu isAdmin={isAdmin} closeMenu={closeMenu} />
                 )}
             </AnimatePresence>
 
