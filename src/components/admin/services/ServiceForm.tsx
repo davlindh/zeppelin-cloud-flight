@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { 
   Plus, 
   DollarSign, 
@@ -13,14 +15,17 @@ import {
   Tag,
   Clock,
   MapPin,
-  X
+  X,
+  User
 } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useServiceCategories } from '@/hooks/useServiceCategories';
+import { useServiceProviders } from '@/hooks/useServiceProviders';
 import { getStoragePathFromPublicUrl } from '@/utils/imageUtils';
 import { BUCKET_MAP } from '@/config/storage.config';
 import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from './RichTextEditor';
+import { QuickProviderModal } from './QuickProviderModal';
 import type { Service } from '@/types/unified';
 
 interface ServiceFormProps {
@@ -49,6 +54,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     images: [] as string[],
     features: [] as string[],
     provider: '',
+    provider_id: '' as string,
     available_times: [] as string[],
     response_time: '24 hours'
   });
@@ -56,9 +62,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const [newFeature, setNewFeature] = useState('');
   const [newAvailableTime, setNewAvailableTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showProviderModal, setShowProviderModal] = useState(false);
 
   const { uploadToSupabase, uploadProgress, deleteFromSupabase } = useImageUpload();
   const { data: categories = [] } = useServiceCategories();
+  const { data: providers = [], refetch: refetchProviders } = useServiceProviders();
   const { toast } = useToast();
   
   const isUploading = uploadProgress.isUploading;
@@ -76,6 +84,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         images: service.images ?? [],
         features: service.features ?? [],
         provider: service.provider ?? '',
+        provider_id: service.providerDetails?.id ?? '',
         available_times: service.availableTimes ?? [],
         response_time: service.responseTime ?? '24 hours'
       });
@@ -92,6 +101,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         images: [],
         features: [],
         provider: '',
+        provider_id: '',
         available_times: [],
         response_time: '24 hours'
       });
@@ -229,6 +239,15 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       return;
     }
 
+    if (!formData.provider_id) {
+      toast({
+        title: "Provider required",
+        description: "Please select a service provider",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!formData.image) {
       toast({
         title: "Image required",
@@ -252,6 +271,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         images: formData.images,
         features: formData.features,
         provider: formData.provider,
+        provider_id: formData.provider_id,
         available_times: formData.available_times,
         response_time: formData.response_time
       };
@@ -352,14 +372,69 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="provider">Provider Name *</Label>
-                  <Input
-                    id="provider"
-                    value={formData.provider}
-                    onChange={(e) => handleInputChange('provider', e.target.value)}
-                    placeholder="Provider or company name"
-                    required
-                  />
+                  <Label htmlFor="provider_id">Service Provider *</Label>
+                  <Select 
+                    value={formData.provider_id} 
+                    onValueChange={(value) => {
+                      if (value === 'create_new') {
+                        setShowProviderModal(true);
+                      } else {
+                        const provider = providers.find(p => p.id === value);
+                        handleInputChange('provider_id', value);
+                        handleInputChange('provider', provider?.name || '');
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Select or create provider" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      <SelectItem value="create_new">
+                        <div className="flex items-center gap-2 py-1">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                            <Plus className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <div className="font-medium">Create New Provider</div>
+                            <div className="text-xs text-muted-foreground">Add a new service provider</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                      <Separator className="my-2" />
+                      {providers.map(provider => (
+                        <SelectItem key={provider.id} value={provider.id}>
+                          <div className="flex items-center gap-3 py-1">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={provider.avatar} />
+                              <AvatarFallback className="bg-primary/10 text-primary">
+                                {provider.name[0]?.toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="font-medium">{provider.name}</div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-2">
+                                <span>{provider.location}</span>
+                                {provider.totalServices > 0 && (
+                                  <>
+                                    <span>•</span>
+                                    <span>{provider.totalServices} services</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="ml-2">
+                              ⭐ {provider.rating.toFixed(1)}
+                            </Badge>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!formData.provider_id && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Select an existing provider or create a new one
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -593,6 +668,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Quick Provider Creation Modal */}
+      <QuickProviderModal
+        isOpen={showProviderModal}
+        onClose={() => setShowProviderModal(false)}
+        onProviderCreated={(newProvider) => {
+          handleInputChange('provider_id', newProvider.id);
+          handleInputChange('provider', newProvider.name);
+          refetchProviders();
+          toast({
+            title: "Provider created",
+            description: `${newProvider.name} has been added successfully.`,
+          });
+        }}
+      />
     </Dialog>
   );
 };
