@@ -1,0 +1,78 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import type { ServicePortfolioItem } from '@/types/unified';
+import { useMemo } from 'react';
+
+export function useServicePortfolio(providerId: string) {
+  // Fetch portfolio items
+  const { data: portfolioItems, isLoading } = useQuery({
+    queryKey: ['service-portfolio', providerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('service_portfolio_items')
+        .select('*')
+        .eq('provider_id', providerId)
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Transform to match ServicePortfolioItem interface
+      return (data || []).map(item => ({
+        id: item.id,
+        providerId: item.provider_id,
+        title: item.title,
+        description: item.description,
+        image: item.image,
+        images: item.images || [],
+        category: item.category,
+        tags: item.tags || [],
+        projectDate: item.project_date,
+        clientName: item.client_name,
+        projectUrl: item.project_url,
+        featured: item.featured || false,
+        displayOrder: item.display_order || 0,
+        testimonial: item.testimonial,
+        beforeImage: item.before_image,
+        afterImage: item.after_image,
+        projectValue: item.project_value,
+        createdAt: item.created_at
+      })) as ServicePortfolioItem[];
+    },
+    enabled: !!providerId,
+    staleTime: 5 * 60 * 1000,
+  });
+  
+  // Get featured items
+  const featuredItems = useMemo(() => {
+    return portfolioItems?.filter(item => item.featured) ?? [];
+  }, [portfolioItems]);
+  
+  // Get categories
+  const categories = useMemo(() => {
+    const cats = new Set(portfolioItems?.map(item => item.category) ?? []);
+    return Array.from(cats);
+  }, [portfolioItems]);
+  
+  // Filter by category
+  const filterByCategory = (category: string) => {
+    if (category === 'all') return portfolioItems ?? [];
+    return portfolioItems?.filter(item => item.category === category) ?? [];
+  };
+  
+  // Filter by tags
+  const filterByTags = (tags: string[]) => {
+    return portfolioItems?.filter(item => 
+      tags.some(tag => item.tags?.includes(tag))
+    ) ?? [];
+  };
+  
+  return {
+    portfolioItems: portfolioItems ?? [],
+    featuredItems,
+    categories,
+    isLoading,
+    filterByCategory,
+    filterByTags
+  };
+}

@@ -16,6 +16,7 @@ import { ServiceRatingsSummary } from '@/components/marketplace/services/reviews
 import { ServiceReviewsList } from '@/components/marketplace/services/reviews/ServiceReviewsList';
 import { ServiceReviewForm } from '@/components/marketplace/services/reviews/ServiceReviewForm';
 import { ServiceFAQ } from '@/components/marketplace/services/ServiceFAQ';
+import { ServiceProviderPortfolioSection } from '@/components/marketplace/services/portfolio/ServiceProviderPortfolioSection';
 
 import { useService } from '@/hooks/marketplace/useService';
 import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
@@ -166,6 +167,15 @@ const ServiceDetail = () => {
               <ServiceReviewsList serviceId={service.id} sessionId={sessionId} />
               <ServiceReviewForm serviceId={service.id} />
             </div>
+
+            {/* Portfolio Section */}
+            {service.providerDetails?.id && (
+              <ServiceProviderPortfolioSection
+                providerId={service.providerDetails.id}
+                showFilters={true}
+                layout="masonry"
+              />
+            )}
           </div>
 
           {/* Booking and Communication Sidebar */}
