@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { DashboardHero } from '@/components/dashboard/shared/hero/DashboardHero';
 import { ActionShortcuts } from '@/components/dashboard/shared/actions/ActionShortcuts';
 import { PerformanceCard } from '@/components/dashboard/shared/performance/PerformanceCard';
@@ -18,9 +19,11 @@ import { useProviderAnalytics } from '@/hooks/marketplace/provider/useProviderAn
 import { useProviderActivity } from '@/hooks/marketplace/provider/useProviderActivity';
 import { useProviderNotifications } from '@/hooks/marketplace/provider/useProviderNotifications';
 import { useDashboardShortcuts } from '@/hooks/dashboard/useDashboardShortcuts';
-import { Briefcase, Calendar, Image, MessageSquare, DollarSign, User, Star, AlertCircle } from 'lucide-react';
+import { Briefcase, Calendar, Image, MessageSquare, DollarSign, User, Star, AlertCircle, CheckCircle } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { ShortcutConfig, QuickStat } from '@/types/dashboard';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export const ProviderDashboard: React.FC = () => {
   const { data: profile, isLoading: profileLoading } = useProviderProfile();
@@ -48,10 +51,63 @@ export const ProviderDashboard: React.FC = () => {
     onShortcutHelp: () => setShowShortcuts(true),
   });
   
-  if (profileLoading || !profile) {
+  if (profileLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Empty state - no provider profile
+  if (!profile) {
+    return (
+      <div className="container max-w-4xl mx-auto py-12">
+        <Card className="border-2 border-dashed">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <Briefcase className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl">Welcome to Provider Dashboard</CardTitle>
+            <CardDescription className="text-base mt-2">
+              You haven't set up your provider profile yet. Create one to start offering services in the marketplace.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <h4 className="font-semibold flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                What you'll get:
+              </h4>
+              <ul className="space-y-2 ml-7 text-sm text-muted-foreground">
+                <li>• Professional profile page showcasing your services</li>
+                <li>• Dashboard to manage bookings and revenue</li>
+                <li>• Direct communication with potential clients</li>
+                <li>• Portfolio showcase to display your work</li>
+                <li>• Performance analytics and insights</li>
+                <li>• Flexible availability management</li>
+              </ul>
+            </div>
+            
+            <div className="flex gap-3 justify-center pt-4">
+              <Button asChild size="lg" className="gap-2">
+                <Link to="/marketplace/provider/onboarding">
+                  <Briefcase className="h-4 w-4" />
+                  Create Provider Profile
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link to="/marketplace">
+                  Browse Marketplace
+                </Link>
+              </Button>
+            </div>
+            
+            <p className="text-center text-xs text-muted-foreground">
+              Setup takes approximately 10 minutes
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
