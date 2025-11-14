@@ -1,191 +1,178 @@
-import React from 'react';
-import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { StatCard } from '@/components/dashboard/RoleStats';
-import { ActionItemCard } from '@/components/dashboard/ActionItemCard';
-import { useRoleActionItems } from '@/hooks/useRoleActionItems';
-import { Briefcase, Star, Calendar, DollarSign, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { DashboardHero } from '@/components/dashboard/shared/hero/DashboardHero';
+import { ActionShortcuts } from '@/components/dashboard/shared/actions/ActionShortcuts';
+import { PerformanceCard } from '@/components/dashboard/shared/performance/PerformanceCard';
+import { AnalyticsSection } from '@/components/dashboard/shared/analytics/AnalyticsSection';
+import { ActivityFeed } from '@/components/dashboard/shared/activity/ActivityFeed';
+import { NotificationCenter } from '@/components/dashboard/shared/notifications/NotificationCenter';
+import { ProviderQuickActions } from '@/components/marketplace/provider/ProviderQuickActions';
+import { useProviderProfile } from '@/hooks/marketplace/provider/useProviderProfile';
+import { useProviderPerformance } from '@/hooks/marketplace/provider/useProviderPerformance';
+import { useProviderAnalytics } from '@/hooks/marketplace/provider/useProviderAnalytics';
+import { useProviderActivity } from '@/hooks/marketplace/provider/useProviderActivity';
+import { useProviderNotifications } from '@/hooks/marketplace/provider/useProviderNotifications';
+import { useDashboardShortcuts } from '@/hooks/dashboard/useDashboardShortcuts';
+import { Briefcase, Calendar, Image, MessageSquare, DollarSign, User, Star, AlertCircle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { ShortcutConfig, QuickStat } from '@/types/dashboard';
 
 export const ProviderDashboard: React.FC = () => {
-  const { data: user } = useAuthenticatedUser();
-  const { data: actionItems, isLoading: itemsLoading } = useRoleActionItems('provider');
-
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ['provider-stats', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const [servicesRes, bookingsRes, portfolioRes, providerRes] = await Promise.all([
-        supabase
-          .from('services')
-          .select('id', { count: 'exact', head: true })
-          .eq('provider_id', user.id),
-        supabase
-          .from('bookings')
-          .select('*, services!inner(provider_id)', { count: 'exact', head: true })
-          .eq('services.provider_id', user.id)
-          .in('status', ['pending', 'confirmed']),
-        supabase
-          .from('service_portfolio_items')
-          .select('id', { count: 'exact', head: true })
-          .eq('provider_id', user.id),
-        supabase
-          .from('service_providers')
-          .select('rating, reviews')
-          .eq('auth_user_id', user.id)
-          .single()
-      ]);
-
-      return {
-        services: servicesRes.count || 0,
-        bookings: bookingsRes.count || 0,
-        portfolio: portfolioRes.count || 0,
-        rating: providerRes.data?.rating || 0,
-        reviews: providerRes.data?.reviews || 0
-      };
-    },
-    enabled: !!user?.id
+  const { data: profile, isLoading: profileLoading } = useProviderProfile();
+  const { data: performance, isLoading: perfLoading } = useProviderPerformance(profile?.id || '');
+  const { data: analytics, isLoading: analyticsLoading } = useProviderAnalytics(profile?.id || '');
+  const { data: activities, isLoading: activitiesLoading } = useProviderActivity(profile?.id || '');
+  const { notifications, unreadCount, markAsRead } = useProviderNotifications(profile?.id || '');
+  
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  
+  // Provider shortcuts
+  const shortcuts: ShortcutConfig[] = [
+    { id: 'services', label: 'My Services', icon: Briefcase, key: 'S', path: '/marketplace/services/manage', badge: 0 },
+    { id: 'bookings', label: 'Bookings', icon: Calendar, key: 'B', path: '/marketplace/bookings', badge: 0 },
+    { id: 'portfolio', label: 'Portfolio', icon: Image, key: 'P', path: '/marketplace/portfolio/manage', badge: 0 },
+    { id: 'messages', label: 'Messages', icon: MessageSquare, key: 'M', path: '/marketplace/messages', badge: 0 },
+    { id: 'revenue', label: 'Revenue', icon: DollarSign, key: 'R', path: '/marketplace/revenue', badge: 0 },
+    { id: 'profile', label: 'My Profile', icon: User, key: 'U', path: '/marketplace/profile', badge: 0 },
+  ];
+  
+  useDashboardShortcuts({
+    role: 'provider',
+    shortcuts,
+    enabled: true,
+    onShortcutHelp: () => setShowShortcuts(true),
   });
-
-  if (statsLoading || itemsLoading) {
+  
+  if (profileLoading || !profile) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
-
-  const hasNoServices = stats?.services === 0;
-  const allActionItems = [
-    ...(actionItems?.critical || []),
-    ...(actionItems?.recommended || []),
-    ...(actionItems?.optional || [])
+  
+  // Quick stats for hero
+  const quickStats: QuickStat[] = [
+    {
+      label: 'Active Services',
+      value: performance?.metrics.find(m => m.label === 'Bookings This Month')?.value || 0,
+      icon: Briefcase,
+      trend: 5,
+      trendDirection: 'up',
+      variant: 'default',
+    },
+    {
+      label: 'Pending Bookings',
+      value: 3,
+      icon: Calendar,
+      trend: 2,
+      trendDirection: 'up',
+      variant: 'warning',
+    },
+    {
+      label: 'Rating',
+      value: profile.rating?.toFixed(1) || '0.0',
+      icon: Star,
+      variant: 'success',
+    },
+    {
+      label: 'This Month Revenue',
+      value: '$4,250',
+      icon: DollarSign,
+      trend: 23,
+      trendDirection: 'up',
+      variant: 'success',
+    },
+  ];
+  
+  // Quick actions
+  const quickActions = [
+    {
+      id: 'pending-bookings',
+      title: 'Pending Bookings',
+      description: 'Respond to booking requests',
+      urgency: 'urgent' as const,
+      icon: AlertCircle,
+      actionText: 'Review',
+      actionLink: '/marketplace/bookings',
+      count: 2,
+    },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold">Tjänsteleverantör Dashboard</h2>
-        <p className="text-muted-foreground">
-          Hantera dina tjänster, bokningar och portfolio
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Aktiva Tjänster"
-          value={stats?.services || 0}
-          icon={Briefcase}
-          description="Totalt antal tjänster"
-        />
-        <StatCard
-          title="Pågående Bokningar"
-          value={stats?.bookings || 0}
-          icon={Calendar}
-          description="Väntande eller bekräftade"
-        />
-        <StatCard
-          title="Portfolio"
-          value={stats?.portfolio || 0}
-          icon={DollarSign}
-          description="Antal objekt"
-        />
-        <StatCard
-          title="Betyg"
-          value={stats?.rating?.toFixed(1) || '0.0'}
-          icon={Star}
-          description={`${stats?.reviews || 0} recensioner`}
+      {/* Header with Notifications */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Provider Dashboard</h1>
+          <p className="text-muted-foreground">Welcome back, {profile.name}!</p>
+        </div>
+        <NotificationCenter
+          notifications={notifications}
+          unreadCount={unreadCount}
+          onMarkAsRead={markAsRead}
+          onMarkAllAsRead={() => {
+            notifications.filter(n => !n.read).forEach(n => markAsRead(n.id));
+          }}
+          onDismiss={markAsRead}
         />
       </div>
 
-      {/* Action Items */}
-      {allActionItems.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Att göra</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {allActionItems.map((item) => (
-              <ActionItemCard key={item.id} item={item} />
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Empty State for New Providers */}
-      {hasNoServices && (
-        <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="p-8 text-center space-y-4">
-            <Briefcase className="h-16 w-16 mx-auto text-primary" />
-            <div>
-              <h3 className="text-2xl font-bold mb-2">Välkommen som Tjänsteleverantör! 🎉</h3>
-              <p className="text-muted-foreground mb-6">
-                Du har nu tillgång till tjänsteleverantörsfunktioner. Här är vad du kan göra härnäst:
-              </p>
-            </div>
-            <div className="space-y-2 text-left max-w-md mx-auto">
-              <div className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                <span>Skapa din första tjänst</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                <span>Ladda upp portfolio-exempel</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                <span>Komplettera din profilsida</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-primary">✓</span>
-                <span>Publicera din publika portfolio</span>
-              </div>
-            </div>
-            <Button asChild size="lg" className="mt-4">
-              <Link to="/marketplace/portfolio/manage">Kom igång</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
+      {/* Hero Section */}
+      <DashboardHero
+        role="provider"
+        userName={profile.name}
+        stats={quickStats}
+        actionItemsCount={unreadCount}
+        onRefresh={() => window.location.reload()}
+        isRefreshing={false}
+        customGreeting="Welcome back"
+      />
+      
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Snabblänkar</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2">
-          <Button asChild variant="outline" className="justify-start">
-            <Link to="/marketplace/portfolio/manage">
-              <Briefcase className="mr-2 h-4 w-4" />
-              Hantera Tjänster
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="justify-start">
-            <Link to="/marketplace/portfolio/manage">
-              <DollarSign className="mr-2 h-4 w-4" />
-              Portfolio
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="justify-start">
-            <Link to="/marketplace/profile">
-              <Star className="mr-2 h-4 w-4" />
-              Min Profil
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="justify-start">
-            <Link to="/marketplace/services">
-              <Calendar className="mr-2 h-4 w-4" />
-              Se Alla Tjänster
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
+      {quickActions.length > 0 && <ProviderQuickActions actions={quickActions} />}
+      
+      {/* Action Shortcuts */}
+      <ActionShortcuts
+        shortcuts={shortcuts}
+        columns={3}
+        enableKeyboard={true}
+      />
+      
+      {/* Performance & Activity Row */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Performance Card */}
+        {performance && (
+          <PerformanceCard
+            title="Your Performance"
+            description="Last 30 days"
+            grade={performance.grade}
+            metrics={performance.metrics}
+            topAction={performance.topAction}
+            isLoading={perfLoading}
+          />
+        )}
+        
+        {/* Activity Feed */}
+        <ActivityFeed
+          activities={activities || []}
+          title="Recent Activity"
+          showSearch={true}
+          showLiveIndicator={true}
+          maxItems={10}
+          isLoading={activitiesLoading}
+        />
+      </div>
+      
+      {/* Analytics Section */}
+      {analytics && (
+        <AnalyticsSection
+          charts={analytics.charts}
+          title="Performance Analytics"
+          description="Last 30 days"
+          defaultTab="bookings"
+          isLoading={analyticsLoading}
+        />
+      )}
     </div>
   );
 };

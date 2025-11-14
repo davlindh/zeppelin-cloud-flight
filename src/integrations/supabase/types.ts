@@ -435,6 +435,13 @@ export type Database = {
             foreignKeyName: "communication_requests_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "communication_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
             referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
@@ -2185,6 +2192,57 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_activities: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          link: string | null
+          metadata: Json | null
+          provider_id: string | null
+          severity: string | null
+          title: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          metadata?: Json | null
+          provider_id?: string | null
+          severity?: string | null
+          title: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          metadata?: Json | null
+          provider_id?: string | null
+          severity?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_activities_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "provider_activities_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_audit_log: {
         Row: {
           action: string
@@ -2213,6 +2271,70 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "provider_audit_log_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "provider_audit_log_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          entity_id: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          provider_id: string | null
+          read: boolean | null
+          title: string
+          type: string
+          urgency: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          provider_id?: string | null
+          read?: boolean | null
+          title: string
+          type: string
+          urgency?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          provider_id?: string | null
+          read?: boolean | null
+          title?: string
+          type?: string
+          urgency?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_notifications_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "provider_notifications_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "service_providers"
@@ -2354,6 +2476,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "service_portfolio_items_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
           {
             foreignKeyName: "service_portfolio_items_provider_id_fkey"
             columns: ["provider_id"]
@@ -2559,6 +2688,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "services_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
           {
             foreignKeyName: "services_provider_id_fkey"
             columns: ["provider_id"]
@@ -2878,6 +3014,23 @@ export type Database = {
           },
         ]
       }
+      provider_performance_metrics: {
+        Row: {
+          acceptance_rate: number | null
+          active_services: number | null
+          auth_user_id: string | null
+          avg_rating: number | null
+          completed_bookings: number | null
+          confirmed_bookings: number | null
+          pending_bookings: number | null
+          portfolio_items: number | null
+          provider_id: string | null
+          response_time: string | null
+          total_bookings: number | null
+          total_reviews: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_claim_participant: {
@@ -2941,6 +3094,10 @@ export type Database = {
       get_available_times: {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]
+      }
+      get_provider_revenue_stats: {
+        Args: { p_days?: number; p_provider_id: string }
+        Returns: Json
       }
       get_total_users_count: { Args: never; Returns: number }
       get_unified_admin_dashboard_stats: { Args: never; Returns: Json }
