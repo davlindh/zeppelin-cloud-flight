@@ -13,16 +13,16 @@ export const formatCurrency = (
   options?: Intl.NumberFormatOptions
 ): string => {
   if (amount === null || amount === undefined || isNaN(amount)) {
-    return '0 kr';
+    return 'Sek 0:-';
   }
 
   const formatted = new Intl.NumberFormat('sv-SE', {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
     ...options,
   }).format(amount);
 
-  return `${formatted} kr`;
+  return `Sek ${formatted}:-`;
 };
 
 /**

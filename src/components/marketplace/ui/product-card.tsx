@@ -32,6 +32,7 @@ import { useQuickActions } from '@/hooks/marketplace/useQuickActions';
 import { useToast } from '@/hooks/use-toast';
 import { getProductStatusBadge, calculateProductAnalytics } from '@/utils/marketplace/productUtils';
 import { getImageUrl, getImageAlt } from '@/utils/marketplace/imageUtils';
+import { formatCurrency } from '@/utils/currency';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/unified';
 
@@ -284,7 +285,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         
         <CardContent className={cn(
           "flex-grow flex flex-col justify-end",
-          isEnhanced ? "p-6 space-y-4" : ""
+          isEnhanced ? "p-4 md:p-5 lg:p-6 space-y-4" : ""
         )}>
 
           {/* Category and Brand - Enhanced version */}
@@ -335,7 +336,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 "font-bold text-foreground",
                 isEnhanced ? "text-3xl" : priceSizeClasses[size]
               )}>
-                ${product.price.toLocaleString()}
+                {formatCurrency(product.price)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
                 <>
@@ -343,11 +344,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     "text-muted-foreground line-through",
                     isEnhanced ? "text-xl" : size === 'xs' ? 'text-sm' : size === 'xl' ? 'text-2xl' : 'text-lg'
                   )}>
-                    ${product.originalPrice.toLocaleString()}
+                    {formatCurrency(product.originalPrice)}
                   </span>
                   {isEnhanced && (
                     <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
-                      Save ${(product.originalPrice - product.price).toLocaleString()}
+                      Save {formatCurrency(product.originalPrice - product.price)}
                     </Badge>
                   )}
                 </>

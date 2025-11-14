@@ -3,6 +3,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/utils/currency';
 
 interface ActiveFilterChipsProps {
   filters: {
@@ -26,7 +27,7 @@ export const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
   if (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000) {
     activeFilters.push({
       type: 'priceRange',
-      label: `$${filters.priceRange[0]} - $${filters.priceRange[1]}`,
+      label: `${formatCurrency(filters.priceRange[0])} - ${formatCurrency(filters.priceRange[1])}`,
       value: 'priceRange'
     });
   }
