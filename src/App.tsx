@@ -69,6 +69,7 @@ const BookingsPage = lazy(() => import("./pages/admin/BookingsPage").then(m => (
 const CommunicationsPage = lazy(() => import("./pages/admin/CommunicationsPage").then(m => ({ default: m.CommunicationsPage })));
 const SecurityPage = lazy(() => import("./pages/admin/SecurityPage").then(m => ({ default: m.SecurityPage })));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const DataCleanup = lazy(() => import("./pages/admin/DataCleanup").then(m => ({ default: m.DataCleanup })));
 const ParticipantsManagementPage = lazy(() => import("./pages/admin/ParticipantsManagementPage").then(m => ({ default: m.ParticipantsManagementPage })));
 const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManagementPage").then(m => ({ default: m.ProjectsManagementPage })));
 const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManagementPage").then(m => ({ default: m.SponsorsManagementPage })));
@@ -229,6 +230,11 @@ const App = () => (
                   <Route path="settings" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SettingsPage />
+                    </Suspense>
+                  } />
+                  <Route path="data-cleanup" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <DataCleanup />
                     </Suspense>
                   } />
                   <Route path="participants-management" element={

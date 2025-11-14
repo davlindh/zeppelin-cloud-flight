@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { z } from 'zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+
+const providerFormSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email format').or(z.literal('')),
+  phone: z.string().min(7, 'Phone must be at least 7 digits').or(z.literal('')),
+  location: z.string().min(2, 'Location is required'),
+  bio: z.string().min(10, 'Bio must be at least 10 characters').optional().or(z.literal('')),
+}).refine(
+  (data) => data.email !== '' || data.phone !== '',
+  {
+    message: 'Either email or phone must be provided',
+    path: ['email']
+  }
+);
 
 interface QuickProviderModalProps {
   isOpen: boolean;
@@ -43,13 +58,18 @@ export const QuickProviderModal: React.FC<QuickProviderModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name.trim()) {
-      toast({
-        title: "Validation error",
-        description: "Provider name is required",
-        variant: "destructive",
-      });
-      return;
+    // Validate with Zod schema
+    try {
+      providerFormSchema.parse(formData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: 'Validation Error',
+          description: error.errors[0].message,
+          variant: 'destructive'
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);

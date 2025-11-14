@@ -7,6 +7,7 @@ import { DashboardHero } from '@/components/admin/dashboard/DashboardHero';
 import { QuickActions } from '@/components/admin/dashboard/QuickActions';
 import { ZeppelStatsSection } from '@/components/admin/dashboard/ZeppelStatsSection';
 import { MarketplaceStatsSection } from '@/components/admin/dashboard/MarketplaceStatsSection';
+import { ServicesStatsSection } from '@/components/admin/dashboard/ServicesStatsSection';
 import { useUnifiedDashboardStats } from '@/hooks/useUnifiedDashboardStats';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -76,6 +77,7 @@ export const Dashboard = () => {
           mediaPending={stats.action_items.media_pending}
           lowStockCount={stats.action_items.low_stock_count}
           endingTodayCount={stats.marketplace.auctions.ending_today}
+          unlinkedServices={stats.action_items.unlinked_services}
         />
       )}
 
@@ -84,6 +86,9 @@ export const Dashboard = () => {
 
       {/* Marketplace Stats */}
       <MarketplaceStatsSection stats={stats.marketplace} />
+
+      {/* Services Stats */}
+      {stats.services && <ServicesStatsSection stats={stats.services} />}
 
       {/* Security & Activity Row */}
       <div className="grid gap-4 md:grid-cols-2">

@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { AlertCircle, Image, Package, Gavel } from 'lucide-react';
+import { AlertCircle, Image, Package, Gavel, AlertTriangle } from 'lucide-react';
 
 interface QuickActionsProps {
   submissionsPending: number;
   mediaPending: number;
   lowStockCount: number;
   endingTodayCount: number;
+  unlinkedServices?: number;
 }
 
 export const QuickActions = ({
@@ -14,6 +15,7 @@ export const QuickActions = ({
   mediaPending,
   lowStockCount,
   endingTodayCount,
+  unlinkedServices,
 }: QuickActionsProps) => {
   const navigate = useNavigate();
 
@@ -49,6 +51,14 @@ export const QuickActions = ({
       path: '/admin/marketplace/auctions',
       show: endingTodayCount > 0,
       color: 'text-purple-600 bg-purple-50 border-purple-200',
+    },
+    {
+      label: 'Olänkade tjänster',
+      count: unlinkedServices || 0,
+      icon: AlertTriangle,
+      path: '/admin/data-cleanup',
+      show: (unlinkedServices || 0) > 0,
+      color: 'text-amber-600 bg-amber-50 border-amber-200',
     },
   ].filter(action => action.show);
 
