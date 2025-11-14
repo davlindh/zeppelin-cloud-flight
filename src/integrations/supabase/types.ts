@@ -219,13 +219,18 @@ export type Database = {
           customer_name: string
           customer_phone: string
           customizations: Json
+          event_id: string | null
           id: string
+          proposed_times: Json | null
+          provider_notes: string | null
+          provider_response: string | null
           selected_date: string
           selected_time: string
           service_id: string
           status: Database["public"]["Enums"]["booking_status"]
           total_price: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           agreed_to_terms?: boolean
@@ -235,13 +240,18 @@ export type Database = {
           customer_name: string
           customer_phone: string
           customizations?: Json
+          event_id?: string | null
           id?: string
+          proposed_times?: Json | null
+          provider_notes?: string | null
+          provider_response?: string | null
           selected_date: string
           selected_time: string
           service_id: string
           status?: Database["public"]["Enums"]["booking_status"]
           total_price?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           agreed_to_terms?: boolean
@@ -251,15 +261,27 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           customizations?: Json
+          event_id?: string | null
           id?: string
+          proposed_times?: Json | null
+          provider_notes?: string | null
+          provider_response?: string | null
           selected_date?: string
           selected_time?: string
           service_id?: string
           status?: Database["public"]["Enums"]["booking_status"]
           total_price?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_service_id_fkey"
             columns: ["service_id"]
@@ -2817,12 +2839,17 @@ export type Database = {
           created_at: string
           description: string
           duration: string
+          event_availability: Json | null
           faqs: Json | null
           features: string[] | null
+          hourly_rate: number | null
           id: string
           image: string
           images: string[] | null
           location: string
+          pricing_model: string | null
+          project_rate_max: number | null
+          project_rate_min: number | null
           provider: string
           provider_id: string | null
           provider_rating: number | null
@@ -2831,6 +2858,7 @@ export type Database = {
           reviews: number
           slug: string | null
           starting_price: number
+          tags: string[] | null
           title: string
           updated_at: string
         }
@@ -2841,12 +2869,17 @@ export type Database = {
           created_at?: string
           description: string
           duration: string
+          event_availability?: Json | null
           faqs?: Json | null
           features?: string[] | null
+          hourly_rate?: number | null
           id?: string
           image: string
           images?: string[] | null
           location: string
+          pricing_model?: string | null
+          project_rate_max?: number | null
+          project_rate_min?: number | null
           provider: string
           provider_id?: string | null
           provider_rating?: number | null
@@ -2855,6 +2888,7 @@ export type Database = {
           reviews?: number
           slug?: string | null
           starting_price: number
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
@@ -2865,12 +2899,17 @@ export type Database = {
           created_at?: string
           description?: string
           duration?: string
+          event_availability?: Json | null
           faqs?: Json | null
           features?: string[] | null
+          hourly_rate?: number | null
           id?: string
           image?: string
           images?: string[] | null
           location?: string
+          pricing_model?: string | null
+          project_rate_max?: number | null
+          project_rate_min?: number | null
           provider?: string
           provider_id?: string | null
           provider_rating?: number | null
@@ -2879,6 +2918,7 @@ export type Database = {
           reviews?: number
           slug?: string | null
           starting_price?: number
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
@@ -3349,6 +3389,9 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "cancelled"
+        | "request"
+        | "pending_provider"
+        | "rejected"
       communication_status:
         | "sent"
         | "delivered"
@@ -3530,6 +3573,9 @@ export const Constants = {
         "in_progress",
         "completed",
         "cancelled",
+        "request",
+        "pending_provider",
+        "rejected",
       ],
       communication_status: [
         "sent",

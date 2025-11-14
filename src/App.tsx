@@ -67,6 +67,9 @@ const AuctionsPage = lazy(() => import("./pages/admin/AuctionsPage").then(m => (
 const EventsPage = lazy(() => import("./pages/admin/EventsPage").then(m => ({ default: m.EventsPage })));
 const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage").then(m => ({ default: m.EventOpsPage })));
 const EventCheckInPage = lazy(() => import("./pages/admin/EventCheckInPage").then(m => ({ default: m.EventCheckInPage })));
+const MyServicesPage = lazy(() => import("./pages/provider/MyServicesPage").then(m => ({ default: m.MyServicesPage })));
+const BookingsManagementPage = lazy(() => import("./pages/provider/BookingsManagementPage").then(m => ({ default: m.BookingsManagementPage })));
+const ServiceBrowsePage = lazy(() => import("./pages/marketplace/ServiceBrowsePage").then(m => ({ default: m.ServiceBrowsePage })));
 const ServicesPage = lazy(() => import("./pages/admin/ServicesPage").then(m => ({ default: m.ServicesPage })));
 const OrdersPage = lazy(() => import("./pages/admin/OrdersPage").then(m => ({ default: m.OrdersPage })));
 const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
@@ -176,6 +179,25 @@ const App = () => (
                       </RoleProtectedRoute>
                     </ProtectedRoute>
                   } />
+                  <Route path="provider/services" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <Suspense fallback={<div>Loading...</div>}>
+                          <MyServicesPage />
+                        </Suspense>
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/bookings" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <Suspense fallback={<div>Loading...</div>}>
+                          <BookingsManagementPage />
+                        </Suspense>
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="services/browse" element={<ServiceBrowsePage />} />
                 </Route>
 
                 {/* Order Pages */}
