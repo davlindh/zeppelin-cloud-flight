@@ -15,6 +15,7 @@ import { ShareServiceButton } from '@/components/marketplace/services/ShareServi
 import { ServiceRatingsSummary } from '@/components/marketplace/services/reviews/ServiceRatingsSummary';
 import { ServiceReviewsList } from '@/components/marketplace/services/reviews/ServiceReviewsList';
 import { ServiceReviewForm } from '@/components/marketplace/services/reviews/ServiceReviewForm';
+import { ServiceFAQ } from '@/components/marketplace/services/ServiceFAQ';
 
 import { useService } from '@/hooks/marketplace/useService';
 import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
@@ -153,6 +154,11 @@ const ServiceDetail = () => {
               }}
               category={service.category}
             />
+
+            {/* FAQ Section */}
+            {service.faqs && service.faqs.length > 0 && (
+              <ServiceFAQ faqs={service.faqs} />
+            )}
 
             {/* Reviews Section */}
             <div className="space-y-6">
