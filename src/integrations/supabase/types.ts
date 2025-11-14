@@ -72,58 +72,105 @@ export type Database = {
         Row: {
           bidders: number
           category: string
+          commission_rate: number | null
           condition: Database["public"]["Enums"]["auction_condition"]
           created_at: string
           current_bid: number
           description: string | null
           end_time: string
+          event_id: string | null
           id: string
           image: string
           images: string[] | null
+          project_id: string | null
+          seller_id: string | null
+          seller_type: string | null
           slug: string | null
           starting_bid: number
           status: string | null
           title: string
           updated_at: string
+          visibility: string | null
           winner_id: string | null
         }
         Insert: {
           bidders?: number
           category: string
+          commission_rate?: number | null
           condition: Database["public"]["Enums"]["auction_condition"]
           created_at?: string
           current_bid?: number
           description?: string | null
           end_time: string
+          event_id?: string | null
           id?: string
           image: string
           images?: string[] | null
+          project_id?: string | null
+          seller_id?: string | null
+          seller_type?: string | null
           slug?: string | null
           starting_bid: number
           status?: string | null
           title: string
           updated_at?: string
+          visibility?: string | null
           winner_id?: string | null
         }
         Update: {
           bidders?: number
           category?: string
+          commission_rate?: number | null
           condition?: Database["public"]["Enums"]["auction_condition"]
           created_at?: string
           current_bid?: number
           description?: string | null
           end_time?: string
+          event_id?: string | null
           id?: string
           image?: string
           images?: string[] | null
+          project_id?: string | null
+          seller_id?: string | null
+          seller_type?: string | null
           slug?: string | null
           starting_bid?: number
           status?: string | null
           title?: string
           updated_at?: string
+          visibility?: string | null
           winner_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "auctions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auctions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auctions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "auctions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bid_history: {
         Row: {
@@ -375,6 +422,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      commission_settings: {
+        Row: {
+          commission_rate: number
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          reference_id: string | null
+          rule_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          commission_rate: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          reference_id?: string | null
+          rule_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          commission_rate?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          reference_id?: string | null
+          rule_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       communication_requests: {
         Row: {
@@ -1213,6 +1293,8 @@ export type Database = {
       }
       order_items: {
         Row: {
+          commission_amount: number | null
+          commission_rate: number | null
           created_at: string
           id: string
           item_id: string
@@ -1222,6 +1304,7 @@ export type Database = {
           metadata: Json | null
           order_id: string
           quantity: number
+          seller_id: string | null
           tax_rate: number | null
           total_price: number
           unit_price: number
@@ -1229,6 +1312,8 @@ export type Database = {
           variant_id: string | null
         }
         Insert: {
+          commission_amount?: number | null
+          commission_rate?: number | null
           created_at?: string
           id?: string
           item_id: string
@@ -1238,6 +1323,7 @@ export type Database = {
           metadata?: Json | null
           order_id: string
           quantity?: number
+          seller_id?: string | null
           tax_rate?: number | null
           total_price: number
           unit_price: number
@@ -1245,6 +1331,8 @@ export type Database = {
           variant_id?: string | null
         }
         Update: {
+          commission_amount?: number | null
+          commission_rate?: number | null
           created_at?: string
           id?: string
           item_id?: string
@@ -1254,6 +1342,7 @@ export type Database = {
           metadata?: Json | null
           order_id?: string
           quantity?: number
+          seller_id?: string | null
           tax_rate?: number | null
           total_price?: number
           unit_price?: number
@@ -1331,6 +1420,7 @@ export type Database = {
           customer_phone: string | null
           delivered_at: string | null
           discount_amount: number
+          event_id: string | null
           id: string
           order_number: string
           paid_at: string | null
@@ -1344,6 +1434,7 @@ export type Database = {
           subtotal: number
           tax_amount: number
           total_amount: number
+          total_commission: number | null
           tracking_number: string | null
           tracking_url: string | null
           updated_at: string
@@ -1361,6 +1452,7 @@ export type Database = {
           customer_phone?: string | null
           delivered_at?: string | null
           discount_amount?: number
+          event_id?: string | null
           id?: string
           order_number: string
           paid_at?: string | null
@@ -1374,6 +1466,7 @@ export type Database = {
           subtotal?: number
           tax_amount?: number
           total_amount: number
+          total_commission?: number | null
           tracking_number?: string | null
           tracking_url?: string | null
           updated_at?: string
@@ -1391,6 +1484,7 @@ export type Database = {
           customer_phone?: string | null
           delivered_at?: string | null
           discount_amount?: number
+          event_id?: string | null
           id?: string
           order_number?: string
           paid_at?: string | null
@@ -1404,12 +1498,21 @@ export type Database = {
           subtotal?: number
           tax_amount?: number
           total_amount?: number
+          total_commission?: number | null
           tracking_number?: string | null
           tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       participant_claim_audit: {
         Row: {
@@ -1799,12 +1902,15 @@ export type Database = {
       }
       products: {
         Row: {
+          approval_status: string | null
           article_number: string | null
           barcode: string | null
           category_id: string | null
+          commission_rate: number | null
           cost_price: number | null
           created_at: string
           description: string
+          event_id: string | null
           features: string[] | null
           id: string
           image: string | null
@@ -1815,8 +1921,11 @@ export type Database = {
           product_brand: string | null
           product_group: string | null
           product_type: string | null
+          project_id: string | null
           rating: number | null
           reviews: number | null
+          seller_id: string | null
+          seller_type: string | null
           selling_price: number
           slug: string | null
           stock_quantity: number | null
@@ -1826,14 +1935,18 @@ export type Database = {
           title: string
           unit: string | null
           updated_at: string
+          visibility: string | null
         }
         Insert: {
+          approval_status?: string | null
           article_number?: string | null
           barcode?: string | null
           category_id?: string | null
+          commission_rate?: number | null
           cost_price?: number | null
           created_at?: string
           description: string
+          event_id?: string | null
           features?: string[] | null
           id?: string
           image?: string | null
@@ -1844,8 +1957,11 @@ export type Database = {
           product_brand?: string | null
           product_group?: string | null
           product_type?: string | null
+          project_id?: string | null
           rating?: number | null
           reviews?: number | null
+          seller_id?: string | null
+          seller_type?: string | null
           selling_price: number
           slug?: string | null
           stock_quantity?: number | null
@@ -1855,14 +1971,18 @@ export type Database = {
           title: string
           unit?: string | null
           updated_at?: string
+          visibility?: string | null
         }
         Update: {
+          approval_status?: string | null
           article_number?: string | null
           barcode?: string | null
           category_id?: string | null
+          commission_rate?: number | null
           cost_price?: number | null
           created_at?: string
           description?: string
+          event_id?: string | null
           features?: string[] | null
           id?: string
           image?: string | null
@@ -1873,8 +1993,11 @@ export type Database = {
           product_brand?: string | null
           product_group?: string | null
           product_type?: string | null
+          project_id?: string | null
           rating?: number | null
           reviews?: number | null
+          seller_id?: string | null
+          seller_type?: string | null
           selling_price?: number
           slug?: string | null
           stock_quantity?: number | null
@@ -1884,6 +2007,7 @@ export type Database = {
           title?: string
           unit?: string | null
           updated_at?: string
+          visibility?: string | null
         }
         Relationships: [
           {
@@ -1891,6 +2015,34 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
         ]
