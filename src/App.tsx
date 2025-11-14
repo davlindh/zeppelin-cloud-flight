@@ -49,8 +49,11 @@ import { NotificationProvider } from "./contexts/marketplace/NotificationProvide
 import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
+import { ServiceProvidersAdmin } from "./pages/admin/ServiceProvidersAdmin";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
+import { ProviderPortfolioPage } from "./pages/marketplace/ProviderPortfolioPage";
+import PortfolioManagement from "./pages/marketplace/PortfolioManagement";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -128,6 +131,11 @@ const App = () => (
                   <Route path="shop/:id" element={<ProductDetail />} />
                   <Route path="services" element={<Services />} />
                   <Route path="services/:id" element={<ServiceDetail />} />
+                  <Route path="portfolio-management" element={
+                    <ProtectedRoute>
+                      <PortfolioManagement />
+                    </ProtectedRoute>
+                  } />
                   <Route path="cart" element={<CartPage />} />
                   <Route path="checkout" element={<CheckoutPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
@@ -147,6 +155,7 @@ const App = () => (
                 {/* Order Pages */}
                 <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                 <Route path="/order-tracking" element={<OrderTrackingPage />} />
+                <Route path="/providers/:slug/portfolio" element={<ProviderPortfolioPage />} />
                 
                 {/* Admin Routes - Nested with Layout */}
                 <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -250,6 +259,11 @@ const App = () => (
                   <Route path="media/submissions" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <MediaSubmissionsPage />
+                    </Suspense>
+                  } />
+                  <Route path="service-providers" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ServiceProvidersAdmin />
                     </Suspense>
                   } />
                 </Route>

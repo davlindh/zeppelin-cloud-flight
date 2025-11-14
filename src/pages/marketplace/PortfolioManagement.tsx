@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
 import { PortfolioManagementSection } from '@/components/marketplace/services/portfolio/PortfolioManagementSection';
 import { ProviderProjectsSection } from '@/components/marketplace/services/portfolio/ProviderProjectsSection';
+import { PortfolioBatchUpload } from '@/components/marketplace/services/portfolio/PortfolioBatchUpload';
+import { PortfolioImageBatchUpload } from '@/components/marketplace/services/portfolio/PortfolioImageBatchUpload';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -84,11 +87,30 @@ const PortfolioManagement = () => {
         </div>
 
         <div className="space-y-8">
-          {/* Portfolio Management */}
-          <PortfolioManagementSection providerId={provider.id} />
+          <Tabs defaultValue="manage" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="manage">Hantera</TabsTrigger>
+              <TabsTrigger value="projects">Projekt</TabsTrigger>
+              <TabsTrigger value="csv">Batch CSV</TabsTrigger>
+              <TabsTrigger value="images">Batch Bilder</TabsTrigger>
+            </TabsList>
 
-          {/* Community Projects */}
-          <ProviderProjectsSection providerId={provider.id} isOwner={true} />
+            <TabsContent value="manage" className="mt-6">
+              <PortfolioManagementSection providerId={provider.id} />
+            </TabsContent>
+
+            <TabsContent value="projects" className="mt-6">
+              <ProviderProjectsSection providerId={provider.id} isOwner={true} />
+            </TabsContent>
+
+            <TabsContent value="csv" className="mt-6">
+              <PortfolioBatchUpload providerId={provider.id} />
+            </TabsContent>
+
+            <TabsContent value="images" className="mt-6">
+              <PortfolioImageBatchUpload providerId={provider.id} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 

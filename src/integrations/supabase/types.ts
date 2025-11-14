@@ -2308,7 +2308,7 @@ export type Database = {
           rating: number
           response_time: string | null
           reviews: number
-          slug: string | null
+          slug: string
           specialties: string[] | null
           updated_at: string
           work_philosophy: string | null
@@ -2332,7 +2332,7 @@ export type Database = {
           rating?: number
           response_time?: string | null
           reviews?: number
-          slug?: string | null
+          slug: string
           specialties?: string[] | null
           updated_at?: string
           work_philosophy?: string | null
@@ -2356,7 +2356,7 @@ export type Database = {
           rating?: number
           response_time?: string | null
           reviews?: number
-          slug?: string | null
+          slug?: string
           specialties?: string[] | null
           updated_at?: string
           work_philosophy?: string | null
