@@ -2220,6 +2220,45 @@ export type Database = {
           },
         ]
       }
+      role_applications: {
+        Row: {
+          admin_notes: string | null
+          application_data: Json | null
+          created_at: string | null
+          id: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          application_data?: Json | null
+          created_at?: string | null
+          id?: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          application_data?: Json | null
+          created_at?: string | null
+          id?: string
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       role_change_audit: {
         Row: {
           changed_at: string | null
