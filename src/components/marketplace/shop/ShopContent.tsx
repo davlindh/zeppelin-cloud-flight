@@ -12,9 +12,10 @@ import { SearchResultContext } from './SearchResultContext';
 
 interface ShopContentProps {
   availableBrands: string[];
+  eventFilter?: string;
 }
 
-export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => {
+export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, eventFilter }) => {
   const { state, dispatch, hasActiveFilters } = useShop();
   const {
     addToComparison,
@@ -66,8 +67,11 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
 
   // Flatten all pages into single array
   const products = React.useMemo(() => {
-    return infiniteData?.pages.flatMap(page => page.products) || [];
-  }, [infiniteData]);
+    const allProducts = infiniteData?.pages.flatMap(page => page.products) || [];
+    // Apply event filter if provided
+    if (!eventFilter) return allProducts;
+    return allProducts.filter(p => (p as any).eventId === eventFilter);
+  }, [infiniteData, eventFilter]);
 
   // Debug logging for data pipeline
   React.useEffect(() => {

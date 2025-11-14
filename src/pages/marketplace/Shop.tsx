@@ -16,13 +16,23 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useProducts } from '@/hooks/marketplace/useProducts';
 import { useProductComparison } from '@/hooks/marketplace/useProductComparison';
-import { ShopProvider } from '@/contexts/marketplace/ShopContext';
-import { Eye, BarChart3, Truck, Shield, Zap, X } from 'lucide-react';
+import { ShopProvider, useShop } from '@/contexts/marketplace/ShopContext';
+import { Eye, BarChart3, Truck, Shield, Zap, X, Calendar } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Inner component that uses the shop context
 const ShopPage = () => {
   const [quickViewProductId, setQuickViewProductId] = useState<string | null>(null);
   const [showComparison, setShowComparison] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
 
   // Product comparison
   const {
@@ -30,6 +40,21 @@ const ShopPage = () => {
     removeFromComparison,
     clearComparison
   } = useProductComparison();
+
+  // Fetch events for filter
+  const { data: events = [] } = useQuery({
+    queryKey: ['events-for-shop'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, title')
+        .eq('status', 'published')
+        .order('starts_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   // Get products to determine available brands
   const { data: products = [] } = useProducts();
@@ -117,10 +142,31 @@ const ShopPage = () => {
 
         {/* Main Shopping Area - Visual Separator */}
         <div className="border-t-2 border-primary/10 pt-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <h2 className="text-2xl font-bold text-foreground">
-              Shop All Products
+              {selectedEventId ? 'Event Products' : 'Shop All Products'}
             </h2>
+            <div className="flex items-center gap-3">
+              <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+                <SelectTrigger className="w-[240px]">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by Event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Events</SelectItem>
+                  {events.map((event) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedEventId && (
+                <Button variant="ghost" size="sm" onClick={() => setSelectedEventId('')}>
+                  Clear Filter
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -198,7 +244,10 @@ const ShopPage = () => {
               </div>
 
               {/* Shop Content */}
-              <ShopContentComponent availableBrands={availableBrands} />
+              <ShopContentComponent 
+                availableBrands={availableBrands}
+                eventFilter={selectedEventId || undefined}
+              />
             </div>
 
             {/* Recently Viewed Sidebar - Right (Desktop Only) */}
