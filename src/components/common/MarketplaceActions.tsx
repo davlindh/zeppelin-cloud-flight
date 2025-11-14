@@ -4,6 +4,7 @@ import { ShoppingCart, Heart, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/marketplace/CartContext';
+import { triggerHapticFeedback } from '@/lib/haptics';
 
 interface MarketplaceActionsProps {
   onCartClick?: () => void;
@@ -23,16 +24,20 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
   const iconSize = variant === 'compact' ? 'h-4 w-4' : 'h-5 w-5';
   const buttonSize = variant === 'compact' ? 'sm' : 'icon';
 
+  const handleClick = () => {
+    triggerHapticFeedback('light');
+  };
+
   if (showLabels) {
     return (
       <div className="flex flex-col gap-2 w-full">
-        <Link to="/marketplace/wishlist" className="w-full">
+        <Link to="/marketplace/wishlist" className="w-full" onClick={handleClick}>
           <Button variant="ghost" className="w-full justify-start gap-3">
             <Heart className={iconSize} />
             <span>Önskelista</span>
           </Button>
         </Link>
-        <Link to="/marketplace/notifications" className="w-full">
+        <Link to="/marketplace/notifications" className="w-full" onClick={handleClick}>
           <Button variant="ghost" className="w-full justify-start gap-3">
             <Bell className={iconSize} />
             <span>Notifikationer</span>
@@ -41,7 +46,10 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 relative"
-          onClick={onCartClick}
+          onClick={() => {
+            handleClick();
+            onCartClick?.();
+          }}
           asChild={!onCartClick}
         >
           {onCartClick ? (
@@ -58,7 +66,7 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
               )}
             </>
           ) : (
-            <Link to="/marketplace/cart">
+            <Link to="/marketplace/cart" onClick={handleClick}>
               <ShoppingCart className={iconSize} />
               <span>Varukorg</span>
               {itemCount > 0 && (
@@ -78,12 +86,12 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
 
   return (
     <div className="flex items-center space-x-2">
-      <Link to="/marketplace/wishlist">
+      <Link to="/marketplace/wishlist" onClick={handleClick}>
         <Button variant="ghost" size={buttonSize} aria-label="Önskelista">
           <Heart className={iconSize} />
         </Button>
       </Link>
-      <Link to="/marketplace/notifications">
+      <Link to="/marketplace/notifications" onClick={handleClick}>
         <Button variant="ghost" size={buttonSize} aria-label="Notifikationer">
           <Bell className={iconSize} />
         </Button>
@@ -93,7 +101,10 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
           variant="ghost"
           size={buttonSize}
           className="relative"
-          onClick={onCartClick}
+          onClick={() => {
+            handleClick();
+            onCartClick();
+          }}
           aria-label="Varukorg"
         >
           <ShoppingCart className={iconSize} />
@@ -107,7 +118,7 @@ export const MarketplaceActions: React.FC<MarketplaceActionsProps> = ({
           )}
         </Button>
       ) : (
-        <Link to="/marketplace/cart">
+        <Link to="/marketplace/cart" onClick={handleClick}>
           <Button variant="ghost" size={buttonSize} className="relative" aria-label="Varukorg">
             <ShoppingCart className={iconSize} />
             {itemCount > 0 && (
