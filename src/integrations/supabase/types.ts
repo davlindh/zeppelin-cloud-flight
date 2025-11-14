@@ -2326,6 +2326,7 @@ export type Database = {
       }
       service_providers: {
         Row: {
+          auth_user_id: string | null
           avatar: string
           awards: string[] | null
           bio: string
@@ -2350,6 +2351,7 @@ export type Database = {
           years_in_business: number | null
         }
         Insert: {
+          auth_user_id?: string | null
           avatar: string
           awards?: string[] | null
           bio: string
@@ -2374,6 +2376,7 @@ export type Database = {
           years_in_business?: number | null
         }
         Update: {
+          auth_user_id?: string | null
           avatar?: string
           awards?: string[] | null
           bio?: string
@@ -2938,7 +2941,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "participant" | "customer" | "moderator"
+      app_role: "admin" | "participant" | "customer" | "moderator" | "provider"
       auction_category:
         | "electronics"
         | "fashion"
@@ -3118,7 +3121,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "participant", "customer", "moderator"],
+      app_role: ["admin", "participant", "customer", "moderator", "provider"],
       auction_category: [
         "electronics",
         "fashion",
