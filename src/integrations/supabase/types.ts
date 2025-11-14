@@ -423,6 +423,281 @@ export type Database = {
           },
         ]
       }
+      collaboration_project_activity: {
+        Row: {
+          activity_type: string
+          content: string | null
+          created_at: string | null
+          edited_at: string | null
+          id: string
+          metadata: Json | null
+          parent_activity_id: string | null
+          project_id: string
+          reactions: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          content?: string | null
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          metadata?: Json | null
+          parent_activity_id?: string | null
+          project_id: string
+          reactions?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          content?: string | null
+          created_at?: string | null
+          edited_at?: string | null
+          id?: string
+          metadata?: Json | null
+          parent_activity_id?: string | null
+          project_id?: string
+          reactions?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaboration_project_activity_parent_activity_id_fkey"
+            columns: ["parent_activity_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_project_activity"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collaboration_project_activity_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaboration_project_links: {
+        Row: {
+          added_by: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          link_type: string | null
+          project_id: string
+          title: string
+          url: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link_type?: string | null
+          project_id: string
+          title: string
+          url: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link_type?: string | null
+          project_id?: string
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaboration_project_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaboration_project_members: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          id: string
+          invitation_status: string | null
+          invited_at: string | null
+          invited_by: string | null
+          joined_at: string | null
+          last_active_at: string | null
+          project_id: string
+          role: string | null
+          skills_offered: string[] | null
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          invitation_status?: string | null
+          invited_at?: string | null
+          invited_by?: string | null
+          joined_at?: string | null
+          last_active_at?: string | null
+          project_id: string
+          role?: string | null
+          skills_offered?: string[] | null
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          invitation_status?: string | null
+          invited_at?: string | null
+          invited_by?: string | null
+          joined_at?: string | null
+          last_active_at?: string | null
+          project_id?: string
+          role?: string | null
+          skills_offered?: string[] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaboration_project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaboration_project_tasks: {
+        Row: {
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string | null
+          project_id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          project_id: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          project_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaboration_project_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaboration_projects: {
+        Row: {
+          completed_at: string | null
+          cover_image: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          event_id: string
+          id: string
+          is_archived: boolean | null
+          is_featured: boolean | null
+          owner_id: string | null
+          project_type: string | null
+          slug: string
+          starts_at: string | null
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_id: string
+          id?: string
+          is_archived?: boolean | null
+          is_featured?: boolean | null
+          owner_id?: string | null
+          project_type?: string | null
+          slug: string
+          starts_at?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_id?: string
+          id?: string
+          is_archived?: boolean | null
+          is_featured?: boolean | null
+          owner_id?: string | null
+          project_type?: string | null
+          slug?: string
+          starts_at?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaboration_projects_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commission_settings: {
         Row: {
           commission_rate: number
@@ -3481,6 +3756,10 @@ export type Database = {
       get_available_times: {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]
+      }
+      get_collaboration_project_stats: {
+        Args: { p_project_id: string }
+        Returns: Json
       }
       get_provider_revenue_stats: {
         Args: { p_days?: number; p_provider_id: string }

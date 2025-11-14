@@ -59,6 +59,9 @@ import { Dashboard as MarketplaceDashboard } from "./pages/marketplace/Dashboard
 import { RoleApplicationsPage } from "./pages/admin/RoleApplicationsPage";
 import { ProviderOnboarding } from "./pages/marketplace/ProviderOnboarding";
 import { ProviderDashboard } from "./pages/marketplace/ProviderDashboard";
+import { MyCollaborationProjects } from "./pages/collaboration/MyCollaborationProjects";
+import { ProjectWorkspace } from "./pages/collaboration/ProjectWorkspace";
+import { FeaturedProjects } from "./pages/collaboration/FeaturedProjects";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -238,6 +241,11 @@ const App = () => (
                       <EventStorefront />
                     </Suspense>
                   } />
+                  
+                  {/* Collaboration Routes */}
+                  <Route path="collaboration/projects" element={<MyCollaborationProjects />} />
+                  <Route path="collaboration/projects/:projectId" element={<ProjectWorkspace />} />
+                  <Route path="collaboration/showcase" element={<FeaturedProjects />} />
                 </Route>
 
                 {/* Order Pages */}
