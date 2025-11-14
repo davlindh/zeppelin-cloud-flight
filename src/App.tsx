@@ -47,6 +47,7 @@ import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
 import { CartProvider } from "./contexts/marketplace/CartContext";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
+import { RoleProtectedRoute } from "./components/marketplace/RoleProtectedRoute";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
 import { ServiceProvidersAdmin } from "./pages/admin/ServiceProvidersAdmin";
@@ -56,6 +57,8 @@ import { ProviderPortfolioPage } from "./pages/marketplace/ProviderPortfolioPage
 import PortfolioManagement from "./pages/marketplace/PortfolioManagement";
 import { Dashboard as MarketplaceDashboard } from "./pages/marketplace/Dashboard";
 import { RoleApplicationsPage } from "./pages/admin/RoleApplicationsPage";
+import { ProviderOnboarding } from "./pages/marketplace/ProviderOnboarding";
+import { ProviderDashboard } from "./pages/marketplace/ProviderDashboard";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -156,6 +159,18 @@ const App = () => (
                   <Route path="orders" element={
                     <ProtectedRoute>
                       <CustomerOrdersPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/onboarding" element={
+                    <ProtectedRoute>
+                      <ProviderOnboarding />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/dashboard" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <ProviderDashboard />
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } />
                 </Route>
