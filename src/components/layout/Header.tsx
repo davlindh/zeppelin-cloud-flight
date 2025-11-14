@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { NAV_LINKS } from '../../../constants/index';
 import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
@@ -26,14 +25,6 @@ const SITE_ITEMS = [
     { title: 'Partners', href: '/partners', description: 'Våra samarbetspartners' },
     { title: 'Mediagalleri', href: '/media', description: 'Bilder och videos' },
 ];
-
-const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `transition ${isActive ? 'text-amber-500' : 'text-gray-600 hover:text-amber-500'}`;
-
-const mobileNavLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 py-3 px-6 text-lg hover:bg-gray-50 transition-colors min-h-[48px] ${
-        isActive ? 'text-amber-500 font-semibold bg-amber-50' : 'text-gray-700'
-    }`;
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -176,7 +167,7 @@ export const Header: React.FC = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[50]"
+                        className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[51]"
                         onClick={closeMenu}
                         aria-hidden="true"
                     />
