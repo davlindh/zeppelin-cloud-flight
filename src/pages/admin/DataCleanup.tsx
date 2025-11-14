@@ -178,11 +178,19 @@ export const DataCleanup = () => {
               <CardContent className="max-h-64 overflow-y-auto">
                 <ul className="space-y-2">
                   {auditData.issues.unlinked_services.map((service: any) => (
-                    <li key={service.id} className="text-sm border-b pb-2">
-                      <div className="font-medium">{service.title}</div>
-                      <div className="text-muted-foreground text-xs">
-                        Provider: {service.provider_name}
-                      </div>
+                    <li key={service.id}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-auto p-2 text-left"
+                        onClick={() => window.open(`/admin/services`, '_blank')}
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{service.title}</div>
+                          <div className="text-muted-foreground text-xs">
+                            Provider: {service.provider_name}
+                          </div>
+                        </div>
+                      </Button>
                     </li>
                   ))}
                 </ul>
@@ -204,11 +212,19 @@ export const DataCleanup = () => {
               <CardContent className="max-h-64 overflow-y-auto">
                 <ul className="space-y-2">
                   {auditData.issues.providers_without_services.map((provider: any) => (
-                    <li key={provider.id} className="text-sm border-b pb-2">
-                      <div className="font-medium">{provider.name}</div>
-                      <div className="text-muted-foreground text-xs">
-                        Created: {new Date(provider.created_at).toLocaleDateString()}
-                      </div>
+                    <li key={provider.id}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-auto p-2 text-left"
+                        onClick={() => window.open(`/admin/providers`, '_blank')}
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{provider.name}</div>
+                          <div className="text-muted-foreground text-xs">
+                            Created: {new Date(provider.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </Button>
                     </li>
                   ))}
                 </ul>

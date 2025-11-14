@@ -40,7 +40,7 @@ export const QuickActions = ({
       label: 'Hantera lågt lager',
       count: lowStockCount,
       icon: Package,
-      path: '/admin/marketplace/products',
+      path: '/admin/products',
       show: lowStockCount > 0,
       color: 'text-red-600 bg-red-50 border-red-200',
     },
