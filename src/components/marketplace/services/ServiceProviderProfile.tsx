@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Star, Award, MapPin, ChevronDown, ChevronUp, Phone, Mail, Clock, CheckCircle2 } from 'lucide-react';
+import { Star, Award, MapPin, ChevronDown, ChevronUp, Phone, Mail, Clock, CheckCircle2, Briefcase } from 'lucide-react';
 
 interface ServiceProviderProfileProps {
   provider?: {
@@ -104,6 +104,24 @@ export const ServiceProviderProfile: React.FC<ServiceProviderProfileProps> = ({
                 <Clock className="h-4 w-4" />
                 <span>Svarar {providerData.responseTime}</span>
               </div>
+              
+              {providerData.completedProjects > 0 && (
+                <div className="col-span-2 flex items-center gap-2 text-sm">
+                  <Briefcase className="h-4 w-4 text-primary" />
+                  <span className="font-semibold">{providerData.completedProjects} slutförda projekt</span>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => {
+                      const portfolioElement = document.getElementById('portfolio-section');
+                      portfolioElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="p-0 h-auto text-primary hover:text-primary/80"
+                  >
+                    Visa Portfolio →
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

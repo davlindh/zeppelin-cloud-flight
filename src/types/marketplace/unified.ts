@@ -55,10 +55,23 @@ export interface Auction extends BaseEntity {
 
 export interface ServicePortfolioItem {
   id: string;
+  providerId: string;
   title: string;
   description: string;
   image: string;
+  images?: string[];
   category: string;
+  tags?: string[];
+  projectDate?: string;
+  clientName?: string;
+  projectUrl?: string;
+  featured?: boolean;
+  displayOrder?: number;
+  testimonial?: string;
+  beforeImage?: string;
+  afterImage?: string;
+  projectValue?: number;
+  createdAt?: string;
 }
 
 export interface ServiceReview {

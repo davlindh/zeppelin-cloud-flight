@@ -2214,32 +2214,65 @@ export type Database = {
       }
       service_portfolio_items: {
         Row: {
+          after_image: string | null
+          before_image: string | null
           category: string
+          client_name: string | null
           created_at: string
           description: string
+          display_order: number | null
+          featured: boolean | null
           id: string
           image: string
+          images: string[] | null
+          project_date: string | null
+          project_url: string | null
+          project_value: number | null
           provider_id: string
+          tags: string[] | null
+          testimonial: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          after_image?: string | null
+          before_image?: string | null
           category: string
+          client_name?: string | null
           created_at?: string
           description: string
+          display_order?: number | null
+          featured?: boolean | null
           id?: string
           image: string
+          images?: string[] | null
+          project_date?: string | null
+          project_url?: string | null
+          project_value?: number | null
           provider_id: string
+          tags?: string[] | null
+          testimonial?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          after_image?: string | null
+          before_image?: string | null
           category?: string
+          client_name?: string | null
           created_at?: string
           description?: string
+          display_order?: number | null
+          featured?: boolean | null
           id?: string
           image?: string
+          images?: string[] | null
+          project_date?: string | null
+          project_url?: string | null
+          project_value?: number | null
           provider_id?: string
+          tags?: string[] | null
+          testimonial?: string | null
           title?: string
           updated_at?: string
         }
@@ -2256,6 +2289,7 @@ export type Database = {
       service_providers: {
         Row: {
           avatar: string
+          awards: string[] | null
           bio: string
           certifications: string[] | null
           completed_projects: number | null
@@ -2266,15 +2300,20 @@ export type Database = {
           location: string
           name: string
           phone: string
+          portfolio_description: string | null
+          portfolio_visible: boolean | null
           rating: number
           response_time: string | null
           reviews: number
           slug: string | null
           specialties: string[] | null
           updated_at: string
+          work_philosophy: string | null
+          years_in_business: number | null
         }
         Insert: {
           avatar: string
+          awards?: string[] | null
           bio: string
           certifications?: string[] | null
           completed_projects?: number | null
@@ -2285,15 +2324,20 @@ export type Database = {
           location: string
           name: string
           phone: string
+          portfolio_description?: string | null
+          portfolio_visible?: boolean | null
           rating?: number
           response_time?: string | null
           reviews?: number
           slug?: string | null
           specialties?: string[] | null
           updated_at?: string
+          work_philosophy?: string | null
+          years_in_business?: number | null
         }
         Update: {
           avatar?: string
+          awards?: string[] | null
           bio?: string
           certifications?: string[] | null
           completed_projects?: number | null
@@ -2304,12 +2348,16 @@ export type Database = {
           location?: string
           name?: string
           phone?: string
+          portfolio_description?: string | null
+          portfolio_visible?: boolean | null
           rating?: number
           response_time?: string | null
           reviews?: number
           slug?: string | null
           specialties?: string[] | null
           updated_at?: string
+          work_philosophy?: string | null
+          years_in_business?: number | null
         }
         Relationships: []
       }
