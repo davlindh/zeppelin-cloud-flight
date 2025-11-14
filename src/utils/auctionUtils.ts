@@ -1,5 +1,4 @@
-
-
+import { getCurrentTime } from './timeUtils';
 
 export interface AuctionAnalytics {
   activityLevel: 'cold' | 'warm' | 'hot' | 'blazing';
@@ -24,7 +23,7 @@ export const calculateAuctionAnalytics = (
   endTime: Date,
   createdAt?: string
 ): AuctionAnalytics => {
-  const timeLeft = endTime.getTime() - Date.now();
+  const timeLeft = endTime.getTime() - getCurrentTime();
   const totalDuration = createdAt 
     ? endTime.getTime() - new Date(createdAt).getTime()
     : 7 * 24 * 60 * 60 * 1000; // Default 7 days if no created_at
