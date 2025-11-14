@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '@/contexts/marketplace/ShopContext';
-import { useProducts } from '@/hooks/marketplace/useProducts';
+import { useInfiniteProducts } from '@/hooks/marketplace/useProducts';
 import { useProductComparison } from '@/hooks/marketplace/useProductComparison';
 import { sortProductsByAnalytics } from '@/utils/marketplace/productUtils';
 import { ShopProductGrid } from './ShopProductGrid';
@@ -48,18 +48,26 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
     return undefined;
   };
 
-  // Fetch products based on current state
+  // Fetch products based on current state with infinite scroll
   const { 
-    data: products = [], 
+    data: infiniteData,
     isLoading: productsLoading, 
-    isError: productsError 
-  } = useProducts({
+    isError: productsError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteProducts({
     category: state.selectedCategory !== 'all' ? state.selectedCategory : undefined,
     search: state.searchTerm || undefined,
     minPrice: state.filters.priceRange[0] > 0 ? state.filters.priceRange[0] : undefined,
     maxPrice: state.filters.priceRange[1] < 10000 ? state.filters.priceRange[1] : undefined,
     inStockOnly: state.filters.inStockOnly
   });
+
+  // Flatten all pages into single array
+  const products = React.useMemo(() => {
+    return infiniteData?.pages.flatMap(page => page.products) || [];
+  }, [infiniteData]);
 
   // Debug logging for data pipeline
   React.useEffect(() => {
@@ -242,6 +250,10 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
             products={filteredAndSortedProducts}
             isLoading={productsLoading}
             isError={productsError}
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+            scrollMode="loadmore"
             handleQuickView={handleQuickView}
             handleAddToComparison={addToComparison}
             isInComparison={isInComparison}

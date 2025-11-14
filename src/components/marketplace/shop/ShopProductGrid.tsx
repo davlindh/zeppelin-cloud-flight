@@ -1,5 +1,7 @@
 
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/marketplace/ui/product-card';
 import { ProductSkeleton } from '@/components/marketplace/ui/product-skeleton';
 import { ResponsiveGrid } from '@/components/marketplace/ui/advanced-layout';
@@ -10,27 +12,62 @@ interface ShopProductGridProps {
   products: Product[];
   isLoading: boolean;
   isError: boolean;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
   handleQuickView: (productId: string) => void;
   handleAddToComparison: (product: Product) => void;
   isInComparison: (productId: string) => boolean;
   onBrandClick?: (brand: string) => void;
   density?: 'compact' | 'comfortable' | 'spacious';
+  scrollMode?: 'infinite' | 'loadmore';
 }
 
 export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   products,
   isLoading,
   isError,
+  isFetchingNextPage = false,
+  hasNextPage = false,
+  fetchNextPage,
   handleQuickView,
   handleAddToComparison,
   isInComparison,
   onBrandClick,
-  density = 'comfortable'
+  density = 'comfortable',
+  scrollMode = 'loadmore'
 }) => {
-  if (isLoading) {
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll observer
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage?.();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  // Setup intersection observer for infinite scroll
+  React.useEffect(() => {
+    if (scrollMode !== 'infinite') return;
+    
+    const element = observerTarget.current;
+    const option = { threshold: 0.5 };
+    const observer = new IntersectionObserver(handleObserver, option);
+    
+    if (element) observer.observe(element);
+    return () => {
+      if (element) observer.unobserve(element);
+    };
+  }, [handleObserver, scrollMode]);
+
+  if (isLoading && products.length === 0) {
     return (
-      <ResponsiveGrid density={density} variant="normal">
-        {Array.from({ length: 9 }).map((_, index) => (
+      <ResponsiveGrid density={density} variant="tight">
+        {Array.from({ length: 12 }).map((_, index) => (
           <ProductSkeleton key={index} />
         ))}
       </ResponsiveGrid>
@@ -65,20 +102,55 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   }
 
   return (
-    <ResponsiveGrid density="compact" variant="tight">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          variant="enhanced"
-          showQuickActions={true}
-          showAnalytics={true}
-          onQuickView={() => handleQuickView(product.id)}
-          onToggleComparison={handleAddToComparison}
-          isInComparison={isInComparison(product.id)}
-          onBrandClick={onBrandClick}
-        />
-      ))}
-    </ResponsiveGrid>
+    <>
+      <ResponsiveGrid density="compact" variant="tight">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            variant="enhanced"
+            showQuickActions={true}
+            showAnalytics={true}
+            onQuickView={() => handleQuickView(product.id)}
+            onToggleComparison={handleAddToComparison}
+            isInComparison={isInComparison(product.id)}
+            onBrandClick={onBrandClick}
+          />
+        ))}
+      </ResponsiveGrid>
+
+      {/* Loading indicator for next page */}
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )}
+
+      {/* Load More Button Mode */}
+      {scrollMode === 'loadmore' && hasNextPage && !isFetchingNextPage && (
+        <div className="flex justify-center mt-8">
+          <Button
+            onClick={() => fetchNextPage?.()}
+            size="lg"
+            variant="outline"
+            className="min-w-[200px]"
+          >
+            Load More Products
+          </Button>
+        </div>
+      )}
+
+      {/* Infinite Scroll Trigger */}
+      {scrollMode === 'infinite' && hasNextPage && (
+        <div ref={observerTarget} className="h-10" />
+      )}
+
+      {/* End of results message */}
+      {!hasNextPage && products.length > 0 && (
+        <div className="text-center py-8 text-muted-foreground text-sm">
+          You've reached the end of the product list
+        </div>
+      )}
+    </>
   );
 };

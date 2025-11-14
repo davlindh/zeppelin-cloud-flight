@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Product, ProductVariant } from '@/types/unified';
 import { transformNullableImage } from '@/utils/marketplace/transforms';
@@ -86,6 +86,171 @@ const transformDatabaseProduct = (dbProduct: DatabaseProduct): Product => {
   });
 
   return transformed;
+};
+
+const PRODUCTS_PER_PAGE = 12;
+
+export const useInfiniteProducts = (filters?: {
+  category?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStockOnly?: boolean;
+}) => {
+  return useInfiniteQuery({
+    queryKey: ['products-infinite', filters],
+    queryFn: async ({ pageParam = 0 }) => {
+      console.log('🔍 useInfiniteProducts: Fetching page:', pageParam, 'with filters:', filters);
+      
+      try {
+        const from = pageParam * PRODUCTS_PER_PAGE;
+        const to = from + PRODUCTS_PER_PAGE - 1;
+        
+        let query = supabase
+          .from('products')
+          .select(`
+            *,
+            category:categories!products_category_id_fkey (
+              name,
+              display_name
+            ),
+            product_variants (
+              id,
+              size,
+              color,
+              material,
+              stock_quantity
+            )
+          `, { count: 'exact' })
+          .range(from, to)
+          .order('created_at', { ascending: false });
+
+        // Apply category filter
+        if (filters?.category && filters.category !== 'all') {
+          console.log('🔍 Filtering by category:', filters.category);
+          
+          let { data: categoryData, error: categoryError } = await supabase
+            .from('categories')
+            .select('id, name, display_name')
+            .eq('name', filters.category.toLowerCase())
+            .maybeSingle();
+
+          if (!categoryData && !categoryError) {
+            const result = await supabase
+              .from('categories')
+              .select('id, name, display_name')
+              .eq('display_name', filters.category)
+              .maybeSingle();
+            categoryData = result.data;
+            categoryError = result.error;
+          }
+
+          if (categoryError) {
+            console.error('❌ Category lookup error:', categoryError);
+          } else if (categoryData) {
+            console.log('✅ Found category:', categoryData);
+            query = query.eq('category_id', categoryData.id);
+          } else {
+            console.warn('⚠️ Category not found:', filters.category);
+            return {
+              products: [],
+              nextCursor: undefined,
+              totalCount: 0
+            };
+          }
+        }
+
+        // Enhanced search logic
+        if (filters?.search) {
+          const searchTerm = filters.search.toLowerCase();
+          console.log('🔍 Enhanced search for:', searchTerm);
+          
+          const { data: matchingCategories } = await supabase
+            .from('categories')
+            .select('id, name, display_name')
+            .or(`name.ilike.%${searchTerm}%,display_name.ilike.%${searchTerm}%`);
+          
+          if (matchingCategories && matchingCategories.length > 0) {
+            console.log('🔍 Found matching categories:', matchingCategories.map(c => c.name));
+            
+            const categoryIds = matchingCategories.map(c => c.id);
+            const categoryCondition = categoryIds.map(id => `category_id.eq.${id}`).join(',');
+            
+            query = query.or([
+              `title.ilike.%${searchTerm}%`,
+              `description.ilike.%${searchTerm}%`,
+              `product_brand.ilike.%${searchTerm}%`,
+              `tags.cs.{${searchTerm}}`,
+              categoryCondition
+            ].join(','));
+          } else {
+            query = query.or([
+              `title.ilike.%${searchTerm}%`,
+              `description.ilike.%${searchTerm}%`,
+              `product_brand.ilike.%${searchTerm}%`,
+              `tags.cs.{${searchTerm}}`
+            ].join(','));
+          }
+        }
+
+        if (filters?.minPrice) {
+          query = query.gte('selling_price', filters.minPrice);
+        }
+
+        if (filters?.maxPrice) {
+          query = query.lte('selling_price', filters.maxPrice);
+        }
+
+        if (filters?.inStockOnly) {
+          query = query.eq('in_stock', true);
+        }
+
+        const { data: productsData, error, count } = await query;
+
+        if (error) {
+          console.error('Error fetching products:', error);
+          throw error;
+        }
+
+        console.log('🔍 useInfiniteProducts: Fetched page data:', {
+          page: pageParam,
+          count: productsData?.length ?? 0,
+          totalCount: count ?? 0,
+          from,
+          to
+        });
+
+        if (!productsData || productsData.length === 0) {
+          console.warn('🔍 useInfiniteProducts: No products found for page:', pageParam);
+          return {
+            products: [],
+            nextCursor: undefined,
+            totalCount: count || 0
+          };
+        }
+
+        const transformedProducts = productsData.map(transformDatabaseProduct);
+        
+        return {
+          products: transformedProducts,
+          nextCursor: to < (count || 0) - 1 ? pageParam + 1 : undefined,
+          totalCount: count || 0
+        };
+      } catch (error) {
+        console.error('Failed to fetch products page:', error);
+        return {
+          products: [],
+          nextCursor: undefined,
+          totalCount: 0
+        };
+      }
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: 0,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 2,
+  });
 };
 
 export const useProducts = (filters?: {
