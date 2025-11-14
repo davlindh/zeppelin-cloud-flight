@@ -10,7 +10,7 @@ export const useServiceProvider = (serviceId: string) => {
         .from('services')
         .select(`
           *,
-          service_providers (
+          service_providers!provider_id (
             id,
             name,
             email,
