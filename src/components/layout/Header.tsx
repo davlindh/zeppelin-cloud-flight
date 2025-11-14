@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { NAV_LINKS } from '../../../constants/index';
 import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
@@ -160,16 +161,22 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Mobile Menu */}
-            {!isAdminPage && (
-                <div 
-                    id="mobile-menu" 
-                    role="menu" 
-                    aria-label="Mobile navigation" 
-                    className={cn(
-                        "lg:hidden fixed inset-0 top-[72px] bg-white transform transition-transform duration-300 ease-in-out overflow-y-auto z-[55] will-change-transform",
-                        isMenuOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
-                    )}
-                >
+            <AnimatePresence>
+                {isMenuOpen && !isAdminPage && (
+                    <motion.div 
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ 
+                            type: 'spring',
+                            damping: 25,
+                            stiffness: 300
+                        }}
+                        id="mobile-menu" 
+                        role="menu" 
+                        aria-label="Mobile navigation" 
+                        className="lg:hidden fixed inset-y-0 right-0 top-[72px] w-[90vw] sm:w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto z-[55]"
+                    >
                     <div className="container mx-auto px-4 py-6">
                         {/* Home Link */}
                         <NavLink 
@@ -306,19 +313,24 @@ export const Header: React.FC = () => {
                             <UserMenu variant="compact" />
                         </div>
                     </div>
-                </div>
-            )}
+                </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile Menu Overlay */}
-            {isMenuOpen && !isAdminPage && (
-                <div 
-                    className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[50] pointer-events-auto"
-                    onClick={() => {
-                        closeMenu();
-                    }}
-                    aria-hidden="true"
-                />
-            )}
+            <AnimatePresence>
+                {isMenuOpen && !isAdminPage && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[50]"
+                        onClick={closeMenu}
+                        aria-hidden="true"
+                    />
+                )}
+            </AnimatePresence>
         </header>
     );
 };
