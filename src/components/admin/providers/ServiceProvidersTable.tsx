@@ -182,9 +182,9 @@ export const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
                         <div className="text-xs text-muted-foreground">
                           {provider.experience}
                         </div>
-                        {provider.responseTime && (
+                        {provider.response_time && (
                           <div className="text-xs text-green-600">
-                            Responds {provider.responseTime}
+                            Responds {provider.response_time}
                           </div>
                         )}
                       </div>
@@ -219,9 +219,9 @@ export const ServiceProvidersTable: React.FC<ServiceProvidersTableProps> = ({
                         <span className="font-medium text-xs">{provider.rating}</span>
                         <span className="text-muted-foreground text-xs">({provider.reviews})</span>
                       </div>
-                      {provider.completedProjects && (
+                      {provider.completed_projects && (
                         <div className="text-xs text-muted-foreground">
-                          {provider.completedProjects} projects
+                          {provider.completed_projects} projects
                         </div>
                       )}
                     </div>

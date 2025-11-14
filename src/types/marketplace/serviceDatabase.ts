@@ -37,6 +37,11 @@ export interface DatabaseService {
     certifications: string[] | null;
     response_time: string | null;
     completed_projects: number | null;
+    slug?: string | null;
+    years_in_business?: number | null;
+    awards?: string[] | null;
+    work_philosophy?: string | null;
+    portfolio_description?: string | null;
   } | null;
 }
 

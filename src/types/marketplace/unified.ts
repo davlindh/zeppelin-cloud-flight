@@ -102,6 +102,11 @@ export interface ServiceProvider extends BaseEntity {
   completedProjects?: number;
   portfolio?: ServicePortfolioItem[];
   recentReviews?: ServiceReview[];
+  slug?: string;
+  years_in_business?: number;
+  awards?: string[];
+  work_philosophy?: string;
+  portfolio_description?: string;
 }
 
 export interface Service extends BaseEntity {
