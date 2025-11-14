@@ -6,6 +6,12 @@ import { AnalyticsSection } from '@/components/dashboard/shared/analytics/Analyt
 import { ActivityFeed } from '@/components/dashboard/shared/activity/ActivityFeed';
 import { NotificationCenter } from '@/components/dashboard/shared/notifications/NotificationCenter';
 import { ProviderQuickActions } from '@/components/marketplace/provider/ProviderQuickActions';
+import { ProviderRevenueCard } from '@/components/marketplace/provider/dashboard/ProviderRevenueCard';
+import { BookingCalendar } from '@/components/marketplace/provider/dashboard/BookingCalendar';
+import { ServicePerformanceTable } from '@/components/marketplace/provider/dashboard/ServicePerformanceTable';
+import { CustomerInsights } from '@/components/marketplace/provider/dashboard/CustomerInsights';
+import { AvailabilityWidget } from '@/components/marketplace/provider/dashboard/AvailabilityWidget';
+import { ReviewsSnapshot } from '@/components/marketplace/provider/dashboard/ReviewsSnapshot';
 import { useProviderProfile } from '@/hooks/marketplace/provider/useProviderProfile';
 import { useProviderPerformance } from '@/hooks/marketplace/provider/useProviderPerformance';
 import { useProviderAnalytics } from '@/hooks/marketplace/provider/useProviderAnalytics';
@@ -138,6 +144,24 @@ export const ProviderDashboard: React.FC = () => {
         enableKeyboard={true}
       />
       
+      {/* Quick Actions */}
+      {quickActions.length > 0 && <ProviderQuickActions actions={quickActions} />}
+      
+      {/* Revenue & Availability Row */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <ProviderRevenueCard providerId={profile.id} className="lg:col-span-2" />
+        <AvailabilityWidget providerId={profile.id} />
+      </div>
+      
+      {/* Booking Calendar & Customer Insights */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <BookingCalendar providerId={profile.id} />
+        <CustomerInsights providerId={profile.id} />
+      </div>
+      
+      {/* Service Performance Table */}
+      <ServicePerformanceTable providerId={profile.id} />
+      
       {/* Performance & Activity Row */}
       <div className="grid gap-4 md:grid-cols-2">
         {/* Performance Card */}
@@ -162,6 +186,9 @@ export const ProviderDashboard: React.FC = () => {
           isLoading={activitiesLoading}
         />
       </div>
+      
+      {/* Reviews Snapshot */}
+      <ReviewsSnapshot providerId={profile.id} />
       
       {/* Analytics Section */}
       {analytics && (

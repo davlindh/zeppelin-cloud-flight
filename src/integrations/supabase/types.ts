@@ -2495,6 +2495,7 @@ export type Database = {
       service_providers: {
         Row: {
           auth_user_id: string | null
+          availability_status: string | null
           avatar: string
           awards: string[] | null
           bio: string
@@ -2506,6 +2507,7 @@ export type Database = {
           id: string
           location: string
           name: string
+          next_available_at: string | null
           phone: string
           portfolio_description: string | null
           portfolio_visible: boolean | null
@@ -2520,6 +2522,7 @@ export type Database = {
         }
         Insert: {
           auth_user_id?: string | null
+          availability_status?: string | null
           avatar: string
           awards?: string[] | null
           bio: string
@@ -2531,6 +2534,7 @@ export type Database = {
           id?: string
           location: string
           name: string
+          next_available_at?: string | null
           phone: string
           portfolio_description?: string | null
           portfolio_visible?: boolean | null
@@ -2545,6 +2549,7 @@ export type Database = {
         }
         Update: {
           auth_user_id?: string | null
+          availability_status?: string | null
           avatar?: string
           awards?: string[] | null
           bio?: string
@@ -2556,6 +2561,7 @@ export type Database = {
           id?: string
           location?: string
           name?: string
+          next_available_at?: string | null
           phone?: string
           portfolio_description?: string | null
           portfolio_visible?: boolean | null
@@ -2607,6 +2613,55 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "service_reviews_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_views: {
+        Row: {
+          id: string
+          provider_id: string | null
+          referrer: string | null
+          service_id: string | null
+          session_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          provider_id?: string | null
+          referrer?: string | null
+          service_id?: string | null
+          session_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          provider_id?: string | null
+          referrer?: string | null
+          service_id?: string | null
+          session_id?: string | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_views_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "service_views_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_views_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
