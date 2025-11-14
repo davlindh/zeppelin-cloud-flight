@@ -11,7 +11,8 @@ import {
   Eye, 
   Archive,
   Bell,
-  RefreshCw
+  RefreshCw,
+  Activity
 } from 'lucide-react';
 
 interface SystemAlert {
@@ -33,7 +34,8 @@ interface AlertsCenterProps {
 export const AlertsCenter: React.FC<AlertsCenterProps> = ({ onAlertAction }) => {
   const [activeTab, setActiveTab] = useState('unresolved');
   
-  // Mock alerts data - replace with actual hook
+  // DEMO DATA - This component shows sample alerts for demonstration
+  // Real alert system integration coming soon
   const [alerts, setAlerts] = useState<SystemAlert[]>([
     {
       id: '1',
@@ -139,33 +141,37 @@ export const AlertsCenter: React.FC<AlertsCenterProps> = ({ onAlertAction }) => 
   const renderAlert = (alert: SystemAlert) => (
     <div
       key={alert.id}
-      className={`p-4 border rounded-lg ${getSeverityColor(alert.severity)} ${
-        !alert.isRead ? 'ring-2 ring-primary/20' : ''
+      className={`group p-4 border rounded-lg transition-all hover:shadow-md ${getSeverityColor(alert.severity)} ${
+        !alert.isRead ? 'ring-2 ring-primary/30 animate-in fade-in slide-in-from-left-3' : ''
       }`}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">{getTypeIcon(alert.type)}</span>
-            <h4 className="font-medium">{alert.title}</h4>
+            <span className="text-lg group-hover:scale-110 transition-transform">{getTypeIcon(alert.type)}</span>
+            <h4 className="font-medium group-hover:text-primary transition-colors">{alert.title}</h4>
             {getSeverityBadge(alert.severity)}
             {!alert.isRead && (
-              <Badge variant="outline" className="bg-primary text-primary-foreground">
+              <Badge variant="outline" className="bg-primary text-primary-foreground animate-pulse">
                 NEW
               </Badge>
             )}
           </div>
           <p className="text-sm text-muted-foreground mb-2">{alert.message}</p>
-          <p className="text-xs text-muted-foreground">{alert.timestamp}</p>
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <Activity className="h-3 w-3" />
+            {alert.timestamp}
+          </p>
         </div>
         
-        <div className="flex items-center gap-1 ml-4">
+        <div className="flex items-center gap-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
           {!alert.isRead && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleAlertAction(alert.id, 'read')}
               title="Mark as read"
+              className="hover:bg-primary/10"
             >
               <Eye className="h-4 w-4" />
             </Button>
@@ -176,6 +182,7 @@ export const AlertsCenter: React.FC<AlertsCenterProps> = ({ onAlertAction }) => 
               size="sm"
               onClick={() => handleAlertAction(alert.id, 'resolve')}
               title="Mark as resolved"
+              className="hover:bg-green-500/10 hover:text-green-600"
             >
               <CheckCircle className="h-4 w-4" />
             </Button>
@@ -185,6 +192,7 @@ export const AlertsCenter: React.FC<AlertsCenterProps> = ({ onAlertAction }) => 
             size="sm"
             onClick={() => handleAlertAction(alert.id, 'dismiss')}
             title="Dismiss"
+            className="hover:bg-destructive/10 hover:text-destructive"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -192,9 +200,9 @@ export const AlertsCenter: React.FC<AlertsCenterProps> = ({ onAlertAction }) => 
       </div>
       
       {alert.actionRequired && !alert.isResolved && (
-        <Alert className="mt-3">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
+        <Alert className="mt-3 border-amber-500/50 bg-amber-500/5 animate-in fade-in slide-in-from-bottom-2">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-700">
             This alert requires immediate attention and action.
           </AlertDescription>
         </Alert>
@@ -203,18 +211,32 @@ export const AlertsCenter: React.FC<AlertsCenterProps> = ({ onAlertAction }) => 
   );
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-medium flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Alerts Center
-          {unreadCount > 0 && (
-            <Badge variant="destructive" className="ml-2">
-              {unreadCount}
-            </Badge>
-          )}
-        </CardTitle>
-        <Button variant="outline" size="sm">
+    <Card className="overflow-hidden border-border/50">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Bell className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-lg font-medium">
+                Alerts Center
+              </CardTitle>
+              <Badge variant="secondary" className="text-xs">
+                Demo
+              </Badge>
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="animate-pulse">
+                  {unreadCount}
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Sample alerts for demonstration
+            </p>
+          </div>
+        </div>
+        <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-all">
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
         </Button>
