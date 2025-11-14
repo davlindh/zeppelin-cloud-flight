@@ -42,7 +42,7 @@ export const useServiceProviderMutations = () => {
           rating: 0,
           reviews: 0,
           completed_projects: 0
-        })
+        } as any)
         .select()
         .single();
 
