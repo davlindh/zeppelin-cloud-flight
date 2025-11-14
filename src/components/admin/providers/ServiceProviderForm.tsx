@@ -6,7 +6,7 @@ import { useServiceProviderMutations } from '@/hooks/useServiceProviderMutations
 import { useAdminAuditLog } from '@/hooks/useAdminAuditLog';
 import { useToast } from '@/hooks/use-toast';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import { ServiceProvider } from '@/types/unified';
+import { ServiceProvider } from '@/types/marketplace/unified';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +41,11 @@ const serviceProviderSchema = z.object({
   avatar: z.string().optional().or(z.literal('')),
   specialties: z.string().optional(),
   certifications: z.string().optional(),
-  responseTime: z.string().optional()
+  responseTime: z.string().optional(),
+  yearsInBusiness: z.number().min(0).max(100).optional(),
+  awards: z.string().optional(),
+  workPhilosophy: z.string().max(1000).optional(),
+  portfolioDescription: z.string().max(500).optional()
 });
 
 type ServiceProviderFormData = z.infer<typeof serviceProviderSchema>;
@@ -79,7 +83,11 @@ export const ServiceProviderForm: React.FC<ServiceProviderFormProps> = ({
       avatar: '',
       specialties: '',
       certifications: '',
-      responseTime: ''
+      responseTime: '',
+      yearsInBusiness: undefined,
+      awards: '',
+      workPhilosophy: '',
+      portfolioDescription: ''
     }
   });
 
@@ -96,6 +104,10 @@ export const ServiceProviderForm: React.FC<ServiceProviderFormProps> = ({
       form.setValue('specialties', provider.specialties?.join(', ') || '');
       form.setValue('certifications', provider.certifications?.join(', ') || '');
       form.setValue('responseTime', provider.responseTime || '');
+      form.setValue('yearsInBusiness', provider.years_in_business);
+      form.setValue('awards', provider.awards?.join(', ') || '');
+      form.setValue('workPhilosophy', provider.work_philosophy || '');
+      form.setValue('portfolioDescription', provider.portfolio_description || '');
     } else if (mode === 'create') {
       form.reset();
     }
@@ -428,6 +440,79 @@ export const ServiceProviderForm: React.FC<ServiceProviderFormProps> = ({
                   <FormLabel>Response Time</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="e.g., within 24 hours" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Years in Business Field */}
+            <FormField
+              control={form.control}
+              name="yearsInBusiness"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Years in Business</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                      placeholder="e.g., 5" 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Awards Field */}
+            <FormField
+              control={form.control}
+              name="awards"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Awards</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter awards (comma separated)" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Work Philosophy Field */}
+            <FormField
+              control={form.control}
+              name="workPhilosophy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Work Philosophy</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Describe your approach to work and client relationships..."
+                      rows={4}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Portfolio Description Field */}
+            <FormField
+              control={form.control}
+              name="portfolioDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Portfolio Description</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Brief description of your portfolio and work style..."
+                      rows={3}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

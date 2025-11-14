@@ -19,6 +19,11 @@ interface ServiceProvider {
   certifications: string[] | null;
   response_time: string | null;
   completed_projects: number | null;
+  slug: string | null;
+  years_in_business: number | null;
+  awards: string[] | null;
+  work_philosophy: string | null;
+  portfolio_description: string | null;
   created_at: string;
   updated_at: string;
   services?: Array<{
@@ -29,6 +34,7 @@ interface ServiceProvider {
     available: boolean;
     rating: number;
     reviews: number;
+    slug?: string | null;
   }>;
 }
 
@@ -45,8 +51,13 @@ export interface ProviderWithServices {
   bio: string;
   specialties?: string[];
   certifications?: string[];
-  responseTime?: string;
-  completedProjects?: number;
+  response_time?: string;
+  completed_projects?: number;
+  slug?: string;
+  years_in_business?: number;
+  awards?: string[];
+  work_philosophy?: string;
+  portfolio_description?: string;
   services: Service[];
   totalServices: number;
   categories: string[];
@@ -110,8 +121,13 @@ const transformProviderData = (provider: ServiceProvider): ProviderWithServices 
     bio: provider.bio ?? '',
     specialties: provider.specialties ?? [],
     certifications: provider.certifications ?? [],
-    responseTime: provider.response_time ?? '24 hours',
-    completedProjects: provider.completed_projects ?? 0,
+    response_time: provider.response_time ?? '24 hours',
+    completed_projects: provider.completed_projects ?? 0,
+    slug: provider.slug ?? undefined,
+    years_in_business: provider.years_in_business ?? undefined,
+    awards: provider.awards ?? [],
+    work_philosophy: provider.work_philosophy ?? undefined,
+    portfolio_description: provider.portfolio_description ?? undefined,
     services,
     totalServices: services.length,
     categories,
