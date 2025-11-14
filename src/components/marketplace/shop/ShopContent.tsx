@@ -254,6 +254,7 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
             hasNextPage={hasNextPage}
             fetchNextPage={fetchNextPage}
             scrollMode="loadmore"
+            enableVirtualization={true}
             handleQuickView={handleQuickView}
             handleAddToComparison={addToComparison}
             isInComparison={isInComparison}
