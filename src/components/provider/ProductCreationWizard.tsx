@@ -10,6 +10,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSellerProductMutations } from '@/hooks/marketplace/useSellerProductMutations';
 import { useDynamicCategories } from '@/hooks/useDynamicCategories';
+import { CommissionPreview } from '@/components/provider/CommissionPreview';
+import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import type { ProductFormData, ProductVisibility } from '@/types/commerce';
 
 interface ProductCreationWizardProps {
@@ -29,13 +31,9 @@ export const ProductCreationWizard = ({ open, onClose }: ProductCreationWizardPr
 
   const { createProduct } = useSellerProductMutations();
   const { data: categories = [] } = useDynamicCategories();
+  const { data: user } = useAuthenticatedUser();
 
   const visibility = watch('visibility');
-  const commissionRate = watch('commissionRate') || 0;
-  const price = watch('price') || 0;
-
-  const commissionAmount = (price * commissionRate) / 100;
-  const netAmount = price - commissionAmount;
 
   const onSubmit = async (data: ProductFormData) => {
     await createProduct.mutateAsync(data);
@@ -119,34 +117,13 @@ export const ProductCreationWizard = ({ open, onClose }: ProductCreationWizardPr
                 {errors.stockQuantity && <span className="text-sm text-destructive">Required</span>}
               </div>
 
-              <div>
-                <Label>Commission Rate (%)</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  {...register('commissionRate', { min: 0, max: 100 })}
-                />
-              </div>
-
-              {commissionRate > 0 && (
-                <Card className="p-4 bg-muted">
-                  <h4 className="font-semibold mb-2">Commission Preview</h4>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>Product Price:</span>
-                      <span className="font-semibold">{price.toFixed(2)} kr</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Commission ({commissionRate}%):</span>
-                      <span className="text-destructive">-{commissionAmount.toFixed(2)} kr</span>
-                    </div>
-                    <div className="flex justify-between border-t pt-1">
-                      <span className="font-semibold">Your Payout:</span>
-                      <span className="font-bold">{netAmount.toFixed(2)} kr</span>
-                    </div>
-                  </div>
-                </Card>
-              )}
+              {/* Commission Preview */}
+              <CommissionPreview
+                price={watch('price') || 0}
+                sellerId={user?.id}
+                eventId={watch('eventId')}
+                categoryId={watch('categoryId')}
+              />
             </div>
           )}
 
