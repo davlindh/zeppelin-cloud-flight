@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import ServicesTable from '@/components/admin/services/ServicesTable';
@@ -7,11 +8,20 @@ import { useServiceActions } from '@/hooks/admin/useServiceActions';
 import type { Service } from '@/types/unified';
 
 export const ServicesPage = () => {
+  const [searchParams] = useSearchParams();
   const [showForm, setShowForm] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
 
   const { handleCreate, handleUpdate, handleDelete, handleView } = useServiceActions();
+
+  // Handle opening form with pre-selected provider from URL
+  useEffect(() => {
+    const newProviderId = searchParams.get('newProvider');
+    if (newProviderId && !showForm) {
+      handleCreateClick();
+    }
+  }, [searchParams]);
 
   const handleCreateClick = () => {
     setEditingService(null);

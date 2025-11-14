@@ -31,8 +31,20 @@ import {
   Star,
   Filter,
   MapPin,
-  Clock
+  Clock,
+  AlertTriangle
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectSeparator,
+} from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useNavigate } from 'react-router-dom';
 import { useServices } from '@/hooks/useServices';
 import { useServiceMutations } from '@/hooks/useServiceMutations';
 import { useToast } from '@/hooks/use-toast';
@@ -55,6 +67,8 @@ const ServicesTable: React.FC<ServicesTableProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [availabilityFilter, setAvailabilityFilter] = useState<boolean | undefined>(undefined);
+  const [providerFilter, setProviderFilter] = useState<string>('all');
+  const navigate = useNavigate();
   
   const { data: services = [], isLoading, error } = useServices({
     search: searchTerm || undefined,
@@ -109,11 +123,31 @@ const ServicesTable: React.FC<ServicesTableProps> = ({
     const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter;
     const matchesAvailability = availabilityFilter === undefined || service.available === availabilityFilter;
     
-    return matchesSearch && matchesCategory && matchesAvailability;
+    // Handle provider filter including special "unlinked" case
+    let matchesProvider = true;
+    if (providerFilter !== 'all') {
+      if (providerFilter === 'unlinked') {
+        matchesProvider = !service.providerDetails;
+      } else {
+        matchesProvider = service.providerDetails && service.providerDetails.id === providerFilter;
+      }
+    }
+    
+    return matchesSearch && matchesCategory && matchesAvailability && matchesProvider;
   });
 
-  // Get unique categories for filter
+  // Get unique categories and providers for filters
   const categories = Array.from(new Set(services.map(service => service.category)));
+  const uniqueProviders = Array.from(
+    new Map(
+      services
+        .filter(s => s.providerDetails)
+        .map(s => [s.providerDetails.id, s.providerDetails])
+    ).values()
+  );
+
+  // Count unlinked services
+  const unlinkedServicesCount = services.filter(s => !s.providerDetails).length;
 
   if (error) {
     return (
@@ -178,6 +212,24 @@ const ServicesTable: React.FC<ServicesTableProps> = ({
       </CardHeader>
 
       <CardContent>
+        {/* Unlinked Services Warning */}
+        {unlinkedServicesCount > 0 && (
+          <Alert variant="default" className="mb-4 border-amber-500 bg-amber-50 dark:bg-amber-950">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertTitle className="text-amber-800 dark:text-amber-200">Unlinked Services</AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-300">
+              {unlinkedServicesCount} service{unlinkedServicesCount > 1 ? 's are' : ' is'} not linked to a provider. 
+              <Button 
+                variant="link" 
+                className="px-2 text-amber-600 hover:text-amber-700"
+                onClick={() => setProviderFilter('unlinked')}
+              >
+                View unlinked services
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Filters */}
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           <div className="relative flex-1">
@@ -190,6 +242,35 @@ const ServicesTable: React.FC<ServicesTableProps> = ({
             />
           </div>
           
+          <Select value={providerFilter} onValueChange={setProviderFilter}>
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="All Providers" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Providers</SelectItem>
+              {unlinkedServicesCount > 0 && (
+                <SelectItem value="unlinked">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    <span>Unlinked ({unlinkedServicesCount})</span>
+                  </div>
+                </SelectItem>
+              )}
+              <SelectSeparator />
+              {uniqueProviders.map(provider => (
+                <SelectItem key={provider.id} value={provider.id}>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-5 w-5">
+                      <AvatarImage src={provider.avatar || undefined} />
+                      <AvatarFallback className="text-[10px]">{provider.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <span>{provider.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
@@ -288,13 +369,40 @@ const ServicesTable: React.FC<ServicesTableProps> = ({
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{service.provider}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {service.responseTime}
+                      {service.providerDetails ? (
+                        <button 
+                          onClick={() => navigate(`/admin/providers?id=${service.providerDetails.id}`)}
+                          className="flex items-center gap-2 hover:bg-accent rounded-lg p-2 transition-colors text-left w-full"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={service.providerDetails.avatar || undefined} />
+                            <AvatarFallback className="bg-primary/10 text-primary">
+                              {service.provider[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium hover:underline">{service.provider}</div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              {service.providerRating || service.providerDetails.rating}
+                            </div>
+                            {service.responseTime && (
+                              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {service.responseTime}
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-2 p-2">
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          <div>
+                            <div className="text-sm text-muted-foreground">{service.provider}</div>
+                            <div className="text-xs text-amber-600">Not linked</div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">{service.category}</Badge>
