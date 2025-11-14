@@ -312,9 +312,8 @@ export const Header: React.FC = () => {
             {/* Mobile Menu Overlay */}
             {isMenuOpen && !isAdminPage && (
                 <div 
-                    className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[45] pointer-events-auto"
-                    onClick={(e) => {
-                        e.stopPropagation();
+                    className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-[50] pointer-events-auto"
+                    onClick={() => {
                         closeMenu();
                     }}
                     aria-hidden="true"
