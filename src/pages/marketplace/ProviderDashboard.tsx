@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { UnifiedDashboardLayout } from '@/components/layouts/UnifiedDashboardLayout';
 import { DashboardHero } from '@/components/dashboard/shared/hero/DashboardHero';
 import { ActionShortcuts } from '@/components/dashboard/shared/actions/ActionShortcuts';
 import { PerformanceCard } from '@/components/dashboard/shared/performance/PerformanceCard';
 import { AnalyticsSection } from '@/components/dashboard/shared/analytics/AnalyticsSection';
 import { ActivityFeed } from '@/components/dashboard/shared/activity/ActivityFeed';
-import { NotificationCenter } from '@/components/dashboard/shared/notifications/NotificationCenter';
 import { ProviderQuickActions } from '@/components/marketplace/provider/ProviderQuickActions';
 import { ProviderRevenueCard } from '@/components/marketplace/provider/dashboard/ProviderRevenueCard';
 import { BookingCalendar } from '@/components/marketplace/provider/dashboard/BookingCalendar';
@@ -161,26 +161,10 @@ export const ProviderDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header with Notifications */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Provider Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {profile.name}!</p>
-        </div>
-        <NotificationCenter
-          notifications={notifications}
-          unreadCount={unreadCount}
-          onMarkAsRead={markAsRead}
-          onMarkAllAsRead={() => {
-            notifications.filter(n => !n.read).forEach(n => markAsRead(n.id));
-          }}
-          onDismiss={markAsRead}
-        />
-      </div>
-
-      {/* Hero Section */}
-      <DashboardHero
+    <UnifiedDashboardLayout role="provider">
+      <div className="space-y-6">
+        {/* Hero Section */}
+        <DashboardHero
         role="provider"
         userName={profile.name}
         stats={quickStats}
@@ -255,7 +239,8 @@ export const ProviderDashboard: React.FC = () => {
           defaultTab="bookings"
           isLoading={analyticsLoading}
         />
-      )}
-    </div>
+        )}
+      </div>
+    </UnifiedDashboardLayout>
   );
 };

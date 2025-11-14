@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { UnifiedDashboardLayout } from '@/components/layouts/UnifiedDashboardLayout';
 import { SecurityMetricsCard } from '@/components/admin/dashboard/SecurityMetricsCard';
 import { LiveActivityFeed } from '@/components/admin/dashboard/LiveActivityFeed';
 import { AlertsCenter } from '@/components/admin/dashboard/AlertsCenter';
@@ -72,7 +73,7 @@ export const Dashboard = () => {
   };
 
   return (
-    <>
+    <UnifiedDashboardLayout role="admin">
       <div className="space-y-6">
         {/* Hero Section */}
         <DashboardHero
@@ -139,6 +140,6 @@ export const Dashboard = () => {
         open={showShortcuts} 
         onOpenChange={setShowShortcuts} 
       />
-    </>
+    </UnifiedDashboardLayout>
   );
 };
