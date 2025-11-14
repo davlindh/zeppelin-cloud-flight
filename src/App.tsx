@@ -65,6 +65,8 @@ const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ defa
 const ProductsPage = lazy(() => import("./pages/admin/ProductsPage").then(m => ({ default: m.ProductsPage })));
 const AuctionsPage = lazy(() => import("./pages/admin/AuctionsPage").then(m => ({ default: m.AuctionsPage })));
 const EventsPage = lazy(() => import("./pages/admin/EventsPage").then(m => ({ default: m.EventsPage })));
+const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage").then(m => ({ default: m.EventOpsPage })));
+const EventCheckInPage = lazy(() => import("./pages/admin/EventCheckInPage").then(m => ({ default: m.EventCheckInPage })));
 const ServicesPage = lazy(() => import("./pages/admin/ServicesPage").then(m => ({ default: m.ServicesPage })));
 const OrdersPage = lazy(() => import("./pages/admin/OrdersPage").then(m => ({ default: m.OrdersPage })));
 const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
@@ -208,6 +210,16 @@ const App = () => (
                   <Route path="events" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <EventsPage />
+                    </Suspense>
+                  } />
+                  <Route path="events/:eventId" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <EventOpsPage />
+                    </Suspense>
+                  } />
+                  <Route path="events/:eventId/checkin" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <EventCheckInPage />
                     </Suspense>
                   } />
                   <Route path="services" element={

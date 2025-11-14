@@ -489,6 +489,10 @@ export type Database = {
       }
       event_registrations: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           checked_in_at: string | null
           created_at: string | null
           event_id: string
@@ -498,6 +502,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           checked_in_at?: string | null
           created_at?: string | null
           event_id: string
@@ -507,6 +515,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           checked_in_at?: string | null
           created_at?: string | null
           event_id?: string
