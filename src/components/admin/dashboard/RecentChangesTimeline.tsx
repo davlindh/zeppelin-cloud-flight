@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { useAdminActivity } from '@/hooks/marketplace/useAdminData';
+import { useAdminActivity } from '@/hooks/useAdminData';
 import { Clock, Package, Users, ShoppingCart, Settings, Plus, Edit, Trash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { sv } from 'date-fns/locale';
@@ -42,10 +42,10 @@ export const RecentChangesTimeline = () => {
 
   const getActionColor = (type: string) => {
     switch (type) {
-      case 'create': return 'text-green-600 bg-green-50 border-green-200';
-      case 'update': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'delete': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'create': return 'text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950 border-green-300 dark:border-green-800';
+      case 'update': return 'text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-950 border-blue-300 dark:border-blue-800';
+      case 'delete': return 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-950 border-red-300 dark:border-red-800';
+      default: return 'text-muted-foreground bg-muted border-border';
     }
   };
 
@@ -83,7 +83,7 @@ export const RecentChangesTimeline = () => {
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      by Admin • {activity.timestamp ? formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true, locale: sv }) : 'Recently'}
+                      by Admin • {activity.created_at ? formatDistanceToNow(new Date(activity.created_at), { addSuffix: true, locale: sv }) : 'Recently'}
                     </p>
                   </div>
                 </div>

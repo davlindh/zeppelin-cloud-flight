@@ -24,17 +24,17 @@ export const SystemHealthMonitor = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
-      case 'critical': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case 'healthy': return 'bg-green-500 dark:bg-green-600';
+      case 'warning': return 'bg-yellow-500 dark:bg-yellow-600';
+      case 'critical': return 'bg-red-500 dark:bg-red-600';
+      default: return 'bg-muted';
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'healthy': return <Badge variant="outline" className="text-green-700 border-green-200">Healthy</Badge>;
-      case 'warning': return <Badge variant="outline" className="text-yellow-700 border-yellow-200">Warning</Badge>;
+      case 'healthy': return <Badge variant="outline" className="text-green-700 dark:text-green-400 border-green-300 dark:border-green-800">Healthy</Badge>;
+      case 'warning': return <Badge variant="outline" className="text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800">Warning</Badge>;
       case 'critical': return <Badge variant="destructive">Critical</Badge>;
       default: return <Badge variant="outline">Unknown</Badge>;
     }
