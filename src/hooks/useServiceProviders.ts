@@ -135,7 +135,7 @@ export const useServiceProviders = (filters?: {
           .from('service_providers')
           .select(`
             *,
-            services (
+            services!services_provider_id_fkey (
               id,
               title,
               category,
