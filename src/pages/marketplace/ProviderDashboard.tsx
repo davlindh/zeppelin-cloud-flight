@@ -19,7 +19,9 @@ import { useProviderAnalytics } from '@/hooks/marketplace/provider/useProviderAn
 import { useProviderActivity } from '@/hooks/marketplace/provider/useProviderActivity';
 import { useProviderNotifications } from '@/hooks/marketplace/provider/useProviderNotifications';
 import { useDashboardShortcuts } from '@/hooks/dashboard/useDashboardShortcuts';
-import { Briefcase, Calendar, Image, MessageSquare, DollarSign, User, Star, AlertCircle, CheckCircle } from 'lucide-react';
+import { useMyProducts } from '@/hooks/marketplace/useMyProducts';
+import { useSellerRevenue } from '@/hooks/marketplace/useSellerRevenue';
+import { Briefcase, Calendar, Image, MessageSquare, DollarSign, User, Star, AlertCircle, CheckCircle, Package, ShoppingCart } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { ShortcutConfig, QuickStat } from '@/types/dashboard';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
@@ -31,16 +33,20 @@ export const ProviderDashboard: React.FC = () => {
   const { data: analytics, isLoading: analyticsLoading } = useProviderAnalytics(profile?.id || '');
   const { data: activities, isLoading: activitiesLoading } = useProviderActivity(profile?.id || '');
   const { notifications, unreadCount, markAsRead } = useProviderNotifications(profile?.id || '');
+  const { data: myProducts = [] } = useMyProducts();
+  const { data: revenue } = useSellerRevenue();
   
   const [showShortcuts, setShowShortcuts] = useState(false);
   
-  // Provider shortcuts
+  // Provider shortcuts with commerce actions
   const shortcuts: ShortcutConfig[] = [
     { id: 'services', label: 'My Services', icon: Briefcase, key: 'S', path: '/marketplace/services/manage', badge: 0 },
     { id: 'bookings', label: 'Bookings', icon: Calendar, key: 'B', path: '/marketplace/bookings', badge: 0 },
     { id: 'portfolio', label: 'Portfolio', icon: Image, key: 'P', path: '/marketplace/portfolio/manage', badge: 0 },
     { id: 'messages', label: 'Messages', icon: MessageSquare, key: 'M', path: '/marketplace/messages', badge: 0 },
-    { id: 'revenue', label: 'Revenue', icon: DollarSign, key: 'R', path: '/marketplace/revenue', badge: 0 },
+    { id: 'products', label: 'My Products', icon: Package, key: 'T', path: '/provider/products', badge: myProducts.filter(p => p.approvalStatus === 'pending').length },
+    { id: 'orders', label: 'Orders', icon: ShoppingCart, key: 'O', path: '/provider/orders', badge: 0 },
+    { id: 'revenue', label: 'Revenue', icon: DollarSign, key: 'R', path: '/provider/revenue', badge: 0 },
     { id: 'profile', label: 'My Profile', icon: User, key: 'U', path: '/marketplace/profile', badge: 0 },
   ];
   
@@ -163,6 +169,52 @@ export const ProviderDashboard: React.FC = () => {
   return (
     <UnifiedDashboardLayout role="provider">
       <div className="space-y-6">
+        {/* Commerce Metrics - Show if provider has products */}
+        {myProducts.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Products</CardTitle>
+                <Package className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{myProducts.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  {myProducts.filter(p => p.approvalStatus === 'approved').length} approved
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {revenue?.totalRevenue.toFixed(0) || '0'} kr
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Net: {revenue?.netPayout.toFixed(0) || '0'} kr
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Orders</CardTitle>
+                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{revenue?.orderCount || 0}</div>
+                <p className="text-xs text-muted-foreground">
+                  {revenue?.itemsSold || 0} items sold
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Hero Section */}
         <DashboardHero
         role="provider"

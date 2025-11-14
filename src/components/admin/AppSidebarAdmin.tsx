@@ -13,7 +13,10 @@ import {
   Tags,
   FolderOpen,
   HandHeart,
-  Image
+  Image,
+  TrendingUp,
+  Percent,
+  ShoppingBag
 } from "lucide-react"
 import {
   Sidebar,
@@ -54,6 +57,13 @@ const marketplaceSections = [
   { title: "Security", path: "/admin/security", icon: Shield, description: "Security overview" }
 ]
 
+const commerceSections = [
+  { title: "Commerce Overview", path: "/admin/commerce/overview", icon: TrendingUp, description: "Sales & revenue dashboard" },
+  { title: "Commission Settings", path: "/admin/settings/commissions", icon: Percent, description: "Manage commission rules" },
+  { title: "Seller Management", path: "/admin/commerce/sellers", icon: ShoppingBag, description: "Manage sellers & payouts" },
+  { title: "Event Analytics", path: "/admin/commerce/events", icon: Calendar, description: "Sales per event" },
+]
+
 interface AppSidebarAdminProps {
   activeTab: string
   onTabChange: (tab: string) => void
@@ -78,6 +88,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     if (path.includes('orders')) return counts.pendingOrders || 0
     if (path.includes('products')) return counts.lowStockProducts || 0
     if (path.includes('auctions')) return counts.endingAuctions || 0
+    // TODO: Add pending products count when available in AdminCounts
     return 0
   }
 
@@ -136,6 +147,52 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
           <SidebarGroupContent>
             <SidebarMenu>
               {marketplaceSections.map((section) => {
+                const badgeCount = getBadgeCount(section.path)
+                const active = isActive(section.path)
+                
+                return (
+                  <SidebarMenuItem key={section.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      className={active ? "bg-accent text-accent-foreground" : ""}
+                    >
+                      <button
+                        onClick={() => handleClick(section.path)}
+                        className="w-full flex items-center justify-between gap-3 p-3 hover:bg-accent/50 rounded-lg transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`flex items-center justify-center shrink-0 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                            <section.icon className="h-5 w-5" />
+                          </div>
+                          {!collapsed && (
+                            <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                              <span className="text-sm font-semibold leading-none">{section.title}</span>
+                              <span className="text-xs text-muted-foreground leading-tight">{section.description}</span>
+                            </div>
+                          )}
+                        </div>
+                        {!collapsed && badgeCount > 0 && (
+                          <Badge variant="secondary" className="shrink-0 text-xs">
+                            {badgeCount > 99 ? '99+' : badgeCount}
+                          </Badge>
+                        )}
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        {/* Commerce Admin Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
+            Commerce Admin
+          </SidebarGroupLabel>
+
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {commerceSections.map((section) => {
                 const badgeCount = getBadgeCount(section.path)
                 const active = isActive(section.path)
                 

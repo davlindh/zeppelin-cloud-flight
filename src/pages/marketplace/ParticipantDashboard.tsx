@@ -3,7 +3,7 @@ import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { UnifiedDashboardLayout } from '@/components/layouts/UnifiedDashboardLayout';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShoppingBag, Package } from 'lucide-react';
 import { ParticipantHero } from '@/components/marketplace/participant/dashboard/ParticipantHero';
 import { ParticipantAnalyticsChart } from '@/components/marketplace/participant/dashboard/ParticipantAnalyticsChart';
 import { ParticipantActivityFeed } from '@/components/marketplace/participant/dashboard/ParticipantActivityFeed';
@@ -13,9 +13,14 @@ import { ParticipantPortfolioShowcase } from '@/components/marketplace/participa
 import { ParticipantCollaborationWidget } from '@/components/marketplace/participant/dashboard/ParticipantCollaborationWidget';
 import { ParticipantSkillsMatrix } from '@/components/marketplace/participant/dashboard/ParticipantSkillsMatrix';
 import { MyEventsSection } from '@/components/participant/events/MyEventsSection';
+import { useMyProducts } from '@/hooks/marketplace/useMyProducts';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 export const ParticipantDashboard: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
+  const { data: myProducts = [] } = useMyProducts();
 
   const { data: participant, isLoading } = useQuery({
     queryKey: ['participant-profile', user?.id],
@@ -73,6 +78,59 @@ export const ParticipantDashboard: React.FC = () => {
       <div className="space-y-6">
       {/* Hero Section */}
       <ParticipantHero />
+
+      {/* Sell Your Work CTA or Commerce Metrics */}
+      {myProducts.length === 0 ? (
+        <Card className="border-primary/50 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingBag className="h-5 w-5" />
+              Start Selling Your Work
+            </CardTitle>
+            <CardDescription>
+              Turn your creative projects into products and earn from your art
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                You can sell prints, digital downloads, merchandise, or offer your services
+              </p>
+              <Button asChild>
+                <Link to="/provider/products">
+                  <ShoppingBag className="h-4 w-4 mr-2" />
+                  Create Product Listing
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Commerce</CardTitle>
+            <CardDescription>Manage your product listings</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm">Products Listed</span>
+              <span className="font-bold">{myProducts.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm">Approved</span>
+              <span className="font-bold text-green-600">
+                {myProducts.filter(p => p.approvalStatus === 'approved').length}
+              </span>
+            </div>
+            <Button asChild variant="outline" className="w-full mt-2">
+              <Link to="/provider/products">
+                <Package className="h-4 w-4 mr-2" />
+                Manage Products
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Notifications & Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2">
