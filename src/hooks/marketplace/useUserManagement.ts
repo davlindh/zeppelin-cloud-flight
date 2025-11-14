@@ -17,7 +17,7 @@ export interface User {
 export interface UserRole {
   id: string;
   user_id: string;
-  role: 'admin' | 'moderator' | 'customer' | 'participant';
+  role: 'admin' | 'moderator' | 'customer' | 'participant' | 'provider';
   created_at: string;
   updated_at: string;
 }
@@ -73,7 +73,7 @@ export const useUserMutations = () => {
   const { toast } = useToast();
 
   const updateUserRole = useMutation({
-    mutationFn: async ({ userId, newRole }: { userId: string; newRole: 'admin' | 'moderator' | 'customer' | 'participant' }) => {
+    mutationFn: async ({ userId, newRole }: { userId: string; newRole: 'admin' | 'moderator' | 'customer' | 'participant' | 'provider' }) => {
       console.log('🔄 Updating user role:', { userId, newRole });
       
       // First, check if user role already exists
