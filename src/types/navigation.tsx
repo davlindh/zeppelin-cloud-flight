@@ -12,6 +12,12 @@ export interface MenuSection {
   items: MenuItem[];
 }
 
+export interface DropdownMenuItem {
+  title: string;
+  href: string;
+  description: string;
+}
+
 export const SITE_MENU_ITEMS: MenuItem[] = [
   { to: '/showcase', icon: <Layers className="w-5 h-5" />, label: 'Showcase' },
   { to: '/participants', icon: <Users className="w-5 h-5" />, label: 'Deltagare' },
@@ -28,4 +34,17 @@ export const MARKETPLACE_MENU_ITEMS: MenuItem[] = [
 
 export const ADMIN_MENU_ITEMS: MenuItem[] = [
   { to: '/admin', icon: <ShieldCheck className="w-5 h-5" />, label: 'Admin Dashboard' },
+];
+
+export const SITE_DROPDOWN_ITEMS: DropdownMenuItem[] = [
+  { title: 'Showcase', href: '/showcase', description: 'Utforska våra projekt' },
+  { title: 'Deltagare', href: '/participants', description: 'Möt våra deltagare' },
+  { title: 'Partners', href: '/partners', description: 'Våra samarbetspartners' },
+  { title: 'Mediagalleri', href: '/media', description: 'Bilder och videos' },
+];
+
+export const MARKETPLACE_DROPDOWN_ITEMS: DropdownMenuItem[] = [
+  { title: 'Auktioner', href: '/marketplace/auctions', description: 'Bjud på unika föremål' },
+  { title: 'Butik', href: '/marketplace/shop', description: 'Handla produkter direkt' },
+  { title: 'Tjänster', href: '/marketplace/services', description: 'Boka professionella tjänster' },
 ];
