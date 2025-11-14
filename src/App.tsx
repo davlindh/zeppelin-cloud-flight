@@ -70,6 +70,10 @@ const EventCheckInPage = lazy(() => import("./pages/admin/EventCheckInPage").the
 const MyServicesPage = lazy(() => import("./pages/provider/MyServicesPage").then(m => ({ default: m.MyServicesPage })));
 const BookingsManagementPage = lazy(() => import("./pages/provider/BookingsManagementPage").then(m => ({ default: m.BookingsManagementPage })));
 const ServiceBrowsePage = lazy(() => import("./pages/marketplace/ServiceBrowsePage").then(m => ({ default: m.ServiceBrowsePage })));
+const MyProductsPage = lazy(() => import("./pages/provider/MyProductsPage").then(m => ({ default: m.MyProductsPage })));
+const SellerOrdersPage = lazy(() => import("./pages/provider/SellerOrdersPage").then(m => ({ default: m.SellerOrdersPage })));
+const SellerRevenueAnalytics = lazy(() => import("./pages/provider/SellerRevenueAnalytics").then(m => ({ default: m.SellerRevenueAnalytics })));
+const EventStorefront = lazy(() => import("./pages/marketplace/EventStorefront").then(m => ({ default: m.EventStorefront })));
 const ServicesPage = lazy(() => import("./pages/admin/ServicesPage").then(m => ({ default: m.ServicesPage })));
 const OrdersPage = lazy(() => import("./pages/admin/OrdersPage").then(m => ({ default: m.OrdersPage })));
 const UsersPage = lazy(() => import("./pages/admin/UsersPage").then(m => ({ default: m.UsersPage })));
@@ -197,7 +201,39 @@ const App = () => (
                       </RoleProtectedRoute>
                     </ProtectedRoute>
                   } />
+                  <Route path="provider/products" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <Suspense fallback={<div>Loading...</div>}>
+                          <MyProductsPage />
+                        </Suspense>
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/orders" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <Suspense fallback={<div>Loading...</div>}>
+                          <SellerOrdersPage />
+                        </Suspense>
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/revenue" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <Suspense fallback={<div>Loading...</div>}>
+                          <SellerRevenueAnalytics />
+                        </Suspense>
+                      </RoleProtectedRoute>
+                    </ProtectedRoute>
+                  } />
                   <Route path="services/browse" element={<ServiceBrowsePage />} />
+                  <Route path="events/:eventId/shop" element={
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <EventStorefront />
+                    </Suspense>
+                  } />
                 </Route>
 
                 {/* Order Pages */}
