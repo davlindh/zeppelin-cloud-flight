@@ -15,6 +15,7 @@ import { getUserInitials } from '@/utils/transforms/profile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { triggerHapticFeedback } from '@/lib/haptics';
 
 interface UserMenuProps {
   variant?: 'default' | 'compact';
@@ -39,7 +40,13 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'default' }) => {
   };
 
   const handleLogin = () => {
+    triggerHapticFeedback('light');
     navigate('/auth');
+  };
+
+  const handleMenuItemClick = (action: () => void) => {
+    triggerHapticFeedback('light');
+    action();
   };
 
   if (isLoading) {
@@ -82,29 +89,29 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'default' }) => {
           <p className="text-xs text-muted-foreground truncate">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/marketplace/account')}>
+        <DropdownMenuItem onClick={() => handleMenuItemClick(() => navigate('/marketplace/account'))}>
           <User className="mr-2 h-4 w-4" />
           Mitt konto
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/marketplace/orders')}>
+        <DropdownMenuItem onClick={() => handleMenuItemClick(() => navigate('/marketplace/orders'))}>
           <Package className="mr-2 h-4 w-4" />
           Mina beställningar
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/marketplace/wishlist')}>
+        <DropdownMenuItem onClick={() => handleMenuItemClick(() => navigate('/marketplace/wishlist'))}>
           <Heart className="mr-2 h-4 w-4" />
           Önskelista
         </DropdownMenuItem>
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/admin')}>
+            <DropdownMenuItem onClick={() => handleMenuItemClick(() => navigate('/admin'))}>
               <ShieldCheck className="mr-2 h-4 w-4" />
               Admin
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={() => handleMenuItemClick(handleLogout)}>
           <LogOut className="mr-2 h-4 w-4" />
           Logga ut
         </DropdownMenuItem>

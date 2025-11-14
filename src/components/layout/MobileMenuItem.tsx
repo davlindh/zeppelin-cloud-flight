@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { triggerHapticFeedback } from '@/lib/haptics';
 
 interface MobileMenuItemProps {
   to: string;
@@ -33,11 +35,6 @@ const itemVariants = {
   }
 };
 
-const mobileNavLinkClasses = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 py-3 px-6 text-lg hover:bg-gray-50 transition-colors min-h-[48px] ${
-    isActive ? 'text-amber-500 font-semibold bg-amber-50' : 'text-gray-700'
-  }`;
-
 export const MobileMenuItem: React.FC<MobileMenuItemProps> = ({
   to,
   icon,
@@ -45,12 +42,26 @@ export const MobileMenuItem: React.FC<MobileMenuItemProps> = ({
   onClick,
   className
 }) => {
+  const shouldReduceMotion = useMemo(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
+
+  const handleClick = () => {
+    triggerHapticFeedback('light');
+    onClick();
+  };
+
   return (
-    <motion.div variants={itemVariants}>
+    <motion.div variants={shouldReduceMotion ? undefined : itemVariants}>
       <NavLink
         to={to}
-        className={mobileNavLinkClasses}
-        onClick={onClick}
+        className={({ isActive }) => cn(
+          'flex items-center gap-3 py-3 px-6 text-lg hover:bg-gray-50 transition-colors min-h-[48px]',
+          isActive ? 'text-amber-500 font-semibold bg-amber-50' : 'text-gray-700',
+          className
+        )}
+        onClick={handleClick}
       >
         {icon}
         {label}
