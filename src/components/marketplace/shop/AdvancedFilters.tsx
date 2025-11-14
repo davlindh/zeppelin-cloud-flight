@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
+import { formatCurrency } from '@/utils/currency';
 
 interface AdvancedFiltersProps {
   filters: {
@@ -95,8 +96,8 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
               className="mb-3"
             />
             <div className="flex justify-between text-sm text-slate-600">
-              <span>${filters.priceRange[0]}</span>
-              <span>${filters.priceRange[1]}</span>
+              <span>{formatCurrency(filters.priceRange[0])}</span>
+              <span>{formatCurrency(filters.priceRange[1])}</span>
             </div>
           </div>
         </div>

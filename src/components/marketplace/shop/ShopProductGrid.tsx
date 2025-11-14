@@ -154,7 +154,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   // Render skeleton loading state
   if (isLoading && products.length === 0) {
     return (
-      <div className={`grid gap-3 ${
+      <div className={`grid gap-4 md:gap-6 ${
         density === 'compact' 
           ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
           : density === 'comfortable'
@@ -219,7 +219,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
                   key={virtualRow.key}
                   data-index={virtualRow.index}
                   ref={rowVirtualizer.measureElement}
-                  className={`grid gap-3 ${
+                  className={`grid gap-4 md:gap-6 ${
                     density === 'compact' 
                       ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
                       : density === 'comfortable'
@@ -287,7 +287,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   // Render standard grid (for smaller lists)
   return (
     <>
-      <div className={`grid gap-3 ${
+      <div className={`grid gap-4 md:gap-6 ${
         density === 'compact' 
           ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
           : density === 'comfortable'
