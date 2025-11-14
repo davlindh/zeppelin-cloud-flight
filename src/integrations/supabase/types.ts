@@ -487,6 +487,95 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations: {
+        Row: {
+          checked_in_at: string | null
+          created_at: string | null
+          event_id: string
+          id: string
+          note: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          checked_in_at?: string | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          note?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          checked_in_at?: string | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          note?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          capacity: number
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          ends_at: string
+          id: string
+          is_featured: boolean | null
+          location: string | null
+          slug: string
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string | null
+          venue: string | null
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ends_at: string
+          id?: string
+          is_featured?: boolean | null
+          location?: string | null
+          slug: string
+          starts_at: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          venue?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_featured?: boolean | null
+          location?: string | null
+          slug?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          venue?: string | null
+        }
+        Relationships: []
+      }
       media_audit_log: {
         Row: {
           action: string

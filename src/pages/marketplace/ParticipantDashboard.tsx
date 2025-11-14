@@ -12,6 +12,7 @@ import { ParticipantQuickActions } from '@/components/marketplace/participant/da
 import { ParticipantPortfolioShowcase } from '@/components/marketplace/participant/dashboard/ParticipantPortfolioShowcase';
 import { ParticipantCollaborationWidget } from '@/components/marketplace/participant/dashboard/ParticipantCollaborationWidget';
 import { ParticipantSkillsMatrix } from '@/components/marketplace/participant/dashboard/ParticipantSkillsMatrix';
+import { UpcomingEventsSection } from '@/components/participant/events/UpcomingEventsSection';
 
 export const ParticipantDashboard: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
@@ -81,6 +82,9 @@ export const ParticipantDashboard: React.FC = () => {
           mediaCount={participant?.mediaCount}
         />
       </div>
+
+      {/* Upcoming Events */}
+      <UpcomingEventsSection />
 
       {/* Analytics Charts */}
       <ParticipantAnalyticsChart />
