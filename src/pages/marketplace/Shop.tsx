@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { OptimizedUnifiedSearchBar } from '@/components/marketplace/shop/OptimizedUnifiedSearchBar';
 import { SearchErrorBoundary } from '@/components/marketplace/shop/SearchErrorBoundary';
 import { ShopFilters } from '@/components/marketplace/shop/ShopFilters';
@@ -56,8 +54,6 @@ const ShopPage = () => {
 
   return (
     <div className="min-h-screen brand-gradient-bg">
-      <Header />
-      
       <div className="section-container section-spacing content-spacing"
         style={{ backgroundImage: 'radial-gradient(circle at top right, hsl(var(--brand-primary)/0.03) 0%, transparent 50%)' }}
       >
@@ -222,8 +218,6 @@ const ShopPage = () => {
 
       {/* Back to Top */}
       <BackToTop />
-
-      <Footer />
     </div>
   );
 };
