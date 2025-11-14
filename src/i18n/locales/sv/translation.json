@@ -73,6 +73,8 @@
     "itemsSaved": "{{count}} artikel sparad",
     "itemsSaved_plural": "{{count}} artiklar sparade",
     "clearAll": "Rensa alla",
+    "recentlyViewed": "Senast Visade",
+    "moreItems": "fler produkter",
     "continueShopping": "Fortsätt handla",
     "proceedToCheckout": "Gå till kassan",
     "orderSummary": "Orderöversikt",
