@@ -10,11 +10,14 @@ import { MarketplaceActions } from '@/components/common/MarketplaceActions';
 import { PageTransition } from '@/components/layout/PageTransition';
 import { useState } from 'react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useScrollDetection } from '@/hooks/useScrollDetection';
+import { cn } from '@/lib/utils';
 
 export default function MarketplaceLayout() {
   const location = useLocation();
   const { state } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const isScrolled = useScrollDetection({ threshold: 20 });
   
   // Auto-scroll to top on navigation within marketplace
   useScrollToTop({ behavior: 'smooth', threshold: 100 });
@@ -24,7 +27,12 @@ export default function MarketplaceLayout() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Marketplace Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
+      <header className={cn(
+        "sticky top-0 z-50 transition-all duration-300 motion-reduce:transition-none",
+        isScrolled
+          ? "bg-white/95 backdrop-blur-lg shadow-md border-b border-gray-200/50"
+          : "bg-white/90 backdrop-blur-md shadow-sm"
+      )}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             {/* Logo and Breadcrumb */}
