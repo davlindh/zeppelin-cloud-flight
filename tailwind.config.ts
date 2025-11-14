@@ -116,6 +116,10 @@ export default {
 				'float': {
 					'0%, 100%': { transform: 'translateY(0px)' },
 					'50%': { transform: 'translateY(-4px)' }
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '-1000px 0' },
+					'100%': { backgroundPosition: '1000px 0' }
 				}
 			},
 			animation: {
@@ -130,7 +134,8 @@ export default {
 				'reveal-up': 'reveal-up 0.6s ease-out',
 				'reveal-scale': 'reveal-scale 0.4s ease-out',
 				'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-				'float': 'float 3s ease-in-out infinite'
+				'float': 'float 3s ease-in-out infinite',
+				'shimmer': 'shimmer 2s infinite linear'
 			}
 		}
 }} satisfies Config

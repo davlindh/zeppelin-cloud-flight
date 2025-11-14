@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -13,34 +14,96 @@ const AlertDialogPortal = AlertDialogPrimitive.Portal
 const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Overlay
-    className={cn(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
-    )}
-    {...props}
-    ref={ref}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const shouldReduceMotion = React.useMemo(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
+
+  const overlayVariants: Variants = {
+    initial: { opacity: 0 },
+    animate: { 
+      opacity: 1,
+      transition: { duration: shouldReduceMotion ? 0.1 : 0.2 }
+    },
+    exit: { 
+      opacity: 0,
+      transition: { duration: shouldReduceMotion ? 0.1 : 0.15 }
+    }
+  };
+
+  return (
+    <AlertDialogPrimitive.Overlay asChild ref={ref} {...props}>
+      <motion.div
+        variants={overlayVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        className={cn(
+          'fixed inset-0 z-50 bg-black/80 backdrop-blur-sm',
+          className
+        )}
+      />
+    </AlertDialogPrimitive.Overlay>
+  );
+});
 AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <AlertDialogPortal>
-    <AlertDialogOverlay />
-    <AlertDialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-        className
-      )}
-      {...props}
-    />
-  </AlertDialogPortal>
-))
+>(({ className, ...props }, ref) => {
+  const shouldReduceMotion = React.useMemo(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
+
+  const contentVariants: Variants = {
+    initial: { 
+      opacity: 0, 
+      scale: shouldReduceMotion ? 1 : 0.95,
+      y: shouldReduceMotion ? 0 : 10
+    },
+    animate: { 
+      opacity: 1, 
+      scale: 1,
+      y: 0,
+      transition: { 
+        duration: shouldReduceMotion ? 0.15 : 0.25,
+        ease: [0.32, 0.72, 0, 1] as const
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: shouldReduceMotion ? 1 : 0.95,
+      y: shouldReduceMotion ? 0 : 10,
+      transition: { 
+        duration: shouldReduceMotion ? 0.1 : 0.2,
+        ease: [0.32, 0.72, 0, 1] as const
+      }
+    }
+  };
+
+  return (
+    <AlertDialogPortal>
+      <AnimatePresence mode="wait">
+        <AlertDialogOverlay />
+        <AlertDialogPrimitive.Content asChild ref={ref} {...props}>
+          <motion.div
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className={cn(
+              'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
+              className
+            )}
+          />
+        </AlertDialogPrimitive.Content>
+      </AnimatePresence>
+    </AlertDialogPortal>
+  );
+});
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
 const AlertDialogHeader = ({
