@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CartSidebar } from './cart/CartSidebar';
@@ -6,6 +7,7 @@ import { FloatingCartButton } from './FloatingCartButton';
 import { useCart } from '@/contexts/marketplace/CartContext';
 import { UserMenu } from '@/components/common/UserMenu';
 import { MarketplaceActions } from '@/components/common/MarketplaceActions';
+import { PageTransition } from '@/components/layout/PageTransition';
 import { useState } from 'react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 
@@ -89,7 +91,11 @@ export default function MarketplaceLayout() {
 
       {/* Main Content */}
       <main>
-        <Outlet />
+        <AnimatePresence mode="wait" initial={false}>
+          <PageTransition key={location.pathname}>
+            <Outlet />
+          </PageTransition>
+        </AnimatePresence>
       </main>
 
       {/* Marketplace Footer */}

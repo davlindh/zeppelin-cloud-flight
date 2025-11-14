@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebarAdmin } from '@/components/admin/AppSidebarAdmin';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { PageTransition } from '@/components/layout/PageTransition';
 
 export const AdminLayout = () => {
   const location = useLocation();
@@ -25,7 +27,11 @@ export const AdminLayout = () => {
             <AdminHeader />
           </header>
           <div className="flex-1 p-6">
-            <Outlet />
+            <AnimatePresence mode="wait" initial={false}>
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
           </div>
         </main>
       </div>
