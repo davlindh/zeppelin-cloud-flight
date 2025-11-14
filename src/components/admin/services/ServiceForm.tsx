@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { z } from 'zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,19 @@ import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from './RichTextEditor';
 import { QuickProviderModal } from './QuickProviderModal';
 import type { Service } from '@/types/unified';
+
+const serviceFormSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  provider_id: z.string().uuid('Provider must be selected'),
+  category: z.string().min(1, 'Category is required'),
+  starting_price: z.number().min(0, 'Price must be positive'),
+  location: z.string().min(1, 'Location is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  duration: z.string().min(1, 'Duration is required'),
+  features: z.array(z.string()).min(1, 'At least one feature is required'),
+  images: z.array(z.string()).min(1, 'At least one image is required'),
+  available_times: z.array(z.string()).min(1, 'At least one available time is required'),
+});
 
 interface ServiceFormProps {
   isOpen: boolean;
@@ -222,50 +236,29 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields with user feedback
-    if (!formData.title) {
-      toast({
-        title: "Title required",
-        description: "Please enter a service title",
-        variant: "destructive",
+    // Validate with Zod schema
+    try {
+      serviceFormSchema.parse({
+        title: formData.title,
+        provider_id: formData.provider_id,
+        category: formData.category,
+        starting_price: formData.starting_price,
+        location: formData.location,
+        description: formData.description,
+        duration: formData.duration,
+        features: formData.features,
+        images: formData.images,
+        available_times: formData.available_times,
       });
-      return;
-    }
-
-    if (!formData.category) {
-      toast({
-        title: "Category required",
-        description: "Please select a category",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.provider) {
-      toast({
-        title: "Provider required",
-        description: "Please enter a provider name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.provider_id) {
-      toast({
-        title: "Provider required",
-        description: "Please select a service provider",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.image) {
-      toast({
-        title: "Image required",
-        description: "Please upload at least one image",
-        variant: "destructive",
-      });
-      return;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: 'Validation Error',
+          description: error.errors[0].message,
+          variant: 'destructive'
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);

@@ -48,12 +48,31 @@ export interface UnifiedDashboardStats {
       week: number;
     };
   };
+  services: {
+    providers: {
+      total: number;
+      with_services: number;
+      without_services: number;
+    };
+    services: {
+      total: number;
+      linked: number;
+      unlinked: number;
+      active: number;
+      inactive: number;
+    };
+    metrics: {
+      avg_services_per_provider: number;
+      providers_needing_attention: number;
+    };
+  };
   action_items: {
     total: number;
     submissions_pending: number;
     media_pending: number;
     orders_pending: number;
     low_stock_count: number;
+    unlinked_services: number;
   };
   last_updated: string;
 }
