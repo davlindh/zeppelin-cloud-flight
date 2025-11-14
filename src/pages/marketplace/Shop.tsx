@@ -9,6 +9,7 @@ import { ShopContent as ShopContentComponent } from '@/components/marketplace/sh
 import { BrandShowcase } from '@/components/marketplace/shop/BrandShowcase';
 import { FeaturedProducts } from '@/components/marketplace/shop/FeaturedProducts';
 import { RecentlyViewedProducts } from '@/components/marketplace/shop/RecentlyViewedProducts';
+import { StickyRecentlyViewed } from '@/components/marketplace/shop/StickyRecentlyViewed';
 import { QuickViewModal } from '@/components/marketplace/shop/QuickViewModal';
 import { ProductComparison } from '@/components/marketplace/shop/ProductComparison';
 import { BackToTop } from '@/components/marketplace/ui/back-to-top';
@@ -109,14 +110,12 @@ const ShopPage = () => {
             </div>
           )}
 
-          {/* Recently Viewed & Featured - Side by side on desktop */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="lg:border-r lg:border-border/20 lg:pr-4">
-              <RecentlyViewedProducts />
-            </div>
-            <div>
-              <FeaturedProducts />
-            </div>
+          {/* Featured Products - Full width, more prominent */}
+          <FeaturedProducts />
+
+          {/* Recently Viewed - Mobile/Tablet only (horizontal) */}
+          <div className="lg:hidden">
+            <RecentlyViewedProducts variant="horizontal" maxItems={6} />
           </div>
         </div>
 
@@ -182,20 +181,35 @@ const ShopPage = () => {
           </div>
         )}
 
-        {/* Mobile Filter Bar */}
-        <MobileFilterBar availableBrands={availableBrands} />
 
         {/* Main Shop Content - Only show when not in comparison mode */}
         {!showComparison && (
-          <>
-            {/* Desktop Shop Filters - Always visible for category navigation and sorting */}
-            <ShopFilters 
-              availableBrands={availableBrands}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Desktop Filters Sidebar - Left (Hidden on mobile) */}
+            <div className="hidden lg:block lg:col-span-2">
+              <div className="sticky top-20">
+                <ShopFilters 
+                  availableBrands={availableBrands}
+                />
+              </div>
+            </div>
 
-            {/* Shop Content */}
-            <ShopContentComponent availableBrands={availableBrands} />
-          </>
+            {/* Main Product Grid - Center */}
+            <div className="lg:col-span-7">
+              {/* Mobile Filter Bar */}
+              <div className="lg:hidden mb-4">
+                <MobileFilterBar availableBrands={availableBrands} />
+              </div>
+
+              {/* Shop Content */}
+              <ShopContentComponent availableBrands={availableBrands} />
+            </div>
+
+            {/* Recently Viewed Sidebar - Right (Desktop Only) */}
+            <div className="hidden lg:block lg:col-span-3">
+              <StickyRecentlyViewed maxVisible={6} />
+            </div>
+          </div>
         )}
       </div>
 
