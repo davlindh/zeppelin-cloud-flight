@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertTriangle } from 'lucide-react';
+import { formatCurrency } from '@/utils/currency';
 
 interface EnhancedBidDialogProps {
   isOpen: boolean;
@@ -61,7 +61,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
 
     const amount = parseFloat(bidAmount);
     if (isNaN(amount) || amount < minimumBid) {
-      setError(`Bid must be at least $${minimumBid.toLocaleString()}`);
+      setError(`Budet måste vara minst ${formatCurrency(minimumBid)}`);
       return;
     }
 
@@ -155,7 +155,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="bidAmount">
-                Your Bid (minimum: ${minimumBid.toLocaleString()})
+                Ditt bud (minimum: {formatCurrency(minimumBid)})
               </Label>
               <Input
                 id="bidAmount"
@@ -172,7 +172,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
               {/* Quick bid suggestions */}
               {suggestedBids.length > 0 && (
                 <div className="flex gap-2 flex-wrap">
-                  <span className="text-xs text-slate-500">Quick bids:</span>
+                  <span className="text-xs text-slate-500">Snabba bud:</span>
                   {suggestedBids.map((amount) => (
                     <button
                       key={amount}
@@ -181,7 +181,7 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
                       className="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded"
                       disabled={isSubmitting}
                     >
-                      ${amount.toLocaleString()}
+                      {formatCurrency(amount)}
                     </button>
                   ))}
                 </div>
@@ -196,10 +196,10 @@ export const EnhancedBidDialog: React.FC<EnhancedBidDialogProps> = ({
 
             <div className="bg-slate-50 p-4 rounded-lg">
               <p className="text-sm text-slate-600 mb-2">
-                <strong>Current highest bid:</strong> ${currentBid.toLocaleString()}
+                <strong>Aktuellt högsta bud:</strong> {formatCurrency(currentBid)}
               </p>
               <p className="text-xs text-slate-500">
-                By placing a bid, you agree that this bid is binding and you will complete the purchase if you win.
+                Genom att lägga ett bud godkänner du att detta bud är bindande och att du kommer att slutföra köpet om du vinner.
               </p>
             </div>
 

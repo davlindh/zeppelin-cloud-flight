@@ -9,14 +9,21 @@ import { Loader2, AlertTriangle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency';
 
-const bidFormSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  name: z.string().min(2, 'Please enter your full name'),
-  amount: z.number().min(1, 'Please enter a valid bid amount')
+// Schema will be created with translations in component
+const createBidFormSchema = (t: (key: string) => string) => z.object({
+  email: z.string().email(t('auctions.enterValidEmail')),
+  name: z.string().min(2, t('auctions.enterFullName')),
+  amount: z.number().min(1, t('auctions.enterValidBid'))
 });
 
-type BidFormValues = z.infer<typeof bidFormSchema>;
+type BidFormValues = {
+  email: string;
+  name: string;
+  amount: number;
+};
 
 interface StandardizedBidDialogProps {
   isOpen: boolean;
@@ -37,21 +44,22 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
   isSubmitting = false,
   endTime
 }) => {
+  const { t } = useTranslation();
   const minimumBid = currentBid + 50;
   const timeLeft = endTime ? endTime.getTime() - new Date().getTime() : 0;
   const isAuctionEnded = timeLeft <= 0;
 
   const form = useForm<BidFormValues>({
-    resolver: zodResolver(bidFormSchema.refine(
+    resolver: zodResolver(createBidFormSchema(t).refine(
       (data) => data.amount >= minimumBid,
       {
-        message: `Bid must be at least $${minimumBid.toLocaleString()}`,
+        message: t('auctions.bidTooLow', { amount: formatCurrency(minimumBid) }),
         path: ['amount']
       }
     ).refine(
       (data) => data.amount <= currentBid * 10,
       {
-        message: 'Bid amount seems unusually high. Please verify the amount.',
+        message: t('auctions.bidTooHigh'),
         path: ['amount']
       }
     )),
@@ -72,7 +80,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
 
   const onSubmit = async (data: BidFormValues) => {
     if (isAuctionEnded) {
-      form.setError('root', { message: 'This auction has ended and no longer accepts bids' });
+      form.setError('root', { message: t('auctions.auctionEndedNoBids') });
       return;
     }
 
@@ -90,7 +98,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
       form.reset();
       onClose();
     } catch (_error) {
-      form.setError('root', { message: 'Failed to place bid. Please try again.' });
+      form.setError('root', { message: t('auctions.auctionEndedNoBids') });
     }
   };
 
@@ -111,14 +119,14 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Auction Ended</DialogTitle>
+            <DialogTitle>{t('auctions.auctionEnded')}</DialogTitle>
           </DialogHeader>
           
           <div className="text-center py-6">
             <AlertTriangle className="h-12 w-12 text-warning mx-auto mb-4" />
-            <p className="text-muted-foreground">This auction has ended and no longer accepts bids.</p>
+            <p className="text-muted-foreground">{t('auctions.auctionEndedDescription')}</p>
             <Button onClick={handleClose} className="mt-4">
-              Close
+              {t('auctions.close')}
             </Button>
           </div>
         </DialogContent>
@@ -130,7 +138,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Place Your Bid</DialogTitle>
+          <DialogTitle>{t('auctions.placeYourBid')}</DialogTitle>
         </DialogHeader>
         
         <Form {...form}>
@@ -140,7 +148,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel>{t('common.email')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="your@email.com"
@@ -158,7 +166,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t('common.name')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="John Doe"
@@ -177,7 +185,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Your Bid (minimum: ${minimumBid.toLocaleString()})
+                    {t('auctions.yourBid')} ({t('auctions.minimumBid')}: {formatCurrency(minimumBid)})
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -193,7 +201,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
                   {/* Quick bid suggestions */}
                   {suggestedBids.length > 0 && (
                     <div className="flex gap-2 flex-wrap mt-2">
-                      <span className="text-xs text-muted-foreground">Quick bids:</span>
+                      <span className="text-xs text-muted-foreground">{t('auctions.suggestedBids')}:</span>
                       {suggestedBids.map((amount) => (
                         <Badge
                           key={amount}
@@ -201,7 +209,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
                           className="cursor-pointer hover-subtle transition-fast"
                           onClick={() => form.setValue('amount', amount)}
                         >
-                          ${amount.toLocaleString()}
+                          {formatCurrency(amount)}
                         </Badge>
                       ))}
                     </div>
@@ -219,10 +227,10 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
 
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground mb-2">
-                <strong>Current highest bid:</strong> ${currentBid.toLocaleString()}
+                <strong>{t('auctions.currentHighestBid')}</strong> {formatCurrency(currentBid)}
               </p>
               <p className="text-xs text-muted-foreground">
-                By placing a bid, you agree that this bid is binding and you will complete the purchase if you win.
+                {t('auctions.enterContactDetails')}
               </p>
             </div>
 
@@ -234,7 +242,7 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
                 className="flex-1"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('auctions.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -244,10 +252,10 @@ export const StandardizedBidDialog: React.FC<StandardizedBidDialogProps> = ({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Placing Bid...
+                    {t('auctions.placingBid')}
                   </>
                 ) : (
-                  'Place Bid'
+                  t('auctions.placeBid')
                 )}
               </Button>
             </div>

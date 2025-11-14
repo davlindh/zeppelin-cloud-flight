@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Heart, Share2, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,8 @@ import { StandardizedBidDialog } from './StandardizedBidDialog';
 import { useWishlist } from '@/contexts/marketplace/WishlistContext';
 import { useRealTimeBidding } from '@/hooks/marketplace/useRealTimeBidding';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency';
 
 interface BidSectionProps {
   slug: string;
@@ -34,6 +35,7 @@ export const BidSection: React.FC<BidSectionProps> = ({
   const { isInWishlist, addItem, removeItem } = useWishlist();
   const { submitBid, isSubmitting } = useRealTimeBidding(slug, auctionId);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const isWatching = isInWishlist(auctionId);
   const timeLeft = endTime.getTime() - new Date().getTime();
@@ -52,14 +54,14 @@ export const BidSection: React.FC<BidSectionProps> = ({
     if (isWatching) {
       removeItem(auctionId);
       toast({
-        title: "Removed from saved items",
-        description: `"${title}" has been removed from your saved items.`,
+        title: t('auctions.removedFromSaved'),
+        description: `"${title}" ${t('auctions.itemRemovedFromSaved')}`,
       });
     } else {
       addItem(auctionId, 'auction');
       toast({
-        title: "Added to saved items",
-        description: `"${title}" has been added to your saved items for tracking.`,
+        title: t('auctions.addedToSaved'),
+        description: `"${title}" ${t('auctions.itemAddedToSaved')}`,
       });
     }
   };
@@ -72,13 +74,13 @@ export const BidSection: React.FC<BidSectionProps> = ({
     const shareUrl = `${window.location.origin}/marketplace/auctions/${slug}`;
     
     const shareData = {
-      title: `${title} - Live Auction`,
-      text: `Check out this auction! Current bid: $${currentBid.toLocaleString()}. ${
+      title: `${title} - ${t('auctions.liveAuctions')}`,
+      text: `${t('auctions.shareAuction')}! ${t('auctions.currentBid')}: ${formatCurrency(currentBid)}. ${
         actuallyEnded 
-          ? 'Auction ended' 
+          ? t('auctions.auctionEnded')
           : hoursLeft > 0 
-            ? `${hoursLeft}h ${minutesLeft}m remaining` 
-            : `${minutesLeft}m remaining`
+            ? `${hoursLeft}h ${minutesLeft}m ${t('auctions.timeLeft').toLowerCase()}` 
+            : `${minutesLeft}m ${t('auctions.timeLeft').toLowerCase()}`
       }.`,
       url: shareUrl
     };
@@ -89,8 +91,8 @@ export const BidSection: React.FC<BidSectionProps> = ({
       } else {
         await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
         toast({
-          title: "Link copied!",
-          description: "Auction details have been copied to your clipboard.",
+          title: t('auctions.linkCopied'),
+          description: t('auctions.auctionDetailsCopied'),
         });
       }
     } catch (_error) {
@@ -98,13 +100,13 @@ export const BidSection: React.FC<BidSectionProps> = ({
       try {
         await navigator.clipboard.writeText(shareUrl);
         toast({
-          title: "Link copied!",
-          description: "Auction URL has been copied to your clipboard.",
+          title: t('auctions.linkCopied'),
+          description: t('auctions.auctionUrlCopied'),
         });
       } catch (_clipboardError) {
         toast({
-          title: "Share failed",
-          description: "Unable to share or copy the auction link.",
+          title: t('auctions.shareFailed'),
+          description: t('auctions.shareFailedDescription'),
           variant: "destructive",
         });
       }
@@ -117,7 +119,7 @@ export const BidSection: React.FC<BidSectionProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl">
-              {actuallyEnded ? 'Auction Ended' : 'Current Bid'}
+              {actuallyEnded ? t('auctions.auctionEnded') : t('auctions.currentBid')}
             </CardTitle>
           </div>
         </CardHeader>
@@ -125,17 +127,17 @@ export const BidSection: React.FC<BidSectionProps> = ({
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className={`text-3xl font-bold ${actuallyEnded ? 'text-slate-600' : 'text-blue-600'}`}>
-                ${currentBid.toLocaleString()}
+                {formatCurrency(currentBid)}
               </p>
               <p className="text-sm text-slate-600">
-                Starting bid: ${startingBid.toLocaleString()}
+                {t('auctions.startingBid')}: {formatCurrency(startingBid)}
               </p>
             </div>
             <div className="text-right">
               <CountdownTimer endTime={endTime} className="mb-1" />
               <div className="flex items-center text-slate-600">
                 <Users className="h-4 w-4 mr-1" />
-                <span>{bidders} bidders</span>
+                <span>{bidders} {t('auctions.bidders').toLowerCase()}</span>
               </div>
             </div>
           </div>
@@ -146,7 +148,7 @@ export const BidSection: React.FC<BidSectionProps> = ({
               onClick={() => setShowBidDialog(true)}
               disabled={actuallyEnded || isSubmitting}
             >
-              {actuallyEnded ? 'Auction Ended' : isSubmitting ? 'Placing Bid...' : 'Place Bid'}
+              {actuallyEnded ? t('auctions.auctionEnded') : isSubmitting ? t('auctions.placingBid') : t('auctions.placeBid')}
             </Button>
             
             <div className="grid grid-cols-2 gap-2">
@@ -156,7 +158,7 @@ export const BidSection: React.FC<BidSectionProps> = ({
                 className="flex items-center justify-center gap-2"
               >
                 <Heart className={`h-4 w-4 ${isWatching ? 'fill-red-500 text-red-500' : ''}`} />
-                {isWatching ? 'Saved' : 'Save'}
+                {isWatching ? t('auctions.saved') : t('common.save')}
               </Button>
               <Button 
                 variant="outline" 
@@ -164,7 +166,7 @@ export const BidSection: React.FC<BidSectionProps> = ({
                 className="flex items-center justify-center gap-2"
               >
                 <Share2 className="h-4 w-4" />
-                Share
+                {t('product.share')}
               </Button>
             </div>
           </div>
