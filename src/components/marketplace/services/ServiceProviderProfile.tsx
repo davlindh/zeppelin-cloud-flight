@@ -1,9 +1,9 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Star, Award, Calendar, Clock, MapPin, Users } from 'lucide-react';
+import { Star, Award, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ServiceProviderProfileProps {
   provider?: {
@@ -36,6 +36,8 @@ export const ServiceProviderProfile: React.FC<ServiceProviderProfileProps> = ({
   provider = {}, 
   category: _category 
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const providerData = {
     name: provider?.name || 'Unknown Provider',
     title: provider?.title || 'Service Provider',
@@ -46,53 +48,154 @@ export const ServiceProviderProfile: React.FC<ServiceProviderProfileProps> = ({
     yearsInBusiness: provider?.experience ? parseInt(provider.experience) : provider?.yearsInBusiness || 0,
     location: provider?.location || 'Unknown Location',
     customersServed: provider?.customersServed || 0,
-    availableUntil: provider?.availableUntil || 'Contact for availability'
+    phone: provider?.phone || '',
+    email: provider?.email || '',
+    specialties: provider?.specialties || [],
+    certifications: provider?.certifications || [],
+    responseTime: provider?.responseTime || 'Fast',
+    completedProjects: provider?.completedProjects || 0
   };
+
   return (
-    <Card className="bg-white shadow-md rounded-lg overflow-hidden">
-      <CardHeader className="flex flex-col items-center p-6">
-        <Avatar className="h-24 w-24 border-2 border-primary rounded-full overflow-hidden mb-4">
-          <AvatarImage src={providerData.image} alt={providerData.name} />
-          <AvatarFallback>{providerData.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <CardTitle className="text-xl font-semibold text-gray-900">{providerData.name}</CardTitle>
-        <p className="text-sm text-gray-500">{providerData.title}</p>
+    <Card>
+      <CardHeader className="pb-4">
+        <div className="flex items-start gap-4">
+          {/* Compact Avatar */}
+          <Avatar className="h-16 w-16 border-2 border-primary/20">
+            <AvatarImage src={providerData.image} alt={providerData.name} />
+            <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
+              {providerData.name.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+
+          {/* Provider Info */}
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg font-semibold mb-1">
+              {providerData.name}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mb-3">{providerData.title}</p>
+            
+            {/* Inline Stats */}
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <span className="font-medium">{providerData.rating}</span>
+                <span className="text-muted-foreground">({providerData.reviews})</span>
+              </div>
+              
+              <Badge variant="secondary" className="h-6">
+                <Award className="h-3 w-3 mr-1" />
+                {providerData.yearsInBusiness} Years
+              </Badge>
+              
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" />
+                <span className="text-xs">{providerData.location}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <Star className="h-5 w-5 text-yellow-500 mr-1" />
-            <span className="text-gray-700">{providerData.rating}</span>
-            <span className="text-gray-500 ml-1">({providerData.reviews} reviews)</span>
+
+      <CardContent className="pt-0 space-y-4">
+        {/* Description - Always visible but truncated */}
+        <p className="text-sm text-foreground/80 line-clamp-2">
+          {providerData.description}
+        </p>
+
+        {/* Expandable Details */}
+        {isExpanded && (
+          <div className="space-y-4 pt-2 border-t animate-in fade-in slide-in-from-top-2">
+            {/* Full Description */}
+            {providerData.description && (
+              <div>
+                <h4 className="text-sm font-semibold mb-2">About</h4>
+                <p className="text-sm text-muted-foreground">
+                  {providerData.description}
+                </p>
+              </div>
+            )}
+
+            {/* Specialties */}
+            {providerData.specialties.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Specialties</h4>
+                <div className="flex flex-wrap gap-2">
+                  {providerData.specialties.map((specialty, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs">
+                      {specialty}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Certifications */}
+            {providerData.certifications.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Certifications</h4>
+                <div className="flex flex-wrap gap-2">
+                  {providerData.certifications.map((cert, idx) => (
+                    <Badge key={idx} variant="secondary" className="text-xs">
+                      <Award className="h-3 w-3 mr-1" />
+                      {cert}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              {providerData.completedProjects > 0 && (
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-lg font-bold text-primary">
+                    {providerData.completedProjects}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Projects</div>
+                </div>
+              )}
+              {providerData.customersServed > 0 && (
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-lg font-bold text-primary">
+                    {providerData.customersServed}+
+                  </div>
+                  <div className="text-xs text-muted-foreground">Customers</div>
+                </div>
+              )}
+            </div>
+
+            {/* Contact Info */}
+            {(providerData.phone || providerData.email) && (
+              <div className="pt-2 border-t">
+                <h4 className="text-sm font-semibold mb-2">Contact</h4>
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  {providerData.phone && <p>📞 {providerData.phone}</p>}
+                  {providerData.email && <p>✉️ {providerData.email}</p>}
+                </div>
+              </div>
+            )}
           </div>
-          <Badge variant="secondary">
-            <Award className="h-4 w-4 mr-1" />
-            {providerData.yearsInBusiness} Years
-          </Badge>
-        </div>
-        <p className="text-gray-700 mb-4">{providerData.description}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center text-gray-600">
-            <Calendar className="h-4 w-4 mr-2" />
-            Available Until: {providerData.availableUntil}
-          </div>
-          <div className="flex items-center text-gray-600">
-            <MapPin className="h-4 w-4 mr-2" />
-            Location: {providerData.location}
-          </div>
-          <div className="flex items-center text-gray-600">
-            <Clock className="h-4 w-4 mr-2" />
-            Avg. Response Time: Fast
-          </div>
-          <div className="flex items-center text-gray-600">
-            <Users className="h-4 w-4 mr-2" />
-            {providerData.customersServed}+ Customers Served
-          </div>
-        </div>
+        )}
+
+        {/* Expand/Collapse Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full"
+        >
+          {isExpanded ? (
+            <>
+              Show Less <ChevronUp className="h-4 w-4 ml-2" />
+            </>
+          ) : (
+            <>
+              View Full Profile <ChevronDown className="h-4 w-4 ml-2" />
+            </>
+          )}
+        </Button>
       </CardContent>
-      <CardFooter className="p-6 border-t">
-        <Button className="w-full">Book Service</Button>
-      </CardFooter>
     </Card>
   );
 };
