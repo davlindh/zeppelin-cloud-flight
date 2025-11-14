@@ -100,20 +100,33 @@ const ShopPage = () => {
           </div>
         </div>
 
-        {/* Brand Showcase - Only show if we have brands */}
-        {availableBrands.length >= 3 && (
-          <div className="mb-6">
-            <BrandShowcase />
-          </div>
-        )}
+        {/* Compact Discovery Section */}
+        <div className="mb-4 space-y-3">
+          {/* Brand Showcase - Compact horizontal scroll */}
+          {availableBrands.length >= 3 && (
+            <div className="overflow-x-auto scrollbar-thin">
+              <BrandShowcase />
+            </div>
+          )}
 
-        {/* Recently Viewed & Featured Products */}
-        <div className="mb-6">
-          <RecentlyViewedProducts />
+          {/* Recently Viewed & Featured - Side by side on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="lg:border-r lg:border-border/20 lg:pr-4">
+              <RecentlyViewedProducts />
+            </div>
+            <div>
+              <FeaturedProducts />
+            </div>
+          </div>
         </div>
 
-        <div className="mb-6">
-          <FeaturedProducts />
+        {/* Main Shopping Area - Visual Separator */}
+        <div className="border-t-2 border-primary/10 pt-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-foreground">
+              Shop All Products
+            </h2>
+          </div>
         </div>
 
         {/* Product Comparison Panel */}

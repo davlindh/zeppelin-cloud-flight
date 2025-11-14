@@ -183,7 +183,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <Link to={finalHref}>
       <Card className={cn(
-        "group relative overflow-hidden h-full transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]",
+        "product-card-compact group relative overflow-hidden h-full transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]",
         isEnhanced ? "shadow-lg border-0 bg-white rounded-2xl animate-fade-in" : "card-base card-hover border border-border/50",
         sizeClasses[size]
       )}>

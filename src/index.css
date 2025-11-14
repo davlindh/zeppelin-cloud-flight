@@ -426,4 +426,92 @@
       background-position: -200% 0;
     }
   }
+
+  /* === Responsive Grid System === */
+  /* Compact density: More items per row, tighter spacing (5-6 items on XL) */
+  .grid-compact {
+    @apply grid gap-3;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  @screen sm {
+    .grid-compact {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+  }
+  
+  @screen lg {
+    .grid-compact {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+  }
+  
+  @screen xl {
+    .grid-compact {
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+  }
+
+  /* Comfortable density: Balanced spacing (4-5 items on XL) */
+  .grid-comfortable {
+    @apply grid gap-4;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  
+  @screen lg {
+    .grid-comfortable {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+
+  /* Spacious density: Fewer items, more breathing room (3-4 items on XL) */
+  .grid-spacious {
+    @apply grid gap-6;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  @screen lg {
+    .grid-spacious {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+  }
+
+  /* Legacy variant support */
+  .grid-tight {
+    @apply grid-compact;
+  }
+  
+  .grid-normal {
+    @apply grid-comfortable;
+  }
+  
+  .grid-loose {
+    @apply grid-spacious;
+  }
+  
+  .grid-extra-loose {
+    @apply grid gap-8;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  /* Product card optimization for dense grids */
+  .product-card-compact {
+    @apply transition-all duration-300;
+    container-type: inline-size;
+  }
+
+  .product-card-compact:hover {
+    @apply scale-[1.02] shadow-lg z-10;
+  }
+
+  /* Responsive typography using container queries */
+  @container (max-width: 250px) {
+    .product-card-compact .product-title {
+      @apply text-sm;
+    }
+    
+    .product-card-compact .product-price {
+      @apply text-base;
+    }
+  }
 }

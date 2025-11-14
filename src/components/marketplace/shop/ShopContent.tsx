@@ -191,8 +191,8 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
       <div className="flex gap-6">
         {/* Compact Filters Sidebar - Only show if we have products */}
         {filteredAndSortedProducts.length > 0 && (
-          <div className="hidden lg:block">
-            <div className="sticky top-6 w-64">
+          <aside className="hidden lg:block lg:sticky lg:top-20 lg:h-[calc(100vh-6rem)] lg:overflow-y-auto">
+            <div className="w-64">
               <div className="p-4 rounded-lg bg-card border border-border shadow-sm">
                 <h3 className="text-sm font-semibold mb-4 text-foreground">Filters</h3>
                 <AdvancedFilters
@@ -202,7 +202,7 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => 
                 />
               </div>
             </div>
-          </div>
+          </aside>
         )}
 
         {/* Main Content Area */}

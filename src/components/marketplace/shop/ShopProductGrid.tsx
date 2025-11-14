@@ -65,7 +65,7 @@ export const ShopProductGrid: React.FC<ShopProductGridProps> = ({
   }
 
   return (
-    <ResponsiveGrid density="compact" variant="normal">
+    <ResponsiveGrid density="compact" variant="tight">
       {products.map((product) => (
         <ProductCard
           key={product.id}
