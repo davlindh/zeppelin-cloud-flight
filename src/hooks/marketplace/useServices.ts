@@ -24,7 +24,7 @@ export const useServices = (filters?: ServiceFilters) => {
           .from('services')
           .select(`
             *,
-            service_providers:provider_id (
+            service_providers!services_provider_id_fkey (
               id,
               name,
               avatar,

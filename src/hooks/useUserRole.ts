@@ -26,6 +26,7 @@ export const useUserRole = () => {
   return {
     isAdmin: roles?.includes('admin') || false,
     isParticipant: roles?.includes('participant') || false,
+    isProvider: roles?.includes('provider') || false,
     isCustomer: roles?.includes('customer') || false,
     roles: roles || [],
     isLoading

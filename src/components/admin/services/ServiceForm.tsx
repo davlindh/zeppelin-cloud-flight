@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { z } from 'zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { 
   Plus, 
   DollarSign, 
@@ -13,15 +18,32 @@ import {
   Tag,
   Clock,
   MapPin,
-  X
+  X,
+  User,
+  Info
 } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useServiceCategories } from '@/hooks/useServiceCategories';
+import { useServiceProviders } from '@/hooks/useServiceProviders';
 import { getStoragePathFromPublicUrl } from '@/utils/imageUtils';
 import { BUCKET_MAP } from '@/config/storage.config';
 import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from './RichTextEditor';
+import { QuickProviderModal } from './QuickProviderModal';
 import type { Service } from '@/types/unified';
+
+const serviceFormSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  provider_id: z.string().uuid('Provider must be selected'),
+  category: z.string().min(1, 'Category is required'),
+  starting_price: z.number().min(0, 'Price must be positive'),
+  location: z.string().min(1, 'Location is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  duration: z.string().min(1, 'Duration is required'),
+  features: z.array(z.string()).min(1, 'At least one feature is required'),
+  images: z.array(z.string()).min(1, 'At least one image is required'),
+  available_times: z.array(z.string()).min(1, 'At least one available time is required'),
+});
 
 interface ServiceFormProps {
   isOpen: boolean;
@@ -38,6 +60,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   service,
   mode
 }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -49,6 +73,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     images: [] as string[],
     features: [] as string[],
     provider: '',
+    provider_id: '' as string,
     available_times: [] as string[],
     response_time: '24 hours'
   });
@@ -56,12 +81,20 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const [newFeature, setNewFeature] = useState('');
   const [newAvailableTime, setNewAvailableTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showProviderModal, setShowProviderModal] = useState(false);
 
   const { uploadToSupabase, uploadProgress, deleteFromSupabase } = useImageUpload();
   const { data: categories = [] } = useServiceCategories();
+  const { data: providers = [], refetch: refetchProviders } = useServiceProviders();
   const { toast } = useToast();
   
   const isUploading = uploadProgress.isUploading;
+  
+  // Get pre-selected provider info from URL
+  const preSelectedProviderId = searchParams.get('newProvider');
+  const preSelectedProvider = preSelectedProviderId 
+    ? providers?.find(p => p.id === preSelectedProviderId)
+    : null;
 
   useEffect(() => {
     if (service && mode === 'edit') {
@@ -76,11 +109,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         images: service.images ?? [],
         features: service.features ?? [],
         provider: service.provider ?? '',
+        provider_id: service.providerDetails?.id ?? '',
         available_times: service.availableTimes ?? [],
         response_time: service.responseTime ?? '24 hours'
       });
     } else {
-      // Reset form for create mode
+      // Reset form for create mode and pre-select provider if available
       setFormData({
         title: '',
         description: '',
@@ -91,12 +125,13 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         image: '',
         images: [],
         features: [],
-        provider: '',
+        provider: preSelectedProvider?.name ?? '',
+        provider_id: preSelectedProviderId ?? '',
         available_times: [],
         response_time: '24 hours'
       });
     }
-  }, [service, mode, isOpen]);
+  }, [service, mode, isOpen, preSelectedProviderId, preSelectedProvider]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -201,41 +236,29 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields with user feedback
-    if (!formData.title) {
-      toast({
-        title: "Title required",
-        description: "Please enter a service title",
-        variant: "destructive",
+    // Validate with Zod schema
+    try {
+      serviceFormSchema.parse({
+        title: formData.title,
+        provider_id: formData.provider_id,
+        category: formData.category,
+        starting_price: formData.starting_price,
+        location: formData.location,
+        description: formData.description,
+        duration: formData.duration,
+        features: formData.features,
+        images: formData.images,
+        available_times: formData.available_times,
       });
-      return;
-    }
-
-    if (!formData.category) {
-      toast({
-        title: "Category required",
-        description: "Please select a category",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.provider) {
-      toast({
-        title: "Provider required",
-        description: "Please enter a provider name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.image) {
-      toast({
-        title: "Image required",
-        description: "Please upload at least one image",
-        variant: "destructive",
-      });
-      return;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: 'Validation Error',
+          description: error.errors[0].message,
+          variant: 'destructive'
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -252,6 +275,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
         images: formData.images,
         features: formData.features,
         provider: formData.provider,
+        provider_id: formData.provider_id,
         available_times: formData.available_times,
         response_time: formData.response_time
       };
@@ -292,6 +316,22 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
             {mode === 'create' ? 'Create a new service offering for your customers.' : 'Update the details of this service.'}
           </DialogDescription>
         </DialogHeader>
+
+        {mode === 'create' && preSelectedProvider && (
+          <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-700 dark:text-blue-300">
+              Creating service for <strong>{preSelectedProvider.name}</strong>.
+              <Button
+                variant="link"
+                className="px-2 h-auto text-blue-700 dark:text-blue-300"
+                onClick={() => navigate(`/admin/providers?id=${preSelectedProviderId}`)}
+              >
+                View provider profile
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -352,14 +392,69 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="provider">Provider Name *</Label>
-                  <Input
-                    id="provider"
-                    value={formData.provider}
-                    onChange={(e) => handleInputChange('provider', e.target.value)}
-                    placeholder="Provider or company name"
-                    required
-                  />
+                  <Label htmlFor="provider_id">Service Provider *</Label>
+                  <Select 
+                    value={formData.provider_id} 
+                    onValueChange={(value) => {
+                      if (value === 'create_new') {
+                        setShowProviderModal(true);
+                      } else {
+                        const provider = providers.find(p => p.id === value);
+                        handleInputChange('provider_id', value);
+                        handleInputChange('provider', provider?.name || '');
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Select or create provider" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      <SelectItem value="create_new">
+                        <div className="flex items-center gap-2 py-1">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                            <Plus className="h-4 w-4 text-primary" />
+                          </div>
+                          <div>
+                            <div className="font-medium">Create New Provider</div>
+                            <div className="text-xs text-muted-foreground">Add a new service provider</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                      <Separator className="my-2" />
+                      {providers.map(provider => (
+                        <SelectItem key={provider.id} value={provider.id}>
+                          <div className="flex items-center gap-3 py-1">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={provider.avatar} />
+                              <AvatarFallback className="bg-primary/10 text-primary">
+                                {provider.name[0]?.toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="font-medium">{provider.name}</div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-2">
+                                <span>{provider.location}</span>
+                                {provider.totalServices > 0 && (
+                                  <>
+                                    <span>•</span>
+                                    <span>{provider.totalServices} services</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="ml-2">
+                              ⭐ {provider.rating.toFixed(1)}
+                            </Badge>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!formData.provider_id && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Select an existing provider or create a new one
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -593,6 +688,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Quick Provider Creation Modal */}
+      <QuickProviderModal
+        isOpen={showProviderModal}
+        onClose={() => setShowProviderModal(false)}
+        onProviderCreated={(newProvider) => {
+          handleInputChange('provider_id', newProvider.id);
+          handleInputChange('provider', newProvider.name);
+          refetchProviders();
+          toast({
+            title: "Provider created",
+            description: `${newProvider.name} has been added successfully.`,
+          });
+        }}
+      />
     </Dialog>
   );
 };

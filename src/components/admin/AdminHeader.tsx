@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle, Settings, LogOut, CheckCircle } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/marketplace/useAdminAuth';
+import { AdminNotificationsCenter } from './dashboard/AdminNotificationsCenter';
 
 interface AdminHeaderProps {
   securityStatus?: 'secure' | 'warning' | 'critical';
@@ -84,6 +85,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           <Shield className="h-3 w-3 mr-1" />
           ADMIN ACCESS
         </Badge>
+        
+        {/* Notifications */}
+        <AdminNotificationsCenter />
         
         {/* Action Buttons */}
         <Button variant="outline" size="sm" onClick={() => navigate('/admin/settings')}>

@@ -1,5 +1,4 @@
 // Main hooks barrel export
-export * from './use-mobile';
 export * from './use-toast';
 export * from './useAdaptiveColors';
 export * from './useCountdown';

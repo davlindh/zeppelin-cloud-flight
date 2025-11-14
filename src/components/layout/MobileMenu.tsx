@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
 import { MobileMenuItem } from './MobileMenuItem';
@@ -73,6 +73,8 @@ const componentWrapperVariants = {
 };
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isAdmin, closeMenu }) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
   // Check for reduced motion preference
   const shouldReduceMotion = useMemo(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -97,8 +99,43 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isAdmin, closeMenu }) =>
     return menuVariants;
   }, [shouldReduceMotion]);
 
+  // Focus trap
+  useEffect(() => {
+    if (!menuRef.current) return;
+
+    const focusableElements = menuRef.current.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    menuRef.current.addEventListener('keydown', handleTab);
+    firstElement?.focus();
+
+    return () => {
+      menuRef.current?.removeEventListener('keydown', handleTab);
+    };
+  }, []);
+
   return (
     <motion.div
+      ref={menuRef}
       variants={adjustedMenuVariants}
       initial="closed"
       animate="open"

@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSecurityMetrics } from '@/hooks/useAdminData';
 import { 
   Shield, 
   AlertTriangle, 
@@ -10,7 +12,10 @@ import {
   TrendingUp, 
   TrendingDown,
   Activity,
-  Lock
+  Lock,
+  Users,
+  MessageSquare,
+  Gavel
 } from 'lucide-react';
 
 interface SecurityMetric {
@@ -27,38 +32,45 @@ interface SecurityMetricsCardProps {
 }
 
 export const SecurityMetricsCard: React.FC<SecurityMetricsCardProps> = ({ onViewDetails }) => {
-  // Mock security metrics - replace with actual hook
-  const securityMetrics: SecurityMetric[] = [
+  const { data: metrics, isLoading } = useSecurityMetrics();
+
+  const securityMetrics: SecurityMetric[] = metrics ? [
     {
-      label: 'Failed Login Attempts',
-      value: 3,
-      max: 10,
+      label: 'Total Users',
+      value: metrics.totalUsers,
       status: 'secure',
-      trend: 'down',
+      trend: 'stable',
+      description: 'Registered users'
+    },
+    {
+      label: 'Active User Roles',
+      value: metrics.activeRoles,
+      status: 'secure',
+      description: 'Assigned roles'
+    },
+    {
+      label: 'Recent Requests',
+      value: metrics.communicationRequests,
+      status: metrics.communicationRequests > 10 ? 'warning' : 'secure',
+      trend: metrics.communicationRequests > 10 ? 'up' : 'stable',
       description: 'Last 24 hours'
     },
     {
-      label: 'Active Admin Sessions',
-      value: 2,
-      status: 'secure',
-      description: 'Currently logged in'
-    },
-    {
-      label: 'Suspicious Activities',
-      value: 1,
-      status: 'warning',
-      trend: 'up',
-      description: 'Requires review'
-    },
-    {
-      label: 'Security Score',
-      value: 85,
-      max: 100,
+      label: 'Recent Bids',
+      value: metrics.recentBids,
       status: 'secure',
       trend: 'stable',
-      description: 'Overall system security'
+      description: 'Last 24 hours'
+    },
+    {
+      label: 'Admin Actions',
+      value: metrics.adminActions,
+      max: metrics.adminActions > 0 ? metrics.adminActions * 1.5 : 50,
+      status: 'secure',
+      trend: 'stable',
+      description: 'Last 24 hours'
     }
-  ];
+  ] : [];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -99,31 +111,59 @@ export const SecurityMetricsCard: React.FC<SecurityMetricsCardProps> = ({ onView
     ? 'warning' 
     : 'secure';
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-2 w-full" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card className="overflow-hidden border-border/50 transition-all hover:shadow-md">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-primary/5 to-transparent">
         <CardTitle className="text-lg font-medium flex items-center gap-2">
-          <Shield className="h-5 w-5" />
+          <Shield className="h-5 w-5 text-primary" />
           Security Overview
         </CardTitle>
-        <Badge variant={getStatusBadgeVariant(overallStatus)} className="flex items-center gap-1">
+        <Badge variant={getStatusBadgeVariant(overallStatus)} className="flex items-center gap-1 animate-in fade-in slide-in-from-top-2">
           {getStatusIcon(overallStatus)}
           {overallStatus.toUpperCase()}
         </Badge>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <div className="space-y-4">
           {securityMetrics.map((metric, index) => (
-            <div key={index} className="space-y-2">
+            <div 
+              key={index} 
+              className="group space-y-2 p-3 rounded-lg border border-border/50 bg-gradient-to-br from-background to-muted/20 transition-all hover:border-primary/30 hover:shadow-sm"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">{metric.label}</span>
-                  {metric.trend && getTrendIcon(metric.trend)}
+                  <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                    {metric.label}
+                  </span>
+                  {metric.trend && (
+                    <span className="animate-in fade-in zoom-in">
+                      {getTrendIcon(metric.trend)}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold">
-                    {metric.value}
-                    {metric.max && `/${metric.max}`}
+                  <span className="text-sm font-bold tabular-nums">
+                    {metric.value.toLocaleString()}
+                    {metric.max && <span className="text-muted-foreground">/{Math.round(metric.max).toLocaleString()}</span>}
                   </span>
                   {getStatusIcon(metric.status)}
                 </div>
@@ -132,23 +172,26 @@ export const SecurityMetricsCard: React.FC<SecurityMetricsCardProps> = ({ onView
               {metric.max && (
                 <Progress 
                   value={(metric.value / metric.max) * 100} 
-                  className="h-2"
+                  className="h-2 transition-all"
                 />
               )}
               
               {metric.description && (
-                <p className="text-xs text-muted-foreground">{metric.description}</p>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Activity className="h-3 w-3" />
+                  {metric.description}
+                </p>
               )}
             </div>
           ))}
           
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-border/50 mt-4">
             <Button 
               variant="outline" 
-              className="w-full" 
+              className="w-full group hover:bg-primary hover:text-primary-foreground transition-all" 
               onClick={onViewDetails}
             >
-              <Lock className="h-4 w-4 mr-2" />
+              <Lock className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
               View Security Dashboard
             </Button>
           </div>

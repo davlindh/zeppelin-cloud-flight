@@ -27,12 +27,7 @@ export default function OrderTrackingPage() {
         .from('orders')
         .select(`
           *,
-          order_items (
-            *,
-            products (title, image),
-            auctions (title, image),
-            services (title)
-          ),
+          order_items (*),
           order_status_history (*)
         `)
         .eq('order_number', orderNumber)

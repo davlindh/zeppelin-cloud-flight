@@ -47,6 +47,7 @@ import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
 import { CartProvider } from "./contexts/marketplace/CartContext";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
+import { RoleProtectedRoute } from "./components/marketplace/RoleProtectedRoute";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
 import { ServiceProvidersAdmin } from "./pages/admin/ServiceProvidersAdmin";
@@ -54,6 +55,10 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import { ProviderPortfolioPage } from "./pages/marketplace/ProviderPortfolioPage";
 import PortfolioManagement from "./pages/marketplace/PortfolioManagement";
+import { Dashboard as MarketplaceDashboard } from "./pages/marketplace/Dashboard";
+import { RoleApplicationsPage } from "./pages/admin/RoleApplicationsPage";
+import { ProviderOnboarding } from "./pages/marketplace/ProviderOnboarding";
+import { ProviderDashboard } from "./pages/marketplace/ProviderDashboard";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -69,6 +74,7 @@ const BookingsPage = lazy(() => import("./pages/admin/BookingsPage").then(m => (
 const CommunicationsPage = lazy(() => import("./pages/admin/CommunicationsPage").then(m => ({ default: m.CommunicationsPage })));
 const SecurityPage = lazy(() => import("./pages/admin/SecurityPage").then(m => ({ default: m.SecurityPage })));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const DataCleanup = lazy(() => import("./pages/admin/DataCleanup").then(m => ({ default: m.DataCleanup })));
 const ParticipantsManagementPage = lazy(() => import("./pages/admin/ParticipantsManagementPage").then(m => ({ default: m.ParticipantsManagementPage })));
 const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManagementPage").then(m => ({ default: m.ProjectsManagementPage })));
 const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManagementPage").then(m => ({ default: m.SponsorsManagementPage })));
@@ -140,14 +146,31 @@ const App = () => (
                   <Route path="checkout" element={<CheckoutPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
                   <Route path="notifications" element={<NotificationsPage />} />
-                  <Route path="account" element={
+                  <Route path="profile" element={
                     <ProtectedRoute>
                       <ProfilePage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="dashboard" element={
+                    <ProtectedRoute>
+                      <MarketplaceDashboard />
                     </ProtectedRoute>
                   } />
                   <Route path="orders" element={
                     <ProtectedRoute>
                       <CustomerOrdersPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/onboarding" element={
+                    <ProtectedRoute>
+                      <ProviderOnboarding />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="provider/dashboard" element={
+                    <ProtectedRoute>
+                      <RoleProtectedRoute requiredRole="provider" fallbackPath="/marketplace">
+                        <ProviderDashboard />
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } />
                 </Route>
@@ -221,6 +244,11 @@ const App = () => (
                       <CommunicationsPage />
                     </Suspense>
                   } />
+                  <Route path="applications" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <RoleApplicationsPage />
+                    </Suspense>
+                  } />
                   <Route path="security" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SecurityPage />
@@ -229,6 +257,11 @@ const App = () => (
                   <Route path="settings" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SettingsPage />
+                    </Suspense>
+                  } />
+                  <Route path="data-cleanup" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <DataCleanup />
                     </Suspense>
                   } />
                   <Route path="participants-management" element={

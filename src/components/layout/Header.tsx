@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSmoothScroll } from '../../../hooks/useSmoothScroll';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useScrollDetection } from '@/hooks/useScrollDetection';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, LogOut, Menu, X, ShieldCheck } from 'lucide-react';
@@ -13,19 +14,7 @@ import { NavigationDropdown } from '@/components/common/NavigationDropdown';
 import { MarketplaceActions } from '@/components/common/MarketplaceActions';
 import { MobileMenu } from './MobileMenu';
 import { cn } from '@/lib/utils';
-
-const MARKETPLACE_ITEMS = [
-    { title: 'Auktioner', href: '/marketplace/auctions', description: 'Bjud på unika föremål' },
-    { title: 'Butik', href: '/marketplace/shop', description: 'Handla produkter direkt' },
-    { title: 'Tjänster', href: '/marketplace/services', description: 'Boka professionella tjänster' },
-];
-
-const SITE_ITEMS = [
-    { title: 'Showcase', href: '/showcase', description: 'Utforska våra projekt' },
-    { title: 'Deltagare', href: '/participants', description: 'Möt våra deltagare' },
-    { title: 'Partners', href: '/partners', description: 'Våra samarbetspartners' },
-    { title: 'Mediagalleri', href: '/media', description: 'Bilder och videos' },
-];
+import { SITE_DROPDOWN_ITEMS, MARKETPLACE_DROPDOWN_ITEMS } from '@/types/navigation';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,6 +23,7 @@ export const Header: React.FC = () => {
     const { isAdmin, logout } = useAdminAuth();
     const isAdminPage = location.pathname.startsWith('/admin');
     const isScrolled = useScrollDetection({ threshold: 20 });
+    const isMobile = useIsMobile();
     
     const closeMenu = () => setIsMenuOpen(false);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -51,6 +41,18 @@ export const Header: React.FC = () => {
         return () => {
             document.body.style.overflow = 'unset';
         };
+    }, [isMenuOpen]);
+
+    // Close mobile menu on ESC key press
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isMenuOpen) {
+                closeMenu();
+            }
+        };
+
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
     }, [isMenuOpen]);
 
     const handleNavClick = useSmoothScroll(closeMenu);
@@ -94,66 +96,72 @@ export const Header: React.FC = () => {
                         </div>
                     ) : (
                         <>
-                            {/* Desktop Navigation */}
-                            <nav aria-label="Primary navigation" className="hidden lg:flex items-center space-x-6">
-                                <NavigationDropdown
-                                    title="Utforska"
-                                    items={SITE_ITEMS}
-                                />
-                                <NavigationDropdown
-                                    title="Marketplace"
-                                    items={MARKETPLACE_ITEMS}
-                                    variant="marketplace"
-                                />
-                            </nav>
+                            {/* Desktop Navigation - Only render on desktop */}
+                            {!isMobile && (
+                                <nav aria-label="Primary navigation" className="flex items-center space-x-6">
+                                    <NavigationDropdown
+                                        title="Utforska"
+                                        items={SITE_DROPDOWN_ITEMS}
+                                    />
+                                    <NavigationDropdown
+                                        title="Marketplace"
+                                        items={MARKETPLACE_DROPDOWN_ITEMS}
+                                        variant="marketplace"
+                                    />
+                                </nav>
+                            )}
 
-                            {/* Desktop Actions */}
-                            <div className="hidden lg:flex items-center space-x-3">
-                                <MarketplaceActions />
-                                {isAdmin && (
-                                    <Link to="/admin">
-                                        <Button variant="outline" size="sm" className="border-amber-500 text-amber-600 hover:bg-amber-50">
-                                            <ShieldCheck className="h-4 w-4 mr-2" />
-                                            Admin
-                                        </Button>
-                                    </Link>
-                                )}
-                                <LanguageSwitcher />
-                                <a 
-                                    href="#kontakt" 
-                                    onClick={(e) => handleNavClick(e, '#kontakt')} 
-                                    className="bg-gray-800 text-white font-bold px-5 py-2 rounded-lg hover:bg-gray-900 transition text-sm"
+                            {/* Desktop Actions - Only render on desktop */}
+                            {!isMobile && (
+                                <div className="flex items-center space-x-3">
+                                    <MarketplaceActions />
+                                    {isAdmin && (
+                                        <Link to="/admin">
+                                            <Button variant="outline" size="sm" className="border-amber-500 text-amber-600 hover:bg-amber-50">
+                                                <ShieldCheck className="h-4 w-4 mr-2" />
+                                                Admin
+                                            </Button>
+                                        </Link>
+                                    )}
+                                    <LanguageSwitcher />
+                                    <a 
+                                        href="#kontakt" 
+                                        onClick={(e) => handleNavClick(e, '#kontakt')} 
+                                        className="bg-gray-800 text-white font-bold px-5 py-2 rounded-lg hover:bg-gray-900 transition text-sm"
+                                    >
+                                        Kontakta Oss
+                                    </a>
+                                    <UserMenu />
+                                </div>
+                            )}
+
+                            {/* Mobile Menu Button - Only render on mobile */}
+                            {isMobile && (
+                                <button 
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        toggleMenu();
+                                    }} 
+                                    id="mobile-menu-button" 
+                                    aria-controls="mobile-menu" 
+                                    aria-expanded={isMenuOpen} 
+                                    className={cn(
+                                        "p-2 rounded-md transition-colors relative z-[60]",
+                                        isMenuOpen 
+                                            ? "bg-amber-50 text-amber-600" 
+                                            : "text-gray-600 hover:bg-gray-100"
+                                    )}
+                                    aria-label="Toggle menu"
+                                    style={{ pointerEvents: 'auto' }}
                                 >
-                                    Kontakta Oss
-                                </a>
-                                <UserMenu />
-                            </div>
-
-                            {/* Mobile Menu Button */}
-                            <button 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    toggleMenu();
-                                }} 
-                                id="mobile-menu-button" 
-                                aria-controls="mobile-menu" 
-                                aria-expanded={isMenuOpen} 
-                                className={cn(
-                                    "lg:hidden p-2 rounded-md transition-colors relative z-[60]",
-                                    isMenuOpen 
-                                        ? "bg-amber-50 text-amber-600" 
-                                        : "text-gray-600 hover:bg-gray-100"
-                                )}
-                                aria-label="Toggle menu"
-                                style={{ pointerEvents: 'auto' }}
-                            >
-                                {isMenuOpen ? (
-                                    <X className="h-6 w-6" />
-                                ) : (
-                                    <Menu className="h-6 w-6" />
-                                )}
-                            </button>
+                                    {isMenuOpen ? (
+                                        <X className="h-6 w-6" />
+                                    ) : (
+                                        <Menu className="h-6 w-6" />
+                                    )}
+                                </button>
+                            )}
                         </>
                     )}
                 </div>

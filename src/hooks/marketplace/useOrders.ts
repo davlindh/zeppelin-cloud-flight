@@ -21,12 +21,7 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
         .from('orders')
         .select(`
           *,
-          order_items (
-            *,
-            products (title, image),
-            auctions (title, image),
-            services (title)
-          )
+          order_items (*)
         `)
         .order('created_at', { ascending: false });
       

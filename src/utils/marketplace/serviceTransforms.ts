@@ -25,6 +25,11 @@ export const transformDatabaseService = (dbService: DatabaseService): Service =>
     certifications: dbService.service_providers!.certifications ?? [],
     responseTime: dbService.service_providers!.response_time ?? '24 hours',
     completedProjects: dbService.service_providers!.completed_projects ?? 0,
+    years_in_business: dbService.service_providers!.years_in_business,
+    awards: dbService.service_providers!.awards ?? [],
+    work_philosophy: dbService.service_providers!.work_philosophy,
+    portfolio_description: dbService.service_providers!.portfolio_description,
+    slug: dbService.service_providers!.slug,
     portfolio: [],
     recentReviews: []
   } : {
