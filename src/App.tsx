@@ -54,6 +54,8 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import { ProviderPortfolioPage } from "./pages/marketplace/ProviderPortfolioPage";
 import PortfolioManagement from "./pages/marketplace/PortfolioManagement";
+import { UserDashboard } from "./pages/marketplace/UserDashboard";
+import { RoleApplicationsPage } from "./pages/admin/RoleApplicationsPage";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -220,6 +222,11 @@ const App = () => (
                   <Route path="messages" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <CommunicationsPage />
+                    </Suspense>
+                  } />
+                  <Route path="applications" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <RoleApplicationsPage />
                     </Suspense>
                   } />
                   <Route path="security" element={

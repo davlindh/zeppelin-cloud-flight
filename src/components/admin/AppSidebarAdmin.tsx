@@ -46,6 +46,7 @@ const marketplaceSections = [
   { title: "Bookings", path: "/admin/bookings", icon: Calendar, description: "Service bookings" },
   { title: "Orders", path: "/admin/orders", icon: ShoppingCart, description: "Purchase orders" },
   { title: "Users", path: "/admin/users", icon: Users, description: "User management" },
+  { title: "Applications", path: "/admin/applications", icon: Shield, description: "Role applications" },
   { title: "Providers", path: "/admin/providers", icon: Building, description: "Service providers" },
   { title: "Categories", path: "/admin/categories", icon: Tags, description: "Category management" },
   { title: "Brands", path: "/admin/brands", icon: Package, description: "Brand management" },
