@@ -11,6 +11,7 @@ import { ServiceBookingCard } from '@/components/marketplace/services/ServiceBoo
 import { EnhancedGuestCommunication } from '@/components/marketplace/communication/EnhancedGuestCommunication';
 import { ServiceLoading } from '@/components/marketplace/ui/service-loading';
 import { ServiceError } from '@/components/marketplace/ui/service-error';
+import { ShareServiceButton } from '@/components/marketplace/services/ShareServiceButton';
 
 import { useService } from '@/hooks/marketplace/useService';
 import { useSocialProof } from '@/hooks/marketplace/useSocialProof';
@@ -93,18 +94,29 @@ const ServiceDetail = () => {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <PageHeader
-          title={service.title}
-          breadcrumbs={[
-            { label: 'Services', href: '/services' },
-            { label: service.category, href: `/services?category=${service.category}` },
-            { label: service.title }
-          ]}
-          backLink={{
-            href: '/services',
-            label: 'Back to Services'
-          }}
-        />
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <PageHeader
+            title={service.title}
+            breadcrumbs={[
+              { label: 'Services', href: '/services' },
+              { label: service.category, href: `/services?category=${service.category}` },
+              { label: service.title }
+            ]}
+            backLink={{
+              href: '/services',
+              label: 'Back to Services'
+            }}
+          />
+          
+          {/* Share Button */}
+          <div className="flex-shrink-0 pt-8">
+            <ShareServiceButton
+              serviceTitle={service.title}
+              variant="outline"
+              size="default"
+            />
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
