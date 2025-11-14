@@ -80,8 +80,12 @@ export const useCreateServiceReview = () => {
       if (error) throw error;
       return data as ServiceReview;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['service-reviews', variables.service_id] });
+      
+      // Track conversion (assuming we can get provider_id from somewhere)
+      // This would need to be passed in or fetched
+      
       toast.success('Tack för din recension!', {
         description: 'Din recension har publicerats',
       });

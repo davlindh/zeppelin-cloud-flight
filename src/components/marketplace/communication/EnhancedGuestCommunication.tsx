@@ -11,6 +11,7 @@ import { CommunicationReceipt } from './CommunicationReceipt';
 import { CommunicationTracker } from './CommunicationTracker';
 import { useCommunicationTracking } from '@/hooks/marketplace/useCommunicationTracking';
 import { useServiceProvider } from '@/hooks/marketplace/useServiceProvider';
+import { useTrackConversion } from '@/hooks/marketplace/usePortfolioAnalytics';
 import { CommunicationRequest } from '@/types/marketplace/communication';
 
 interface EnhancedGuestCommunicationProps {
@@ -34,6 +35,7 @@ export const EnhancedGuestCommunication: React.FC<EnhancedGuestCommunicationProp
   const [currentView, setCurrentView] = useState<'form' | 'receipt' | 'history'>('form');
   const [lastRequest, setLastRequest] = useState<CommunicationRequest | null>(null);
   const { submitCommunicationRequest } = useCommunicationTracking();
+  const trackConversion = useTrackConversion();
 
   // If we have a serviceId, try to get the real provider info
   const { data: serviceData } = useServiceProvider(serviceContext?.serviceId || '');
@@ -59,6 +61,14 @@ export const EnhancedGuestCommunication: React.FC<EnhancedGuestCommunicationProp
         subject: formData.subject,
         message: formData.message || formData.description || formData.projectDescription,
         additionalData: formData
+      });
+
+      // Track conversion
+      trackConversion.mutate({
+        providerId: actualProviderId,
+        conversionType: 'inquiry',
+        relatedId: request.id,
+        customerEmail: formData.guestEmail || formData.email
       });
 
       setLastRequest(request);

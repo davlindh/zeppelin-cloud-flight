@@ -5,16 +5,33 @@ import { Button } from '@/components/ui/button';
 import { Star, Eye, Calendar, Briefcase } from 'lucide-react';
 import type { ServicePortfolioItem } from '@/types/unified';
 import { format } from 'date-fns';
+import { useTrackPortfolioClick } from '@/hooks/marketplace/usePortfolioAnalytics';
 
 interface PortfolioItemCardProps {
   item: ServicePortfolioItem;
   onViewDetails: (item: ServicePortfolioItem) => void;
+  sessionId?: string;
 }
 
 export const PortfolioItemCard: React.FC<PortfolioItemCardProps> = ({ 
   item, 
-  onViewDetails 
+  onViewDetails,
+  sessionId
 }) => {
+  const trackClick = useTrackPortfolioClick();
+
+  const handleViewDetails = () => {
+    // Track click
+    trackClick.mutate({
+      itemId: item.id,
+      providerId: item.providerId,
+      clickType: 'detail_view',
+      sessionId
+    });
+    
+    onViewDetails(item);
+  };
+
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300">
       {/* Featured badge */}
@@ -40,7 +57,7 @@ export const PortfolioItemCard: React.FC<PortfolioItemCardProps> = ({
             <Button 
               variant="secondary" 
               size="sm"
-              onClick={() => onViewDetails(item)}
+              onClick={handleViewDetails}
               className="w-full"
             >
               <Eye className="w-4 h-4 mr-2" />

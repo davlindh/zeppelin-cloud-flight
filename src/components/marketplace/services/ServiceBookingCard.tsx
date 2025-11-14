@@ -13,6 +13,7 @@ import { CommunicationTracker } from '@/components/marketplace/communication/Com
 import { useService } from '@/hooks/marketplace/useService';
 import { useAuthenticatedUser } from '@/hooks/marketplace/useAuthenticatedUser';
 import { useAvailableTimes } from '@/hooks/marketplace/useAvailableTimes';
+import { useTrackConversion } from '@/hooks/marketplace/usePortfolioAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { bookingFormSchema, stepValidationSchemas, type BookingFormData } from '@/schemas/marketplace/booking.schema';
@@ -28,6 +29,7 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
   const { data: service } = useService(serviceId);
   const { data: authenticatedUser } = useAuthenticatedUser();
   const { toast } = useToast();
+  const trackConversion = useTrackConversion();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -159,11 +161,11 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
       const validatedData = bookingFormSchema.parse(bookingData);
       setIsSubmitting(true);
 
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('bookings')
         .insert({
           service_id: serviceId,
-          user_id: authenticatedUser?.id || null, // Include user_id if authenticated
+          user_id: authenticatedUser?.id || null,
           selected_date: validatedData.selectedDate,
           selected_time: validatedData.selectedTime,
           customer_name: validatedData.customerName,
@@ -173,10 +175,22 @@ export const ServiceBookingCard: React.FC<ServiceBookingCardProps> = ({
           customizations: validatedData.customizations || {},
           agreed_to_terms: validatedData.agreedToTerms,
           status: 'pending'
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
         throw error;
+      }
+
+      // Track conversion
+      if (service?.providerDetails?.id) {
+        trackConversion.mutate({
+          providerId: service.providerDetails.id,
+          conversionType: 'booking',
+          relatedId: data?.id,
+          customerEmail: validatedData.customerEmail
+        });
       }
 
       toast({
