@@ -9,22 +9,25 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ServiceProviderPortfolioSection } from '@/components/marketplace/services/portfolio/ServiceProviderPortfolioSection';
 import { EnhancedGuestCommunication } from '@/components/marketplace/communication/EnhancedGuestCommunication';
+import { useTrackPortfolioView } from '@/hooks/marketplace/usePortfolioAnalytics';
 import {
   Star,
   MapPin,
   Briefcase,
   Mail,
-  Phone,
   Award,
   Clock,
   TrendingUp
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { sv } from 'date-fns/locale';
+import { useEffect, useState } from 'react';
 
 export const ProviderPortfolioPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const trackView = useTrackPortfolioView();
+  const [sessionId] = useState(() => crypto.randomUUID());
 
   const { data: provider, isLoading } = useQuery({
     queryKey: ['provider-by-slug', slug],
@@ -77,6 +80,17 @@ export const ProviderPortfolioPage = () => {
       </div>
     );
   }
+
+  // Track portfolio page view
+  useEffect(() => {
+    if (provider?.id) {
+      trackView.mutate({
+        itemId: provider.id, // Using provider ID as proxy for portfolio page view
+        providerId: provider.id,
+        sessionId
+      });
+    }
+  }, [provider?.id, sessionId]);
 
   return (
     <>

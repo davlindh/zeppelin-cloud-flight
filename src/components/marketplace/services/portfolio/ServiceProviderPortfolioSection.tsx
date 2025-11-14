@@ -37,6 +37,7 @@ export const ServiceProviderPortfolioSection: React.FC<ServiceProviderPortfolioS
   const [selectedItem, setSelectedItem] = useState<ServicePortfolioItem | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [layout, setLayout] = useState<'masonry' | 'grid'>(initialLayout);
+  const [sessionId] = useState(() => crypto.randomUUID());
   
   const { 
     portfolioItems, 
@@ -127,6 +128,7 @@ export const ServiceProviderPortfolioSection: React.FC<ServiceProviderPortfolioS
                     <PortfolioItemCard 
                       item={item} 
                       onViewDetails={handleItemClick}
+                      sessionId={sessionId}
                     />
                   </div>
                 ))}
@@ -168,6 +170,7 @@ export const ServiceProviderPortfolioSection: React.FC<ServiceProviderPortfolioS
         <PortfolioMasonryGrid 
           items={filteredItems} 
           onItemClick={handleItemClick}
+          sessionId={sessionId}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -176,6 +179,7 @@ export const ServiceProviderPortfolioSection: React.FC<ServiceProviderPortfolioS
               key={item.id}
               item={item} 
               onViewDetails={handleItemClick}
+              sessionId={sessionId}
             />
           ))}
         </div>

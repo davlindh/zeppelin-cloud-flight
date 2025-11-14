@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.process-submission]
 verify_jwt = false
+
+[functions.send-provider-notification]
+verify_jwt = false

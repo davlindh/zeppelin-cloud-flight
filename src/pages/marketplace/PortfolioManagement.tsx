@@ -9,6 +9,7 @@ import { PortfolioManagementSection } from '@/components/marketplace/services/po
 import { ProviderProjectsSection } from '@/components/marketplace/services/portfolio/ProviderProjectsSection';
 import { PortfolioBatchUpload } from '@/components/marketplace/services/portfolio/PortfolioBatchUpload';
 import { PortfolioImageBatchUpload } from '@/components/marketplace/services/portfolio/PortfolioImageBatchUpload';
+import { PortfolioAnalyticsDashboard } from '@/components/marketplace/services/portfolio/PortfolioAnalyticsDashboard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -88,8 +89,9 @@ const PortfolioManagement = () => {
 
         <div className="space-y-8">
           <Tabs defaultValue="manage" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="manage">Hantera</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="projects">Projekt</TabsTrigger>
               <TabsTrigger value="csv">Batch CSV</TabsTrigger>
               <TabsTrigger value="images">Batch Bilder</TabsTrigger>
@@ -97,6 +99,10 @@ const PortfolioManagement = () => {
 
             <TabsContent value="manage" className="mt-6">
               <PortfolioManagementSection providerId={provider.id} />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6">
+              <PortfolioAnalyticsDashboard providerId={provider.id} />
             </TabsContent>
 
             <TabsContent value="projects" className="mt-6">

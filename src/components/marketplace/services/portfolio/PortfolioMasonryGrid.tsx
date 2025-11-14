@@ -5,11 +5,13 @@ import { PortfolioItemCard } from './PortfolioItemCard';
 interface PortfolioMasonryGridProps {
   items: ServicePortfolioItem[];
   onItemClick: (item: ServicePortfolioItem) => void;
+  sessionId?: string;
 }
 
 export const PortfolioMasonryGrid: React.FC<PortfolioMasonryGridProps> = ({ 
   items, 
-  onItemClick 
+  onItemClick,
+  sessionId
 }) => {
   return (
     <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
@@ -21,6 +23,7 @@ export const PortfolioMasonryGrid: React.FC<PortfolioMasonryGridProps> = ({
           <PortfolioItemCard 
             item={item} 
             onViewDetails={onItemClick}
+            sessionId={sessionId}
           />
         </div>
       ))}
