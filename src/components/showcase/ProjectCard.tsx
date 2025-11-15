@@ -2,12 +2,21 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TagList } from './TagList';
 import { ImageWithFallback } from './ImageWithFallback';
+import { Badge } from '@/components/ui/badge';
+import { Target, TrendingUp } from 'lucide-react';
 import type { ShowcaseCard, Project } from '@/types/unified';
 
 // Extended interface for ProjectCard display with computed/derived fields
 type ProjectCardData = ShowcaseCard & {
     imageUrl?: string;
     tags?: string[];
+    activeCampaign?: {
+        slug: string;
+        raised_amount: number;
+        target_amount: number;
+        deadline?: string;
+        percentFunded: number;
+    } | null;
 };
 
 interface ProjectCardProps {
@@ -45,6 +54,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ card, isModal = false 
                     loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Campaign Badge */}
+                {card.activeCampaign && (
+                    <Badge 
+                        variant="default" 
+                        className="absolute top-3 right-3 gap-1 bg-primary/90 backdrop-blur-sm hover:bg-primary shadow-lg"
+                    >
+                        <Target className="h-3 w-3" />
+                        {card.activeCampaign.percentFunded}% funded
+                    </Badge>
+                )}
             </div>
             <div className="p-4 sm:p-6">
                 <h3 className="text-lg sm:text-xl font-bold mb-2 group-hover:text-amber-600 transition-colors duration-200">

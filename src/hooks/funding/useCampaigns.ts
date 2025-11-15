@@ -23,16 +23,22 @@ export const useCampaigns = (filters?: CampaignFilters) => {
         `)
         .order('created_at', { ascending: false });
 
-      if (filters?.status?.length) {
+      // Enforce public visibility rules: only show active/successful campaigns with public visibility
+      // unless specific filters override this
+      if (!filters?.status?.length) {
+        query = query.in('status', ['active', 'successful']);
+      } else {
         query = query.in('status', filters.status);
+      }
+
+      if (!filters?.visibility) {
+        query = query.eq('visibility', 'public');
+      } else {
+        query = query.eq('visibility', filters.visibility);
       }
 
       if (filters?.eventId) {
         query = query.eq('event_id', filters.eventId);
-      }
-
-      if (filters?.visibility) {
-        query = query.eq('visibility', filters.visibility);
       }
 
       if (filters?.projectId) {

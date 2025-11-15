@@ -1,20 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useCampaigns } from '@/hooks/funding/useCampaigns';
+import { useCampaignsWithEvaluation } from '@/hooks/funding/useCampaignsWithEvaluation';
 import { CampaignCard } from '@/components/funding/CampaignCard';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Target } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const FeaturedCampaignsSection: React.FC = () => {
-  const { data: campaigns } = useCampaigns({
+  const { data: campaigns } = useCampaignsWithEvaluation({
     status: ['active'],
     visibility: 'public',
   });
 
   const featured = React.useMemo(() => {
     if (!campaigns) return [];
-    return campaigns
-      .filter(c => c.status === 'active')
+    // Sort by ECKT (conviction) and take top 3
+    return [...campaigns]
+      .sort((a, b) => {
+        const aEckt = a.evaluation_summary?.weighted_eckt || 0;
+        const bEckt = b.evaluation_summary?.weighted_eckt || 0;
+        return bEckt - aEckt;
+      })
       .slice(0, 3);
   }, [campaigns]);
 
@@ -43,7 +48,11 @@ export const FeaturedCampaignsSection: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {featured.map(campaign => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
+            <CampaignCard 
+              key={campaign.id} 
+              campaign={campaign} 
+              evaluationSummary={campaign.evaluation_summary}
+            />
           ))}
         </div>
       </div>

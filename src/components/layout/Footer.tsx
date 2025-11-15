@@ -34,6 +34,14 @@ export const Footer: React.FC = () => {
 
                         <Button
                             variant="secondary"
+                            asChild
+                            className="hover:scale-105 transition-transform duration-300"
+                        >
+                            <Link to="/campaigns">Support Campaigns</Link>
+                        </Button>
+
+                        <Button
+                            variant="secondary"
                             onClick={() => {
                                 window.scrollTo({ top: 2200, behavior: 'smooth' });  
                             }}

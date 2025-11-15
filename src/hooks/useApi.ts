@@ -45,7 +45,37 @@ export const useProjects = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // Fetch active campaigns separately for each project
+      const projectsWithCampaigns = await Promise.all(
+        (data || []).map(async (project) => {
+          const { data: campaign } = await (supabase as any)
+            .from('funding_campaigns')
+            .select('slug, raised_amount, target_amount, deadline, status, visibility')
+            .eq('project_id', project.id)
+            .eq('status', 'active')
+            .eq('visibility', 'public')
+            .limit(1)
+            .maybeSingle();
+          
+          const activeCampaign = campaign ? {
+            slug: campaign.slug,
+            raised_amount: campaign.raised_amount,
+            target_amount: campaign.target_amount,
+            deadline: campaign.deadline,
+            percentFunded: campaign.target_amount > 0 
+              ? Math.round((campaign.raised_amount / campaign.target_amount) * 100)
+              : 0,
+          } : null;
+          
+          return {
+            ...project,
+            activeCampaign,
+          };
+        })
+      );
+      
+      return projectsWithCampaigns;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

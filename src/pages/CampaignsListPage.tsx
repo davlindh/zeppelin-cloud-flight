@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCampaigns } from '@/hooks/funding/useCampaigns';
+import { useCampaignsWithEvaluation } from '@/hooks/funding/useCampaignsWithEvaluation';
 import { CampaignCard } from '@/components/funding/CampaignCard';
 import { Loader2, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ export const CampaignsListPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string[]>(['active']);
   const [sortBy, setSortBy] = useState<'deadline' | 'funded' | 'eckt'>('deadline');
 
-  const { data: campaigns, isLoading } = useCampaigns({
+  const { data: campaigns, isLoading } = useCampaignsWithEvaluation({
     status: statusFilter,
     visibility: 'public',
   });
@@ -32,6 +32,11 @@ export const CampaignsListPage: React.FC = () => {
         const aPercent = a.target_amount > 0 ? a.raised_amount / a.target_amount : 0;
         const bPercent = b.target_amount > 0 ? b.raised_amount / b.target_amount : 0;
         return bPercent - aPercent;
+      }
+      if (sortBy === 'eckt') {
+        const aEckt = a.evaluation_summary?.weighted_eckt || 0;
+        const bEckt = b.evaluation_summary?.weighted_eckt || 0;
+        return bEckt - aEckt;
       }
       return 0;
     });
@@ -71,7 +76,7 @@ export const CampaignsListPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Status:</span>
-            {['active', 'successful', 'draft'].map(status => (
+            {['active', 'successful'].map(status => (
               <Badge
                 key={status}
                 variant={statusFilter.includes(status) ? 'default' : 'outline'}
@@ -103,7 +108,11 @@ export const CampaignsListPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedCampaigns.map(campaign => (
-              <CampaignCard key={campaign.id} campaign={campaign} />
+              <CampaignCard 
+                key={campaign.id} 
+                campaign={campaign}
+                evaluationSummary={campaign.evaluation_summary}
+              />
             ))}
           </div>
         )}
