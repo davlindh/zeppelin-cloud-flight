@@ -111,6 +111,41 @@ export const useUpdateTask = () => {
             content: `Completed task: ${task.title}`,
             metadata: { task_id: task.id }
           });
+
+        // Award Fave Points for task completion
+        try {
+          if (user?.id) {
+            await supabase.rpc('apply_fave_transaction', {
+              p_user_id: user.id,
+              p_delta: 15,
+              p_reason: 'task_completed',
+              p_context_type: 'collaboration_project_task',
+              p_context_id: task.id,
+              p_domain: 'collaboration',
+              p_metadata: {
+                task_title: task.title,
+                project_id: project_id
+              }
+            });
+          }
+
+          // Bonus to task creator if different from completer
+          if (task.created_by && task.created_by !== user?.id) {
+            await supabase.rpc('apply_fave_transaction', {
+              p_user_id: task.created_by,
+              p_delta: 5,
+              p_reason: 'task_delegated_completed',
+              p_context_type: 'collaboration_project_task',
+              p_context_id: task.id,
+              p_domain: 'organizing',
+              p_metadata: {
+                completed_by: user?.id
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Failed to award Fave Points:', error);
+        }
       }
 
       return task;

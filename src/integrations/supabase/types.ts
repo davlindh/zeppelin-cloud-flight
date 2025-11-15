@@ -271,6 +271,9 @@ export type Database = {
           proposed_times: Json | null
           provider_notes: string | null
           provider_response: string | null
+          rating: number | null
+          review_comment: string | null
+          reviewed_at: string | null
           selected_date: string
           selected_time: string
           service_id: string
@@ -292,6 +295,9 @@ export type Database = {
           proposed_times?: Json | null
           provider_notes?: string | null
           provider_response?: string | null
+          rating?: number | null
+          review_comment?: string | null
+          reviewed_at?: string | null
           selected_date: string
           selected_time: string
           service_id: string
@@ -313,6 +319,9 @@ export type Database = {
           proposed_times?: Json | null
           provider_notes?: string | null
           provider_response?: string | null
+          rating?: number | null
+          review_comment?: string | null
+          reviewed_at?: string | null
           selected_date?: string
           selected_time?: string
           service_id?: string
