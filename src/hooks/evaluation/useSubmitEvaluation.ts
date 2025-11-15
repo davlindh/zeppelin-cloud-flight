@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { EvaluationTargetType } from './types';
+import type { 
+  EvaluationTargetType,
+  EvaluationContextScope 
+} from './types';
 import { useToast } from '@/hooks/use-toast';
 
 interface SubmitEvaluationInput {
@@ -11,6 +14,8 @@ interface SubmitEvaluationInput {
   ecktValue: number;
   dimensions: Record<string, number>;
   comment?: string;
+  contextScope?: EvaluationContextScope;
+  contextId?: string;
 }
 
 export const useSubmitEvaluation = () => {
@@ -37,6 +42,8 @@ export const useSubmitEvaluation = () => {
           eckt_value: input.ecktValue,
           dimensions: input.dimensions,
           comment: input.comment ?? null,
+          context_scope: input.contextScope || null,
+          context_id: input.contextId || null,
         })
         .select('id')
         .single();

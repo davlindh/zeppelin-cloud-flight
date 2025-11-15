@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { ProjectActivityFeed } from '@/components/collaboration/ProjectActivityFeed';
 import { ProjectMembersList } from '@/components/collaboration/ProjectMembersList';
 import { ProjectTaskBoard } from '@/components/collaboration/ProjectTaskBoard';
-import { EvaluationSummary, EvaluationForm } from '@/components/evaluation';
 import { Calendar, MapPin, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -108,7 +107,6 @@ export const ProjectWorkspace = () => {
               <TabsTrigger value="activity" className="flex-1">Activity</TabsTrigger>
               <TabsTrigger value="tasks" className="flex-1">Tasks</TabsTrigger>
               <TabsTrigger value="links" className="flex-1">Resources</TabsTrigger>
-              <TabsTrigger value="evaluation" className="flex-1">Evaluation</TabsTrigger>
             </TabsList>
 
             <TabsContent value="activity" className="mt-6">
@@ -128,20 +126,6 @@ export const ProjectWorkspace = () => {
                   <p className="text-muted-foreground">Coming soon...</p>
                 </CardContent>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="evaluation" className="mt-6">
-              <div className="space-y-4">
-                <EvaluationSummary 
-                  targetType="collaboration_project" 
-                  targetId={projectId!} 
-                />
-                <EvaluationForm 
-                  targetType="collaboration_project" 
-                  targetId={projectId!} 
-                  templateKey="project_review" 
-                />
-              </div>
             </TabsContent>
           </Tabs>
         </div>

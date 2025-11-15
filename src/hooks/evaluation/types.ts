@@ -1,7 +1,12 @@
+// Canonical evaluation target types (5 types only)
 export type EvaluationTargetType =
-  | 'collaboration_project'
-  | 'media'
-  | 'funding_campaign';
+  | 'project'          // public showcase projects
+  | 'media'            // media items
+  | 'funding_campaign' // funding entities
+  | 'person'           // endorsements
+  | 'proposal';        // governance / statements / funding ideas
+
+export type EvaluationContextScope = 'global' | 'event' | 'series';
 
 export interface EvaluationDimensionConfig {
   key: string;

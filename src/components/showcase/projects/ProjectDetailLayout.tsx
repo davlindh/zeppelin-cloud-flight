@@ -5,6 +5,7 @@ import { ProjectTimelineBudget } from './ProjectTimelineBudget';
 import { MediaManager } from '@/media';
 import { ProjectLinksSection } from './ProjectLinksSection';
 import { ProjectInfoSidebar } from './ProjectInfoSidebar';
+import { EvaluationSummary, EvaluationForm } from '@/components/evaluation';
 
 interface ProjectDetailLayoutProps {
   project: {
@@ -101,6 +102,32 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
               purpose={project.purpose}
               expected_impact={project.expected_impact}
             />
+
+            {/* Community Evaluation Section */}
+            <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                  Community Evaluation
+                </h2>
+                <p className="text-muted-foreground">
+                  Help shape this project by sharing your perspective using <strong>ECKT</strong> 
+                  (Economic Knowledge Transfer) — a measure of how strongly you stand behind this work. 
+                  Your evaluation is weighted by your community contributions.
+                </p>
+              </div>
+              
+              <EvaluationSummary 
+                targetType="project" 
+                targetId={project.id}
+                className="bg-card/50 backdrop-blur-sm"
+              />
+              
+              <EvaluationForm 
+                targetType="project" 
+                targetId={project.id} 
+                templateKey="project_review"
+              />
+            </section>
 
             {/* Timeline & Budget */}
             <ProjectTimelineBudget
