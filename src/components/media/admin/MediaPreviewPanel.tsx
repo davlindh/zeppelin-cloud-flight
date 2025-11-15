@@ -27,6 +27,7 @@ import { format } from 'date-fns';
 import { RichMediaPreview } from '@/components/media/core/RichMediaPreview';
 import { formatFileSize } from '@/utils/formatFileSize';
 import { useToast } from '@/hooks/use-toast';
+import { EvaluationSummary, EvaluationForm } from '@/components/evaluation';
 
 interface MediaPreviewPanelProps {
   item: MediaLibraryItem | null;
@@ -212,6 +213,23 @@ export const MediaPreviewPanel: React.FC<MediaPreviewPanelProps> = ({
                 </a>
               </Button>
             </div>
+          </div>
+
+          <Separator />
+
+          {/* Evaluation Section */}
+          <div className="space-y-4">
+            <EvaluationSummary 
+              targetType="media" 
+              targetId={item.id} 
+              className="border-none shadow-none"
+            />
+            <EvaluationForm 
+              targetType="media" 
+              targetId={item.id} 
+              templateKey="media_feedback"
+              compact 
+            />
           </div>
 
           <Separator />
