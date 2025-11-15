@@ -67,6 +67,7 @@ export interface Donation {
   status: 'pending' | 'succeeded' | 'failed' | 'refunded';
   message?: string | null;
   is_anonymous: boolean;
+  fave_points_earned?: number | null;
   created_at: string;
   confirmed_at?: string | null;
   metadata: Record<string, any>;

@@ -10,6 +10,7 @@ import { CustomerFavoritesWidget } from '@/components/marketplace/customer/dashb
 import { CustomerActivityFeed } from '@/components/marketplace/customer/dashboard/CustomerActivityFeed';
 import { CustomerLoyaltyCard } from '@/components/marketplace/customer/dashboard/CustomerLoyaltyCard';
 import { CustomerQuickActions } from '@/components/marketplace/customer/dashboard/CustomerQuickActions';
+import { CustomerDonationsWidget } from '@/components/marketplace/customer/dashboard/CustomerDonationsWidget';
 
 export const CustomerDashboard: React.FC = () => {
   const { data: user, isLoading } = useAuthenticatedUser();
@@ -30,6 +31,9 @@ export const CustomerDashboard: React.FC = () => {
 
       {/* Order Tracking - Full Width */}
       <CustomerOrderTracking />
+
+      {/* Donations Widget - Full Width */}
+      <CustomerDonationsWidget />
 
       {/* Quick Actions & Loyalty - Two Columns */}
       <div className="grid gap-4 md:grid-cols-2">

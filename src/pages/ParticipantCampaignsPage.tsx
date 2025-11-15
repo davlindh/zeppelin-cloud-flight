@@ -1,17 +1,28 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCampaigns } from '@/hooks/funding/useCampaigns';
+import { useActivateCampaign } from '@/hooks/funding/useActivateCampaign';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { CampaignCard } from '@/components/funding/CampaignCard';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, Edit, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export const ParticipantCampaignsPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: user } = useAuthenticatedUser();
-
   const { data: campaigns, isLoading } = useCampaigns();
+  const activateCampaign = useActivateCampaign();
 
   const myCampaigns = React.useMemo(() => {
     if (!campaigns || !user) return { active: [], draft: [], completed: [] };
@@ -80,7 +91,42 @@ export const ParticipantCampaignsPage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myCampaigns.draft.map(campaign => (
-                <CampaignCard key={campaign.id} campaign={campaign} />
+                <div key={campaign.id} className="relative">
+                  <CampaignCard campaign={campaign} />
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => navigate(`/participant/campaigns/${campaign.slug}/edit`)}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" className="flex-1">
+                          <Rocket className="h-4 w-4 mr-1" />
+                          Activate
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Activate Campaign?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will make your campaign publicly visible and allow donations. Make sure all details are correct.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => activateCampaign.mutate(campaign.slug)}>
+                            Activate
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
               ))}
             </div>
           )}

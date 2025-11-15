@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CampaignStats } from '@/components/funding/CampaignStats';
 import { DonationForm } from '@/components/funding/DonationForm';
+import { CampaignCreatorCard } from '@/components/funding/CampaignCreatorCard';
 import { EvaluationSummary } from '@/components/evaluation/EvaluationSummary';
 import { EvaluationForm } from '@/components/evaluation/EvaluationForm';
 import { formatDistanceToNow } from 'date-fns';
@@ -192,8 +193,12 @@ export const CampaignPage = () => {
           </Tabs>
         </div>
 
-        {/* Sidebar - Donation Form */}
-        <div className="lg:col-span-1">
+        {/* Sidebar */}
+        <div className="lg:col-span-1 space-y-6">
+          {campaign.created_by && (
+            <CampaignCreatorCard creatorId={campaign.created_by} />
+          )}
+          
           {campaign.status === 'active' && (
             <div className="sticky top-20">
               <DonationForm campaignId={campaign.id} currency={campaign.currency} />

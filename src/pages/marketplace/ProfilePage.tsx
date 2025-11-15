@@ -6,7 +6,8 @@ import { ProfileHeader } from '@/components/marketplace/profile/ProfileHeader';
 import { ProfileEditForm } from '@/components/marketplace/profile/ProfileEditForm';
 import { ProfileOrderHistory } from '@/components/marketplace/profile/ProfileOrderHistory';
 import { ProfileSettings } from '@/components/marketplace/profile/ProfileSettings';
-import { User, Package, Settings, Loader2 } from 'lucide-react';
+import { ProfileDonationHistory } from '@/components/marketplace/profile/ProfileDonationHistory';
+import { User, Package, Settings, Loader2, Heart } from 'lucide-react';
 
 export const ProfilePage: React.FC = () => {
   const { data: user, isLoading } = useAuthenticatedUser();
@@ -36,7 +37,7 @@ export const ProfilePage: React.FC = () => {
       <ProfileHeader user={user} />
 
       <Tabs defaultValue="profile" className="mt-8">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Profil
@@ -44,6 +45,10 @@ export const ProfilePage: React.FC = () => {
           <TabsTrigger value="orders" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Beställningar
+          </TabsTrigger>
+          <TabsTrigger value="donations" className="flex items-center gap-2">
+            <Heart className="h-4 w-4" />
+            Donations
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -59,6 +64,10 @@ export const ProfilePage: React.FC = () => {
           <ProfileOrderHistory userEmail={user.email} />
         </TabsContent>
 
+        <TabsContent value="donations" className="mt-6">
+          <ProfileDonationHistory userId={user.id} />
+        </TabsContent>
+
         <TabsContent value="settings" className="mt-6">
           <ProfileSettings userId={user.id} />
         </TabsContent>
@@ -66,3 +75,4 @@ export const ProfilePage: React.FC = () => {
     </div>
   );
 };
+

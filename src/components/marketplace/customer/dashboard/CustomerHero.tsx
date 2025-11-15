@@ -1,9 +1,11 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { FaveScoreBadge } from '@/components/funding/FaveScoreBadge';
 import { ShoppingBag, Heart, Package, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
+import { useFaveScore } from '@/hooks/funding/useFaveScore';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -16,6 +18,7 @@ interface HeroStats {
 
 export const CustomerHero: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
+  const { data: faveScore } = useFaveScore(user?.id);
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ['customer-hero-stats', user?.id],
@@ -106,7 +109,7 @@ export const CustomerHero: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-background/80 rounded-lg p-4 border">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg">
@@ -154,6 +157,18 @@ export const CustomerHero: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {faveScore && (
+          <div className="bg-background/80 rounded-lg p-4 border">
+            <div className="flex flex-col items-center justify-center h-full">
+              <FaveScoreBadge 
+                score={faveScore.total_score} 
+                level={faveScore.level}
+                size="md"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-3">
