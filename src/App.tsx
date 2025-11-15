@@ -62,6 +62,10 @@ import { ProviderDashboard } from "./pages/marketplace/ProviderDashboard";
 import { MyCollaborationProjects } from "./pages/collaboration/MyCollaborationProjects";
 import { ProjectWorkspace } from "./pages/collaboration/ProjectWorkspace";
 import { FeaturedProjects } from "./pages/collaboration/FeaturedProjects";
+import { CampaignsListPage } from "./pages/CampaignsListPage";
+import { CampaignPage } from "./pages/CampaignPage";
+import { ParticipantCampaignsPage } from "./pages/ParticipantCampaignsPage";
+import { CampaignWizardPage } from "./pages/CampaignWizardPage";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -131,6 +135,8 @@ const App = () => (
                   <Route path="participants/:slug" element={<ParticipantDetailPage />} />
                   <Route path="partners" element={<PartnersPage />} />
                   <Route path="media" element={<MediaGalleryPage />} />
+                  <Route path="campaigns" element={<CampaignsListPage />} />
+                  <Route path="campaigns/:slug" element={<CampaignPage />} />
                 </Route>
 
                 {/* Legacy redirects for old marketplace URLs */}
@@ -246,6 +252,10 @@ const App = () => (
                   <Route path="collaboration/projects" element={<MyCollaborationProjects />} />
                   <Route path="collaboration/projects/:projectId" element={<ProjectWorkspace />} />
                   <Route path="collaboration/showcase" element={<FeaturedProjects />} />
+                  
+                  {/* Campaign Routes */}
+                  <Route path="campaigns" element={<ParticipantCampaignsPage />} />
+                  <Route path="campaigns/new" element={<CampaignWizardPage />} />
                 </Route>
 
                 {/* Order Pages */}
