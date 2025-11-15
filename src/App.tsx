@@ -66,6 +66,7 @@ import { CampaignsListPage } from "./pages/CampaignsListPage";
 import { CampaignPage } from "./pages/CampaignPage";
 import { ParticipantCampaignsPage } from "./pages/ParticipantCampaignsPage";
 import { CampaignWizardPage } from "./pages/CampaignWizardPage";
+import { CampaignEditPage } from "./pages/CampaignEditPage";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
@@ -256,6 +257,7 @@ const App = () => (
                   {/* Campaign Routes */}
                   <Route path="campaigns" element={<ParticipantCampaignsPage />} />
                   <Route path="campaigns/new" element={<CampaignWizardPage />} />
+                  <Route path="campaigns/:slug/edit" element={<CampaignEditPage />} />
                 </Route>
 
                 {/* Order Pages */}

@@ -3,6 +3,8 @@ import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useParticipantPerformance } from '@/hooks/marketplace/participant/useParticipantPerformance';
+import { useFaveScore } from '@/hooks/funding/useFaveScore';
+import { FaveScoreBadge } from '@/components/funding/FaveScoreBadge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const ParticipantHero: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
+  const { data: faveScore } = useFaveScore(user?.id);
 
   const { data: participant, isLoading: participantLoading } = useQuery({
     queryKey: ['participant-profile', user?.id],
@@ -133,6 +136,13 @@ export const ParticipantHero: React.FC = () => {
                     <CheckCircle className="h-3 w-3" />
                     Publik profil
                   </span>
+                )}
+                {faveScore && (
+                  <FaveScoreBadge 
+                    score={faveScore.total_score} 
+                    level={faveScore.level}
+                    size="sm"
+                  />
                 )}
               </div>
               <p className="text-muted-foreground mt-1">

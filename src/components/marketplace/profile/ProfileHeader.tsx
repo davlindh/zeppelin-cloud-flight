@@ -3,7 +3,9 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { RoleBadges } from '@/components/ui/role-badges';
+import { FaveScoreBadge } from '@/components/funding/FaveScoreBadge';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useFaveScore } from '@/hooks/funding/useFaveScore';
 import { getUserInitials } from '@/utils/transforms/profile';
 import { Calendar, LayoutDashboard } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -21,6 +23,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
   const initials = getUserInitials({ full_name: user.full_name } as any, user.email);
   const displayName = user.full_name || user.email.split('@')[0];
   const { roles } = useUserRole();
+  const { data: faveScore } = useFaveScore(user.id);
 
   return (
     <Card className="p-6">
@@ -32,9 +35,16 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
         
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-3xl font-bold">{displayName}</h1>
               <RoleBadges roles={roles as string[]} size="sm" />
+              {faveScore && (
+                <FaveScoreBadge 
+                  score={faveScore.total_score} 
+                  level={faveScore.level}
+                  size="sm"
+                />
+              )}
             </div>
             {roles.length > 1 && (
               <Button asChild variant="outline" size="sm">
