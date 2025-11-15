@@ -930,6 +930,8 @@ export type Database = {
       evaluations: {
         Row: {
           comment: string | null
+          context_id: string | null
+          context_scope: string | null
           created_at: string
           dimensions: Json
           eckt_value: number
@@ -943,6 +945,8 @@ export type Database = {
         }
         Insert: {
           comment?: string | null
+          context_id?: string | null
+          context_scope?: string | null
           created_at?: string
           dimensions?: Json
           eckt_value: number
@@ -956,6 +960,8 @@ export type Database = {
         }
         Update: {
           comment?: string | null
+          context_id?: string | null
+          context_scope?: string | null
           created_at?: string
           dimensions?: Json
           eckt_value?: number
