@@ -147,13 +147,13 @@ const ShopPage = () => {
               {selectedEventId ? 'Event Products' : 'Shop All Products'}
             </h2>
             <div className="flex items-center gap-3">
-              <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+              <Select value={selectedEventId || "all"} onValueChange={(value) => setSelectedEventId(value === "all" ? "" : value)}>
                 <SelectTrigger className="w-[240px]">
                   <Calendar className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by Event" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Events</SelectItem>
+                  <SelectItem value="all">All Events</SelectItem>
                   {events.map((event) => (
                     <SelectItem key={event.id} value={event.id}>
                       {event.title}
