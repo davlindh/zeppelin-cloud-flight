@@ -38,6 +38,7 @@ export const ADMIN_MENU_ITEMS: MenuItem[] = [
 
 export const SITE_DROPDOWN_ITEMS: DropdownMenuItem[] = [
   { title: 'Showcase', href: '/showcase', description: 'Utforska våra projekt' },
+  { title: 'Campaigns', href: '/campaigns', description: 'Support creative projects' },
   { title: 'Deltagare', href: '/participants', description: 'Möt våra deltagare' },
   { title: 'Partners', href: '/partners', description: 'Våra samarbetspartners' },
   { title: 'Mediagalleri', href: '/media', description: 'Bilder och videos' },
