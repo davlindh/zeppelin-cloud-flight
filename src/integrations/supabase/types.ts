@@ -831,6 +831,33 @@ export type Database = {
           },
         ]
       }
+      contribution_scores: {
+        Row: {
+          domain: string
+          id: string
+          score: number
+          updated_at: string | null
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          domain: string
+          id?: string
+          score?: number
+          updated_at?: string | null
+          user_id: string
+          weight?: number
+        }
+        Update: {
+          domain?: string
+          id?: string
+          score?: number
+          updated_at?: string | null
+          user_id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       draft_submissions: {
         Row: {
           created_at: string
@@ -863,6 +890,83 @@ export type Database = {
           uploaded_files?: Json
         }
         Relationships: []
+      }
+      evaluation_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          dimensions: Json
+          id: string
+          key: string
+          label: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          dimensions: Json
+          id?: string
+          key: string
+          label: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          dimensions?: Json
+          id?: string
+          key?: string
+          label?: string
+        }
+        Relationships: []
+      }
+      evaluations: {
+        Row: {
+          comment: string | null
+          created_at: string
+          dimensions: Json
+          eckt_value: number
+          evaluator_id: string
+          id: string
+          rating: number | null
+          target_id: string
+          target_type: string
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          dimensions?: Json
+          eckt_value: number
+          evaluator_id: string
+          id?: string
+          rating?: number | null
+          target_id: string
+          target_type: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          dimensions?: Json
+          eckt_value?: number
+          evaluator_id?: string
+          id?: string
+          rating?: number | null
+          target_id?: string
+          target_type?: string
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       event_registrations: {
         Row: {
@@ -962,6 +1066,60 @@ export type Database = {
           title?: string
           updated_at?: string | null
           venue?: string | null
+        }
+        Relationships: []
+      }
+      fave_scores: {
+        Row: {
+          last_recalculated_at: string | null
+          level: string
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          last_recalculated_at?: string | null
+          level?: string
+          total_score?: number
+          user_id: string
+        }
+        Update: {
+          last_recalculated_at?: string | null
+          level?: string
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fave_transactions: {
+        Row: {
+          context_id: string | null
+          context_type: string | null
+          created_at: string
+          delta: number
+          id: string
+          metadata: Json
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          delta: number
+          id?: string
+          metadata?: Json
+          reason: string
+          user_id: string
+        }
+        Update: {
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          delta?: number
+          id?: string
+          metadata?: Json
+          reason?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3695,6 +3853,19 @@ export type Database = {
       }
     }
     Functions: {
+      apply_fave_transaction: {
+        Args: {
+          p_context_id?: string
+          p_context_type?: string
+          p_delta: number
+          p_domain?: string
+          p_metadata?: Json
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      calculate_fave_level: { Args: { p_score: number }; Returns: string }
       can_claim_participant: {
         Args: { _participant_id: string; _user_email: string }
         Returns: boolean
@@ -3765,6 +3936,10 @@ export type Database = {
         Args: { p_days?: number; p_provider_id: string }
         Returns: Json
       }
+      get_target_evaluation_summary: {
+        Args: { p_target_id: string; p_target_type: string }
+        Returns: Json
+      }
       get_total_users_count: { Args: never; Returns: number }
       get_unified_admin_dashboard_stats: { Args: never; Returns: Json }
       get_zeppel_admin_stats: { Args: never; Returns: Json }
@@ -3787,6 +3962,10 @@ export type Database = {
           new_current_bid: number
           success: boolean
         }[]
+      }
+      recalc_user_fave_score: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
       set_session_context: {
         Args: { device_fingerprint: string; session_id: string }
