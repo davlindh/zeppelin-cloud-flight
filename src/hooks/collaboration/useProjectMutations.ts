@@ -56,11 +56,33 @@ export const useCreateCollaborationProject = () => {
 
       return project;
     },
-    onSuccess: () => {
+    onSuccess: async (project) => {
       queryClient.invalidateQueries({ queryKey: ['my-collaboration-projects'] });
+      
+      // Award Fave Points for project creation
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.rpc('apply_fave_transaction', {
+            p_user_id: user.id,
+            p_delta: 50,
+            p_reason: 'project_created',
+            p_context_type: 'collaboration_project',
+            p_context_id: project.id,
+            p_domain: 'organizing',
+            p_metadata: {
+              project_title: project.title,
+              event_id: project.event_id
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Failed to award Fave Points:', error);
+      }
+      
       toast({
         title: 'Success',
-        description: 'Project created successfully'
+        description: 'Project created successfully! +50 Fave Points'
       });
     },
     onError: (error) => {
