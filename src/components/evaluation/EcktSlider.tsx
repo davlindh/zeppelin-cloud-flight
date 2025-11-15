@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const ECKT_LABELS = [
@@ -35,8 +37,28 @@ export const EcktSlider: React.FC<EcktSliderProps> = ({
   return (
     <div className={cn('space-y-2', className)}>
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">{label}</Label>
-        <span className="text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Label className="text-sm font-medium">{label}</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <p className="font-semibold mb-1">What is ECKT?</p>
+                <p className="text-xs mb-2">
+                  ECKT measures how strongly you stand behind this evaluation.
+                  It's not just "how good is it" – it's "how much do you commit to this assessment."
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Your ECKT score is weighted by your Fave Points (reputation score),
+                  giving more influence to trusted community members.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        <span className="text-xs font-medium text-muted-foreground">
           {value} / 100 – {currentLabel}
         </span>
       </div>

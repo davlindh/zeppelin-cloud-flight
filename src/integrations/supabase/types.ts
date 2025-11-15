@@ -3952,7 +3952,12 @@ export type Database = {
         Returns: Json
       }
       get_target_evaluation_summary: {
-        Args: { p_target_id: string; p_target_type: string }
+        Args: {
+          p_context_id?: string
+          p_context_scope?: string
+          p_target_id: string
+          p_target_type: string
+        }
         Returns: Json
       }
       get_total_users_count: { Args: never; Returns: number }
