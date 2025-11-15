@@ -2,20 +2,32 @@ import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEvaluationSummary } from '@/hooks/evaluation/useEvaluationSummary';
-import type { EvaluationTargetType } from '@/hooks/evaluation/types';
+import type { 
+  EvaluationTargetType,
+  EvaluationContextScope 
+} from '@/hooks/evaluation/types';
 
 interface EvaluationSummaryProps {
   targetType: EvaluationTargetType;
   targetId: string;
+  contextScope?: EvaluationContextScope;
+  contextId?: string;
   className?: string;
 }
 
 export const EvaluationSummary: React.FC<EvaluationSummaryProps> = ({
   targetType,
   targetId,
+  contextScope,
+  contextId,
   className,
 }) => {
-  const { data, isLoading } = useEvaluationSummary(targetType, targetId);
+  const { data, isLoading } = useEvaluationSummary(
+    targetType, 
+    targetId,
+    contextScope,
+    contextId
+  );
 
   if (isLoading) {
     return (

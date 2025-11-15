@@ -8,20 +8,31 @@ import { Slider } from '@/components/ui/slider';
 import { EcktSlider } from './EcktSlider';
 import { useEvaluationTemplate } from '@/hooks/evaluation/useEvaluationTemplate';
 import { useSubmitEvaluation } from '@/hooks/evaluation/useSubmitEvaluation';
-import type { EvaluationTargetType } from '@/hooks/evaluation/types';
+import type { 
+  EvaluationTargetType,
+  EvaluationContextScope 
+} from '@/hooks/evaluation/types';
 
 interface EvaluationFormProps {
   targetType: EvaluationTargetType;
   targetId: string;
   templateKey: string;
+  contextScope?: EvaluationContextScope;
+  contextId?: string;
   compact?: boolean;
+  canEvaluate?: boolean;
+  onSubmitted?: () => void;
 }
 
 export const EvaluationForm: React.FC<EvaluationFormProps> = ({
   targetType,
   targetId,
   templateKey,
-  compact,
+  contextScope,
+  contextId,
+  compact = false,
+  canEvaluate = true,
+  onSubmitted,
 }) => {
   const { data: template, isLoading: templateLoading } =
     useEvaluationTemplate(templateKey);
@@ -56,11 +67,29 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
       ecktValue,
       dimensions,
       comment: comment.trim() || undefined,
+      contextScope,
+      contextId,
     });
 
+    // Reset form
     setComment('');
     setRating(null);
+    setEcktValue(70);
+    setDimensions({});
+    
+    onSubmitted?.();
   };
+
+  if (!canEvaluate) {
+    return (
+      <Card className={compact ? 'border-none shadow-none' : ''}>
+        <CardContent className="py-6 text-center text-muted-foreground">
+          <p>You cannot evaluate your own work.</p>
+          <p className="text-xs mt-2">Log in with a different account to provide feedback.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (templateLoading) {
     return (
