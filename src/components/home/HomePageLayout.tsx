@@ -16,6 +16,7 @@ import { SystematicsSection } from '@/components/sections/SystematicsSection';
 import { EngagementSection } from '@/components/sections/EngagementSection';
 import { PartnerSection } from '@/components/sections/PartnerSection';
 import { EventMediaSection } from '@/components/sections/EventMediaSection';
+import { FeaturedCampaignsSection } from '@/components/home/FeaturedCampaignsSection';
 
 // Stats Card Component
 interface StatsCardProps {
@@ -334,6 +335,9 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
 
             {/* Engagement Section - Call to action after methodology */}
             <EngagementSection />
+            
+            {/* Featured Campaigns Section */}
+            <FeaturedCampaignsSection />
 
             {/* Vision Section - Deeper storytelling */}
             <VisionSection />

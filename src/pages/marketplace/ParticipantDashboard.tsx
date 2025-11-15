@@ -13,6 +13,7 @@ import { ParticipantPortfolioShowcase } from '@/components/marketplace/participa
 import { ParticipantCollaborationWidget } from '@/components/marketplace/participant/dashboard/ParticipantCollaborationWidget';
 import { ParticipantSkillsMatrix } from '@/components/marketplace/participant/dashboard/ParticipantSkillsMatrix';
 import { MyEventsSection } from '@/components/participant/events/MyEventsSection';
+import { ParticipantCampaignsWidget } from '@/components/funding/ParticipantCampaignsWidget';
 import { useMyProducts } from '@/hooks/marketplace/useMyProducts';
 import { useMyCollaborationProjects } from '@/hooks/collaboration';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -182,6 +183,9 @@ export const ParticipantDashboard: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      
+      {/* Campaigns Widget */}
+      <ParticipantCampaignsWidget />
 
       {/* Analytics Charts */}
       <ParticipantAnalyticsChart />
