@@ -92,10 +92,10 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
       />
 
       {/* Content Container */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10 md:gap-16 max-w-8xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 md:gap-20 max-w-8xl">
           {/* Main Content */}
-          <div className="space-y-10 md:space-y-12 animate-fade-in">
+          <div className="space-y-16 md:space-y-20 animate-fade-in">
             {/* Purpose & Impact */}
             <ProjectPurposeImpact
               full_description={project.full_description}
@@ -103,14 +103,24 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
               expected_impact={project.expected_impact}
             />
 
+            {/* Visual Divider */}
+            <div className="relative py-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t-2 border-gradient-to-r from-transparent via-border to-transparent"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-background px-4 text-sm text-muted-foreground">⋆</span>
+              </div>
+            </div>
+
             {/* Community Evaluation Section */}
-            <section className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-2">
+            <section className="space-y-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="text-center max-w-3xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
                   Community Evaluation
                 </h2>
-                <p className="text-muted-foreground">
-                  Help shape this project by sharing your perspective using <strong>ECKT</strong> 
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                  Help shape this project by sharing your perspective using <strong className="text-primary">ECKT</strong> 
                   (Economic Knowledge Transfer) — a measure of how strongly you stand behind this work. 
                   Your evaluation is weighted by your community contributions.
                 </p>

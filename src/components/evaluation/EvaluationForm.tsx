@@ -104,48 +104,52 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
   if (!template) return null;
 
   return (
-    <Card className={compact ? 'border-none shadow-none p-0' : 'mt-4'}>
+    <Card className={compact ? 'border-none shadow-none p-0' : 'mt-4 backdrop-blur-xl bg-card/40 border-2 border-border/50 shadow-2xl hover:shadow-primary/20 rounded-2xl'}>
       <form onSubmit={onSubmit}>
         {!compact && (
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl md:text-2xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
               {template.label || 'Evaluation'}
             </CardTitle>
             {template.description && (
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
                 {template.description}
               </p>
             )}
           </CardHeader>
         )}
-        <CardContent className="space-y-4 pt-2">
+        <CardContent className="space-y-6 pt-2">
           <EcktSlider
             value={ecktValue}
             onChange={setEcktValue}
             label="ECKT – How strongly do you stand behind this?"
           />
 
-          <div className="space-y-2">
-            <Label className="text-sm">Overall rating (1–5)</Label>
-            <div className="flex items-center gap-3">
+          <div className="space-y-3 p-4 rounded-xl bg-muted/30 backdrop-blur-sm border border-border/50">
+            <Label className="text-sm font-semibold flex items-center gap-2">
+              Overall rating (1–5)
+              <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+            </Label>
+            <div className="flex items-center gap-4">
               <Slider
                 value={[rating ?? 0]}
                 min={0}
                 max={5}
                 step={1}
                 onValueChange={([v]) => setRating(v === 0 ? null : v)}
+                className="flex-1"
               />
-              <span className="w-6 text-sm text-right tabular-nums">
+              <span className="w-8 text-base font-bold text-right tabular-nums text-foreground">
                 {rating ?? '–'}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Optional. Use this for a quick overall impression.
+            <p className="text-xs text-muted-foreground/80">
+              Quick overall impression of this project
             </p>
           </div>
 
           {template.dimensions?.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-4 p-4 rounded-xl bg-muted/30 backdrop-blur-sm border border-border/50">
               {template.dimensions.map((dim) => {
                 const min = dim.min ?? 1;
                 const max = dim.max ?? 5;
@@ -153,12 +157,12 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                 const val = dimensions[dim.key] ?? min;
 
                 return (
-                  <div key={dim.key} className="space-y-1.5">
+                  <div key={dim.key} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-medium">
+                      <Label className="text-sm font-semibold">
                         {dim.label}
                       </Label>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm font-bold tabular-nums text-primary">
                         {val} / {max}
                       </span>
                     </div>
@@ -175,7 +179,7 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                       }
                     />
                     {dim.description && (
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-xs text-muted-foreground/80 leading-relaxed">
                         {dim.description}
                       </p>
                     )}
@@ -186,20 +190,22 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           )}
 
           <div className="space-y-2">
-            <Label className="text-sm">Comment</Label>
+            <Label className="text-sm font-semibold">Comment</Label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              rows={3}
+              rows={4}
               placeholder="Share context: what makes this strong, or what could be improved?"
+              className="resize-none bg-muted/30 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-colors"
             />
           </div>
 
-          <div className="flex justify-end pt-1">
+          <div className="flex justify-end pt-2">
             <Button
               type="submit"
-              size="sm"
+              size="lg"
               disabled={submitMutation.isPending}
+              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-primary/40 transition-all duration-300 font-semibold"
             >
               {submitMutation.isPending ? 'Submitting…' : 'Submit evaluation'}
             </Button>
