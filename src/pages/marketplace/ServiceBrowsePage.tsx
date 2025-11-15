@@ -98,14 +98,14 @@ export const ServiceBrowsePage = () => {
             <div>
               <Label htmlFor="category">Category</Label>
               <Select
-                value={filters.category}
-                onValueChange={(value) => setFilters({ ...filters, category: value })}
+                value={filters.category || "all"}
+                onValueChange={(value) => setFilters({ ...filters, category: value === "all" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All categories</SelectItem>
+                  <SelectItem value="all">All categories</SelectItem>
                   {categories.map(cat => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
