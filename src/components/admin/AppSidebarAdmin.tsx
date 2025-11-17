@@ -17,7 +17,11 @@ import {
   TrendingUp,
   Percent,
   ShoppingBag,
-  DollarSign
+  DollarSign,
+  Ticket,
+  CalendarCheck,
+  Heart,
+  TrendingDown
 } from "lucide-react"
 import {
   Sidebar,
@@ -66,6 +70,18 @@ const commerceSections = [
   { title: "Event Analytics", path: "/admin/commerce/events", icon: Calendar, description: "Sales per event" },
 ]
 
+const eventsSections = [
+  { title: "All Events", path: "/admin/events", icon: Calendar, description: "Manage events", badge: "upcomingEvents" },
+  { title: "Event Tickets", path: "/admin/events/tickets", icon: Ticket, description: "Ticket sales & inventory", badge: "lowStockTickets" },
+  { title: "Registrations", path: "/admin/events/registrations", icon: CalendarCheck, description: "Attendee management", badge: "pendingRegistrations" },
+]
+
+const campaignsSections = [
+  { title: "All Campaigns", path: "/admin/campaigns", icon: Heart, description: "Funding campaigns", badge: "draftCampaigns" },
+  { title: "Active Campaigns", path: "/admin/campaigns?status=active", icon: TrendingUp, description: "Currently fundraising", badge: "activeCampaigns" },
+  { title: "Ending Soon", path: "/admin/campaigns?ending=true", icon: TrendingDown, description: "Campaigns closing", badge: "endingCampaigns" },
+]
+
 interface AppSidebarAdminProps {
   activeTab: string
   onTabChange: (tab: string) => void
@@ -84,13 +100,17 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     return location.pathname.startsWith(path)
   }
 
-  const getBadgeCount = (path: string): number => {
+  const getBadgeCount = (path: string, badgeKey?: string): number => {
+    if (badgeKey) {
+      return counts[badgeKey as keyof typeof counts] || 0
+    }
+    
     if (path.includes('messages')) return counts.unreadMessages || 0
     if (path.includes('bookings')) return counts.pendingBookings || 0
     if (path.includes('orders')) return counts.pendingOrders || 0
     if (path.includes('products')) return counts.lowStockProducts || 0
     if (path.includes('auctions')) return counts.endingAuctions || 0
-    // TODO: Add pending products count when available in AdminCounts
+    
     return 0
   }
 
@@ -221,6 +241,106 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
                         </div>
                         {!collapsed && badgeCount > 0 && (
                           <Badge variant="secondary" className="shrink-0 text-xs">
+                            {badgeCount > 99 ? '99+' : badgeCount}
+                          </Badge>
+                        )}
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Events Management Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
+            Events Management
+          </SidebarGroupLabel>
+
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {eventsSections.map((section) => {
+                const badgeCount = section.badge ? getBadgeCount(section.path, section.badge) : 0
+                const active = isActive(section.path)
+                
+                return (
+                  <SidebarMenuItem key={section.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      className={active ? "bg-accent text-accent-foreground" : ""}
+                    >
+                      <button
+                        onClick={() => handleClick(section.path)}
+                        className="w-full flex items-center justify-between gap-3 p-3 hover:bg-accent/50 rounded-lg transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`flex items-center justify-center shrink-0 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                            <section.icon className="h-5 w-5" />
+                          </div>
+                          {!collapsed && (
+                            <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                              <span className="text-sm font-semibold leading-none">{section.title}</span>
+                              <span className="text-xs text-muted-foreground leading-tight">{section.description}</span>
+                            </div>
+                          )}
+                        </div>
+                        {!collapsed && badgeCount > 0 && (
+                          <Badge 
+                            variant={section.badge === 'lowStockTickets' ? "destructive" : "secondary"} 
+                            className="shrink-0 text-xs"
+                          >
+                            {badgeCount > 99 ? '99+' : badgeCount}
+                          </Badge>
+                        )}
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Funding Campaigns Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
+            Funding Campaigns
+          </SidebarGroupLabel>
+
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {campaignsSections.map((section) => {
+                const badgeCount = section.badge ? getBadgeCount(section.path, section.badge) : 0
+                const active = isActive(section.path)
+                
+                return (
+                  <SidebarMenuItem key={section.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      className={active ? "bg-accent text-accent-foreground" : ""}
+                    >
+                      <button
+                        onClick={() => handleClick(section.path)}
+                        className="w-full flex items-center justify-between gap-3 p-3 hover:bg-accent/50 rounded-lg transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`flex items-center justify-center shrink-0 ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+                            <section.icon className="h-5 w-5" />
+                          </div>
+                          {!collapsed && (
+                            <div className="flex flex-col items-start gap-0.5 min-w-0 flex-1">
+                              <span className="text-sm font-semibold leading-none">{section.title}</span>
+                              <span className="text-xs text-muted-foreground leading-tight">{section.description}</span>
+                            </div>
+                          )}
+                        </div>
+                        {!collapsed && badgeCount > 0 && (
+                          <Badge 
+                            variant={section.badge === 'endingCampaigns' ? "destructive" : "secondary"} 
+                            className="shrink-0 text-xs"
+                          >
                             {badgeCount > 99 ? '99+' : badgeCount}
                           </Badge>
                         )}

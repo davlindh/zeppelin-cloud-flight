@@ -77,6 +77,7 @@ const AuctionsPage = lazy(() => import("./pages/admin/AuctionsPage").then(m => (
 import { EventsPage } from "./pages/admin/EventsPage";
 import { EventWizardPage } from "./pages/admin/EventWizardPage";
 import { EventTicketsOverviewPage } from "./pages/admin/EventTicketsOverviewPage";
+import { EventRegistrationsPage } from "./pages/admin/EventRegistrationsPage";
 import { CampaignsManagementPage } from "./pages/admin/CampaignsManagementPage";
 import { EventTicketsShop } from "./pages/marketplace/EventTicketsShop";
 const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage").then(m => ({ default: m.EventOpsPage })));
@@ -301,6 +302,7 @@ const App = () => (
                   <Route path="events" element={<EventsPage />} />
                   <Route path="events/new" element={<EventWizardPage />} />
                   <Route path="events/tickets" element={<EventTicketsOverviewPage />} />
+                  <Route path="events/registrations" element={<EventRegistrationsPage />} />
                   <Route path="events/:eventId" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <EventOpsPage />
