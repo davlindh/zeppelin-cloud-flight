@@ -1,29 +1,35 @@
 import * as React from "react";
 import { CalendarDays, MapPin, Users, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEvents } from "@/hooks/useEvents";
-import type { Event } from "@/types/events";
+import type { EventWithStats } from "@/hooks/admin";
 import { Button } from "@/components/ui/button";
 import { useRealtimeSubscription } from "@/hooks/shared/useRealtimeSubscription";
 
 interface AdminEventsTableProps {
+  events?: EventWithStats[];
+  isLoading?: boolean;
   onCreate?: () => void;
 }
 
 export const AdminEventsTable: React.FC<AdminEventsTableProps> = ({
+  events = [],
+  isLoading = false,
   onCreate,
 }) => {
   const navigate = useNavigate();
-  const { data: events = [], isLoading, error, refetch } = useEvents({ includePast: true });
+  
+  // Real-time updates for events - pass empty refetch if no parent refetch
+  const handleRefetch = React.useCallback(() => {
+    // Parent component handles refetch via useAdminEvents
+  }, []);
 
-  // Real-time updates for events
   useRealtimeSubscription({
     table: "events",
     event: "*",
-    onChange: () => {
-      refetch();
-    },
+    onChange: handleRefetch,
   });
+
+  const error = false; // Error handling moved to parent
 
   if (isLoading) {
     return <div className="h-32 animate-pulse rounded-2xl bg-slate-200" />;
