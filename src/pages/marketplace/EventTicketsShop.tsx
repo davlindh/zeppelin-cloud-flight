@@ -4,9 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Calendar, MapPin, Users, Ticket } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Calendar, MapPin, Users, Ticket, Heart } from 'lucide-react';
 import { ProductCard } from '@/components/marketplace/ui/product-card';
 import { useEventTickets } from '@/hooks/admin/useEventTickets';
+import { useCampaignsWithEvaluation } from '@/hooks/funding/useCampaignsWithEvaluation';
 import { format } from 'date-fns';
 import type { Event } from '@/types/events';
 
@@ -30,6 +32,12 @@ export const EventTicketsShop: React.FC = () => {
   });
 
   const { data: tickets = [], isLoading: ticketsLoading } = useEventTickets(eventId);
+
+  const { data: campaigns = [], isLoading: campaignsLoading } = useCampaignsWithEvaluation({
+    status: ['active'],
+    visibility: 'public',
+    eventId,
+  });
 
   if (eventLoading || ticketsLoading) {
     return (
@@ -121,6 +129,76 @@ export const EventTicketsShop: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Support This Event Section */}
+      {!campaignsLoading && campaigns.length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 py-12 border-t">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-2">Support This Event</h2>
+            <p className="text-muted-foreground">
+              Help bring this event to life by supporting these campaigns
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {campaigns.map((campaign) => {
+              const percentFunded = campaign.target_amount > 0
+                ? (campaign.raised_amount / campaign.target_amount) * 100
+                : 0;
+
+              return (
+                <Card key={campaign.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{campaign.title}</h3>
+                        {campaign.short_description && (
+                          <p className="text-sm text-muted-foreground">
+                            {campaign.short_description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Raised</span>
+                          <span className="font-medium">
+                            {campaign.raised_amount.toLocaleString()} / {campaign.target_amount.toLocaleString()} {campaign.currency}
+                          </span>
+                        </div>
+                        <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="bg-primary h-full transition-all"
+                            style={{ width: `${Math.min(percentFunded, 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <Badge variant="outline">
+                            {percentFunded.toFixed(0)}% funded
+                          </Badge>
+                          {campaign.evaluation_summary?.weighted_eckt && (
+                            <Badge variant="secondary">
+                              <Heart className="h-3 w-3 mr-1" />
+                              {campaign.evaluation_summary.weighted_eckt.toFixed(1)} ECKT
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button 
+                        className="w-full"
+                        onClick={() => navigate(`/campaigns/${campaign.slug}`)}
+                      >
+                        View Campaign & Donate
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Tickets Grid */}
       <div className="max-w-7xl mx-auto px-6 py-12">
