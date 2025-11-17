@@ -8,4 +8,5 @@ export { useFaveScore } from './useFaveScore';
 export { useUserDonations } from './useUserDonations';
 export { useUpdateCampaign } from './useUpdateCampaign';
 export { useActivateCampaign } from './useActivateCampaign';
+export { useTopDonors } from './useTopDonors';
 

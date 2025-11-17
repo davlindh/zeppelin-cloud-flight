@@ -8,6 +8,7 @@ import { DonationForm } from '@/components/funding/DonationForm';
 import { CampaignCreatorCard } from '@/components/funding/CampaignCreatorCard';
 import { EvaluationSummary } from '@/components/evaluation/EvaluationSummary';
 import { EvaluationForm } from '@/components/evaluation/EvaluationForm';
+import { DonationLeaderboard } from '@/components/funding/DonationLeaderboard';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, Target, Users, FileText } from 'lucide-react';
 
@@ -147,30 +148,36 @@ export const CampaignPage = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="backers" className="mt-6">
-              <Card className="backdrop-blur-xl bg-card/40 border-2 border-border/50">
+            <TabsContent value="backers" className="space-y-6">
+              {campaign?.id && <DonationLeaderboard campaignId={campaign.id} />}
+              
+              <Card>
                 <CardHeader>
                   <CardTitle>Recent Backers</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {donations && donations.length > 0 ? (
-                    <div className="space-y-3">
-                      {donations.filter(d => d.status === 'succeeded' && !d.is_anonymous).slice(0, 10).map((donation) => (
-                        <div key={donation.id} className="flex justify-between items-center p-3 rounded-lg bg-muted/30">
+                    <div className="space-y-4">
+                      {donations.slice(0, 10).map((donation: any) => (
+                        <div key={donation.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                           <div>
-                            <p className="font-medium">{donation.donor_name || 'Anonymous'}</p>
-                            {donation.message && (
-                              <p className="text-sm text-muted-foreground line-clamp-1">{donation.message}</p>
-                            )}
+                            <p className="font-medium">
+                              {donation.is_anonymous ? 'Anonymous' : donation.donor_name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(donation.created_at).toLocaleDateString()}
+                            </p>
                           </div>
-                          <span className="font-semibold">
-                            {donation.amount.toLocaleString()} {donation.currency}
-                          </span>
+                          <p className="font-bold">
+                            {donation.amount} {donation.currency}
+                          </p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground">Be the first to support this campaign!</p>
+                    <p className="text-muted-foreground text-center py-8">
+                      No donations yet. Be the first to support this campaign!
+                    </p>
                   )}
                 </CardContent>
               </Card>

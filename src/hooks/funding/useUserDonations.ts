@@ -1,35 +1,35 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Donation } from '@/types/funding';
+import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 
-interface UserDonation extends Donation {
-  funding_campaigns?: {
-    title: string;
-    slug: string;
-  } | null;
-}
+export const useUserDonations = () => {
+  const { data: user } = useAuthenticatedUser();
 
-export const useUserDonations = (userId: string | undefined) => {
-  return useQuery<UserDonation[]>({
-    queryKey: ['user-donations', userId],
-    enabled: !!userId,
+  return useQuery({
+    queryKey: ['user-donations', user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
-      if (!userId) return [];
-      
       const { data, error } = await (supabase as any)
         .from('donations')
         .select(`
           *,
-          funding_campaigns (
+          funding_campaigns:campaign_id (
             title,
             slug
+          ),
+          donation_subscriptions:subscription_id (
+            *,
+            funding_campaigns:campaign_id (
+              title,
+              slug
+            )
           )
         `)
-        .eq('donor_user_id', userId)
+        .eq('donor_user_id', user!.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as UserDonation[];
+      return data;
     },
   });
 };

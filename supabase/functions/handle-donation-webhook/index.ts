@@ -84,6 +84,22 @@ serve(async (req) => {
       }
 
       console.log("Donation updated successfully:", data);
+
+      // Send receipt email
+      try {
+        await fetch(`${supabaseUrl}/functions/v1/send-donation-receipt`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseServiceKey}`,
+          },
+          body: JSON.stringify({ donation_id }),
+        });
+        console.log("Receipt email triggered");
+      } catch (emailError) {
+        console.error("Error triggering receipt email:", emailError);
+        // Don't fail the webhook if email fails
+      }
     }
 
     return new Response(
