@@ -28,6 +28,11 @@ interface CreateProductData {
   supplier?: string;
   productGroup?: string;
   unit?: string;
+  eventId?: string;
+  productType?: string;
+  projectId?: string;
+  sellerId?: string;
+  sellerType?: string;
 }
 
 interface UpdateProductData extends CreateProductData {
@@ -79,6 +84,11 @@ const buildProductPayload = (productData: CreateProductData, totalStock: number)
     unit: productData.unit ?? 'pcs',
     rating: 0,
     reviews: 0,
+    event_id: productData.eventId || null,
+    product_type: productData.productType || null,
+    project_id: productData.projectId || null,
+    seller_id: productData.sellerId || null,
+    seller_type: productData.sellerType || 'admin',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
