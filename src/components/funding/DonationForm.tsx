@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { useCreateDonation } from '@/hooks/funding';
 import { Heart, CreditCard } from 'lucide-react';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface DonationFormProps {
   campaignId: string;
@@ -25,8 +27,9 @@ interface DonationFormData {
 
 export const DonationForm = ({ campaignId, currency = 'SEK' }: DonationFormProps) => {
   const { data: user } = useAuthenticatedUser();
-  const { mutate: createDonation, isPending } = useCreateDonation();
+  const { mutateAsync: createDonation } = useCreateDonation();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<DonationFormData>({
     defaultValues: {
@@ -40,16 +43,55 @@ export const DonationForm = ({ campaignId, currency = 'SEK' }: DonationFormProps
 
   const quickAmounts = [100, 250, 500, 1000, 2500];
 
-  const onSubmit = (data: DonationFormData) => {
-    createDonation({
-      campaign_id: campaignId,
-      amount: data.amount,
-      currency,
-      donor_name: data.donor_name,
-      donor_email: data.donor_email,
-      message: data.message,
-      is_anonymous: data.is_anonymous,
-    });
+  const onSubmit = async (data: DonationFormData) => {
+    setIsProcessing(true);
+    
+    try {
+      // Create donation record first
+      const donation = await createDonation({
+        campaign_id: campaignId,
+        amount: data.amount,
+        currency,
+        donor_name: data.donor_name,
+        donor_email: data.donor_email,
+        message: data.message,
+        is_anonymous: data.is_anonymous,
+      });
+
+      console.log("Donation created:", donation.id);
+
+      // Create Stripe checkout session
+      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
+        'create-donation-checkout',
+        {
+          body: {
+            donation_id: donation.id,
+            donor_email: data.donor_email,
+            donor_name: data.donor_name,
+            amount: data.amount,
+            currency,
+          },
+        }
+      );
+
+      if (checkoutError) {
+        console.error("Checkout error:", checkoutError);
+        throw new Error("Failed to create payment session");
+      }
+
+      if (!checkoutData?.url) {
+        throw new Error("No checkout URL returned");
+      }
+
+      console.log("Redirecting to Stripe checkout:", checkoutData.url);
+
+      // Redirect to Stripe checkout
+      window.location.href = checkoutData.url;
+    } catch (error) {
+      console.error("Donation error:", error);
+      toast.error("Failed to process donation. Please try again.");
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -166,11 +208,11 @@ export const DonationForm = ({ campaignId, currency = 'SEK' }: DonationFormProps
         <CardFooter>
           <Button
             type="submit"
-            disabled={isPending}
+            disabled={isProcessing}
             className="w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-primary/50 transition-all duration-300"
           >
             <CreditCard className="h-4 w-4 mr-2" />
-            {isPending ? 'Processing...' : `Donate ${watch('amount') || 0} ${currency}`}
+            {isProcessing ? 'Processing...' : `Donate ${watch('amount') || 0} ${currency}`}
           </Button>
         </CardFooter>
       </form>

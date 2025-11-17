@@ -1,8 +1,6 @@
-// Stub for payment webhook handler
-// This will be extended when integrating with Stripe/Swish
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,61 +18,87 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse webhook payload
-    const payload = await req.json();
-    console.log('Received webhook:', payload);
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
 
-    // TODO: Verify webhook signature from payment provider
-    // For Stripe: use stripe.webhooks.constructEvent
-    // For Swish: verify callback token
+    const signature = req.headers.get("stripe-signature");
+    const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
-    // Extract donation info from payload
-    const {
-      donation_id,
-      payment_reference,
-      status, // 'succeeded' | 'failed' | 'refunded'
-      provider, // 'stripe' | 'swish' | etc
-    } = payload;
-
-    if (!donation_id) {
-      throw new Error('Missing donation_id in webhook payload');
+    if (!signature || !webhookSecret) {
+      console.error("Missing signature or webhook secret");
+      throw new Error("Webhook authentication failed");
     }
 
-    // Update donation status (uses service role, bypasses RLS)
-    const { data, error } = await supabase
-      .from('donations')
-      .update({
-        status,
-        payment_reference,
-        payment_provider: provider,
-        confirmed_at: status === 'succeeded' ? new Date().toISOString() : null,
-      })
-      .eq('id', donation_id)
-      .select()
-      .single();
+    // Get raw body for signature verification
+    const body = await req.text();
+    let event: Stripe.Event;
 
-    if (error) {
-      console.error('Failed to update donation:', error);
-      throw error;
+    try {
+      event = await stripe.webhooks.constructEventAsync(
+        body,
+        signature,
+        webhookSecret
+      );
+    } catch (err) {
+      console.error("Webhook signature verification failed:", err.message);
+      return new Response(
+        JSON.stringify({ error: "Webhook signature verification failed" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        }
+      );
     }
 
-    console.log('Donation updated:', data);
+    console.log("Stripe webhook event:", event.type);
 
-    // Trigger will handle Fave Points and campaign updates automatically
+    // Handle checkout.session.completed event
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const donation_id = session.metadata?.donation_id;
+
+      if (!donation_id) {
+        console.error("No donation_id in session metadata");
+        throw new Error("Missing donation_id in session metadata");
+      }
+
+      console.log("Processing payment for donation:", donation_id);
+
+      // Update donation status
+      const { data, error } = await supabase
+        .from("donations")
+        .update({
+          status: "succeeded",
+          payment_reference: session.id,
+          payment_provider: "stripe",
+          confirmed_at: new Date().toISOString(),
+        })
+        .eq("id", donation_id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Failed to update donation:", error);
+        throw error;
+      }
+
+      console.log("Donation updated successfully:", data);
+    }
 
     return new Response(
-      JSON.stringify({ success: true, donation: data }),
+      JSON.stringify({ received: true }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       }
     );
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error("Webhook error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ error: error.message }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
       }
     );
