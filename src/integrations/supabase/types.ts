@@ -867,6 +867,71 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount: number
+          campaign_id: string
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          donor_email: string | null
+          donor_name: string | null
+          donor_user_id: string | null
+          fave_points_earned: number | null
+          id: string
+          is_anonymous: boolean
+          message: string | null
+          metadata: Json
+          payment_provider: string | null
+          payment_reference: string | null
+          status: Database["public"]["Enums"]["donation_status"]
+        }
+        Insert: {
+          amount: number
+          campaign_id: string
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          donor_user_id?: string | null
+          fave_points_earned?: number | null
+          id?: string
+          is_anonymous?: boolean
+          message?: string | null
+          metadata?: Json
+          payment_provider?: string | null
+          payment_reference?: string | null
+          status?: Database["public"]["Enums"]["donation_status"]
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          donor_user_id?: string | null
+          fave_points_earned?: number | null
+          id?: string
+          is_anonymous?: boolean
+          message?: string | null
+          metadata?: Json
+          payment_provider?: string | null
+          payment_reference?: string | null
+          status?: Database["public"]["Enums"]["donation_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "funding_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       draft_submissions: {
         Row: {
           created_at: string
@@ -1137,6 +1202,107 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      funding_campaigns: {
+        Row: {
+          budget_id: string | null
+          collaboration_project_id: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          deadline: string | null
+          description: string | null
+          event_id: string | null
+          id: string
+          metadata: Json
+          project_id: string | null
+          raised_amount: number
+          series_id: string | null
+          short_description: string | null
+          slug: string
+          starts_at: string | null
+          status: Database["public"]["Enums"]["funding_campaign_status"]
+          target_amount: number
+          title: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["funding_campaign_visibility"]
+        }
+        Insert: {
+          budget_id?: string | null
+          collaboration_project_id?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          metadata?: Json
+          project_id?: string | null
+          raised_amount?: number
+          series_id?: string | null
+          short_description?: string | null
+          slug: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["funding_campaign_status"]
+          target_amount: number
+          title: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["funding_campaign_visibility"]
+        }
+        Update: {
+          budget_id?: string | null
+          collaboration_project_id?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          metadata?: Json
+          project_id?: string | null
+          raised_amount?: number
+          series_id?: string | null
+          short_description?: string | null
+          slug?: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["funding_campaign_status"]
+          target_amount?: number
+          title?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["funding_campaign_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funding_campaigns_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "project_budgets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funding_campaigns_collaboration_project_id_fkey"
+            columns: ["collaboration_project_id"]
+            isOneToOne: false
+            referencedRelation: "collaboration_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funding_campaigns_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funding_campaigns_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       media_audit_log: {
         Row: {
@@ -2568,6 +2734,50 @@ export type Database = {
           },
         ]
       }
+      project_budgets: {
+        Row: {
+          breakdown: Json | null
+          created_at: string
+          id: string
+          project_id: string | null
+          raised_from_donations: number | null
+          secured_from_sponsors: number | null
+          status: Database["public"]["Enums"]["project_budget_status"] | null
+          total_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          breakdown?: Json | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          raised_from_donations?: number | null
+          secured_from_sponsors?: number | null
+          status?: Database["public"]["Enums"]["project_budget_status"] | null
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          breakdown?: Json | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          raised_from_donations?: number | null
+          secured_from_sponsors?: number | null
+          status?: Database["public"]["Enums"]["project_budget_status"] | null
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_budgets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_links: {
         Row: {
           created_at: string
@@ -3539,6 +3749,70 @@ export type Database = {
           },
         ]
       }
+      sponsor_contributions: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          contributed_at: string
+          created_at: string
+          currency: string
+          id: string
+          is_recurring: boolean
+          notes: string | null
+          project_id: string | null
+          recurrence_interval: string | null
+          sponsor_id: string
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          contributed_at?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          is_recurring?: boolean
+          notes?: string | null
+          project_id?: string | null
+          recurrence_interval?: string | null
+          sponsor_id: string
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          contributed_at?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          is_recurring?: boolean
+          notes?: string | null
+          project_id?: string | null
+          recurrence_interval?: string | null
+          sponsor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsor_contributions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "funding_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_contributions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsor_contributions_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sponsors: {
         Row: {
           contact_email: string | null
@@ -4029,6 +4303,14 @@ export type Database = {
         | "responded"
         | "completed"
       communication_type: "message" | "consultation" | "quote"
+      donation_status: "pending" | "succeeded" | "failed" | "refunded"
+      funding_campaign_status:
+        | "draft"
+        | "active"
+        | "successful"
+        | "failed"
+        | "archived"
+      funding_campaign_visibility: "public" | "event_members" | "private"
       order_item_type: "product" | "auction" | "service"
       order_status:
         | "pending"
@@ -4047,6 +4329,7 @@ export type Database = {
         | "beauty"
         | "toys"
         | "automotive"
+      project_budget_status: "planning" | "fundraising" | "funded" | "closed"
       service_category:
         | "photography"
         | "design"
@@ -4215,6 +4498,15 @@ export const Constants = {
         "completed",
       ],
       communication_type: ["message", "consultation", "quote"],
+      donation_status: ["pending", "succeeded", "failed", "refunded"],
+      funding_campaign_status: [
+        "draft",
+        "active",
+        "successful",
+        "failed",
+        "archived",
+      ],
+      funding_campaign_visibility: ["public", "event_members", "private"],
       order_item_type: ["product", "auction", "service"],
       order_status: [
         "pending",
@@ -4235,6 +4527,7 @@ export const Constants = {
         "toys",
         "automotive",
       ],
+      project_budget_status: ["planning", "fundraising", "funded", "closed"],
       service_category: [
         "photography",
         "design",

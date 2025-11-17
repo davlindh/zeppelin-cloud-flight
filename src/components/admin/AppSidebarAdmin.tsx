@@ -16,7 +16,8 @@ import {
   Image,
   TrendingUp,
   Percent,
-  ShoppingBag
+  ShoppingBag,
+  DollarSign
 } from "lucide-react"
 import {
   Sidebar,
@@ -38,6 +39,7 @@ const zeppelSections = [
   { title: "Projekt", path: "/admin/projects-management", icon: FolderOpen, description: "Showcase-projekt" },
   { title: "Sponsorer", path: "/admin/sponsors-management", icon: HandHeart, description: "Partners & sponsorer" },
   { title: "Media", path: "/admin/media", icon: Image, description: "Media library" },
+  { title: "Donationer", path: "/admin/donations", icon: DollarSign, description: "Donation management" },
 ]
 
 const marketplaceSections = [
