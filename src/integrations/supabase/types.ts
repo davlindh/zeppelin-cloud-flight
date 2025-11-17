@@ -867,6 +867,65 @@ export type Database = {
         }
         Relationships: []
       }
+      donation_subscriptions: {
+        Row: {
+          amount: number
+          campaign_id: string
+          cancel_at_period_end: boolean | null
+          created_at: string | null
+          currency: string
+          current_period_end: string | null
+          current_period_start: string | null
+          donor_user_id: string
+          id: string
+          interval: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id: string
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          currency?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          donor_user_id: string
+          id?: string
+          interval?: string
+          status?: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          currency?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          donor_user_id?: string
+          id?: string
+          interval?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_subscriptions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "funding_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       donations: {
         Row: {
           amount: number
@@ -880,11 +939,16 @@ export type Database = {
           fave_points_earned: number | null
           id: string
           is_anonymous: boolean
+          is_recurring: boolean | null
           message: string | null
           metadata: Json
+          next_billing_date: string | null
           payment_provider: string | null
           payment_reference: string | null
+          recurrence_interval: string | null
           status: Database["public"]["Enums"]["donation_status"]
+          subscription_id: string | null
+          subscription_status: string | null
         }
         Insert: {
           amount: number
@@ -898,11 +962,16 @@ export type Database = {
           fave_points_earned?: number | null
           id?: string
           is_anonymous?: boolean
+          is_recurring?: boolean | null
           message?: string | null
           metadata?: Json
+          next_billing_date?: string | null
           payment_provider?: string | null
           payment_reference?: string | null
+          recurrence_interval?: string | null
           status?: Database["public"]["Enums"]["donation_status"]
+          subscription_id?: string | null
+          subscription_status?: string | null
         }
         Update: {
           amount?: number
@@ -916,11 +985,16 @@ export type Database = {
           fave_points_earned?: number | null
           id?: string
           is_anonymous?: boolean
+          is_recurring?: boolean | null
           message?: string | null
           metadata?: Json
+          next_billing_date?: string | null
           payment_provider?: string | null
           payment_reference?: string | null
+          recurrence_interval?: string | null
           status?: Database["public"]["Enums"]["donation_status"]
+          subscription_id?: string | null
+          subscription_status?: string | null
         }
         Relationships: [
           {
@@ -4216,6 +4290,17 @@ export type Database = {
       get_available_times: {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]
+      }
+      get_campaign_top_donors: {
+        Args: { p_campaign_id: string }
+        Returns: {
+          currency: string
+          donor_name: string
+          donor_user_id: string
+          fave_level: string
+          fave_score: number
+          total_donated: number
+        }[]
       }
       get_collaboration_project_stats: {
         Args: { p_project_id: string }
