@@ -10,6 +10,9 @@ interface UpdateCampaignInput {
   target_amount?: number;
   deadline?: string;
   visibility?: string;
+  project_id?: string | null;
+  collaboration_project_id?: string | null;
+  event_id?: string | null;
 }
 
 export const useUpdateCampaign = () => {
