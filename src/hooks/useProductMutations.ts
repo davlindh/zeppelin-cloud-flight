@@ -130,6 +130,9 @@ export const useProductMutations = () => {
         await queryClient.invalidateQueries({ 
           queryKey: ['ticket-sales-stats', productData.eventId] 
         });
+        await queryClient.invalidateQueries({ 
+          queryKey: ['event-tickets-overview'] 
+        });
       }
 
       // Transform database response to Product type
