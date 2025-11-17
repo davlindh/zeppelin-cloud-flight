@@ -17,13 +17,13 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { donation_id, donor_email, donor_name, amount, currency } = await req.json();
+    const { donation_id, donor_email, donor_name, amount, currency, is_recurring } = await req.json();
 
     if (!donation_id || !donor_email || !amount) {
       throw new Error("Missing required fields: donation_id, donor_email, amount");
     }
 
-    console.log("Creating checkout session for donation:", donation_id);
+    console.log("Creating checkout session for donation:", donation_id, "is_recurring:", is_recurring);
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -45,38 +45,72 @@ serve(async (req) => {
       customerId = customer.id;
     }
 
-    // Create checkout session with dynamic pricing
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      line_items: [
-        {
-          price_data: {
-            currency: currency.toLowerCase(),
-            product_data: {
-              name: "Campaign Donation",
-              description: "Support a campaign",
-            },
-            unit_amount: Math.round(amount * 100), // Convert to cents
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/campaigns?donation=success`,
-      cancel_url: `${req.headers.get("origin")}/campaigns?donation=cancelled`,
-      metadata: {
-        donation_id,
-      },
-    });
+    let session;
+    const successUrl = is_recurring 
+      ? `${req.headers.get("origin")}/campaigns/donation-success?type=recurring`
+      : `${req.headers.get("origin")}/campaigns?donation=success`;
+    const cancelUrl = `${req.headers.get("origin")}/campaigns?donation=cancelled`;
 
-    console.log("Checkout session created:", session.id);
+    if (is_recurring) {
+      // Create recurring subscription
+      const price = await stripe.prices.create({
+        currency: currency.toLowerCase(),
+        unit_amount: Math.round(amount * 100),
+        recurring: { interval: 'month' },
+        product_data: {
+          name: `Monthly donation`,
+          description: "Recurring campaign support",
+        },
+      });
+
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        line_items: [{ price: price.id, quantity: 1 }],
+        mode: "subscription",
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: {
+          donation_id,
+          is_recurring: 'true',
+        },
+      });
+
+      console.log("Subscription checkout session created:", session.id);
+    } else {
+      // Create one-time payment
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        line_items: [
+          {
+            price_data: {
+              currency: currency.toLowerCase(),
+              product_data: {
+                name: "Campaign Donation",
+                description: "Support a campaign",
+              },
+              unit_amount: Math.round(amount * 100), // Convert to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: {
+          donation_id,
+        },
+      });
+
+      console.log("Checkout session created:", session.id);
+    }
 
     // Update donation with payment_intent_id
     const { error: updateError } = await supabase
       .from("donations")
       .update({ 
         payment_reference: session.id,
-        payment_provider: "stripe" 
+        payment_provider: "stripe",
+        is_recurring: is_recurring || false,
       })
       .eq("id", donation_id);
 

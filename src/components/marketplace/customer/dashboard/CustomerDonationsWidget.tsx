@@ -10,7 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 export const CustomerDonationsWidget: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
-  const { data: donations, isLoading } = useUserDonations(user?.id);
+  const { data: donations, isLoading } = useUserDonations();
 
   const recentDonations = donations?.slice(0, 3) || [];
   const totalDonated = donations?.reduce((sum, d) => sum + d.amount, 0) || 0;

@@ -12,7 +12,7 @@ interface ProfileDonationHistoryProps {
 }
 
 export const ProfileDonationHistory: React.FC<ProfileDonationHistoryProps> = ({ userId }) => {
-  const { data: donations, isLoading } = useUserDonations(userId);
+  const { data: donations, isLoading } = useUserDonations();
 
   const succeededDonations = donations?.filter(d => d.status === 'succeeded') || [];
   const pendingDonations = donations?.filter(d => d.status === 'pending') || [];

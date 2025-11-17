@@ -6,8 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCreateDonation } from '@/hooks/funding';
-import { Heart, CreditCard } from 'lucide-react';
+import { Heart, CreditCard, RefreshCw } from 'lucide-react';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -30,6 +31,7 @@ export const DonationForm = ({ campaignId, currency = 'SEK' }: DonationFormProps
   const { mutateAsync: createDonation } = useCreateDonation();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [donationType, setDonationType] = useState<'one-time' | 'recurring'>('one-time');
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<DonationFormData>({
     defaultValues: {
@@ -70,6 +72,7 @@ export const DonationForm = ({ campaignId, currency = 'SEK' }: DonationFormProps
             donor_name: data.donor_name,
             amount: data.amount,
             currency,
+            is_recurring: donationType === 'recurring',
           },
         }
       );
@@ -105,6 +108,30 @@ export const DonationForm = ({ campaignId, currency = 'SEK' }: DonationFormProps
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-6">
+          {/* Donation Type Toggle */}
+          <div>
+            <Label>Donation Type</Label>
+            <RadioGroup value={donationType} onValueChange={(v) => setDonationType(v as 'one-time' | 'recurring')} className="mt-2">
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                <RadioGroupItem value="one-time" id="one-time" />
+                <Label htmlFor="one-time" className="cursor-pointer flex-1">
+                  <div className="font-medium">One-time donation</div>
+                  <div className="text-xs text-muted-foreground">Make a single contribution</div>
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                <RadioGroupItem value="recurring" id="recurring" />
+                <Label htmlFor="recurring" className="cursor-pointer flex-1">
+                  <div className="font-medium flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4" />
+                    Monthly recurring
+                  </div>
+                  <div className="text-xs text-muted-foreground">Support every month • Cancel anytime</div>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+
           {/* Quick amounts */}
           <div>
             <Label>Select amount ({currency})</Label>
