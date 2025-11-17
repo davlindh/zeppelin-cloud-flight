@@ -103,6 +103,7 @@ const SponsorsManagementPage = lazy(() => import("./pages/admin/SponsorsManageme
 const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage"));
 const SubmissionManagementPage = lazy(() => import("./pages/admin/SubmissionManagementPage"));
 const MediaSubmissionsPage = lazy(() => import("./pages/admin/MediaSubmissionsPage").then(m => ({ default: m.MediaSubmissionsPage })));
+const DonationsManagementPage = lazy(() => import("./pages/admin/DonationsManagementPage"));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-96">
@@ -407,6 +408,11 @@ const App = () => (
                   <Route path="submissions" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SubmissionManagementPage />
+                    </Suspense>
+                  } />
+                  <Route path="donations" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <DonationsManagementPage />
                     </Suspense>
                   } />
                   <Route path="media/submissions" element={
