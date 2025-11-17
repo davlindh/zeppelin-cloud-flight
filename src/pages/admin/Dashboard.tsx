@@ -10,6 +10,8 @@ import { QuickActions } from '@/components/admin/dashboard/QuickActions';
 import { ZeppelStatsSection } from '@/components/admin/dashboard/ZeppelStatsSection';
 import { MarketplaceStatsSection } from '@/components/admin/dashboard/MarketplaceStatsSection';
 import { ServicesStatsSection } from '@/components/admin/dashboard/ServicesStatsSection';
+import { FundingStatsSection } from '@/components/admin/dashboard/FundingStatsSection';
+import { EventsStatsSection } from '@/components/admin/dashboard/EventsStatsSection';
 import { useUnifiedDashboardStats } from '@/hooks/useUnifiedDashboardStats';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AdminActionShortcuts } from '@/components/admin/dashboard/AdminActionShortcuts';
@@ -108,6 +110,12 @@ export const Dashboard = () => {
 
         {/* Zeppel Stats */}
         <ZeppelStatsSection stats={stats.zeppel} />
+
+        {/* Funding Stats */}
+        <FundingStatsSection stats={stats.funding} />
+
+        {/* Events Stats */}
+        <EventsStatsSection stats={stats.events} />
 
         {/* Marketplace Stats */}
         <MarketplaceStatsSection stats={stats.marketplace} />
