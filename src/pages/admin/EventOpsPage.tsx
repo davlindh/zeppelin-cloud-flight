@@ -7,7 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEventStats } from "@/hooks/useEventStats";
 import { EventRegistrationsTable } from "@/components/admin/events/EventRegistrationsTable";
 import { EventTimeline } from "@/components/admin/events/EventTimeline";
-import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { EventTicketsTab } from "@/components/admin/events/EventTicketsTab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/events";
 
@@ -143,44 +145,77 @@ export const EventOpsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div>
-            <EventRegistrationsTable eventId={eventId!} />
-          </div>
+        {/* Main Content with Tabs */}
+        <Tabs defaultValue="registrations" className="w-full">
+          <TabsList>
+            <TabsTrigger value="registrations">
+              <Users className="mr-2 h-4 w-4" />
+              Registrations
+            </TabsTrigger>
+            <TabsTrigger value="tickets">
+              <Ticket className="mr-2 h-4 w-4" />
+              Tickets
+            </TabsTrigger>
+            <TabsTrigger value="details">
+              <Clock className="mr-2 h-4 w-4" />
+              Details
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-6">
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <EventTimeline event={event} />
+          <TabsContent value="registrations" className="mt-6">
+            <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+              <div>
+                <EventRegistrationsTable eventId={eventId!} />
+              </div>
+              <div>
+                <div className="rounded-2xl border border-border bg-card p-4">
+                  <EventTimeline event={event} />
+                </div>
+              </div>
             </div>
+          </TabsContent>
 
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <h3 className="text-sm font-semibold text-foreground mb-3">Event Details</h3>
-              <dl className="space-y-2 text-sm">
-                <div>
-                  <dt className="text-muted-foreground">Status</dt>
-                  <dd className="font-medium text-foreground">{event.status}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Location</dt>
-                  <dd className="font-medium text-foreground">{event.location || "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Starts</dt>
-                  <dd className="font-medium text-foreground">
-                    {new Date(event.starts_at).toLocaleString()}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Ends</dt>
-                  <dd className="font-medium text-foreground">
-                    {new Date(event.ends_at).toLocaleString()}
-                  </dd>
-                </div>
-              </dl>
+          <TabsContent value="tickets" className="mt-6">
+            <EventTicketsTab eventId={eventId!} eventTitle={event.title} />
+          </TabsContent>
+
+          <TabsContent value="details" className="mt-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Event Details</h3>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Status</dt>
+                    <dd className="font-medium text-foreground mt-1">{event.status}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Location</dt>
+                    <dd className="font-medium text-foreground mt-1">{event.location || "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Venue</dt>
+                    <dd className="font-medium text-foreground mt-1">{event.venue || "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Starts</dt>
+                    <dd className="font-medium text-foreground mt-1">
+                      {new Date(event.starts_at).toLocaleString()}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Ends</dt>
+                    <dd className="font-medium text-foreground mt-1">
+                      {new Date(event.ends_at).toLocaleString()}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <EventTimeline event={event} />
+              </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </UnifiedDashboardLayout>
   );

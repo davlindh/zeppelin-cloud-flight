@@ -26,3 +26,9 @@ verify_jwt = false
 
 [functions.cancel-subscription]
 verify_jwt = false
+
+[functions.handle-order-completion]
+verify_jwt = false
+
+[functions.send-event-confirmation]
+verify_jwt = false
