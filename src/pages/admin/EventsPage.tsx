@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { UnifiedDashboardLayout } from "@/components/layouts/UnifiedDashboardLayout";
 import { useAuthenticatedUser } from "@/hooks/useAuthenticatedUser";
 import { AdminEventsTable } from "@/components/admin/events/AdminEventsTable";
+import { useAdminEvents } from "@/hooks/admin";
 
 export const EventsPage: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
   const navigate = useNavigate();
+  const { data: events, isLoading } = useAdminEvents();
 
   const handleCreate = () => {
     navigate('/admin/events/new');
@@ -22,7 +24,7 @@ export const EventsPage: React.FC = () => {
           </p>
         </div>
 
-        <AdminEventsTable onCreate={handleCreate} />
+        <AdminEventsTable events={events} isLoading={isLoading} onCreate={handleCreate} />
       </div>
     </UnifiedDashboardLayout>
   );
