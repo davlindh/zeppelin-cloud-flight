@@ -1,4 +1,5 @@
 export { useCampaigns } from './useCampaigns';
+export { useAdminCampaigns } from './useAdminCampaigns';
 export { useCampaign } from './useCampaign';
 export { useCampaignsWithEvaluation } from './useCampaignsWithEvaluation';
 export { useDonations, useCreateDonation } from './useDonations';
