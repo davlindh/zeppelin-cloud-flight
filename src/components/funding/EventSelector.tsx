@@ -32,8 +32,8 @@ export const EventSelector: React.FC<EventSelectorProps> = ({ value, onChange, d
       <SelectTrigger>
         <SelectValue placeholder="Select an event (optional)" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="none">No event link</SelectItem>
+  <SelectContent className="bg-popover border border-border z-50">
+    <SelectItem value="none">No event link</SelectItem>
         {events?.map((event) => (
           <SelectItem key={event.id} value={event.id}>
             <div className="flex items-center gap-2">

@@ -21,7 +21,8 @@ import {
   Ticket,
   CalendarCheck,
   Heart,
-  TrendingDown
+  TrendingDown,
+  Link2
 } from "lucide-react"
 import {
   Sidebar,
@@ -78,6 +79,7 @@ const eventsSections = [
 
 const campaignsSections = [
   { title: "All Campaigns", path: "/admin/campaigns", icon: Heart, description: "Funding campaigns", badge: "draftCampaigns" },
+  { title: "Campaign Linkages", path: "/admin/campaigns/linkage", icon: Link2, description: "Manage connections" },
   { title: "Active Campaigns", path: "/admin/campaigns?status=active", icon: TrendingUp, description: "Currently fundraising", badge: "activeCampaigns" },
   { title: "Ending Soon", path: "/admin/campaigns?ending=true", icon: TrendingDown, description: "Campaigns closing", badge: "endingCampaigns" },
 ]

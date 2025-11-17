@@ -37,8 +37,8 @@ export const CollaborationProjectSelector: React.FC<CollaborationProjectSelector
       <SelectTrigger>
         <SelectValue placeholder="Select a collaboration project (optional)" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="none">No collaboration project link</SelectItem>
+  <SelectContent className="bg-popover border border-border z-50">
+    <SelectItem value="none">No collaboration project link</SelectItem>
         {projects?.map((project) => (
           <SelectItem key={project.id} value={project.id}>
             <div className="flex items-center gap-2">
