@@ -1,5 +1,6 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCampaigns } from '@/hooks/funding/useCampaigns';
+import { useCampaignsWithEvaluation } from '@/hooks/funding/useCampaignsWithEvaluation';
 import { useActivateCampaign } from '@/hooks/funding/useActivateCampaign';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 import { CampaignCard } from '@/components/funding/CampaignCard';
@@ -21,7 +22,7 @@ import {
 export const ParticipantCampaignsPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: user } = useAuthenticatedUser();
-  const { data: campaigns, isLoading } = useCampaigns();
+  const { data: campaigns, isLoading } = useCampaignsWithEvaluation();
   const activateCampaign = useActivateCampaign();
 
   const myCampaigns = React.useMemo(() => {
@@ -77,7 +78,7 @@ export const ParticipantCampaignsPage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myCampaigns.active.map(campaign => (
-                <CampaignCard key={campaign.id} campaign={campaign} />
+                <CampaignCard key={campaign.id} campaign={campaign} evaluationSummary={campaign.evaluation_summary} />
               ))}
             </div>
           )}
@@ -92,7 +93,7 @@ export const ParticipantCampaignsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myCampaigns.draft.map(campaign => (
                 <div key={campaign.id} className="relative">
-                  <CampaignCard campaign={campaign} />
+                  <CampaignCard campaign={campaign} evaluationSummary={campaign.evaluation_summary} />
                   <div className="flex gap-2 mt-3">
                     <Button
                       size="sm"
@@ -140,7 +141,7 @@ export const ParticipantCampaignsPage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myCampaigns.completed.map(campaign => (
-                <CampaignCard key={campaign.id} campaign={campaign} />
+                <CampaignCard key={campaign.id} campaign={campaign} evaluationSummary={campaign.evaluation_summary} />
               ))}
             </div>
           )}
