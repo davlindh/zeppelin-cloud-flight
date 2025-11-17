@@ -31,8 +31,8 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({ value, onChang
       <SelectTrigger>
         <SelectValue placeholder="Select a project (optional)" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="none">No project link</SelectItem>
+  <SelectContent className="bg-popover border border-border z-50">
+    <SelectItem value="none">No project link</SelectItem>
         {projects?.map((project) => (
           <SelectItem key={project.id} value={project.id}>
             <div className="flex items-center gap-2">

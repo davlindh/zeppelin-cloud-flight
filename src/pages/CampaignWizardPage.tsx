@@ -225,94 +225,100 @@ export const CampaignWizardPage: React.FC = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="event_members">Event Members</SelectItem>
-                      <SelectItem value="private">Private</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="event_members">Event Members</SelectItem>
+                  <SelectItem value="private">Private</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormControl>
+                <input type="hidden" {...field} />
+              </FormControl>
+              <FormDescription>
+                Who can see and donate to this campaign
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <div className="space-y-4 border-t pt-6">
-              <div>
-                <h3 className="text-lg font-semibold">Campaign Linkages (Optional)</h3>
-                <p className="text-sm text-muted-foreground">
-                  Connect this campaign to projects or events for better organization
-                </p>
-              </div>
+        <div className="space-y-4 border-t pt-6">
+          <div>
+            <h3 className="text-lg font-semibold">Campaign Linkages (Optional)</h3>
+            <p className="text-sm text-muted-foreground">
+              Connect this campaign to projects or events for better organization
+            </p>
+          </div>
 
-              {form.watch('project_id') && form.watch('collaboration_project_id') && (
-                <Alert>
-                  <AlertDescription>
-                    A campaign can be linked to either a regular project OR a collaboration project, not both.
-                  </AlertDescription>
-                </Alert>
-              )}
+          {form.watch('project_id') && form.watch('collaboration_project_id') && (
+            <Alert>
+              <AlertDescription>
+                A campaign can be linked to either a regular project OR a collaboration project, not both.
+              </AlertDescription>
+            </Alert>
+          )}
 
-              <FormField
-                control={form.control}
-                name="project_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link to Project</FormLabel>
-                    <FormControl>
-                      <ProjectSelector
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={!!form.watch('collaboration_project_id')}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Connect this campaign to an existing project
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <FormField
+            control={form.control}
+            name="project_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Link to Project</FormLabel>
+                <FormControl>
+                  <ProjectSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={!!form.watch('collaboration_project_id')}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Connect this campaign to an existing project
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <FormField
-                control={form.control}
-                name="collaboration_project_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link to Collaboration Project</FormLabel>
-                    <FormControl>
-                      <CollaborationProjectSelector
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={!!form.watch('project_id')}
-                        eventId={form.watch('event_id') || undefined}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Connect to a collaboration project (alternative to regular project)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <FormField
+            control={form.control}
+            name="collaboration_project_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Link to Collaboration Project</FormLabel>
+                <FormControl>
+                  <CollaborationProjectSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={!!form.watch('project_id')}
+                    eventId={form.watch('event_id') || undefined}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Connect to a collaboration project (alternative to regular project)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <FormField
-                control={form.control}
-                name="event_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link to Event</FormLabel>
-                    <FormControl>
-                      <EventSelector value={field.value} onChange={field.onChange} />
-                    </FormControl>
-                    <FormDescription>
-                      Raise funds for a specific event
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <FormField
+            control={form.control}
+            name="event_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Link to Event</FormLabel>
+                <FormControl>
+                  <EventSelector value={field.value} onChange={field.onChange} />
+                </FormControl>
+                <FormDescription>
+                  Raise funds for a specific event
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-            <div className="flex gap-4">
+        <div className="flex gap-4">
               <Button
                 type="button"
                 variant="outline"
