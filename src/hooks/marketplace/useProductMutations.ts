@@ -17,6 +17,7 @@ interface CreateProductData {
   variants?: Array<{
     color?: string;
     size?: string;
+    material?: string;
     stock: number;
   }>;
   images?: string[];
@@ -111,22 +112,30 @@ export const useProductMutations = () => {
       }
 
       if (productData.variants?.length) {
-        const timestamp = new Date().toISOString();
-        const variantPayload = productData.variants.map(variant => ({
-          product_id: data.id,
-          color: variant.color,
-          size: variant.size,
-          stock_quantity: variant.stock,
-          created_at: timestamp,
-          updated_at: timestamp,
-        }));
+        // Only create variants that have actual attributes (color, size, or material)
+        const validVariants = productData.variants.filter(v => 
+          v.color || v.size || v.material
+        );
 
-        const { error: variantError } = await supabase
-          .from('product_variants')
-          .insert(variantPayload);
+        if (validVariants.length > 0) {
+          const timestamp = new Date().toISOString();
+          const variantPayload = validVariants.map(variant => ({
+            product_id: data.id,
+            color: variant.color || null,
+            size: variant.size || null,
+            material: variant.material || null,
+            stock_quantity: variant.stock,
+            created_at: timestamp,
+            updated_at: timestamp,
+          }));
 
-        if (variantError) {
-          console.warn('[useProductMutations] Failed to create variants:', variantError);
+          const { error: variantError } = await supabase
+            .from('product_variants')
+            .insert(variantPayload);
+
+          if (variantError) {
+            console.warn('[useProductMutations] Failed to create variants:', variantError);
+          }
         }
       }
 

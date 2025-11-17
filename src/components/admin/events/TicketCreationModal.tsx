@@ -71,7 +71,7 @@ export const TicketCreationModal: React.FC<TicketCreationModalProps> = ({
         price: data.selling_price,
         originalPrice: data.original_price || data.selling_price,
         category: 'Events',
-        variants: [{ stock: data.stock_quantity }],
+        stockQuantity: data.stock_quantity,
         images: [],
       } as any);
 
