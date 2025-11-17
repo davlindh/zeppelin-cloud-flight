@@ -66,6 +66,20 @@ export interface UnifiedDashboardStats {
       providers_needing_attention: number;
     };
   };
+  funding: {
+    total_raised_all_time: number;
+    total_raised_30d: number;
+    active_campaigns: number;
+    campaigns_successful: number;
+    avg_campaign_success_rate: number;
+  };
+  events: {
+    tickets_sold_30d: number;
+    ticket_revenue_30d: number;
+    upcoming_events_with_tickets: number;
+    total_registrations: number;
+    confirmed_registrations: number;
+  };
   action_items: {
     total: number;
     submissions_pending: number;
@@ -73,6 +87,7 @@ export interface UnifiedDashboardStats {
     orders_pending: number;
     low_stock_count: number;
     unlinked_services: number;
+    campaigns_ending_soon: number;
   };
   last_updated: string;
 }
