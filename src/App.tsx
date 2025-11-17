@@ -67,12 +67,16 @@ import { CampaignPage } from "./pages/CampaignPage";
 import { ParticipantCampaignsPage } from "./pages/ParticipantCampaignsPage";
 import { CampaignWizardPage } from "./pages/CampaignWizardPage";
 import { CampaignEditPage } from "./pages/CampaignEditPage";
+import { MyDonationsPage } from "./pages/MyDonationsPage";
+import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 
 // Lazy load admin pages
 const Dashboard = lazy(() => import("./pages/admin/Dashboard").then(m => ({ default: m.Dashboard })));
 const ProductsPage = lazy(() => import("./pages/admin/ProductsPage").then(m => ({ default: m.ProductsPage })));
 const AuctionsPage = lazy(() => import("./pages/admin/AuctionsPage").then(m => ({ default: m.AuctionsPage })));
-const EventsPage = lazy(() => import("./pages/admin/EventsPage").then(m => ({ default: m.EventsPage })));
+import { EventsPage } from "./pages/admin/EventsPage";
+import { EventWizardPage } from "./pages/admin/EventWizardPage";
+import { CampaignsManagementPage } from "./pages/admin/CampaignsManagementPage";
 const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage").then(m => ({ default: m.EventOpsPage })));
 const EventCheckInPage = lazy(() => import("./pages/admin/EventCheckInPage").then(m => ({ default: m.EventCheckInPage })));
 const MyServicesPage = lazy(() => import("./pages/provider/MyServicesPage").then(m => ({ default: m.MyServicesPage })));
@@ -259,6 +263,8 @@ const App = () => (
                   <Route path="campaigns" element={<ParticipantCampaignsPage />} />
                   <Route path="campaigns/new" element={<CampaignWizardPage />} />
                   <Route path="campaigns/:slug/edit" element={<CampaignEditPage />} />
+                  <Route path="my-donations" element={<MyDonationsPage />} />
+                  <Route path="campaigns/donation-success" element={<DonationSuccessPage />} />
                 </Route>
 
                 {/* Order Pages */}
@@ -290,11 +296,8 @@ const App = () => (
                       <AuctionsPage />
                     </Suspense>
                   } />
-                  <Route path="events" element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <EventsPage />
-                    </Suspense>
-                  } />
+                  <Route path="events" element={<EventsPage />} />
+                  <Route path="events/new" element={<EventWizardPage />} />
                   <Route path="events/:eventId" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <EventOpsPage />
@@ -415,6 +418,7 @@ const App = () => (
                       <DonationsManagementPage />
                     </Suspense>
                   } />
+                  <Route path="campaigns-management" element={<CampaignsManagementPage />} />
                   <Route path="media/submissions" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <MediaSubmissionsPage />

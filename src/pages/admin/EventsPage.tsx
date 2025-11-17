@@ -1,18 +1,15 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import { UnifiedDashboardLayout } from "@/components/layouts/UnifiedDashboardLayout";
 import { useAuthenticatedUser } from "@/hooks/useAuthenticatedUser";
 import { AdminEventsTable } from "@/components/admin/events/AdminEventsTable";
-import { useToast } from "@/hooks/use-toast";
 
 export const EventsPage: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
-  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleCreate = () => {
-    toast({
-      title: "Event creation",
-      description: "Event creation form will be implemented next.",
-    });
+    navigate('/admin/events/new');
   };
 
   return (
