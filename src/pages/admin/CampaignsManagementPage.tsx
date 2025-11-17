@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCampaigns } from '@/hooks/funding';
+import { useAdminCampaigns } from '@/hooks/funding';
 import { AdminRoute } from '@/components/admin/AdminRoute';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 
 export const CampaignsManagementPage: React.FC = () => {
   const navigate = useNavigate();
-  const { data: campaigns, isLoading } = useCampaigns({});
+  const { data: campaigns, isLoading } = useAdminCampaigns();
 
   const activeCampaigns = campaigns?.filter(c => c.status === 'active') || [];
   const draftCampaigns = campaigns?.filter(c => c.status === 'draft') || [];

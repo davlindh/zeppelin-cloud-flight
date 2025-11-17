@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCampaigns } from '@/hooks/funding/useCampaigns';
+import { useAdminCampaigns } from '@/hooks/funding/useAdminCampaigns';
 import { useUpdateCampaign } from '@/hooks/funding/useUpdateCampaign';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ import { Loader2, Link2, Link2Off, AlertCircle, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner';
 
 export const CampaignLinkageManagement: React.FC = () => {
-  const { data: campaigns, isLoading } = useCampaigns();
+  const { data: campaigns, isLoading } = useAdminCampaigns();
   const updateCampaign = useUpdateCampaign();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
