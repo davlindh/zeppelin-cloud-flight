@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.send-provider-notification]
 verify_jwt = false
+
+[functions.create-donation-checkout]
+verify_jwt = false
+
+[functions.handle-donation-webhook]
+verify_jwt = false
