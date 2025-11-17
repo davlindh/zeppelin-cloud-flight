@@ -122,6 +122,16 @@ export const useProductMutations = () => {
       // Invalidate products query to refresh the list
       await queryClient.invalidateQueries({ queryKey: ['products'] });
 
+      // Also invalidate event-tickets queries if this is an event ticket
+      if (productData.eventId && productData.productType === 'event_ticket') {
+        await queryClient.invalidateQueries({ 
+          queryKey: ['event-tickets', productData.eventId] 
+        });
+        await queryClient.invalidateQueries({ 
+          queryKey: ['ticket-sales-stats', productData.eventId] 
+        });
+      }
+
       // Transform database response to Product type
       const product: Product = {
         id: data.id,
