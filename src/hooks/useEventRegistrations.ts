@@ -6,28 +6,38 @@ export function useEventRegistrations(eventId: string) {
   return useQuery({
     queryKey: ["event-registrations", eventId],
     queryFn: async (): Promise<EventRegistrationWithUser[]> => {
-      const { data, error } = await supabase
+      // Fetch registrations without user join (no FK relationship exists)
+      const { data: registrations, error } = await supabase
         .from("event_registrations")
-        .select(`
-          *,
-          user:user_id (
-            id,
-            email,
-            full_name
-          )
-        `)
+        .select("*")
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      
-      return (data ?? []).map((reg: any) => ({
+
+      // If no registrations or no user_ids, return early
+      if (!registrations || registrations.length === 0) {
+        return [];
+      }
+
+      // Fetch user data separately for registrations that have user_id
+      const userIds = registrations
+        .map((r) => r.user_id)
+        .filter((id): id is string => !!id);
+
+      if (userIds.length === 0) {
+        return registrations.map((reg) => ({
+          ...reg,
+          user: undefined,
+        })) as EventRegistrationWithUser[];
+      }
+
+      // Fetch users from auth.users via RPC or public.users if it exists
+      // For now, return without user data since FK doesn't exist
+      // TODO: Add foreign key relationship or fetch from correct users table
+      return registrations.map((reg) => ({
         ...reg,
-        user: reg.user ? {
-          id: reg.user.id,
-          email: reg.user.email,
-          full_name: reg.user.full_name,
-        } : undefined,
+        user: undefined,
       })) as EventRegistrationWithUser[];
     },
     enabled: !!eventId,
