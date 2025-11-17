@@ -73,6 +73,10 @@ export const TicketCreationModal: React.FC<TicketCreationModalProps> = ({
         category: 'Events',
         stockQuantity: data.stock_quantity,
         images: [],
+        eventId: eventId,
+        productType: 'event_ticket',
+        sellerType: 'admin',
+        tags: [data.ticket_type],
       } as any);
 
       toast({
