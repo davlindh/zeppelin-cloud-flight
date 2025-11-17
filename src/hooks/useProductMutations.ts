@@ -20,6 +20,12 @@ interface CreateProductData {
   }>;
   images?: string[];
   image?: string;
+  stockQuantity?: number;        // NEW: Direct stock support
+  eventId?: string;              // NEW: Link to event
+  productType?: string;          // NEW: Mark as 'event_ticket'
+  projectId?: string;            // NEW: For future use
+  sellerId?: string;             // NEW: For seller tracking
+  sellerType?: string;           // NEW: 'admin' | 'provider'
 }
 
 interface UpdateProductData extends CreateProductData {
@@ -36,8 +42,9 @@ export const useProductMutations = () => {
     setError(null);
 
     try {
-      // Calculate total stock from variants
-      const totalStock = productData.variants?.reduce((sum, variant) => sum + variant.stock, 0) ?? 0;
+      // Calculate total stock from variants or use direct stockQuantity
+      const totalStock = productData.stockQuantity ?? 
+        productData.variants?.reduce((sum, variant) => sum + variant.stock, 0) ?? 0;
       
       // Prepare data for database using correct field names
       const dbData = {
@@ -53,6 +60,12 @@ export const useProductMutations = () => {
         image: productData.image || productData.images?.[0] || null,
         stock_quantity: totalStock,
         in_stock: totalStock > 0,
+        // ✅ NEW FIELDS for event tickets
+        event_id: productData.eventId || null,
+        product_type: productData.productType || null,
+        project_id: productData.projectId || null,
+        seller_id: productData.sellerId || null,
+        seller_type: productData.sellerType || 'admin',
         rating: 0,
         reviews: 0,
         created_at: new Date().toISOString(),
@@ -79,23 +92,30 @@ export const useProductMutations = () => {
 
       console.log('✅ Product created successfully:', data);
 
-      // Create variants if provided
+      // Create variants if provided (only with actual attributes)
       if (productData.variants && productData.variants.length > 0) {
-        const variantData = productData.variants.map(variant => ({
-          product_id: data.id,
-          color: variant.color,
-          size: variant.size,
-          stock_quantity: variant.stock,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }));
+        // Filter out variants without actual attributes
+        const validVariants = productData.variants.filter(v => 
+          v.color || v.size
+        );
+        
+        if (validVariants.length > 0) {
+          const variantData = validVariants.map(variant => ({
+            product_id: data.id,
+            color: variant.color || null,
+            size: variant.size || null,
+            stock_quantity: variant.stock,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }));
 
-        const { error: variantError } = await supabase
-          .from('product_variants')
-          .insert(variantData);
+          const { error: variantError } = await supabase
+            .from('product_variants')
+            .insert(variantData);
 
-        if (variantError) {
-          console.warn('⚠️ Failed to create variants:', variantError);
+          if (variantError) {
+            console.warn('⚠️ Failed to create variants:', variantError);
+          }
         }
       }
 
