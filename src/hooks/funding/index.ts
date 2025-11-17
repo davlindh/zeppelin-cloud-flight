@@ -9,4 +9,6 @@ export { useUserDonations } from './useUserDonations';
 export { useUpdateCampaign } from './useUpdateCampaign';
 export { useActivateCampaign } from './useActivateCampaign';
 export { useTopDonors } from './useTopDonors';
+export { useCollaborationProjects } from './useCollaborationProjects';
+export { useProjectCampaigns } from './useProjectCampaigns';
 

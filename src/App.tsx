@@ -79,6 +79,7 @@ import { EventWizardPage } from "./pages/admin/EventWizardPage";
 import { EventTicketsOverviewPage } from "./pages/admin/EventTicketsOverviewPage";
 import { EventRegistrationsPage } from "./pages/admin/EventRegistrationsPage";
 import { CampaignsManagementPage } from "./pages/admin/CampaignsManagementPage";
+import { CampaignLinkageManagement } from "./pages/admin/CampaignLinkageManagement";
 import { EventTicketsShop } from "./pages/marketplace/EventTicketsShop";
 const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage").then(m => ({ default: m.EventOpsPage })));
 const EventCheckInPage = lazy(() => import("./pages/admin/EventCheckInPage").then(m => ({ default: m.EventCheckInPage })));
@@ -314,6 +315,7 @@ const App = () => (
                     </Suspense>
                   } />
                   <Route path="campaigns" element={<CampaignsManagementPage />} />
+                  <Route path="campaigns/linkage" element={<CampaignLinkageManagement />} />
                   <Route path="services" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <ServicesPage />

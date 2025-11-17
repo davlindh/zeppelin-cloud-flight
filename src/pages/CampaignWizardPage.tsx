@@ -26,6 +26,10 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { ProjectSelector } from '@/components/funding/ProjectSelector';
+import { EventSelector } from '@/components/funding/EventSelector';
+import { CollaborationProjectSelector } from '@/components/funding/CollaborationProjectSelector';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const campaignSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
@@ -34,7 +38,9 @@ const campaignSchema = z.object({
   target_amount: z.coerce.number().min(1, 'Target must be at least 1'),
   currency: z.string().default('SEK'),
   deadline: z.string().optional(),
-  project_id: z.string().optional(),
+  project_id: z.string().nullable().optional(),
+  collaboration_project_id: z.string().nullable().optional(),
+  event_id: z.string().nullable().optional(),
   visibility: z.enum(['public', 'event_members', 'private']),
 });
 
@@ -228,6 +234,83 @@ export const CampaignWizardPage: React.FC = () => {
                 </FormItem>
               )}
             />
+
+            <div className="space-y-4 border-t pt-6">
+              <div>
+                <h3 className="text-lg font-semibold">Campaign Linkages (Optional)</h3>
+                <p className="text-sm text-muted-foreground">
+                  Connect this campaign to projects or events for better organization
+                </p>
+              </div>
+
+              {form.watch('project_id') && form.watch('collaboration_project_id') && (
+                <Alert>
+                  <AlertDescription>
+                    A campaign can be linked to either a regular project OR a collaboration project, not both.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <FormField
+                control={form.control}
+                name="project_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link to Project</FormLabel>
+                    <FormControl>
+                      <ProjectSelector
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={!!form.watch('collaboration_project_id')}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Connect this campaign to an existing project
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="collaboration_project_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link to Collaboration Project</FormLabel>
+                    <FormControl>
+                      <CollaborationProjectSelector
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={!!form.watch('project_id')}
+                        eventId={form.watch('event_id') || undefined}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Connect to a collaboration project (alternative to regular project)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="event_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link to Event</FormLabel>
+                    <FormControl>
+                      <EventSelector value={field.value} onChange={field.onChange} />
+                    </FormControl>
+                    <FormDescription>
+                      Raise funds for a specific event
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className="flex gap-4">
               <Button

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCampaign } from '@/hooks/funding/useCampaign';
 import { useUpdateCampaign } from '@/hooks/funding/useUpdateCampaign';
@@ -9,8 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Link2, Link2Off } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { ProjectSelector } from '@/components/funding/ProjectSelector';
+import { EventSelector } from '@/components/funding/EventSelector';
+import { CollaborationProjectSelector } from '@/components/funding/CollaborationProjectSelector';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface CampaignFormData {
   title: string;
@@ -19,6 +23,9 @@ interface CampaignFormData {
   target_amount: number;
   deadline: string;
   visibility: string;
+  project_id?: string | null;
+  collaboration_project_id?: string | null;
+  event_id?: string | null;
 }
 
 export const CampaignEditPage: React.FC = () => {
@@ -27,8 +34,9 @@ export const CampaignEditPage: React.FC = () => {
   const { data: user } = useAuthenticatedUser();
   const { data: campaign, isLoading } = useCampaign(slug);
   const updateCampaign = useUpdateCampaign();
+  const [showLinkageSection, setShowLinkageSection] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isDirty } } = useForm<CampaignFormData>({
+  const { register, handleSubmit, watch, setValue, formState: { errors, isDirty } } = useForm<CampaignFormData>({
     values: campaign ? {
       title: campaign.title,
       short_description: campaign.short_description || '',
@@ -36,8 +44,21 @@ export const CampaignEditPage: React.FC = () => {
       target_amount: campaign.target_amount,
       deadline: campaign.deadline ? campaign.deadline.split('T')[0] : '',
       visibility: campaign.visibility,
+      project_id: campaign.project_id || null,
+      collaboration_project_id: campaign.collaboration_project_id || null,
+      event_id: campaign.event_id || null,
     } : undefined,
   });
+
+  const handleUnlinkAll = async () => {
+    if (!slug) return;
+    await updateCampaign.mutateAsync({
+      slug,
+      project_id: null,
+      collaboration_project_id: null,
+      event_id: null,
+    });
+  };
 
   const onSubmit = async (data: CampaignFormData) => {
     if (!slug) return;
@@ -92,7 +113,7 @@ export const CampaignEditPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <div className="container mx-auto px-4 py-8 max-w-3xl space-y-6">
       <Button asChild variant="ghost" className="mb-6">
         <Link to="/participant/campaigns">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -206,16 +227,126 @@ export const CampaignEditPage: React.FC = () => {
                   </>
                 )}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate(`/campaigns/${slug}`)}
-              >
+              <Button type="button" variant="outline" onClick={() => navigate(`/campaigns/${slug}`)}>
                 Cancel
               </Button>
             </div>
           </form>
         </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Link2 className="h-5 w-5" />
+              Campaign Linkages
+            </CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLinkageSection(!showLinkageSection)}
+            >
+              {showLinkageSection ? 'Hide' : 'Show'}
+            </Button>
+          </div>
+        </CardHeader>
+        {showLinkageSection && (
+          <CardContent className="space-y-4">
+            {(campaign?.projects || campaign?.collaboration_projects || campaign?.events) && (
+              <div className="space-y-2">
+                <Label>Current Linkages:</Label>
+                <div className="flex flex-wrap gap-2">
+                  {campaign.projects && (
+                    <Alert className="flex-1">
+                      <AlertTitle className="text-sm">Linked to Project</AlertTitle>
+                      <AlertDescription>
+                        <Link to={`/projects/${campaign.projects.slug}`} className="underline text-sm">
+                          {campaign.projects.title}
+                        </Link>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {campaign.collaboration_projects && (
+                    <Alert className="flex-1">
+                      <AlertTitle className="text-sm">Linked to Collaboration</AlertTitle>
+                      <AlertDescription>
+                        <span className="text-sm">{campaign.collaboration_projects.title}</span>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {campaign.events && (
+                    <Alert className="flex-1">
+                      <AlertTitle className="text-sm">Linked to Event</AlertTitle>
+                      <AlertDescription>
+                        <Link to={`/events/${campaign.events.slug}`} className="underline text-sm">
+                          {campaign.events.title}
+                        </Link>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleUnlinkAll}
+                  className="mt-2"
+                >
+                  <Link2Off className="h-4 w-4 mr-2" />
+                  Unlink All
+                </Button>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {watch('project_id') && watch('collaboration_project_id') && (
+                <Alert>
+                  <AlertDescription>
+                    A campaign can be linked to either a regular project OR a collaboration project, not both.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label>Link to Project</Label>
+                <ProjectSelector
+                  value={watch('project_id')}
+                  onChange={(val) => setValue('project_id', val, { shouldDirty: true })}
+                  disabled={!!watch('collaboration_project_id')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Link to Collaboration Project</Label>
+                <CollaborationProjectSelector
+                  value={watch('collaboration_project_id')}
+                  onChange={(val) => setValue('collaboration_project_id', val, { shouldDirty: true })}
+                  disabled={!!watch('project_id')}
+                  eventId={watch('event_id') || undefined}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Link to Event</Label>
+                <EventSelector
+                  value={watch('event_id')}
+                  onChange={(val) => setValue('event_id', val, { shouldDirty: true })}
+                />
+              </div>
+
+              <Button type="submit" disabled={!isDirty || updateCampaign.isPending}>
+                {updateCampaign.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update Linkages'
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        )}
       </Card>
     </div>
   );
