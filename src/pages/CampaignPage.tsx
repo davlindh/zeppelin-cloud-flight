@@ -45,6 +45,7 @@ export const CampaignPage = () => {
     : undefined;
 
   const linkedProject = campaign.projects || campaign.collaboration_projects;
+  const linkedEvent = campaign.events;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -66,11 +67,19 @@ export const CampaignPage = () => {
           </Badge>
         </div>
 
-        {linkedProject && (
-          <Badge variant="secondary">
-            Linked to: {linkedProject.title}
-          </Badge>
-        )}
+        <div className="flex items-center gap-2">
+          {linkedProject && (
+            <Badge variant="secondary">
+              Linked to: {linkedProject.title}
+            </Badge>
+          )}
+          {linkedEvent && (
+            <Badge variant="outline" className="flex items-center gap-1.5">
+              <Calendar className="h-3 w-3" />
+              Part of: {linkedEvent.title}
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Stats */}

@@ -8,8 +8,9 @@ import { useEventStats } from "@/hooks/useEventStats";
 import { EventRegistrationsTable } from "@/components/admin/events/EventRegistrationsTable";
 import { EventTimeline } from "@/components/admin/events/EventTimeline";
 import { EventTicketsTab } from "@/components/admin/events/EventTicketsTab";
+import { EventCampaignsTab } from "@/components/admin/events/EventCampaignsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket } from "lucide-react";
+import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/events";
 
@@ -34,6 +35,21 @@ export const EventOpsPage: React.FC = () => {
   });
 
   const { data: stats, isLoading: statsLoading } = useEventStats(eventId!);
+
+  const { data: campaigns, isLoading: campaignsLoading } = useQuery({
+    queryKey: ['event-campaigns', eventId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('funding_campaigns')
+        .select('*')
+        .eq('event_id', eventId!)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: !!eventId,
+  });
 
   if (eventLoading || statsLoading) {
     return (
@@ -156,6 +172,10 @@ export const EventOpsPage: React.FC = () => {
               <Ticket className="mr-2 h-4 w-4" />
               Tickets
             </TabsTrigger>
+            <TabsTrigger value="campaigns">
+              <Target className="mr-2 h-4 w-4" />
+              Campaigns {campaigns && campaigns.length > 0 && `(${campaigns.length})`}
+            </TabsTrigger>
             <TabsTrigger value="details">
               <Clock className="mr-2 h-4 w-4" />
               Details
@@ -177,6 +197,14 @@ export const EventOpsPage: React.FC = () => {
 
           <TabsContent value="tickets" className="mt-6">
             <EventTicketsTab eventId={eventId!} eventTitle={event.title} />
+          </TabsContent>
+
+          <TabsContent value="campaigns" className="mt-6">
+            <EventCampaignsTab 
+              eventId={eventId!} 
+              campaigns={campaigns || []} 
+              isLoading={campaignsLoading} 
+            />
           </TabsContent>
 
           <TabsContent value="details" className="mt-6">
