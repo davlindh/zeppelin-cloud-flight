@@ -7,7 +7,8 @@ import { ProfileEditForm } from '@/components/marketplace/profile/ProfileEditFor
 import { ProfileOrderHistory } from '@/components/marketplace/profile/ProfileOrderHistory';
 import { ProfileSettings } from '@/components/marketplace/profile/ProfileSettings';
 import { ProfileDonationHistory } from '@/components/marketplace/profile/ProfileDonationHistory';
-import { User, Package, Settings, Loader2, Heart } from 'lucide-react';
+import { ProfileEventsSection } from '@/components/marketplace/profile/ProfileEventsSection';
+import { User, Package, Settings, Loader2, Heart, Calendar } from 'lucide-react';
 
 export const ProfilePage: React.FC = () => {
   const { data: user, isLoading } = useAuthenticatedUser();
@@ -37,7 +38,7 @@ export const ProfilePage: React.FC = () => {
       <ProfileHeader user={user} />
 
       <Tabs defaultValue="profile" className="mt-8">
-        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+        <TabsList className="grid w-full grid-cols-5 max-w-3xl">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Profil
@@ -45,6 +46,10 @@ export const ProfilePage: React.FC = () => {
           <TabsTrigger value="orders" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Beställningar
+          </TabsTrigger>
+          <TabsTrigger value="events" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Mina Event
           </TabsTrigger>
           <TabsTrigger value="donations" className="flex items-center gap-2">
             <Heart className="h-4 w-4" />
@@ -62,6 +67,10 @@ export const ProfilePage: React.FC = () => {
 
         <TabsContent value="orders" className="mt-6">
           <ProfileOrderHistory userEmail={user.email} />
+        </TabsContent>
+
+        <TabsContent value="events" className="mt-6">
+          <ProfileEventsSection userId={user.id} />
         </TabsContent>
 
         <TabsContent value="donations" className="mt-6">
