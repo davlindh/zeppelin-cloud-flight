@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.send-event-confirmation]
 verify_jwt = false
+
+[functions.confirm-ticket-order]
+verify_jwt = false

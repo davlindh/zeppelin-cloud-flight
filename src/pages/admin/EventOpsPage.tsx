@@ -10,8 +10,9 @@ import { EventTimeline } from "@/components/admin/events/EventTimeline";
 import { EventTicketsTab } from "@/components/admin/events/EventTicketsTab";
 import { EventTicketOrdersTab } from "@/components/admin/events/EventTicketOrdersTab";
 import { EventCampaignsTab } from "@/components/admin/events/EventCampaignsTab";
+import { EventCheckInTab } from "@/components/admin/events/EventCheckInTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket, Target } from "lucide-react";
+import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket, Target, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/events";
 
@@ -176,6 +177,10 @@ const EventOpsPage: React.FC = () => {
             <TabsTrigger value="orders">
               Orders
             </TabsTrigger>
+            <TabsTrigger value="checkin">
+              <ScanLine className="mr-2 h-4 w-4" />
+              Check-In
+            </TabsTrigger>
             <TabsTrigger value="campaigns">
               <Target className="mr-2 h-4 w-4" />
               Campaigns {campaigns && campaigns.length > 0 && `(${campaigns.length})`}
@@ -205,6 +210,10 @@ const EventOpsPage: React.FC = () => {
 
           <TabsContent value="orders" className="mt-6">
             <EventTicketOrdersTab eventId={eventId!} />
+          </TabsContent>
+
+          <TabsContent value="checkin" className="mt-6">
+            <EventCheckInTab eventId={eventId!} />
           </TabsContent>
 
           <TabsContent value="campaigns" className="mt-6">

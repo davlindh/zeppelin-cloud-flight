@@ -1243,6 +1243,58 @@ export type Database = {
           },
         ]
       }
+      event_ticket_invitations: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          invitee_email: string | null
+          invitee_user_id: string | null
+          status: string
+          ticket_type_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          invitee_email?: string | null
+          invitee_user_id?: string | null
+          status?: string
+          ticket_type_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          invitee_email?: string | null
+          invitee_user_id?: string | null
+          status?: string
+          ticket_type_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_ticket_invitations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_ticket_invitations_ticket_type_id_fkey"
+            columns: ["ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "event_ticket_availability"
+            referencedColumns: ["ticket_type_id"]
+          },
+          {
+            foreignKeyName: "event_ticket_invitations_ticket_type_id_fkey"
+            columns: ["ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "event_ticket_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_ticket_orders: {
         Row: {
           created_at: string
@@ -1326,6 +1378,7 @@ export type Database = {
           original_price: number | null
           per_user_limit: number | null
           price: number
+          replaces_ticket_type_id: string | null
           requires_approval: boolean
           sales_end: string | null
           sales_start: string | null
@@ -1347,6 +1400,7 @@ export type Database = {
           original_price?: number | null
           per_user_limit?: number | null
           price: number
+          replaces_ticket_type_id?: string | null
           requires_approval?: boolean
           sales_end?: string | null
           sales_start?: string | null
@@ -1368,6 +1422,7 @@ export type Database = {
           original_price?: number | null
           per_user_limit?: number | null
           price?: number
+          replaces_ticket_type_id?: string | null
           requires_approval?: boolean
           sales_end?: string | null
           sales_start?: string | null
@@ -1380,6 +1435,20 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_ticket_types_replaces_ticket_type_id_fkey"
+            columns: ["replaces_ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "event_ticket_availability"
+            referencedColumns: ["ticket_type_id"]
+          },
+          {
+            foreignKeyName: "event_ticket_types_replaces_ticket_type_id_fkey"
+            columns: ["replaces_ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "event_ticket_types"
             referencedColumns: ["id"]
           },
         ]
@@ -4475,6 +4544,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      award_event_attendance_fave: {
+        Args: { p_event_id: string; p_user_id: string }
+        Returns: undefined
+      }
       calculate_fave_level: { Args: { p_score: number }; Returns: string }
       can_claim_participant: {
         Args: { _participant_id: string; _user_email: string }
@@ -4486,6 +4559,7 @@ export type Database = {
       }
       can_edit_project: { Args: { _project_id: string }; Returns: boolean }
       can_edit_sponsor: { Args: { _sponsor_id: string }; Returns: boolean }
+      check_in_ticket_by_qr: { Args: { p_qr_code: string }; Returns: Json }
       claim_participant_profile: {
         Args: { _participant_id: string; _user_email: string; _user_id: string }
         Returns: Json
@@ -4523,6 +4597,29 @@ export type Database = {
         }
         Returns: Json
       }
+      create_event_ticket_order: {
+        Args: { p_quantity: number; p_ticket_type_id: string }
+        Returns: {
+          created_at: string
+          currency: string
+          event_id: string
+          id: string
+          order_id: string | null
+          quantity: number
+          registration_id: string | null
+          status: string
+          ticket_type_id: string
+          unit_price: number
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "event_ticket_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_participant_from_submission: {
         Args: { _submission_id: string }
         Returns: {
@@ -4534,6 +4631,10 @@ export type Database = {
       current_user_email: { Args: never; Returns: string }
       generate_session_id: { Args: never; Returns: string }
       generate_slug: { Args: { title: string }; Returns: string }
+      generate_ticket_instances_for_order: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       get_available_times: {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]

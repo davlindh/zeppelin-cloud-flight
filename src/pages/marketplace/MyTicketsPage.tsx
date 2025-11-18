@@ -1,16 +1,22 @@
 import { Link } from 'react-router-dom';
 import { useMyTicketOrders } from '@/hooks/events/useEventTicketOrders';
+import { useMyTicketInstances } from '@/hooks/events/useEventTicketInstances';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Ticket, Calendar, MapPin, ArrowLeft, QrCode } from 'lucide-react';
+import { TicketQRDisplay } from '@/components/events/TicketQRDisplay';
+import { Ticket, Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const MyTicketsPage = () => {
-  const { data: orders = [], isLoading } = useMyTicketOrders();
+  const { data: orders = [], isLoading: ordersLoading } = useMyTicketOrders();
+  const { data: instances = [], isLoading: instancesLoading } = useMyTicketInstances();
+
+  const isLoading = ordersLoading || instancesLoading;
 
   // Group tickets by event
   const ticketsByEvent = orders.reduce((acc, order) => {
@@ -24,6 +30,16 @@ export const MyTicketsPage = () => {
     acc[eventId].tickets.push(order);
     return acc;
   }, {} as Record<string, { event: any; tickets: typeof orders }>);
+
+  // Group instances by event
+  const instancesByEvent = instances.reduce((acc, instance) => {
+    const eventId = instance.event_id;
+    if (!acc[eventId]) {
+      acc[eventId] = [];
+    }
+    acc[eventId].push(instance);
+    return acc;
+  }, {} as Record<string, typeof instances>);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -68,86 +84,114 @@ export const MyTicketsPage = () => {
         )}
 
         {/* Tickets by Event */}
-        {!isLoading && Object.entries(ticketsByEvent).map(([eventId, { event, tickets }]) => (
-          <Card key={eventId} className="mb-6">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-2xl mb-2">
-                    {event?.title || 'Event'}
-                  </CardTitle>
-                  {event && (
-                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                      {event.starts_at && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{format(new Date(event.starts_at), 'PPP')}</span>
-                        </div>
-                      )}
-                      {event.venue && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          <span>{event.venue}</span>
-                        </div>
-                      )}
-                    </div>
+        {!isLoading && Object.entries(ticketsByEvent).map(([eventId, { event, tickets }]) => {
+          const eventInstances = instancesByEvent[eventId] || [];
+          
+          return (
+            <Card key={eventId} className="mb-6">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-2xl mb-2">
+                      {event?.title || 'Event'}
+                    </CardTitle>
+                    {event && (
+                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        {event.starts_at && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{format(new Date(event.starts_at), 'PPP')}</span>
+                          </div>
+                        )}
+                        {event.venue && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{event.venue}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {event?.slug && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/events/${event.slug}`}>View Event</Link>
+                    </Button>
                   )}
                 </div>
-                {event?.slug && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/events/${event.slug}`}>View Event</Link>
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {tickets.map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Ticket className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">
-                          {ticket.ticket_type?.name || 'Ticket'}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          Quantity: {ticket.quantity} × {ticket.unit_price.toFixed(2)} {ticket.currency}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Purchased: {format(new Date(ticket.created_at), 'PP')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge
-                        variant={
-                          ticket.status === 'confirmed'
-                            ? 'default'
-                            : ticket.status === 'pending'
-                            ? 'secondary'
-                            : ticket.status === 'cancelled'
-                            ? 'destructive'
-                            : 'outline'
-                        }
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="orders">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="orders">Orders</TabsTrigger>
+                    <TabsTrigger value="tickets">
+                      Tickets ({eventInstances.length})
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="orders" className="space-y-3">
+                    {tickets.map((ticket) => (
+                      <div
+                        key={ticket.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
                       >
-                        {ticket.status}
-                      </Badge>
-                      <Button variant="outline" size="sm" disabled>
-                        <QrCode className="h-4 w-4 mr-1" />
-                        QR Code
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                        <div className="flex items-center gap-4">
+                          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <Ticket className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold">
+                              {ticket.ticket_type?.name || 'Ticket'}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Quantity: {ticket.quantity} × {ticket.unit_price.toFixed(2)} {ticket.currency}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Purchased: {format(new Date(ticket.created_at), 'PP')}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge
+                          variant={
+                            ticket.status === 'confirmed'
+                              ? 'default'
+                              : ticket.status === 'pending'
+                              ? 'secondary'
+                              : ticket.status === 'cancelled'
+                              ? 'destructive'
+                              : 'outline'
+                          }
+                        >
+                          {ticket.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </TabsContent>
+
+                  <TabsContent value="tickets">
+                    {eventInstances.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">
+                        Tickets will appear here once your order is confirmed
+                      </p>
+                    ) : (
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {eventInstances.map((instance) => (
+                          <TicketQRDisplay
+                            key={instance.id}
+                            qrCode={instance.qr_code || ''}
+                            ticketTypeName={instance.ticket_type?.name || 'Ticket'}
+                            eventTitle={event?.title || 'Event'}
+                            status={instance.status}
+                            checkedInAt={instance.checked_in_at}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          );
+        })}
       </main>
       <Footer />
     </div>
