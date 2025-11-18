@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/marketplace/CartContext';
 import { useCreateOrder } from './useCreateOrder';
 import type { ShippingInfo, PaymentInfo } from '@/pages/marketplace/CheckoutPage';
-import type { CartItem } from '@/types/cart';
+import type { CartItem } from '@/types/marketplace/cart';
 
 interface CheckoutData {
   shippingInfo: ShippingInfo;
@@ -23,14 +23,17 @@ export const useCheckout = () => {
   const placeOrder = async (checkoutData: CheckoutData): Promise<boolean> => {
     setIsPlacing(true);
     try {
-      // Map cart items to order items format
-      const orderItems = checkoutData.items.map(item => ({
+      // Separate product and ticket items
+      const productItems = checkoutData.items.filter(item => item.kind === 'product');
+      const ticketItems = checkoutData.items.filter(item => item.kind === 'event_ticket');
+      
+      // Map product items to order items format
+      const orderItems = productItems.map(item => ({
         type: 'product' as const,
-        id: item.productId || item.id,
+        id: item.productId,
         title: item.title,
         quantity: item.quantity,
         unitPrice: item.price,
-        variantId: item.selectedVariants ? undefined : undefined,
         metadata: {
           variants: item.selectedVariants,
           image: item.image,

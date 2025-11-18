@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import type { ShippingInfo, PaymentInfo, CheckoutStep } from '@/pages/marketplace/CheckoutPage';
-import type { CartItem } from '@/types/cart';
+import type { CartItem } from '@/types/marketplace/cart';
 import { Edit2, CreditCard, MapPin, ShoppingBag } from 'lucide-react';
 
 interface OrderReviewProps {
@@ -111,7 +111,7 @@ export const OrderReview = ({
         </div>
         <div className="space-y-3">
           {items.map((item) => (
-            <div key={`${item.id}-${JSON.stringify(item.selectedVariants)}`} className="flex gap-3">
+            <div key={item.id} className="flex gap-3">
               {item.image && (
                 <img
                   src={item.image}
@@ -121,7 +121,7 @@ export const OrderReview = ({
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{item.title}</p>
-                {Object.keys(item.selectedVariants).length > 0 && (
+                {item.kind === 'product' && Object.keys(item.selectedVariants).length > 0 && (
                   <p className="text-sm text-muted-foreground">
                     {Object.entries(item.selectedVariants)
                       .filter(([_, value]) => value)
