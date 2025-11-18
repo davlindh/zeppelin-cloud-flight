@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Ticket, DollarSign, TrendingUp } from 'lucide-react';
-import { useEventTickets, useTicketSalesStats } from '@/hooks/admin/useEventTickets';
+import { useEventTicketTypes } from '@/hooks/events/useEventTicketTypes';
 import { TicketCard } from './TicketCard';
 import { TicketCreationModal } from './TicketCreationModal';
-import { useProductMutations } from '@/hooks/useProductMutations';
 import { useToast } from '@/hooks/use-toast';
-import type { Product } from '@/types/unified';
 
 interface EventTicketsTabProps {
   eventId: string;
@@ -16,27 +14,18 @@ interface EventTicketsTabProps {
 
 export const EventTicketsTab: React.FC<EventTicketsTabProps> = ({ eventId, eventTitle }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const { data: tickets = [], isLoading } = useEventTickets(eventId);
-  const { data: stats } = useTicketSalesStats(eventId);
-  const { deleteProduct } = useProductMutations();
+  const { data: ticketTypes = [], isLoading } = useEventTicketTypes(eventId);
   const { toast } = useToast();
 
-  const handleDelete = async (ticketId: string) => {
-    if (!confirm('Are you sure you want to delete this ticket? This cannot be undone.')) return;
-    
-    try {
-      await deleteProduct(ticketId);
-      toast({
-        title: 'Ticket deleted',
-        description: 'The ticket has been removed.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Failed to delete ticket',
-        description: 'Please try again.',
-        variant: 'destructive',
-      });
-    }
+  // Calculate aggregate stats from ticket types
+  const stats = {
+    total_revenue: ticketTypes.reduce((sum, t) => sum + (t.sold * t.price), 0),
+    total_sold: ticketTypes.reduce((sum, t) => sum + t.sold, 0),
+    total_capacity: ticketTypes.reduce((sum, t) => sum + t.capacity, 0),
+    total_remaining: ticketTypes.reduce((sum, t) => sum + t.remaining, 0),
+    average_price: ticketTypes.length > 0 
+      ? ticketTypes.reduce((sum, t) => sum + t.price, 0) / ticketTypes.length 
+      : 0,
   };
 
   if (isLoading) {
@@ -53,9 +42,9 @@ export const EventTicketsTab: React.FC<EventTicketsTabProps> = ({ eventId, event
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_revenue?.toFixed(0) || 0} SEK</div>
+            <div className="text-2xl font-bold">{stats.total_revenue.toFixed(0)} SEK</div>
             <p className="text-xs text-muted-foreground">
-              From {stats?.total_sold || 0} tickets sold
+              From {stats.total_sold} tickets sold
             </p>
           </CardContent>
         </Card>
@@ -66,9 +55,9 @@ export const EventTicketsTab: React.FC<EventTicketsTabProps> = ({ eventId, event
             <Ticket className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_sold || 0}</div>
+            <div className="text-2xl font-bold">{stats.total_sold}</div>
             <p className="text-xs text-muted-foreground">
-              {tickets.reduce((sum, t) => sum + ((t as any).stock_quantity || 0), 0)} remaining
+              {stats.total_remaining} remaining
             </p>
           </CardContent>
         </Card>
@@ -79,9 +68,9 @@ export const EventTicketsTab: React.FC<EventTicketsTabProps> = ({ eventId, event
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.average_price?.toFixed(0) || 0} SEK</div>
+            <div className="text-2xl font-bold">{stats.average_price.toFixed(0)} SEK</div>
             <p className="text-xs text-muted-foreground">
-              Per ticket sold
+              Average ticket price
             </p>
           </CardContent>
         </Card>
@@ -96,7 +85,7 @@ export const EventTicketsTab: React.FC<EventTicketsTabProps> = ({ eventId, event
         </Button>
       </div>
 
-      {tickets.length === 0 ? (
+      {ticketTypes.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Ticket className="h-12 w-12 text-muted-foreground mb-4" />
@@ -112,17 +101,12 @@ export const EventTicketsTab: React.FC<EventTicketsTabProps> = ({ eventId, event
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tickets.map((ticket) => {
-            const ticketStats = stats?.by_ticket_type.find(s => s.ticket_id === ticket.id);
-            return (
-              <TicketCard
-                key={ticket.id}
-                ticket={ticket}
-                stats={ticketStats}
-                onDelete={handleDelete}
-              />
-            );
-          })}
+          {ticketTypes.map((ticket) => (
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+            />
+          ))}
         </div>
       )}
 

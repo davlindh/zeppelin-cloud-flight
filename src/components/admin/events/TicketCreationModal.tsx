@@ -7,17 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useProductMutations } from '@/hooks/useProductMutations';
+import { useCreateTicketType } from '@/hooks/events/useEventTicketTypes';
 import { useToast } from '@/hooks/use-toast';
 
 const ticketSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
+  name: z.string().min(3, 'Name must be at least 3 characters'),
   description: z.string().optional(),
-  selling_price: z.coerce.number().min(0, 'Price must be positive'),
+  price: z.coerce.number().min(0, 'Price must be positive'),
   original_price: z.coerce.number().optional(),
-  stock_quantity: z.coerce.number().min(1, 'Quantity must be at least 1'),
-  ticket_type: z.enum(['early_bird', 'regular', 'vip', 'student', 'group']),
+  capacity: z.coerce.number().min(1, 'Capacity must be at least 1'),
+  badge: z.string().optional(),
+  sales_start: z.string().optional(),
+  sales_end: z.string().optional(),
+  per_user_limit: z.coerce.number().optional(),
 });
 
 type TicketFormData = z.infer<typeof ticketSchema>;
@@ -29,61 +31,45 @@ interface TicketCreationModalProps {
   eventTitle: string;
 }
 
-const ticketTypes = [
-  { value: 'early_bird', label: 'Early Bird' },
-  { value: 'regular', label: 'Regular' },
-  { value: 'vip', label: 'VIP' },
-  { value: 'student', label: 'Student' },
-  { value: 'group', label: 'Group Pass' },
-];
-
 export const TicketCreationModal: React.FC<TicketCreationModalProps> = ({
   open,
   onOpenChange,
   eventId,
   eventTitle,
 }) => {
-  const { createProduct } = useProductMutations();
+  const createTicketType = useCreateTicketType();
   const { toast } = useToast();
-  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<TicketFormData>({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<TicketFormData>({
     resolver: zodResolver(ticketSchema),
-    defaultValues: {
-      ticket_type: 'regular',
-    },
   });
-
-  const ticketType = watch('ticket_type');
-
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-  };
 
   const onSubmit = async (data: TicketFormData) => {
     try {
-      const slug = generateSlug(`${eventTitle}-${data.title}`);
-      
-      await createProduct({
-        title: data.title,
-        description: data.description || '',
-        price: data.selling_price,
-        originalPrice: data.original_price || data.selling_price,
-        category: 'Events',
-        stockQuantity: data.stock_quantity,
-        images: [],
-        eventId: eventId,
-        productType: 'event_ticket',
-        sellerType: 'admin',
-        tags: [data.ticket_type],
-      } as any);
+      await createTicketType.mutateAsync({
+        event_id: eventId,
+        name: data.name,
+        description: data.description || null,
+        price: data.price,
+        original_price: data.original_price || null,
+        capacity: data.capacity,
+        badge: data.badge || null,
+        sales_start: data.sales_start || null,
+        sales_end: data.sales_end || null,
+        per_user_limit: data.per_user_limit || null,
+        currency: 'SEK',
+        is_active: true,
+        is_visible_public: true,
+        requires_approval: false,
+        sort_order: 0,
+        metadata: {},
+      });
 
       toast({
         title: 'Ticket created',
-        description: 'Event ticket has been created successfully.',
+        description: 'Event ticket type has been created successfully.',
       });
       
+      reset();
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to create ticket:', error);
@@ -97,7 +83,7 @@ export const TicketCreationModal: React.FC<TicketCreationModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Event Ticket</DialogTitle>
           <DialogDescription>
@@ -108,60 +94,38 @@ export const TicketCreationModal: React.FC<TicketCreationModalProps> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 space-y-2">
-              <Label htmlFor="title">Ticket Title *</Label>
+              <Label htmlFor="name">Ticket Name *</Label>
               <Input
-                id="title"
-                {...register('title')}
+                id="name"
+                {...register('name')}
                 placeholder="Early Bird Ticket"
               />
-              {errors.title && (
-                <p className="text-sm text-destructive">{errors.title.message}</p>
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="ticket_type">Ticket Type *</Label>
-              <Select
-                value={ticketType}
-                onValueChange={(value) => setValue('ticket_type', value as any)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ticketTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="stock_quantity">Quantity *</Label>
-              <Input
-                id="stock_quantity"
-                type="number"
-                {...register('stock_quantity')}
-                placeholder="50"
+            <div className="col-span-2 space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                {...register('description')}
+                placeholder="Brief description of this ticket type..."
+                rows={3}
               />
-              {errors.stock_quantity && (
-                <p className="text-sm text-destructive">{errors.stock_quantity.message}</p>
-              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="selling_price">Price (SEK) *</Label>
+              <Label htmlFor="price">Price (SEK) *</Label>
               <Input
-                id="selling_price"
+                id="price"
                 type="number"
                 step="0.01"
-                {...register('selling_price')}
-                placeholder="299.00"
+                {...register('price')}
+                placeholder="299"
               />
-              {errors.selling_price && (
-                <p className="text-sm text-destructive">{errors.selling_price.message}</p>
+              {errors.price && (
+                <p className="text-sm text-destructive">{errors.price.message}</p>
               )}
             </div>
 
@@ -172,23 +136,86 @@ export const TicketCreationModal: React.FC<TicketCreationModalProps> = ({
                 type="number"
                 step="0.01"
                 {...register('original_price')}
-                placeholder="399.00"
+                placeholder="399"
               />
+              <p className="text-xs text-muted-foreground">
+                Show strikethrough price if discounted
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="capacity">Capacity *</Label>
+              <Input
+                id="capacity"
+                type="number"
+                {...register('capacity')}
+                placeholder="100"
+              />
+              {errors.capacity && (
+                <p className="text-sm text-destructive">{errors.capacity.message}</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Total number of tickets available (source of truth)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="per_user_limit">Per User Limit</Label>
+              <Input
+                id="per_user_limit"
+                type="number"
+                {...register('per_user_limit')}
+                placeholder="4"
+              />
+              <p className="text-xs text-muted-foreground">
+                Max tickets per customer (optional)
+              </p>
             </div>
 
             <div className="col-span-2 space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                {...register('description')}
-                placeholder="Includes full event access, meals, and swag..."
-                rows={3}
+              <Label htmlFor="badge">Badge</Label>
+              <Input
+                id="badge"
+                {...register('badge')}
+                placeholder="Rekommenderad, Begränsat antal, etc."
               />
+              <p className="text-xs text-muted-foreground">
+                Optional badge to highlight this ticket
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sales_start">Sales Start</Label>
+              <Input
+                id="sales_start"
+                type="datetime-local"
+                {...register('sales_start')}
+              />
+              <p className="text-xs text-muted-foreground">
+                When sales begin (optional)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="sales_end">Sales End</Label>
+              <Input
+                id="sales_end"
+                type="datetime-local"
+                {...register('sales_end')}
+              />
+              <p className="text-xs text-muted-foreground">
+                When sales close (optional)
+              </p>
             </div>
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
