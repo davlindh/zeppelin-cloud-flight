@@ -14,7 +14,7 @@ import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticke
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/events";
 
-export const EventOpsPage: React.FC = () => {
+const EventOpsPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { data: user } = useAuthenticatedUser();
@@ -248,3 +248,5 @@ export const EventOpsPage: React.FC = () => {
     </UnifiedDashboardLayout>
   );
 };
+
+export default EventOpsPage;
