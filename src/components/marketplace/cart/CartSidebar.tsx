@@ -168,12 +168,14 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto py-4 space-y-4">
             {state.items.map((item, index) => (
-              <CartProductItem
-                key={`${item.id}-${JSON.stringify(item.selectedVariants)}-${index}`}
-                item={item}
-                updateQuantity={updateQuantity}
-                removeItem={removeItem}
-              />
+              item.kind === 'product' ? (
+                <CartProductItem
+                  key={`${item.id}-${index}`}
+                  item={item}
+                  updateQuantity={updateQuantity}
+                  removeItem={removeItem}
+                />
+              ) : null
             ))}
           </div>
           

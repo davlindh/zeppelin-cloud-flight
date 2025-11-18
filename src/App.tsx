@@ -64,6 +64,8 @@ import { ProjectWorkspace } from "./pages/collaboration/ProjectWorkspace";
 import { FeaturedProjects } from "./pages/collaboration/FeaturedProjects";
 import { CampaignsListPage } from "./pages/CampaignsListPage";
 import { CampaignPage } from "./pages/CampaignPage";
+import { EventDetailPage } from "./pages/EventDetailPage";
+import { MyTicketsPage } from "./pages/marketplace/MyTicketsPage";
 import { ParticipantCampaignsPage } from "./pages/ParticipantCampaignsPage";
 import { CampaignWizardPage } from "./pages/CampaignWizardPage";
 import { CampaignEditPage } from "./pages/CampaignEditPage";
@@ -160,6 +162,9 @@ const App = () => (
                 {/* Auth & Profile Completion */}
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/participant/complete-profile" element={<CompleteParticipantProfilePage />} />
+
+                {/* Public Event Routes */}
+                <Route path="/events/:slug" element={<EventDetailPage />} />
 
                 {/* Marketplace Routes */}
                 <Route path="/marketplace" element={<MarketplaceLayout />}>
