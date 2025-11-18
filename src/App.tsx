@@ -81,7 +81,7 @@ import { EventRegistrationsPage } from "./pages/admin/EventRegistrationsPage";
 import { CampaignsManagementPage } from "./pages/admin/CampaignsManagementPage";
 import { CampaignLinkageManagement } from "./pages/admin/CampaignLinkageManagement";
 import { EventTicketsShop } from "./pages/marketplace/EventTicketsShop";
-const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage").then(m => ({ default: m.EventOpsPage })));
+const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage"));
 const EventCheckInPage = lazy(() => import("./pages/admin/EventCheckInPage").then(m => ({ default: m.EventCheckInPage })));
 const MyServicesPage = lazy(() => import("./pages/provider/MyServicesPage").then(m => ({ default: m.MyServicesPage })));
 const BookingsManagementPage = lazy(() => import("./pages/provider/BookingsManagementPage").then(m => ({ default: m.BookingsManagementPage })));
