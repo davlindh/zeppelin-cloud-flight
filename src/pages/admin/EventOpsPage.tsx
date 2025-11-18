@@ -8,6 +8,7 @@ import { useEventStats } from "@/hooks/useEventStats";
 import { EventRegistrationsTable } from "@/components/admin/events/EventRegistrationsTable";
 import { EventTimeline } from "@/components/admin/events/EventTimeline";
 import { EventTicketsTab } from "@/components/admin/events/EventTicketsTab";
+import { EventTicketOrdersTab } from "@/components/admin/events/EventTicketOrdersTab";
 import { EventCampaignsTab } from "@/components/admin/events/EventCampaignsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket, Target } from "lucide-react";
@@ -172,6 +173,9 @@ const EventOpsPage: React.FC = () => {
               <Ticket className="mr-2 h-4 w-4" />
               Tickets
             </TabsTrigger>
+            <TabsTrigger value="orders">
+              Orders
+            </TabsTrigger>
             <TabsTrigger value="campaigns">
               <Target className="mr-2 h-4 w-4" />
               Campaigns {campaigns && campaigns.length > 0 && `(${campaigns.length})`}
@@ -197,6 +201,10 @@ const EventOpsPage: React.FC = () => {
 
           <TabsContent value="tickets" className="mt-6">
             <EventTicketsTab eventId={eventId!} eventTitle={event.title} />
+          </TabsContent>
+
+          <TabsContent value="orders" className="mt-6">
+            <EventTicketOrdersTab eventId={eventId!} />
           </TabsContent>
 
           <TabsContent value="campaigns" className="mt-6">
