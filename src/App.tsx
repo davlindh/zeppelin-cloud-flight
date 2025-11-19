@@ -83,6 +83,8 @@ import { EventRegistrationsPage } from "./pages/admin/EventRegistrationsPage";
 import { CampaignsManagementPage } from "./pages/admin/CampaignsManagementPage";
 import { CampaignLinkageManagement } from "./pages/admin/CampaignLinkageManagement";
 import { EventTicketsShop } from "./pages/marketplace/EventTicketsShop";
+import { TicketPurchaseSuccess } from "./pages/events/TicketPurchaseSuccess";
+import { TicketPurchaseCancel } from "./pages/events/TicketPurchaseCancel";
 import { EventCheckInPage } from "./components/events/EventCheckInPage";
 const EventOpsPage = lazy(() => import("./pages/admin/EventOpsPage"));
 const MyServicesPage = lazy(() => import("./pages/provider/MyServicesPage").then(m => ({ default: m.MyServicesPage })));
@@ -165,6 +167,8 @@ const App = () => (
 
                 {/* Public Event Routes */}
                 <Route path="/events/:slug" element={<EventDetailPage />} />
+                <Route path="/events/:slug/tickets/success" element={<TicketPurchaseSuccess />} />
+                <Route path="/events/:slug/tickets/cancel" element={<TicketPurchaseCancel />} />
 
                 {/* Marketplace Routes */}
                 <Route path="/marketplace" element={<MarketplaceLayout />}>
@@ -262,6 +266,10 @@ const App = () => (
                       <EventStorefront />
                     </Suspense>
                   } />
+                  
+                  {/* Event Tickets Routes */}
+                  <Route path="events/:eventId" element={<EventTicketsShop />} />
+                  <Route path="my-tickets" element={<MyTicketsPage />} />
                   
                   {/* Collaboration Routes */}
                   <Route path="collaboration/projects" element={<MyCollaborationProjects />} />

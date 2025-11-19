@@ -1,23 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useCart } from '@/contexts/marketplace/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useTicketCheckout } from '@/hooks/events/useTicketCheckout';
+import { supabase } from '@/integrations/supabase/client';
 import type { TicketAvailability } from '@/hooks/events/useEventTicketTypes';
 import { Ticket, Users, AlertCircle } from 'lucide-react';
-import { format } from 'date-fns';
 
 interface PublicTicketCardProps {
   ticket: TicketAvailability;
+  eventSlug: string;
 }
 
-export const PublicTicketCard: React.FC<PublicTicketCardProps> = ({ ticket }) => {
+export const PublicTicketCard: React.FC<PublicTicketCardProps> = ({ ticket, eventSlug }) => {
   const [quantity, setQuantity] = useState(1);
-  const { addTicket } = useCart();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
+  const { createCheckout } = useTicketCheckout();
+
+  // Get current user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+  }, []);
 
   const isSoldOut = ticket.remaining <= 0;
   const isLowStock = ticket.remaining > 0 && ticket.remaining < 10;
@@ -25,28 +35,49 @@ export const PublicTicketCard: React.FC<PublicTicketCardProps> = ({ ticket }) =>
     ? Math.min(ticket.remaining, ticket.per_user_limit)
     : ticket.remaining;
 
-  const handleAddToCart = () => {
-    if (isSoldOut) return;
+  const handleBuyNow = async () => {
+    if (isSoldOut || isSubmitting) return;
     if (quantity > maxPurchase) return;
 
-    addTicket(
-      ticket.id,
-      ticket.event_id,
-      'Event', // We'll pass this from parent later
-      new Date().toISOString(), // Placeholder
-      ticket.name,
-      ticket.price,
-      quantity,
-      undefined,
-      maxPurchase
-    );
+    try {
+      setIsSubmitting(true);
 
-    toast({
-      title: 'Added to cart',
-      description: `${quantity}x ${ticket.name} added to your cart`,
-    });
+      // Create pending order via RPC
+      const { data: order, error } = await supabase.rpc(
+        'create_event_ticket_order',
+        {
+          p_ticket_type_id: ticket.id,
+          p_quantity: quantity,
+        }
+      );
 
-    setQuantity(1);
+      if (error) {
+        console.error('create_event_ticket_order error', error);
+        toast({
+          variant: 'destructive',
+          title: 'Order Failed',
+          description: error.message,
+        });
+        return;
+      }
+
+      // Initiate Stripe checkout
+      await createCheckout({
+        ticketOrderId: order.id,
+        customerEmail: user?.email ?? undefined,
+        successUrl: `${window.location.origin}/events/${eventSlug}/tickets/success?order_id=${order.id}`,
+        cancelUrl: `${window.location.origin}/events/${eventSlug}?checkout=canceled`,
+      });
+    } catch (error) {
+      console.error('Ticket purchase error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Purchase Failed',
+        description: 'Could not complete ticket purchase',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const stockPercentage = (ticket.remaining / ticket.capacity) * 100;
@@ -168,10 +199,10 @@ export const PublicTicketCard: React.FC<PublicTicketCardProps> = ({ ticket }) =>
       <CardFooter>
         <Button
           className="w-full"
-          onClick={handleAddToCart}
-          disabled={isSoldOut}
+          onClick={handleBuyNow}
+          disabled={isSoldOut || isSubmitting}
         >
-          {isSoldOut ? 'Sold Out' : 'Add to Cart'}
+          {isSoldOut ? 'Sold Out' : isSubmitting ? 'Processing...' : 'Buy Now'}
         </Button>
       </CardFooter>
     </Card>
