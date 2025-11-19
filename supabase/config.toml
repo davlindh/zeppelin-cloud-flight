@@ -35,3 +35,9 @@ verify_jwt = false
 
 [functions.confirm-ticket-order]
 verify_jwt = false
+
+[functions.create-ticket-checkout]
+verify_jwt = false
+
+[functions.handle-ticket-webhook]
+verify_jwt = false

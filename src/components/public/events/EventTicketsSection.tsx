@@ -6,9 +6,10 @@ import { Ticket } from 'lucide-react';
 
 interface EventTicketsSectionProps {
   eventId: string;
+  eventSlug: string;
 }
 
-export const EventTicketsSection: React.FC<EventTicketsSectionProps> = ({ eventId }) => {
+export const EventTicketsSection: React.FC<EventTicketsSectionProps> = ({ eventId, eventSlug }) => {
   const { data: tickets = [], isLoading } = useEventTicketTypes(eventId);
 
   // Filter for public visible and active tickets
@@ -75,6 +76,7 @@ export const EventTicketsSection: React.FC<EventTicketsSectionProps> = ({ eventI
             <PublicTicketCard
               key={ticket.id}
               ticket={ticket}
+              eventSlug={eventSlug}
             />
           ))}
         </div>

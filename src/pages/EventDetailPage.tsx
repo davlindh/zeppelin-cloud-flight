@@ -134,7 +134,7 @@ export const EventDetailPage = () => {
         )}
 
         {/* Tickets Section */}
-        <EventTicketsSection eventId={event.id} />
+        <EventTicketsSection eventId={event.id} eventSlug={event.slug} />
       </main>
       <Footer />
     </div>

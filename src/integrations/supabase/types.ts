@@ -1302,6 +1302,9 @@ export type Database = {
           event_id: string
           id: string
           order_id: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_reference: string | null
           quantity: number
           registration_id: string | null
           status: string
@@ -1316,6 +1319,9 @@ export type Database = {
           event_id: string
           id?: string
           order_id?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
           quantity: number
           registration_id?: string | null
           status?: string
@@ -1330,6 +1336,9 @@ export type Database = {
           event_id?: string
           id?: string
           order_id?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
           quantity?: number
           registration_id?: string | null
           status?: string
@@ -4605,6 +4614,9 @@ export type Database = {
           event_id: string
           id: string
           order_id: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_reference: string | null
           quantity: number
           registration_id: string | null
           status: string
