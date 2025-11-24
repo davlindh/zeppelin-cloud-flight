@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ProjectProposalForm } from '@/components/public/forms';
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 import { ProjectImage } from '@/components/showcase/ProjectImage';
 import { useNavigate } from 'react-router-dom';
 import { getPlaceholderImage } from '@/utils/assetHelpers';
@@ -513,8 +513,9 @@ const ShowcaseHeader = React.memo(({
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <ProjectProposalForm
+              <ComprehensiveSubmissionForm
                 onClose={() => setShowSubmissionForm(false)}
+                initialType="project"
               />
             </DialogContent>
           </Dialog>
@@ -666,8 +667,9 @@ export const ShowcasePage: React.FC = React.memo(() => {
                 </Button>
               </DialogTrigger>
               <DialogContent>
-                <ProjectProposalForm
+                <ComprehensiveSubmissionForm
                   onClose={() => setShowSubmissionForm(false)}
+                  initialType="project"
                 />
               </DialogContent>
             </Dialog>

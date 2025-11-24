@@ -27,7 +27,9 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const origin = req.headers.get("origin") || "";
+    const originFromHeader = req.headers.get("origin");
+    const defaultOrigin = Deno.env.get("PUBLIC_SITE_URL") ?? "";
+    const origin = originFromHeader || defaultOrigin;
     const { ticket_order_id, customer_email, success_url, cancel_url } = await req.json();
 
     if (!ticket_order_id) {

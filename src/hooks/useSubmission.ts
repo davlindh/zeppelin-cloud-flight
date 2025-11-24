@@ -127,7 +127,22 @@ export const useSubmission = () => {
     type: 'participant' | 'project' | 'sponsor' | 'collaboration',
     basePayload: BaseSubmissionPayload,
     files: FileSubmission[] = []
-  ): Promise<void> => {
+  ): Promise<{
+    submissionId: string;
+    submissionSlug: string | null;
+    entityType: string | null;
+    entityId: string | null;
+    providerEntity?: {
+      id: string;
+      slug: string | null;
+      status: string;
+    } | null;
+    sponsorEntity?: {
+      id: string;
+      slug: string | null;
+      status: string;
+    } | null;
+  }> => {
     try {
       setIsSubmitting(true);
       setError('');
@@ -186,11 +201,85 @@ export const useSubmission = () => {
 
       console.log('✅ Collaboration form submitted successfully:', insertedData);
 
+      // Check if a participant, project, provider, or sponsor was created directly through this submission
+      let createdEntity: any = null;
+      let providerEntity: any = null;
+      let sponsorEntity: any = null;
+      
+      if (insertedData && insertedData.content) {
+        const content = insertedData.content as any;
+        
+        // Check if a participant was created directly
+        if (insertedData.type === 'participant' && content.contact_info && content.contact_info.email) {
+          // Try to find the participant with the matching email
+          const { data: participantData } = await supabase
+            .from('participants')
+            .select('id, slug, contact_email')
+            .eq('contact_email', content.contact_info.email)
+            .maybeSingle();
+            
+          if (participantData) {
+            createdEntity = {
+              type: 'participant',
+              id: participantData.id,
+              slug: participantData.slug,
+            };
+          }
+        }
+        
+        // Check if a service provider was created
+        if ((insertedData.type === 'sponsor' || insertedData.type === 'collaboration') && content.contact_info && content.contact_info.email) {
+          // Try to find the service provider with the matching email
+          const { data: providerData } = await supabase
+            .from('service_providers')
+            .select('id, slug, status')
+            .eq('email', content.contact_info.email)
+            .maybeSingle();
+            
+          if (providerData) {
+            providerEntity = {
+              id: providerData.id,
+              slug: providerData.slug,
+              status: providerData.status,
+            };
+          }
+        }
+        
+        // Check if a sponsor was created
+        if ((insertedData.type === 'sponsor' || insertedData.type === 'collaboration') && content.contact_info && content.contact_info.email) {
+          // Try to find the sponsor with the matching email
+          const { data: sponsorData } = await supabase
+            .from('sponsors')
+            .select('id, slug, status')
+            .eq('email', content.contact_info.email)
+            .maybeSingle();
+            
+          if (sponsorData) {
+            sponsorEntity = {
+              id: sponsorData.id,
+              slug: sponsorData.slug,
+              status: sponsorData.status,
+            };
+          }
+        }
+      }
+
       // Invalidate and refetch submissions to update admin inbox
       queryClient.invalidateQueries({ queryKey: ['submissions'] });
 
-      // Also invalidate sponsors query since collaboration submissions should become sponsors
+      // Also invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['sponsors'] });
+      queryClient.invalidateQueries({ queryKey: ['participants'] });
+      queryClient.invalidateQueries({ queryKey: ['serviceProviders'] });
+      
+      return {
+        submissionId: insertedData?.id || '',
+        submissionSlug: createdEntity?.slug || null,
+        entityType: createdEntity?.type || null,
+        entityId: createdEntity?.id || null,
+        providerEntity: providerEntity,
+        sponsorEntity: sponsorEntity,
+      };
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to submit form';
       setError(errorMessage);

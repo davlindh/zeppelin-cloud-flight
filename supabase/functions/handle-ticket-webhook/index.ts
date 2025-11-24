@@ -55,6 +55,12 @@ serve(async (req) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+
+        if (session.payment_status !== "paid") {
+          console.warn("[handle-ticket-webhook] Session completed but not paid", session.id, session.payment_status);
+          break;
+        }
+
         const ticketOrderId = session.metadata?.ticket_order_id;
 
         if (!ticketOrderId) {

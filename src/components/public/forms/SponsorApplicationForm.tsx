@@ -1,9 +1,21 @@
+// Helper function to extract first and last name from full name
+const extractFirstLastName = (fullName: string) => {
+  const nameParts = fullName.trim().split(' ');
+  if (nameParts.length === 1) {
+    return { firstName: nameParts[0], lastName: '' };
+  }
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(' ');
+  return { firstName, lastName };
+};
+
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { FormWrapper } from '@/components/ui/form-wrapper';
 import { StandardFormField, FieldOption } from '@/components/ui/standard-form-field';
 import { useSubmission } from '@/hooks/useSubmission';
+import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
 
 const sponsorFormSchema = z.object({
   // Contact Information
@@ -57,6 +69,7 @@ export const SponsorApplicationForm: React.FC<SponsorApplicationFormProps> = ({
   className,
 }) => {
   const { isSubmitting, error, submitForm } = useSubmission();
+  const { data: authenticatedUser } = useAuthenticatedUser();
 
   const onSubmit = async (data: SponsorFormData) => {
     const payload = {
@@ -89,12 +102,39 @@ export const SponsorApplicationForm: React.FC<SponsorApplicationFormProps> = ({
           marketing: data.acceptMarketing,
           newsletter: data.newsletterSubscription,
         },
+        // Link to authenticated user if signed in
+        auth_user_id: authenticatedUser?.id || null,
+        user_info: authenticatedUser ? {
+          id: authenticatedUser.id,
+          email: authenticatedUser.email,
+          full_name: authenticatedUser.full_name,
+          phone: authenticatedUser.phone
+        } : null
       },
       contact_email: data.email,
       contact_phone: data.phone,
     };
 
     await submitForm('sponsor', payload, []);
+  };
+
+  // Generate default values based on authentication status
+  const getDefaultValues = () => {
+    if (authenticatedUser) {
+      const { firstName, lastName } = extractFirstLastName(authenticatedUser.full_name || '');
+      return {
+        firstName: firstName || '',
+        lastName: lastName || '',
+        email: authenticatedUser.email || '',
+        phone: authenticatedUser.phone || '',
+        acceptTerms: false,
+        acceptPrivacy: false,
+      };
+    }
+    return {
+      acceptTerms: false,
+      acceptPrivacy: false,
+    };
   };
 
   return (
@@ -107,13 +147,28 @@ export const SponsorApplicationForm: React.FC<SponsorApplicationFormProps> = ({
       className={className}
       isSubmitting={isSubmitting}
       error={error}
-      defaultValues={{
-        acceptTerms: false,
-        acceptPrivacy: false,
-      }}
+      defaultValues={getDefaultValues()}
     >
       {(form) => (
         <div className="space-y-6">
+          {/* Authenticated User Indicator */}
+          {authenticatedUser && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 text-green-800">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm font-medium">
+                  Signed in as {authenticatedUser.email}
+                </span>
+              </div>
+              <p className="text-xs text-green-700 mt-1">
+                Your application will be automatically linked to your account for tracking and follow-up.
+              </p>
+              <p className="text-xs text-green-700">
+                Email field is locked to your account email for security.
+              </p>
+            </div>
+          )}
+
           {/* Contact Information */}
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,14 +191,23 @@ export const SponsorApplicationForm: React.FC<SponsorApplicationFormProps> = ({
               />
             </div>
 
-            <StandardFormField
-              form={form}
-              name="email"
-              label="Email Address"
-              type="email"
-              placeholder="your.email@example.com"
-              required
-            />
+            <div className="relative">
+              <StandardFormField
+                form={form}
+                name="email"
+                label="Email Address"
+                type="email"
+                placeholder="your.email@example.com"
+                required
+              />
+              {authenticatedUser && (
+                <div className="absolute right-3 top-8">
+                  <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                    Locked to your account
+                  </span>
+                </div>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StandardFormField

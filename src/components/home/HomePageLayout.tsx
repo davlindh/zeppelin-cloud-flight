@@ -6,8 +6,8 @@ import { Badge, BadgeSuccess, BadgeWarning, BadgeInfo } from '@/components/ui/ba
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ParticipantApplicationForm } from '@/components/public/forms';
 import { PublicMediaUpload } from '@/components/public/PublicMediaUpload';
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 // Import section components - Swedish content
 import { motion } from 'framer-motion';
 import { Users, FolderOpen, Building, Calendar, ChevronDown, ChevronUp, Sparkles, Zap, Shield, Heart } from 'lucide-react';
@@ -54,6 +54,20 @@ const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon, description, 
   );
 };
 
+// Moved getStoryTitle and storyMap outside the component for ESLint fix
+const storyMap: Record<string, string> = {
+  'hero': '🏠 Start',
+  'partner': '🤝 Våra Partners',
+  'engagement': '💫 Bli Delaktig',
+  'vision': '🌟 Vår Vision',
+  'media-upload': '📸 Dela Upplevelser',
+  'systematics': '🔄 Resan från tanke till transformation'
+};
+
+const getStoryTitle = (sectionId: string) => {
+  return storyMap[sectionId] || sectionId;
+};
+
 // Section Navigation Component
 interface SectionNavigationProps {
   sections: Array<{ id: string; title: string; isVisible: boolean }>;
@@ -66,18 +80,6 @@ const SectionNavigation: React.FC<SectionNavigationProps> = ({
   currentSection,
   onSectionClick,
 }) => {
-  const getStoryTitle = (sectionId: string) => {
-    const storyMap: Record<string, string> = {
-      'hero': '🏠 Start',
-      'partner': '🤝 Våra Partners',
-      'engagement': '💫 Bli Delaktig',
-      'vision': '🌟 Vår Vision',
-      'media-upload': '📸 Dela Upplevelser',
-      'systematics': '🔄 Resan från tanke till transformation'
-    };
-    return storyMap[sectionId] || sectionId;
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -222,9 +224,6 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
                     </h2>
                     <p className="text-base sm:text-lg md:text-xl font-light mb-3 sm:mb-4 opacity-90 leading-relaxed max-w-3xl">
                       I hjärtat av Karlskronas skärgård väcks drömmar till liv. Här, där barockens prakt möter digital innovation, skapar vi berättelser som överbryggar generationer och discipliner.
-                    </p>
-                    <p className="text-sm sm:text-base md:text-lg font-light mb-6 sm:mb-8 opacity-80 leading-relaxed max-w-2xl">
-                      Välkommen till en plats där konstnärer, teknologer och visionärer tillsammans utforskar vad som händer när tradition möter transformation.
                     </p>
                     <Button
                       onClick={() => handleSectionClick('partner')}
@@ -435,8 +434,9 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
       {/* Submission Form Dialog */}
       <Dialog open={showSubmissionForm} onOpenChange={setShowSubmissionForm}>
         <DialogContent>
-          <ParticipantApplicationForm
+          <ComprehensiveSubmissionForm
             onClose={() => setShowSubmissionForm(false)}
+            initialType="participant"
           />
         </DialogContent>
       </Dialog>

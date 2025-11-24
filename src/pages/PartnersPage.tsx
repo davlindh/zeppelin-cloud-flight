@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Image } from '@/components/media/Image';
 import { useToast } from '@/hooks/use-toast';
-import { CollaborationInquiryForm } from '@/components/public/forms/CollaborationInquiryForm';
+import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 import {
   Users,
   ExternalLink,
@@ -572,8 +572,9 @@ export const PartnersPage: React.FC = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <CollaborationInquiryForm
+              <ComprehensiveSubmissionForm
                 onClose={() => setIsCollaborationFormOpen(false)}
+                initialType="collaboration"
               />
             </DialogContent>
           </Dialog>
