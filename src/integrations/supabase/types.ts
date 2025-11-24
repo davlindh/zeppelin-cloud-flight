@@ -3852,6 +3852,7 @@ export type Database = {
           reviews: number
           slug: string
           specialties: string[] | null
+          status: string | null
           updated_at: string
           work_philosophy: string | null
           years_in_business: number | null
@@ -3879,6 +3880,7 @@ export type Database = {
           reviews?: number
           slug: string
           specialties?: string[] | null
+          status?: string | null
           updated_at?: string
           work_philosophy?: string | null
           years_in_business?: number | null
@@ -3906,6 +3908,7 @@ export type Database = {
           reviews?: number
           slug?: string
           specialties?: string[] | null
+          status?: string | null
           updated_at?: string
           work_philosophy?: string | null
           years_in_business?: number | null
@@ -4187,6 +4190,8 @@ export type Database = {
           id: string
           logo_path: string | null
           name: string
+          slug: string | null
+          status: string | null
           type: string
           updated_at: string
           website: string | null
@@ -4200,6 +4205,8 @@ export type Database = {
           id?: string
           logo_path?: string | null
           name: string
+          slug?: string | null
+          status?: string | null
           type: string
           updated_at?: string
           website?: string | null
@@ -4213,6 +4220,8 @@ export type Database = {
           id?: string
           logo_path?: string | null
           name?: string
+          slug?: string | null
+          status?: string | null
           type?: string
           updated_at?: string
           website?: string | null
