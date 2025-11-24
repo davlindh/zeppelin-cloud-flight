@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/marketplace/CartContext';
 import { useCreateOrder } from './useCreateOrder';
+import { useMarketplaceCheckout } from './useMarketplaceCheckout';
+import { useToast } from '@/hooks/use-toast';
 import type { ShippingInfo, PaymentInfo } from '@/pages/marketplace/CheckoutPage';
 import type { CartItem } from '@/types/marketplace/cart';
 
@@ -19,13 +20,14 @@ export const useCheckout = () => {
   const [isPlacing, setIsPlacing] = useState(false);
   const { clearCart } = useCart();
   const { mutateAsync: createOrder } = useCreateOrder();
+  const { createCheckout } = useMarketplaceCheckout();
+  const { toast } = useToast();
 
   const placeOrder = async (checkoutData: CheckoutData): Promise<boolean> => {
     setIsPlacing(true);
     try {
       // Separate product and ticket items
       const productItems = checkoutData.items.filter(item => item.kind === 'product');
-      const ticketItems = checkoutData.items.filter(item => item.kind === 'event_ticket');
       
       // Map product items to order items format
       const orderItems = productItems.map(item => ({
@@ -50,8 +52,8 @@ export const useCheckout = () => {
         phone: checkoutData.shippingInfo.phone,
       };
 
-      // Create order
-      await createOrder({
+      // Create order in pending state
+      const orderResult = await createOrder({
         customerEmail: checkoutData.shippingInfo.email,
         customerName: checkoutData.shippingInfo.name,
         customerPhone: checkoutData.shippingInfo.phone,
@@ -60,16 +62,24 @@ export const useCheckout = () => {
         shippingAmount: checkoutData.shippingAmount,
         totalAmount: checkoutData.totalAmount,
         shippingAddress,
-        billingAddress: shippingAddress, // Use same address for billing
+        billingAddress: shippingAddress,
         items: orderItems,
       });
 
-      // Clear cart after successful order
+      // Clear cart after order creation
       clearCart();
+
+      // Redirect to Stripe checkout
+      await createCheckout({ orderId: orderResult.id });
 
       return true;
     } catch (error) {
       console.error('Checkout error:', error);
+      toast({
+        title: 'Fel vid beställning',
+        description: 'Kunde inte genomföra beställningen. Försök igen.',
+        variant: 'destructive',
+      });
       return false;
     } finally {
       setIsPlacing(false);
