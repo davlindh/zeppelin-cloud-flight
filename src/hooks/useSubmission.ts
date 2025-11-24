@@ -230,17 +230,18 @@ export const useSubmission = () => {
         // Check if a service provider was created
         if ((insertedData.type === 'sponsor' || insertedData.type === 'collaboration') && content.contact_info && content.contact_info.email) {
           // Try to find the service provider with the matching email
-          const { data: providerData } = await supabase
+          const providerResult: any = await (supabase as any)
             .from('service_providers')
             .select('id, slug, status')
             .eq('email', content.contact_info.email)
             .maybeSingle();
             
+          const providerData = providerResult.data;
           if (providerData) {
             providerEntity = {
               id: providerData.id,
-              slug: providerData.slug,
-              status: providerData.status,
+              slug: providerData.slug ?? null,
+              status: providerData.status ?? null,
             };
           }
         }
@@ -248,17 +249,18 @@ export const useSubmission = () => {
         // Check if a sponsor was created
         if ((insertedData.type === 'sponsor' || insertedData.type === 'collaboration') && content.contact_info && content.contact_info.email) {
           // Try to find the sponsor with the matching email
-          const { data: sponsorData } = await supabase
+          const sponsorResult: any = await (supabase as any)
             .from('sponsors')
             .select('id, slug, status')
             .eq('email', content.contact_info.email)
             .maybeSingle();
             
+          const sponsorData = sponsorResult.data;
           if (sponsorData) {
             sponsorEntity = {
               id: sponsorData.id,
-              slug: sponsorData.slug,
-              status: sponsorData.status,
+              slug: sponsorData.slug ?? null,
+              status: sponsorData.status ?? null,
             };
           }
         }
