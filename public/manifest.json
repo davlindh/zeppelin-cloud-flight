@@ -1,0 +1,19 @@
+{
+  "name": "Zeppel Inn",
+  "short_name": "Zeppel",
+  "description": "Expedition Tjurkö - Marketplace, Events, Auctions & Services",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
