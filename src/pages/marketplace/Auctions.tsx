@@ -12,6 +12,9 @@ import { LoadingGrid } from '@/components/marketplace/ui/loading-grid';
 import { calculateAuctionAnalytics } from '@/utils/marketplace/auctionUtils';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, AlertCircle } from 'lucide-react';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Auctions = () => {
   // Enable auction notifications
@@ -20,9 +23,18 @@ const Auctions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('ending-soon');
+  const isMobile = useIsMobile();
 
   const { data: auctions, isLoading: auctionsLoading, error: auctionsError, refetch, isRefetching } = useAuctions();
   const { data: categoryNames, isLoading: categoriesLoading, isError: categoriesError } = useDynamicCategoryNames();
+  
+  // Pull to refresh for mobile
+  const { isPulling, isRefreshing, pullDistance, progress } = usePullToRefresh({
+    onRefresh: async () => {
+      await refetch();
+    },
+    enabled: isMobile
+  });
   
   // Create safe category list with fallbacks - extract just the names
   const safeCategoryNames = getSafeCategoryList(categoryNames);
@@ -179,6 +191,12 @@ const Auctions = () => {
 
   return (
     <div className="min-h-screen gradient-bg">
+      <PullToRefreshIndicator 
+        isPulling={isPulling}
+        isRefreshing={isRefreshing}
+        pullDistance={pullDistance}
+        progress={progress}
+      />
       <Header />
       
       <div className="section-container section-spacing">

@@ -48,6 +48,7 @@ import { WishlistProvider } from "./contexts/marketplace/WishlistContext";
 import { CartProvider } from "./contexts/marketplace/CartContext";
 import { NotificationProvider } from "./contexts/marketplace/NotificationProvider";
 import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
+import { InstallPWA } from "./pages/InstallPWA";
 import { RoleProtectedRoute } from "./components/marketplace/RoleProtectedRoute";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
@@ -145,6 +146,7 @@ const App = () => (
                 <Route path="/" element={<RootLayout />}>
                   <Route index element={<Navigate to="/home" replace />} />
                   <Route path="home" element={<HomePage />} />
+                  <Route path="install" element={<InstallPWA />} />
                   <Route path="showcase" element={<ShowcasePage />} />
                   <Route path="showcase/:slug" element={<ProjectDetailPage />} />
                   <Route path="participants" element={<ParticipantsPage />} />

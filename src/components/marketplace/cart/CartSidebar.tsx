@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Minus, Plus, Trash2, X } from 'lucide-react';
+import { ShoppingCart, Minus, Plus, Trash2, X as CloseIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/marketplace/CartContext';
 import { useProduct } from '@/hooks/marketplace/useProducts';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -25,6 +27,18 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
   removeItem: (id: string, variants: any) => void;
 }) => {
   const { data: product, isLoading } = useProduct(item.productId);
+  const isMobile = useIsMobile();
+  
+  // Swipe to delete functionality
+  const { elementRef, swipeDistance } = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (isMobile) {
+        removeItem(item.productId, item.selectedVariants);
+      }
+    },
+    threshold: 100,
+    enabled: isMobile
+  });
 
   if (isLoading) {
     return (
@@ -43,7 +57,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
     return (
       <div className="flex gap-3 p-3 border border-red-200 rounded-lg bg-red-50">
         <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">
-          <X className="h-6 w-6 text-red-500" />
+          <CloseIcon className="h-6 w-6 text-red-500" />
         </div>
         <div className="flex-1">
           <p className="text-red-600 font-medium">Product not found</p>
@@ -51,7 +65,7 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
             variant="ghost"
             size="sm"
             onClick={() => removeItem(item.productId, item.selectedVariants)}
-            className="text-red-500 hover:text-red-700 p-0 h-auto"
+            className="text-red-500 hover:text-red-700 p-0 h-auto min-h-[44px]"
           >
             Remove from cart
           </Button>
@@ -61,58 +75,81 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
   }
 
   return (
-    <div className="flex gap-3 p-3 border border-slate-200 rounded-lg">
-      <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg flex-shrink-0 flex items-center justify-center">
-        {product.image ? (
-          <img 
-            src={product.image} 
-            alt={product.title}
-            className="w-full h-full object-cover rounded-lg"
-          />
-        ) : (
-          <span className="text-xs text-slate-500">IMG</span>
-        )}
-      </div>
+    <div 
+      ref={elementRef as React.RefObject<HTMLDivElement>}
+      className="relative overflow-hidden"
+    >
+      {/* Swipe indicator background */}
+      {isMobile && swipeDistance.x < -20 && (
+        <div 
+          className="absolute inset-0 bg-red-500 flex items-center justify-end pr-6 rounded-lg"
+          style={{ 
+            opacity: Math.min(Math.abs(swipeDistance.x) / 100, 1)
+          }}
+        >
+          <Trash2 className="h-5 w-5 text-white" />
+        </div>
+      )}
       
-      <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm text-slate-900 truncate">
-          {product.title}
-        </h4>
-        {formatVariants(item.selectedVariants) && (
-          <p className="text-xs text-slate-500 mt-1">
-            {formatVariants(item.selectedVariants)}
-          </p>
-        )}
-        <div className="flex items-center justify-between mt-2">
-          <span className="font-bold text-slate-900">
-            ${product.price}
-          </span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity - 1)}
-            >
-              <Minus className="h-3 w-3" />
-            </Button>
-            <span className="w-8 text-center text-sm">{item.quantity}</span>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity + 1)}
-            >
-              <Plus className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-              onClick={() => removeItem(item.productId, item.selectedVariants)}
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
+      <div 
+        className="flex gap-3 p-3 border border-slate-200 rounded-lg bg-white relative"
+        style={{
+          transform: isMobile ? `translateX(${Math.min(swipeDistance.x, 0)}px)` : undefined,
+          transition: swipeDistance.x === 0 ? 'transform 0.3s ease-out' : 'none'
+        }}
+      >
+        <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg flex-shrink-0 flex items-center justify-center">
+          {product.image ? (
+            <img 
+              src={product.image} 
+              alt={product.title}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          ) : (
+            <span className="text-xs text-slate-500">IMG</span>
+          )}
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-sm text-slate-900 truncate">
+            {product.title}
+          </h4>
+          {formatVariants(item.selectedVariants) && (
+            <p className="text-xs text-slate-500 mt-1">
+              {formatVariants(item.selectedVariants)}
+            </p>
+          )}
+          <div className="flex items-center justify-between mt-2">
+            <span className="font-bold text-slate-900">
+              ${product.price}
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-11 w-11 p-0 touch-manipulation"
+                onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity - 1)}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="w-12 text-center text-base font-medium">{item.quantity}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-11 w-11 p-0 touch-manipulation"
+                onClick={() => updateQuantity(item.productId, item.selectedVariants, item.quantity + 1)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-11 w-11 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 touch-manipulation"
+                onClick={() => removeItem(item.productId, item.selectedVariants)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -123,6 +160,26 @@ const CartProductItem = ({ item, updateQuantity, removeItem }: {
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
   const { state, updateQuantity, removeItem } = useCart();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  // Swipe to close functionality for mobile
+  const { elementRef: swipeRef } = useSwipeGesture({
+    onSwipeRight: () => {
+      if (isMobile && isOpen) {
+        onClose();
+      }
+    },
+    threshold: 100,
+    enabled: isMobile
+  });
+
+  // Set ref after mount
+  useEffect(() => {
+    if (sheetRef.current) {
+      (swipeRef as React.MutableRefObject<HTMLElement | null>).current = sheetRef.current;
+    }
+  }, [sheetRef, swipeRef]);
 
   const handleCheckout = () => {
     onClose();
@@ -157,12 +214,15 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="w-full sm:max-w-md" ref={sheetRef as any}>
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
             Shopping Cart ({state.itemCount} items)
           </SheetTitle>
+          {isMobile && (
+            <p className="text-xs text-muted-foreground">Swipe right to close or left on items to remove</p>
+          )}
         </SheetHeader>
         
         <div className="flex flex-col h-full">

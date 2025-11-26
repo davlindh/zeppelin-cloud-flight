@@ -11,6 +11,7 @@ import { StickyRecentlyViewed } from '@/components/marketplace/shop/StickyRecent
 import { QuickViewModal } from '@/components/marketplace/shop/QuickViewModal';
 import { ProductComparison } from '@/components/marketplace/shop/ProductComparison';
 import { BackToTop } from '@/components/marketplace/ui/back-to-top';
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +21,8 @@ import { ShopProvider, useShop } from '@/contexts/marketplace/ShopContext';
 import { Eye, BarChart3, Truck, Shield, Zap, X, Calendar } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Select,
   SelectContent,
@@ -33,6 +36,7 @@ const ShopPage = () => {
   const [quickViewProductId, setQuickViewProductId] = useState<string | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const isMobile = useIsMobile();
 
   // Product comparison
   const {
@@ -42,7 +46,7 @@ const ShopPage = () => {
   } = useProductComparison();
 
   // Fetch events for filter
-  const { data: events = [] } = useQuery({
+  const { data: events = [], refetch: refetchEvents } = useQuery({
     queryKey: ['events-for-shop'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -57,7 +61,15 @@ const ShopPage = () => {
   });
 
   // Get products to determine available brands
-  const { data: products = [] } = useProducts();
+  const { data: products = [], refetch: refetchProducts } = useProducts();
+  
+  // Pull to refresh
+  const { isPulling, isRefreshing, pullDistance, progress } = usePullToRefresh({
+    onRefresh: async () => {
+      await Promise.all([refetchProducts(), refetchEvents()]);
+    },
+    enabled: isMobile
+  });
   
   // Get available brands for filtering
   const availableBrands = React.useMemo(() => {
@@ -76,9 +88,14 @@ const ShopPage = () => {
     return brands;
   }, [products]);
 
-
   return (
     <div className="min-h-screen brand-gradient-bg">
+      <PullToRefreshIndicator 
+        isPulling={isPulling}
+        isRefreshing={isRefreshing}
+        pullDistance={pullDistance}
+        progress={progress}
+      />
       <div className="section-container section-spacing content-spacing"
         style={{ backgroundImage: 'radial-gradient(circle at top right, hsl(var(--brand-primary)/0.03) 0%, transparent 50%)' }}
       >
