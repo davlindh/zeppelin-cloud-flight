@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import type { 
   CartState, 
   CartAction, 
@@ -12,6 +11,15 @@ import type {
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
+    case 'LOAD_CART':
+      return {
+        ...state,
+        items: action.payload.items || [],
+        total: action.payload.total || 0,
+        itemCount: action.payload.itemCount || 0,
+        error: null
+      };
+
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
       
@@ -254,6 +262,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Initialize cart from localStorage
   const [state, dispatch] = useReducer(cartReducer, { 
     items: [], 
     total: 0, 
@@ -261,6 +270,34 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isLoading: false,
     error: null
   });
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem('zeppelin-cart');
+      if (savedCart) {
+        const cartData = JSON.parse(savedCart);
+        if (cartData.items && Array.isArray(cartData.items)) {
+          dispatch({ type: 'LOAD_CART', payload: cartData });
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load cart from localStorage:', error);
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('zeppelin-cart', JSON.stringify({
+        items: state.items,
+        total: state.total,
+        itemCount: state.itemCount
+      }));
+    } catch (error) {
+      console.warn('Failed to save cart to localStorage:', error);
+    }
+  }, [state.items, state.total, state.itemCount]);
 
   const addItem = (
     productId: string, 

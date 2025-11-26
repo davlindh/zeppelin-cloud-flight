@@ -50,6 +50,7 @@ import { ProtectedRoute } from "./components/marketplace/ProtectedRoute";
 import { RoleProtectedRoute } from "./components/marketplace/RoleProtectedRoute";
 
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
+import PaymentDashboardPage from "./pages/admin/PaymentDashboardPage";
 import { ServiceProvidersAdmin } from "./pages/admin/ServiceProvidersAdmin";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
@@ -339,6 +340,7 @@ const App = () => (
                       <OrdersPage />
                     </Suspense>
                   } />
+                  <Route path="payments" element={<PaymentDashboardPage />} />
                   <Route path="users" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <UsersPage />

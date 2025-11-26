@@ -28,7 +28,7 @@ export const useCheckout = () => {
       const ticketItems = checkoutData.items.filter(item => item.kind === 'event_ticket');
       
       // Map product items to order items format
-      const orderItems = productItems.map(item => ({
+      const productOrderItems = productItems.map(item => ({
         type: 'product' as const,
         id: item.productId,
         title: item.title,
@@ -40,6 +40,25 @@ export const useCheckout = () => {
         },
       }));
 
+      // Map ticket items to order items format (as products for now)
+      const ticketOrderItems = ticketItems.map(item => ({
+        type: 'product' as const, // Using 'product' type until OrderItem supports 'event_ticket'
+        id: item.ticketTypeId,
+        title: `${item.eventTitle} - ${item.title}`,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        metadata: {
+          variants: { type: 'ticket' },
+          image: item.image,
+          eventId: item.eventId,
+          eventTitle: item.eventTitle,
+          eventDate: item.eventDate,
+        },
+      }));
+
+      // Combine both types of items
+      const orderItems = [...productOrderItems, ...ticketOrderItems];
+
       // Create shipping address object
       const shippingAddress = {
         name: checkoutData.shippingInfo.name,
@@ -50,7 +69,7 @@ export const useCheckout = () => {
         phone: checkoutData.shippingInfo.phone,
       };
 
-      // Create order
+      // Create order with all items (products and tickets)
       await createOrder({
         customerEmail: checkoutData.shippingInfo.email,
         customerName: checkoutData.shippingInfo.name,

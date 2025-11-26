@@ -44,6 +44,7 @@ export interface CartState {
 }
 
 export type CartAction =
+  | { type: 'LOAD_CART'; payload: LoadCartPayload }
   | { type: 'ADD_ITEM'; payload: AddItemPayload }
   | { type: 'ADD_TICKET'; payload: AddTicketPayload }
   | { type: 'REMOVE_ITEM'; payload: RemoveItemPayload }
@@ -53,6 +54,12 @@ export type CartAction =
   | { type: 'CLEAR_CART' }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null };
+
+export interface LoadCartPayload {
+  items: CartItem[];
+  total: number;
+  itemCount: number;
+}
 
 export interface AddItemPayload {
   productId: string;

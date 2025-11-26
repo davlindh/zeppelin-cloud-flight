@@ -40,7 +40,7 @@ export interface ShippingInfo {
 }
 
 export interface PaymentInfo {
-  method: 'card' | 'klarna' | 'swish';
+  method: 'card' | 'klarna' | 'swish' | 'revolut';
   cardNumber?: string;
   cardName?: string;
   cardExpiry?: string;
