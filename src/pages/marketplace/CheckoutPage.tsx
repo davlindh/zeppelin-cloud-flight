@@ -117,7 +117,7 @@ export const CheckoutPage = () => {
             Back
           </Button>
           
-          <h1 className="text-3xl font-bold mb-2">Checkout</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Checkout</h1>
           <p className="text-muted-foreground">
             Complete your order in just a few steps
           </p>
