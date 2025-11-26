@@ -39,6 +39,7 @@ import Services from "./pages/marketplace/Services";
 import ServiceDetail from "./pages/marketplace/ServiceDetail";
 import { CartPage } from "./pages/marketplace/CartPage";
 import CheckoutPage from "./pages/marketplace/CheckoutPage";
+import { OrderSuccessPage } from "./pages/marketplace/OrderSuccess";
 import { WishlistPage } from "./pages/marketplace/WishlistPage";
 import { NotificationsPage } from "./pages/marketplace/NotificationsPage";
 import { ProfilePage } from "./pages/marketplace/ProfilePage";
@@ -187,6 +188,7 @@ const App = () => (
                   } />
                   <Route path="cart" element={<CartPage />} />
                   <Route path="checkout" element={<CheckoutPage />} />
+                  <Route path="order-success" element={<OrderSuccessPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
                   <Route path="notifications" element={<NotificationsPage />} />
                   <Route path="profile" element={
