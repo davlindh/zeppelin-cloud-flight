@@ -28,6 +28,7 @@ export const useCheckout = () => {
     try {
       // Separate product and ticket items
       const productItems = checkoutData.items.filter(item => item.kind === 'product');
+      const ticketItems = checkoutData.items.filter(item => item.kind === 'event_ticket');
       
       // Map product items to order items format
       const productOrderItems = productItems.map(item => ({
@@ -73,8 +74,6 @@ export const useCheckout = () => {
 
       // Create order in pending state
       const orderResult = await createOrder({
-      // Create order with all items (products and tickets)
-      await createOrder({
         customerEmail: checkoutData.shippingInfo.email,
         customerName: checkoutData.shippingInfo.name,
         customerPhone: checkoutData.shippingInfo.phone,

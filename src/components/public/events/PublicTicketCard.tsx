@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useTicketCheckout } from '@/hooks/events/useTicketCheckout';
 import { useStockManagement } from '@/hooks/useStockManagement';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +22,7 @@ export const PublicTicketCard: React.FC<PublicTicketCardProps> = ({ ticket, even
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const { createCheckout } = useTicketCheckout();
   const { checkStock } = useStockManagement();
 

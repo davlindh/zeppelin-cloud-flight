@@ -61,10 +61,10 @@ export default function MarketplaceLayout() {
 
           {/* Marketplace Navigation */}
           <nav className="border-t border-gray-200">
-            <div className="flex space-x-8 py-3">
+            <div className="flex space-x-6 sm:space-x-8 py-3 overflow-x-auto scrollbar-hide">
               <Link
                 to="/marketplace/auctions"
-                className={`text-sm font-semibold transition-colors ${
+                className={`text-sm font-semibold transition-colors whitespace-nowrap ${
                   isActive('/marketplace/auctions')
                     ? 'text-amber-600 border-b-2 border-amber-600 pb-3'
                     : 'text-gray-600 hover:text-amber-600 pb-3'
@@ -74,7 +74,7 @@ export default function MarketplaceLayout() {
               </Link>
               <Link
                 to="/marketplace/shop"
-                className={`text-sm font-semibold transition-colors ${
+                className={`text-sm font-semibold transition-colors whitespace-nowrap ${
                   isActive('/marketplace/shop')
                     ? 'text-blue-600 border-b-2 border-blue-600 pb-3'
                     : 'text-gray-600 hover:text-blue-600 pb-3'
@@ -84,7 +84,7 @@ export default function MarketplaceLayout() {
               </Link>
               <Link
                 to="/marketplace/services"
-                className={`text-sm font-semibold transition-colors ${
+                className={`text-sm font-semibold transition-colors whitespace-nowrap ${
                   isActive('/marketplace/services')
                     ? 'text-green-600 border-b-2 border-green-600 pb-3'
                     : 'text-gray-600 hover:text-green-600 pb-3'

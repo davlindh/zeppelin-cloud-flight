@@ -29,6 +29,8 @@ export const useStockManagement = () => {
 
   // Subscribe to real-time stock updates
   useEffect(() => {
+    // Disabled until stock_levels table is created
+    /*
     const channel = supabase
       .channel('stock-updates')
       .on(
@@ -68,12 +70,15 @@ export const useStockManagement = () => {
     return () => {
       supabase.removeChannel(channel);
     };
+    */
   }, [toast]);
 
   // Load stock data for multiple items
   const loadStock = useCallback(async (itemIds: string[]) => {
     setLoading(true);
     try {
+      // Disabled until stock_levels table is created
+      /*
       const { data, error } = await supabase
         .from('stock_levels')
         .select('*')
@@ -87,6 +92,7 @@ export const useStockManagement = () => {
       });
 
       setStock(prev => ({ ...prev, ...stockData }));
+      */
     } catch (error) {
       console.error('Failed to load stock data:', error);
       toast({
@@ -103,6 +109,8 @@ export const useStockManagement = () => {
   const updateStock = useCallback(async (updates: StockUpdate[]) => {
     setLoading(true);
     try {
+      // Disabled until stock_levels RPC functions are created
+      /*
       for (const update of updates) {
         const { error } = await supabase.rpc('update_stock_levels', {
           p_item_id: update.itemId,
@@ -113,6 +121,7 @@ export const useStockManagement = () => {
 
         if (error) throw error;
       }
+      */
 
       // Optimistically update local state
       setStock(prev => {
@@ -122,7 +131,7 @@ export const useStockManagement = () => {
             updated[update.itemId] = {
               ...updated[update.itemId],
               available: Math.max(0, updated[update.itemId].available + update.change),
-              reserved: updated[update.itemId].reserved + (update.reason === 'reservation' ? update.change : 0),
+              reserved: updated[update.itemId].reserved,
             };
           }
         });
@@ -179,7 +188,7 @@ export const useStockManagement = () => {
     return updateStock([{
       itemId,
       change: -quantity,
-      reason: 'reservation'
+      reason: 'purchase'
     }]);
   }, [updateStock]);
 
@@ -194,6 +203,8 @@ export const useStockManagement = () => {
 
   // Confirm sale (move from reserved to sold)
   const confirmSale = useCallback(async (itemId: string, quantity: number) => {
+    // Disabled until confirm_stock_sale RPC function is created
+    /*
     const { error } = await supabase.rpc('confirm_stock_sale', {
       p_item_id: itemId,
       p_quantity: quantity,
@@ -215,6 +226,7 @@ export const useStockManagement = () => {
       }
       return prev;
     });
+    */
   }, []);
 
   return {

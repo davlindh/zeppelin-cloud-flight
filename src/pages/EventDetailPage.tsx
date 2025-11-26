@@ -94,7 +94,7 @@ export const EventDetailPage = () => {
             </Badge>
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">{event.title}</h1>
           
           {/* Event Meta */}
           <div className="flex flex-wrap gap-6 text-muted-foreground">

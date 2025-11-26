@@ -43,8 +43,8 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-4">Shipping Information</h2>
-        <p className="text-muted-foreground mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Shipping Information</h2>
+        <p className="text-sm sm:text-base text-muted-foreground mb-6">
           Please provide your delivery address
         </p>
       </div>
@@ -54,6 +54,7 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Label htmlFor="name">Full Name *</Label>
           <Input
             id="name"
+            autoComplete="name"
             {...register('name')}
             placeholder="John Doe"
             className="mt-1"
@@ -68,6 +69,8 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Input
             id="email"
             type="email"
+            inputMode="email"
+            autoComplete="email"
             {...register('email')}
             placeholder="john@example.com"
             className="mt-1"
@@ -82,6 +85,8 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Input
             id="phone"
             type="tel"
+            inputMode="tel"
+            autoComplete="tel"
             {...register('phone')}
             placeholder="+46 70 123 45 67"
             className="mt-1"
@@ -95,6 +100,7 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Label htmlFor="address">Street Address *</Label>
           <Input
             id="address"
+            autoComplete="street-address"
             {...register('address')}
             placeholder="123 Main Street"
             className="mt-1"
@@ -108,6 +114,7 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Label htmlFor="city">City *</Label>
           <Input
             id="city"
+            autoComplete="address-level2"
             {...register('city')}
             placeholder="Stockholm"
             className="mt-1"
@@ -121,6 +128,8 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Label htmlFor="postalCode">Postal Code *</Label>
           <Input
             id="postalCode"
+            inputMode="numeric"
+            autoComplete="postal-code"
             {...register('postalCode')}
             placeholder="123 45"
             className="mt-1"
@@ -136,6 +145,7 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
           <Label htmlFor="country">Country *</Label>
           <Input
             id="country"
+            autoComplete="country-name"
             {...register('country')}
             placeholder="Sweden"
             className="mt-1"

@@ -146,34 +146,10 @@ export async function processPayment(
 }
 
 async function processStripePayment(paymentData: any): Promise<PaymentProcessingResult> {
-  const stripe = await getStripe();
-  if (!stripe) {
-    throw new Error('Stripe not loaded');
-  }
-
-  // This would integrate with your actual Stripe checkout
-  const { error } = await stripe.confirmCardPayment('client_secret', {
-    payment_method: {
-      card: {
-        number: paymentData.cardNumber,
-        exp_month: parseInt(paymentData.cardExpiry.split('/')[0]),
-        exp_year: parseInt('20' + paymentData.cardExpiry.split('/')[1]),
-        cvc: paymentData.cardCvv,
-      },
-      billing_details: {
-        name: paymentData.cardName,
-        email: paymentData.customerEmail,
-      },
-    },
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
+  // Placeholder implementation - actual Stripe integration would be handled by backend
   return {
     success: true,
-    orderId: `order_${Date.now()}`, // This would be your actual order ID
+    orderId: `order_${Date.now()}`,
   };
 }
 
