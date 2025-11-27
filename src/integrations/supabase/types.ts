@@ -2392,6 +2392,7 @@ export type Database = {
           cancelled_at: string | null
           carrier: string | null
           created_at: string
+          currency: string
           customer_email: string
           customer_name: string
           customer_notes: string | null
@@ -2424,6 +2425,7 @@ export type Database = {
           cancelled_at?: string | null
           carrier?: string | null
           created_at?: string
+          currency?: string
           customer_email: string
           customer_name: string
           customer_notes?: string | null
@@ -2456,6 +2458,7 @@ export type Database = {
           cancelled_at?: string | null
           carrier?: string | null
           created_at?: string
+          currency?: string
           customer_email?: string
           customer_name?: string
           customer_notes?: string | null
