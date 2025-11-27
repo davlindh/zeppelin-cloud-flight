@@ -1,14 +1,43 @@
 import { useSearchParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export function OrderSuccessPage() {
   const [params] = useSearchParams();
   const orderId = params.get("order_id");
+  const { toast } = useToast();
 
-  const { data: order } = useQuery({
+  // Verify payment mutation
+  const verifyPayment = useMutation({
+    mutationFn: async (orderId: string) => {
+      const { data, error } = await supabase.functions.invoke("verify-order-payment", {
+        body: { order_id: orderId },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Send confirmation email mutation
+  const sendConfirmation = useMutation({
+    mutationFn: async (order: any) => {
+      const { data, error } = await supabase.functions.invoke("send-order-confirmation", {
+        body: {
+          orderId: order.id,
+          customerEmail: order.customer_email,
+          customerName: order.customer_name,
+        },
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: order, refetch } = useQuery({
     queryKey: ["order", orderId],
     queryFn: async () => {
       if (!orderId) return null;
@@ -33,13 +62,54 @@ export function OrderSuccessPage() {
     enabled: !!orderId,
   });
 
+  // Verify payment and send email on mount
+  useEffect(() => {
+    if (!orderId) return;
+
+    const processOrder = async () => {
+      try {
+        // First verify the payment
+        const result = await verifyPayment.mutateAsync(orderId);
+        
+        if (result.success) {
+          // Refetch order to get updated status
+          await refetch();
+          
+          // Then send confirmation email
+          if (order) {
+            await sendConfirmation.mutateAsync(order);
+          }
+        }
+      } catch (error) {
+        console.error("Error processing order:", error);
+        toast({
+          title: "Processing Error",
+          description: "There was an issue processing your order. Please contact support.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    processOrder();
+  }, [orderId]);
+
+  if (verifyPayment.isPending) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <Loader2 className="w-16 h-16 animate-spin text-primary mx-auto mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Verifying Payment...</h1>
+        <p className="text-muted-foreground">Please wait while we confirm your order.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto py-12 px-4">
       <div className="text-center mb-8">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" />
         <h1 className="text-3xl font-bold mb-2">Beställning genomförd!</h1>
         <p className="text-muted-foreground">
-          Tack för ditt köp. Din beställning har bekräftats.
+          Tack för ditt köp. Vi har skickat en bekräftelse till {order?.customer_email}.
         </p>
       </div>
 
