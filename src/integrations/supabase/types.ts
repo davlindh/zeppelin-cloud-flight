@@ -4713,6 +4713,10 @@ export type Database = {
         Args: { p_project_id: string; p_user_id: string }
         Returns: boolean
       }
+      is_project_member: {
+        Args: { p_project_id: string; p_user_id: string }
+        Returns: boolean
+      }
       place_bid: {
         Args: { p_amount: number; p_auction_id: string; p_bidder: string }
         Returns: {
