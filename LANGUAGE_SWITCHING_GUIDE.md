@@ -217,7 +217,7 @@ To fully localize all pages, apply the translation pattern to:
 #### High Priority:
 - [ ] WishlistPage - Replace "Add to Cart", "Remove", etc.
 - [ ] CartPage - Replace "Shopping Cart", "Checkout", etc.
-- [ ] OrderConfirmationPage - Replace order-related text
+- [ ] OrderSuccessPage - Replace order-related text (merged functionality)
 - [ ] OrderTrackingPage - Replace tracking-related text
 
 #### Medium Priority:

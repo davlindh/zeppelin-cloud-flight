@@ -148,7 +148,7 @@ export function MyOrdersPage() {
                     </span>
                   </div>
                   <Button variant="outline" size="sm" asChild>
-                    <Link to={`/order-confirmation?order=${order.order_number}`}>
+                    <Link to={`/marketplace/order-success?order_id=${order.id}&view=confirm`}>
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </Link>

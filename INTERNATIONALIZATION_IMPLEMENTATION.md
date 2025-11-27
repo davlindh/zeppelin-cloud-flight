@@ -65,8 +65,8 @@ Translation categories include:
    - Convert all $ to SEK
    - Use formatCurrency utility
 
-3. **OrderConfirmationPage** (`src/pages/OrderConfirmationPage.tsx`)
-   - Update subtotal, tax, shipping, discount, total
+3. **OrderSuccessPage** (`src/pages/marketplace/OrderSuccess.tsx`)
+   - Update subtotal, tax, shipping, discount, total (merged from OrderConfirmationPage)
    - Convert all price displays
 
 4. **OrderTrackingPage** (`src/pages/OrderTrackingPage.tsx`)

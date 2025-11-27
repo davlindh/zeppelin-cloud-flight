@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/marketplace/CartContext';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { CheckoutProgress } from '@/components/marketplace/checkout/CheckoutProgress';
 import { ShippingForm } from '@/components/marketplace/checkout/ShippingForm';
-import { PaymentForm } from '@/components/marketplace/checkout/PaymentForm';
+import { PaymentFormStripe } from '@/components/stripe/PaymentFormStripe';
 import { OrderReview } from '@/components/marketplace/checkout/OrderReview';
 import { useCheckout } from '@/hooks/marketplace/useCheckout';
+import { useCreatePaymentIntent } from '@/hooks/usePaymentIntent';
+import { StripeProvider } from '@/components/stripe/StripeProvider';
 import { checkoutConfig, getTaxRate, getShippingCost, calculateTax } from '@/config/checkout.config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 // Utility function to calculate pricing based on configuration
 const calculatePricing = (subtotal: number, country: string) => {
@@ -48,11 +51,20 @@ export interface PaymentInfo {
 }
 
 export const CheckoutPage = () => {
+  return (
+    <StripeProvider>
+      <CheckoutContent />
+    </StripeProvider>
+  );
+};
+
+const CheckoutContent = () => {
   const navigate = useNavigate();
   const { state } = useCart();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('shipping');
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
+  const [clientSecret, setClientSecret] = useState<string>('');
 
   const { placeOrder, isPlacing } = useCheckout();
 
@@ -67,29 +79,48 @@ export const CheckoutPage = () => {
     setCurrentStep('payment');
   };
 
-  const handlePaymentSubmit = (data: PaymentInfo) => {
+  const handlePaymentSubmit = async (data: PaymentInfo) => {
     setPaymentInfo(data);
-    setCurrentStep('review');
-  };
 
-  const handlePlaceOrder = async () => {
-    if (!shippingInfo || !paymentInfo) return;
+    // Create order first
+    if (!shippingInfo) return;
 
     const pricing = calculatePricing(state.total, shippingInfo.country);
 
-    const success = await placeOrder({
-      shippingInfo,
-      paymentInfo,
-      items: state.items,
-      subtotal: pricing.subtotal,
-      taxAmount: pricing.taxAmount,
-      shippingAmount: pricing.shippingAmount,
-      totalAmount: pricing.totalAmount,
-    });
+    try {
+      const orderResult = await placeOrder({
+        shippingInfo,
+        paymentInfo: data,
+        items: state.items,
+        subtotal: pricing.subtotal,
+        taxAmount: pricing.taxAmount,
+        shippingAmount: pricing.shippingAmount,
+        totalAmount: pricing.totalAmount,
+      });
 
-    if (success) {
-      navigate('/order-confirmation');
+      // Create PaymentIntent for Stripe Elements
+      const { data: paymentResult, error } = await supabase.functions.invoke(
+        'create-payment-intent',
+        { body: { order_id: orderResult } }
+      );
+
+      if (error) throw error;
+
+      setClientSecret(paymentResult.clientSecret);
+      setCurrentStep('review');
+    } catch (error) {
+      console.error('Error setting up payment:', error);
     }
+  };
+
+  const handlePlaceOrder = () => {
+    if (!shippingInfo || !paymentInfo || !clientSecret) return;
+
+    const pricing = calculatePricing(state.total, shippingInfo.country);
+
+    // The actual payment will be handled by PaymentFormStripe component
+    // This just prepares the order UI
+    setCurrentStep('review');
   };
 
   const handleBack = () => {
@@ -105,7 +136,7 @@ export const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
           <Button
@@ -116,7 +147,7 @@ export const CheckoutPage = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          
+
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Checkout</h1>
           <p className="text-muted-foreground">
             Complete your order in just a few steps
@@ -135,10 +166,15 @@ export const CheckoutPage = () => {
             )}
 
             {currentStep === 'payment' && shippingInfo && (
-              <PaymentForm
-                initialData={paymentInfo}
-                onSubmit={handlePaymentSubmit}
-              />
+              <StripeProvider>
+                <PaymentFormStripe
+                  clientSecret={clientSecret}
+                  amount={Math.round(state.total * 100)} // Convert to cents
+                  currency="SEK"
+                  onSuccess={() => navigate('/marketplace/order-success?view=success')}
+                  onError={(error) => console.error('Payment error:', error)}
+                />
+              </StripeProvider>
             )}
 
             {currentStep === 'review' && shippingInfo && paymentInfo && (() => {

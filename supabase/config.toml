@@ -48,6 +48,9 @@ verify_jwt = false
 [functions.handle-marketplace-webhook]
 verify_jwt = false
 
+[functions.create-payment-intent]
+verify_jwt = false
+
 [functions.send-order-confirmation]
 verify_jwt = false
 

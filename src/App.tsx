@@ -56,7 +56,6 @@ import { RoleProtectedRoute } from "./components/marketplace/RoleProtectedRoute"
 import OrderDetailPage from "./pages/admin/OrderDetailPage";
 import PaymentDashboardPage from "./pages/admin/PaymentDashboardPage";
 import { ServiceProvidersAdmin } from "./pages/admin/ServiceProvidersAdmin";
-import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import { ProviderPortfolioPage } from "./pages/marketplace/ProviderPortfolioPage";
 import PortfolioManagement from "./pages/marketplace/PortfolioManagement";
@@ -296,7 +295,6 @@ const App = () => (
                 </Route>
 
                 {/* Order Pages */}
-                <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                 <Route path="/order-tracking" element={<OrderTrackingPage />} />
                 <Route path="/providers/:slug/portfolio" element={<ProviderPortfolioPage />} />
                 
