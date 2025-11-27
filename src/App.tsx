@@ -69,6 +69,7 @@ import { FeaturedProjects } from "./pages/collaboration/FeaturedProjects";
 import { CampaignsListPage } from "./pages/CampaignsListPage";
 import { CampaignPage } from "./pages/CampaignPage";
 import { EventDetailPage } from "./pages/EventDetailPage";
+import { EventsOverviewPage } from "./pages/EventsOverviewPage";
 import { MyTicketsPage } from "./pages/marketplace/MyTicketsPage";
 import { ParticipantCampaignsPage } from "./pages/ParticipantCampaignsPage";
 import { CampaignWizardPage } from "./pages/CampaignWizardPage";
@@ -156,6 +157,7 @@ const App = () => (
                   <Route path="media" element={<MediaGalleryPage />} />
                   <Route path="campaigns" element={<CampaignsListPage />} />
                   <Route path="campaigns/:slug" element={<CampaignPage />} />
+                  <Route path="events" element={<EventsOverviewPage />} />
                 </Route>
 
                 {/* Legacy redirects for old marketplace URLs */}

@@ -1,49 +1,186 @@
 import React from 'react';
-import { Book, Beaker, Megaphone } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { BookOpen, Wrench, Megaphone, ArrowRight } from 'lucide-react';
 
-const SystemStep: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
-    <div className="text-center p-6">
-        <div className="flex items-center justify-center h-20 w-20 rounded-full bg-white shadow-md mb-6 mx-auto border-4 border-gray-200">
-            {icon}
-        </div>
-        <h3 className="text-xl font-bold mb-2">{title}</h3>
-        <div className="text-gray-600">{children}</div>
-    </div>
-);
+interface SystemStep {
+  icon: React.ReactNode;
+  title: string;
+  shortTitle: string;
+  description: string;
+  color: string;
+  bgColor: string;
+}
+
+const systemSteps: SystemStep[] = [
+  {
+    icon: <BookOpen className="h-8 w-8" />,
+    title: 'Kunskapsdomänen',
+    shortTitle: 'Lär',
+    description: 'Vi analyserar och validerar kunskap – från forskning till lokala berättelser – för att bygga en solid grund.',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50 border-blue-200',
+  },
+  {
+    icon: <Wrench className="h-8 w-8" />,
+    title: 'Operationella Domänen',
+    shortTitle: 'Bygg',
+    description: 'Vi översätter insikter till handling – konkreta prototyper, projekt och lösningar som kan testas i verkligheten.',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 border-emerald-200',
+  },
+  {
+    icon: <Megaphone className="h-8 w-8" />,
+    title: 'Kommunikationsdomänen',
+    shortTitle: 'Berätta',
+    description: 'Vi skapar berättelser som inspirerar och överbryggar klyftan mellan experter, beslutsfattare och allmänhet.',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50 border-purple-200',
+  },
+];
 
 export const SystematicsSection: React.FC = () => {
-    return (
-        <section id="systematik" className="py-16 md:py-24 bg-gray-100">
-            <div className="container mx-auto px-6">
-                <div className="text-center mb-12 md:mb-20">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">Resan från tanke till transformation</h2>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4 mb-4">Varje stor förändring börjar med en metod. Vår trestegsmodell är inte bara en process – den är en filosofi som vägleder oss från abstrakta idéer till konkreta resultat som förändrar samhällen.</p>
-                    <p className="text-base text-gray-700 max-w-2xl mx-auto">I Zeppel Inn blir denna systematik levande konst, där varje steg i processen bidrar till att skapa något större än summan av dess delar.</p>
-                </div>
-                <div className="grid md:grid-cols-3 gap-10">
-                    <SystemStep
-                        icon={<Book className="h-10 w-10 text-gray-700" />}
-                        title="1. Kunskapsdomänen"
+  return (
+    <section id="systematik" className="py-16 md:py-24 bg-gradient-to-br from-gray-50 to-slate-100">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif text-gray-800">
+              Från idé till verklighet
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Vår trestegsmodell guidar varje projekt genom en strukturerad resa som säkerställer kvalitet och genomslagskraft.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Visual Process Flow */}
+        <div className="max-w-5xl mx-auto">
+          {/* Desktop: Horizontal Flow */}
+          <div className="hidden md:flex items-stretch gap-4">
+            {systemSteps.map((step, index) => (
+              <React.Fragment key={step.shortTitle}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.15 }}
+                  className="flex-1"
+                >
+                  <div className={`h-full p-6 rounded-2xl border-2 ${step.bgColor} hover:shadow-lg transition-all duration-300`}>
+                    {/* Step Number */}
+                    <div className={`inline-flex items-center gap-2 ${step.color} mb-4`}>
+                      <span className="text-sm font-bold opacity-60">0{index + 1}</span>
+                      <span className="text-2xl font-bold">{step.shortTitle}</span>
+                    </div>
+                    
+                    {/* Icon */}
+                    <div className={`mb-4 ${step.color}`}>
+                      {step.icon}
+                    </div>
+                    
+                    {/* Title */}
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      {step.title}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Arrow between steps */}
+                {index < systemSteps.length - 1 && (
+                  <div className="flex items-center">
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.15 }}
                     >
-                        <p className="mb-3">Allt börjar med en grund av verifierad kunskap.</p>
-                        <p className="text-sm">Vi analyserar och utvärderar information – från akademisk forskning till lokala berättelser – för att säkerställa dess noggrannhet, relevans och trovärdighet.</p>
-                    </SystemStep>
-                    <SystemStep
-                        icon={<Beaker className="h-10 w-10 text-gray-700" />}
-                        title="2. Operationella Domänen"
+                      <ArrowRight className="w-6 h-6 text-gray-400" />
+                    </motion.div>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Mobile: Vertical Flow */}
+          <div className="md:hidden space-y-4">
+            {systemSteps.map((step, index) => (
+              <React.Fragment key={step.shortTitle}>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <div className={`p-5 rounded-xl border-2 ${step.bgColor}`}>
+                    <div className="flex items-start gap-4">
+                      {/* Icon & Number */}
+                      <div className={`flex-shrink-0 ${step.color}`}>
+                        <div className="text-xs font-bold opacity-60 mb-1">0{index + 1}</div>
+                        {step.icon}
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1">
+                        <div className={`text-xl font-bold ${step.color} mb-1`}>
+                          {step.shortTitle}
+                        </div>
+                        <h3 className="text-base font-semibold text-gray-800 mb-1">
+                          {step.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {step.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Arrow between steps (mobile) */}
+                {index < systemSteps.length - 1 && (
+                  <div className="flex justify-center py-1">
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.2, delay: 0.2 + index * 0.1 }}
+                      className="rotate-90"
                     >
-                        <p className="mb-3">Här översätter vi den validerade kunskapen till konkreta, testbara modeller och strategier.</p>
-                        <p className="text-sm">Vi utvecklar handlingskraftiga ramverk som kan appliceras i verkliga scenarier.</p>
-                    </SystemStep>
-                    <SystemStep
-                        icon={<Megaphone className="h-10 w-10 text-gray-700" />}
-                        title="3. Kommunikationsdomänen"
-                    >
-                        <p className="mb-3">För att verklig förändring ska ske måste den kommuniceras.</p>
-                        <p className="text-sm">Vi skapar tydliga, övertygande narrativ som överbryggar klyftan mellan experter, beslutsfattare och allmänhet.</p>
-                    </SystemStep>
-                </div>
+                      <ArrowRight className="w-5 h-5 text-gray-400" />
+                    </motion.div>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Summary */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-10 text-center"
+          >
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full shadow-sm border border-gray-200">
+              <span className="text-sm text-gray-600">
+                Denna process vägleder varje projekt på Zeppel Inn
+              </span>
             </div>
-        </section>
-    );
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
 };

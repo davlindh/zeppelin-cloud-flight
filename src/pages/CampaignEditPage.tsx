@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCampaign } from '@/hooks/funding/useCampaign';
 import { useUpdateCampaign } from '@/hooks/funding/useUpdateCampaign';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
+import { useAdminAuth } from '@/hooks/marketplace/useAdminAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ export const CampaignEditPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { data: user } = useAuthenticatedUser();
+  const { isAdmin } = useAdminAuth();
   const { data: campaign, isLoading } = useCampaign(slug);
   const updateCampaign = useUpdateCampaign();
   const [showLinkageSection, setShowLinkageSection] = useState(false);
@@ -97,7 +99,7 @@ export const CampaignEditPage: React.FC = () => {
     );
   }
 
-  if (campaign.created_by !== user?.id) {
+  if (campaign.created_by !== user?.id && !isAdmin) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card>

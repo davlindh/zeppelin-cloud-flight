@@ -31,10 +31,14 @@ export default function OrderDetailPage() {
         .from('orders')
         .select(`
           *,
-          order_items (*,
-            products (title, image),
-            auctions (title, image),
-            services (title)
+          order_items (
+            *,
+            product_variants!left (
+              products!left (
+                title,
+                image
+              )
+            )
           ),
           order_status_history (*)
         `)

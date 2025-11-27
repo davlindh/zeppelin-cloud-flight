@@ -12,10 +12,10 @@ export const useCampaign = (slug: string | undefined) => {
         .from('funding_campaigns')
         .select(`
           *,
-          projects(id, title, slug, auth_user_id),
+          projects(id, title, slug),
           collaboration_projects(id, title, slug),
           events(id, title, slug),
-          project_budget(*)
+          project_budgets(id, total_amount, secured_from_sponsors, raised_from_donations, status, breakdown)
         `)
         .eq('slug', slug)
         .single();

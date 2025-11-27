@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import AuctionsTable from '@/components/admin/auctions/AuctionsTable';
 import AuctionForm from '@/components/admin/auctions/AuctionForm';
+import { AuctionDetailModal } from '@/components/admin/auctions/AuctionDetailModal';
 import { useAuctionActions } from '@/hooks/admin/useAuctionActions';
 import type { Auction } from '@/types/unified';
 
@@ -10,6 +11,8 @@ export const AuctionsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingAuction, setEditingAuction] = useState<Auction | null>(null);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   const { handleCreate, handleUpdate, handleDelete, handleView } = useAuctionActions();
 
@@ -46,6 +49,26 @@ export const AuctionsPage = () => {
     setEditingAuction(null);
   };
 
+  const handleViewDetails = (auction: Auction) => {
+    setSelectedAuction(auction);
+    setShowDetails(true);
+  };
+
+  const handleCloseDetails = () => {
+    setShowDetails(false);
+    setSelectedAuction(null);
+  };
+
+  const handleEndAuction = async (auction: Auction) => {
+    // TODO: Implement ending auction functionality
+    console.log('Ending auction:', auction.id);
+  };
+
+  const handleExtendAuction = async (auction: Auction) => {
+    // TODO: Implement extending auction functionality
+    console.log('Extending auction:', auction.id);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -70,8 +93,17 @@ export const AuctionsPage = () => {
       <AuctionsTable
         onCreateAuction={handleCreateClick}
         onEditAuction={handleEdit}
-        onViewAuction={handleView}
+        onViewAuction={handleViewDetails}
         onDeleteAuction={handleDelete}
+      />
+
+      <AuctionDetailModal
+        isOpen={showDetails}
+        onClose={handleCloseDetails}
+        auction={selectedAuction}
+        onEditAuction={handleEdit}
+        onEndAuction={handleEndAuction}
+        onExtendAuction={handleExtendAuction}
       />
     </div>
   );

@@ -10,13 +10,16 @@ import { PublicMediaUpload } from '@/components/public/PublicMediaUpload';
 import { ComprehensiveSubmissionForm } from '@/components/public/ComprehensiveSubmissionForm';
 // Import section components - Swedish content
 import { motion } from 'framer-motion';
-import { Users, FolderOpen, Building, Calendar, ChevronDown, ChevronUp, Sparkles, Zap, Shield, Heart } from 'lucide-react';
+import { Users, FolderOpen, Building, Calendar, ChevronDown, ChevronUp, Sparkles, Zap, Shield, Heart, Eye, ArrowRight } from 'lucide-react';
 import { VisionSection } from '@/components/sections/VisionSection';
 import { SystematicsSection } from '@/components/sections/SystematicsSection';
 import { EngagementSection } from '@/components/sections/EngagementSection';
 import { PartnerSection } from '@/components/sections/PartnerSection';
 import { EventMediaSection } from '@/components/sections/EventMediaSection';
 import { FeaturedCampaignsSection } from '@/components/home/FeaturedCampaignsSection';
+import { MicroSponsorshipSection } from '@/components/home/MicroSponsorshipSection';
+import { HeroShowcaseOverlay } from '@/components/home/HeroShowcaseOverlay';
+import { Link } from 'react-router-dom';
 
 // Stats Card Component
 interface StatsCardProps {
@@ -235,64 +238,52 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
                   </motion.div>
                 </div>
               </div>
+              
+              {/* Hero Showcase Overlay - Shows featured content on desktop */}
+              <HeroShowcaseOverlay />
             </section>
 
-            {/* Engagement Section - Streamlined */}
-            <section id="media-upload" className="py-6 sm:py-8 md:py-12 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100">
+            {/* Featured Showcase - Moved up for immediate concreteness */}
+            <FeaturedCampaignsSection />
+
+            {/* Quick Showcase Preview */}
+            <section className="py-6 sm:py-8 bg-gradient-to-r from-slate-50 to-gray-50">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="max-w-3xl mx-auto bg-white/95 backdrop-blur-md border border-purple-200 rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
-                  <div className="text-center space-y-4">
-                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold font-serif text-gray-800 leading-tight">
-                      Bli en del av vår gemensamma berättelse
-                    </h2>
-                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed max-w-2xl mx-auto">
-                      Varje ögonblick, varje upptäckt, varje möte vid Zeppel Inn är en del av en större berättelse om innovation och kreativitet.
-                    </p>
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
-                      <Button
-                        onClick={() => setShowSubmissionForm(true)}
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
-                        size="lg"
-                      >
-                        Bli en del av Zeppel Inn idag
+                <div className="max-w-4xl mx-auto text-center">
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+                    Se vad vi skapar tillsammans
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Utforska projekt, deltagare och det som händer på Zeppel Inn.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Link to="/showcase">
+                      <Button variant="outline" className="border-gray-300 hover:border-gray-400">
+                        <Eye className="w-4 h-4 mr-2" />
+                        Projekt & Showcase
                       </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowUploadForm(true)}
-                        className="border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-full font-semibold transition-all duration-200 w-full sm:w-auto"
-                        size="lg"
-                      >
-                        Ladda upp material
+                    </Link>
+                    <Link to="/partners">
+                      <Button variant="outline" className="border-gray-300 hover:border-gray-400">
+                        <Building className="w-4 h-4 mr-2" />
+                        Våra Partners
                       </Button>
-                    </div>
+                    </Link>
+                    <Link to="/media">
+                      <Button variant="outline" className="border-gray-300 hover:border-gray-400">
+                        <FolderOpen className="w-4 h-4 mr-2" />
+                        Mediagalleri
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Support Section - Separated for better UX */}
-            <section className="py-4 sm:py-6 bg-gradient-to-r from-pink-50 to-rose-50">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm border border-pink-200 rounded-xl shadow-sm p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button
-                      onClick={() => window.open('https://revolut.me/davidxt0s', '_blank')}
-                      className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2 w-full sm:w-auto"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
-                      </svg>
-                      Stöd Zeppel Inn
-                    </Button>
-                    <p className="text-sm text-pink-700 font-medium text-center">
-                      Märk "zeppel" och ditt namn vid donation
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
+            {/* Engagement Section with Waitlist + Volunteer */}
+            <EngagementSection />
 
-            {/* Partner + Stats Section - Moved up for credibility */}
+            {/* Partner Section for credibility */}
             <PartnerSection />
 
             {/* Stats Section - Compact social proof */}
@@ -329,14 +320,11 @@ const HomePageLayout: React.FC<HomePageLayoutProps> = ({
               </section>
             )}
 
-            {/* Systematics Section - Methodology before engagement */}
-            <SystematicsSection />
+            {/* Micro-Sponsorship Section - Concrete donation options */}
+            <MicroSponsorshipSection />
 
-            {/* Engagement Section - Call to action after methodology */}
-            <EngagementSection />
-            
-            {/* Featured Campaigns Section */}
-            <FeaturedCampaignsSection />
+            {/* Systematics Section - Methodology */}
+            <SystematicsSection />
 
             {/* Vision Section - Deeper storytelling */}
             <VisionSection />

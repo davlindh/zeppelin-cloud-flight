@@ -216,8 +216,11 @@ const AuctionForm: React.FC<AuctionFormProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Basic Information</h3>
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="font-semibold text-lg text-primary">📝 Basic Information</h3>
+                <p className="text-sm text-muted-foreground">Tell us about your item and set its auction details</p>
+              </div>
               
               {/* Title */}
               <div className="space-y-2">
@@ -316,11 +319,14 @@ const AuctionForm: React.FC<AuctionFormProps> = ({
             </div>
 
             {/* Auction Duration */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Auction Duration
-              </h3>
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Auction Timing
+                </h3>
+                <p className="text-sm text-muted-foreground">Set when your auction will start and end</p>
+              </div>
               
               {/* Quick Duration Selection */}
               <div className="space-y-2">
@@ -358,11 +364,14 @@ const AuctionForm: React.FC<AuctionFormProps> = ({
             </div>
 
             {/* Images */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Product Images
-              </h3>
+            <div className="space-y-6">
+              <div className="border-b pb-2">
+                <h3 className="font-semibold text-lg text-primary flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5" />
+                  Product Images
+                </h3>
+                <p className="text-sm text-muted-foreground">Upload high-quality photos to attract bidders</p>
+              </div>
 
               <AdminImageGallery
                 images={formData.images}
@@ -371,7 +380,14 @@ const AuctionForm: React.FC<AuctionFormProps> = ({
                 maxImages={8}
               />
 
-              {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
+              {errors.image && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700 flex items-center gap-2">
+                    <span className="text-red-500">⚠️</span>
+                    {errors.image}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Form Actions */}
