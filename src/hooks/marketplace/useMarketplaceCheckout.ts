@@ -19,7 +19,16 @@ export function useMarketplaceCheckout() {
     }
 
     if (data?.url) {
-      window.location.href = data.url;
+      // Open in new tab to bypass iframe restrictions
+      const newWindow = window.open(data.url, '_blank');
+      if (!newWindow) {
+        // Fallback: try to break out of iframe if popup blocked
+        if (window.top) {
+          window.top.location.href = data.url;
+        } else {
+          window.location.href = data.url;
+        }
+      }
     } else {
       throw new Error("No checkout URL returned from backend");
     }
