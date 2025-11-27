@@ -34,6 +34,7 @@ import MarketplaceIndex from "./pages/marketplace/MarketplaceIndex";
 import Auctions from "./pages/marketplace/Auctions";
 import AuctionDetail from "./pages/marketplace/AuctionDetail";
 import Shop from "./pages/marketplace/Shop";
+import BrandDetailPage from "./pages/marketplace/BrandDetailPage";
 import ProductDetail from "./pages/marketplace/ProductDetail";
 import Services from "./pages/marketplace/Services";
 import ServiceDetail from "./pages/marketplace/ServiceDetail";
@@ -184,6 +185,7 @@ const App = () => (
                   <Route path="auctions/:id" element={<AuctionDetail />} />
                   <Route path="shop" element={<Shop />} />
                   <Route path="shop/:id" element={<ProductDetail />} />
+                  <Route path="shop/brand/:brandName" element={<BrandDetailPage />} />
                   <Route path="services" element={<Services />} />
                   <Route path="services/:id" element={<ServiceDetail />} />
                   <Route path="portfolio-management" element={
