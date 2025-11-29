@@ -1,4 +1,3 @@
-import { supabaseAdmin } from '@/integrations/supabase/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { Participant, SocialLink, ParticipantMedia } from '@/types/admin';
 import type { Json } from '@/integrations/supabase/types';
