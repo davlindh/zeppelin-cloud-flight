@@ -21,7 +21,32 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Verify user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if user is admin
+    const { data: isAdmin } = await supabase
+      .rpc('has_role', { p_user_id: user.id, p_role: 'admin' });
+
     const { order_id } = await req.json();
 
     if (!order_id) {
@@ -31,10 +56,10 @@ serve(async (req) => {
       });
     }
 
-    // Get order
+    // Get order with user_id for ownership check
     const { data: order, error: orderError } = await supabase
       .from("orders")
-      .select("id, payment_intent_id, status")
+      .select("id, payment_intent_id, status, user_id")
       .eq("id", order_id)
       .single();
 
@@ -43,6 +68,14 @@ serve(async (req) => {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Verify user is admin or order owner
+    if (!isAdmin && order.user_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - You can only verify your own orders' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // If already paid, return success

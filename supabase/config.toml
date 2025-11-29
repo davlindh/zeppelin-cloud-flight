@@ -18,9 +18,6 @@ verify_jwt = false
 [functions.handle-donation-webhook]
 verify_jwt = false
 
-[functions.send-donation-receipt]
-verify_jwt = false
-
 [functions.handle-subscription-webhooks]
 verify_jwt = false
 
@@ -49,10 +46,4 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.create-payment-intent]
-verify_jwt = false
-
-[functions.send-order-confirmation]
-verify_jwt = false
-
-[functions.verify-order-payment]
 verify_jwt = false
