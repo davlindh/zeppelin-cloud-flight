@@ -1903,105 +1903,6 @@ export type Database = {
           },
         ]
       }
-      media_library_backup_20251018: {
-        Row: {
-          approved_at: string | null
-          bucket: string | null
-          category: string | null
-          created_at: string | null
-          description: string | null
-          duration: number | null
-          file_size: number | null
-          filename: string | null
-          height: number | null
-          id: string | null
-          is_featured: boolean | null
-          is_public: boolean | null
-          mime_type: string | null
-          original_filename: string | null
-          participant_id: string | null
-          project_id: string | null
-          public_url: string | null
-          search_vector: unknown
-          source: string | null
-          status: string | null
-          storage_path: string | null
-          submission_id: string | null
-          tags: string[] | null
-          thumbnail_url: string | null
-          title: string | null
-          type: string | null
-          updated_at: string | null
-          uploaded_at: string | null
-          uploaded_by: string | null
-          width: number | null
-        }
-        Insert: {
-          approved_at?: string | null
-          bucket?: string | null
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          duration?: number | null
-          file_size?: number | null
-          filename?: string | null
-          height?: number | null
-          id?: string | null
-          is_featured?: boolean | null
-          is_public?: boolean | null
-          mime_type?: string | null
-          original_filename?: string | null
-          participant_id?: string | null
-          project_id?: string | null
-          public_url?: string | null
-          search_vector?: unknown
-          source?: string | null
-          status?: string | null
-          storage_path?: string | null
-          submission_id?: string | null
-          tags?: string[] | null
-          thumbnail_url?: string | null
-          title?: string | null
-          type?: string | null
-          updated_at?: string | null
-          uploaded_at?: string | null
-          uploaded_by?: string | null
-          width?: number | null
-        }
-        Update: {
-          approved_at?: string | null
-          bucket?: string | null
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          duration?: number | null
-          file_size?: number | null
-          filename?: string | null
-          height?: number | null
-          id?: string | null
-          is_featured?: boolean | null
-          is_public?: boolean | null
-          mime_type?: string | null
-          original_filename?: string | null
-          participant_id?: string | null
-          project_id?: string | null
-          public_url?: string | null
-          search_vector?: unknown
-          source?: string | null
-          status?: string | null
-          storage_path?: string | null
-          submission_id?: string | null
-          tags?: string[] | null
-          thumbnail_url?: string | null
-          title?: string | null
-          type?: string | null
-          updated_at?: string | null
-          uploaded_at?: string | null
-          uploaded_by?: string | null
-          width?: number | null
-        }
-        Relationships: []
-      }
       media_participant_links: {
         Row: {
           category: string | null
@@ -2582,45 +2483,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      participant_media_backup_20251018: {
-        Row: {
-          category: string | null
-          created_at: string | null
-          description: string | null
-          id: string | null
-          participant_id: string | null
-          thumbnail_url: string | null
-          title: string | null
-          type: string | null
-          url: string | null
-          year: string | null
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          participant_id?: string | null
-          thumbnail_url?: string | null
-          title?: string | null
-          type?: string | null
-          url?: string | null
-          year?: string | null
-        }
-        Update: {
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          participant_id?: string | null
-          thumbnail_url?: string | null
-          title?: string | null
-          type?: string | null
-          url?: string | null
-          year?: string | null
-        }
-        Relationships: []
       }
       participant_media_links: {
         Row: {
@@ -3217,39 +3079,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      project_media_backup_20251018: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string | null
-          project_id: string | null
-          thumbnail_url: string | null
-          title: string | null
-          type: string | null
-          url: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          project_id?: string | null
-          thumbnail_url?: string | null
-          title?: string | null
-          type?: string | null
-          url?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          project_id?: string | null
-          thumbnail_url?: string | null
-          title?: string | null
-          type?: string | null
-          url?: string | null
-        }
-        Relationships: []
       }
       project_media_links: {
         Row: {
@@ -4694,17 +4523,20 @@ export type Database = {
       get_total_users_count: { Args: never; Returns: number }
       get_unified_admin_dashboard_stats: { Args: never; Returns: Json }
       get_zeppel_admin_stats: { Args: never; Returns: Json }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      has_role:
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["app_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | { Args: { p_role: string; p_user_id: string }; Returns: boolean }
       hash_device_fingerprint: {
         Args: { fingerprint: string }
         Returns: string
       }
+      is_admin: { Args: never; Returns: boolean }
       is_collaboration_admin: {
         Args: { p_project_id: string; p_user_id: string }
         Returns: boolean
