@@ -54,10 +54,6 @@ Deno.serve(async (req) => {
 
     const { submissionId, action, projectId, approveMedia = true }: ProcessSubmissionRequest = await req.json();
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     console.log(`📋 Processing submission ${submissionId} with action: ${action}`);
 
     // Fetch submission

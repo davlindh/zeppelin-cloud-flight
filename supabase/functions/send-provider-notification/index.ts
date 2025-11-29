@@ -61,14 +61,10 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
     const { providerId, type, data }: NotificationRequest = await req.json();
     
     console.log(`Processing ${type} notification for provider ${providerId}`);
-
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Get provider details and preferences
     const { data: provider, error: providerError } = await supabase
