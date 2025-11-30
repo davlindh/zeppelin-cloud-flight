@@ -4,6 +4,7 @@ import { useAdminAuth } from '@/hooks/marketplace/useAdminAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Shield, AlertTriangle, RefreshCw } from 'lucide-react';
+import { useRolePermissions } from '@/hooks/useRolePermissions';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -11,23 +12,26 @@ interface AdminRouteProps {
 
 export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const { user, isAdmin, isLoading, adminError } = useAdminAuth();
+  const { canAccessAdmin, isLoading: isLoadingPermissions } = useRolePermissions();
   const navigate = useNavigate();
   const [showExtendedLoading, setShowExtendedLoading] = useState(false);
 
+  const isCheckingAccess = isLoading || isLoadingPermissions;
+
   useEffect(() => {
     // Handle navigation based on auth state
-    if (!isLoading && !adminError) {
+    if (!isCheckingAccess && !adminError) {
       if (!user) {
         navigate('/auth', { replace: true });
-      } else if (!isAdmin) {
+      } else if (!canAccessAdmin) {
         navigate('/', { replace: true });
       }
     }
-  }, [isLoading, user, isAdmin, adminError, navigate]);
+  }, [isCheckingAccess, user, canAccessAdmin, adminError, navigate]);
 
   // Show extended loading message after 5 seconds
   useEffect(() => {
-    if (!isLoading) {
+    if (!isCheckingAccess) {
       setShowExtendedLoading(false);
       return;
     }
@@ -37,9 +41,9 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     }, 5000);
     
     return () => clearTimeout(timer);
-  }, [isLoading]);
+  }, [isCheckingAccess]);
 
-  if (isLoading) {
+  if (isCheckingAccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
         <div className="text-center space-y-6 max-w-md">
@@ -122,13 +126,13 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAdmin) {
+  if (!canAccessAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
         <Alert className="max-w-md" variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Access denied. You don't have admin privileges. Contact an administrator if you believe this is an error.
+            Access denied. You don't have admin or moderator privileges. Contact an administrator if you believe this is an error.
           </AlertDescription>
         </Alert>
       </div>

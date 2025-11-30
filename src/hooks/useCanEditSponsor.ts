@@ -1,4 +1,5 @@
 import { useUserRole } from './useUserRole';
+import { AppRole } from '@/types/roles';
 
 export const useCanEditSponsor = (sponsorId?: string) => {
   const { isAdmin, isLoading } = useUserRole();

@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
 import { useAdminCounts } from "@/hooks/useAdminCounts"
+import { useFilteredSidebarSections } from "@/hooks/useCanViewSection"
 
 const zeppelSections = [
   { title: "Inlämningar", path: "/admin/submissions", icon: MessageSquare, description: "Hantera inlämningar" },
@@ -95,6 +96,13 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
   const counts = useAdminCounts()
   const collapsed = state === 'collapsed'
 
+  // Filter sections based on permissions
+  const filteredZeppelSections = useFilteredSidebarSections(zeppelSections);
+  const filteredMarketplaceSections = useFilteredSidebarSections(marketplaceSections);
+  const filteredCommerceSections = useFilteredSidebarSections(commerceSections);
+  const filteredEventsSections = useFilteredSidebarSections(eventsSections);
+  const filteredCampaignsSections = useFilteredSidebarSections(campaignsSections);
+
   const isActive = (path: string) => {
     if (path === '/admin') {
       return location.pathname === '/admin'
@@ -124,6 +132,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
     <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
       <SidebarContent>
         {/* Zeppel Admin Section */}
+        {filteredZeppelSections.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
             Zeppel Admin
@@ -131,7 +140,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {zeppelSections.map((section) => {
+              {filteredZeppelSections.map((section) => {
                 const active = isActive(section.path)
                 
                 return (
@@ -161,8 +170,10 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
 
         {/* Marketplace Admin Section */}
+        {filteredMarketplaceSections.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
             Marketplace Admin
@@ -170,7 +181,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {marketplaceSections.map((section) => {
+              {filteredMarketplaceSections.map((section) => {
                 const badgeCount = getBadgeCount(section.path)
                 const active = isActive(section.path)
                 
@@ -208,7 +219,9 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
         {/* Commerce Admin Section */}
+        {filteredCommerceSections.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
             Commerce Admin
@@ -216,7 +229,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {commerceSections.map((section) => {
+              {filteredCommerceSections.map((section) => {
                 const badgeCount = getBadgeCount(section.path)
                 const active = isActive(section.path)
                 
@@ -254,8 +267,10 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
 
         {/* Events Management Section */}
+        {filteredEventsSections.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
             Events Management
@@ -263,7 +278,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {eventsSections.map((section) => {
+              {filteredEventsSections.map((section) => {
                 const badgeCount = section.badge ? getBadgeCount(section.path, section.badge) : 0
                 const active = isActive(section.path)
                 
@@ -304,8 +319,10 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
 
         {/* Funding Campaigns Section */}
+        {filteredCampaignsSections.length > 0 && (
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-muted-foreground">
             Funding Campaigns
@@ -313,7 +330,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {campaignsSections.map((section) => {
+              {filteredCampaignsSections.map((section) => {
                 const badgeCount = section.badge ? getBadgeCount(section.path, section.badge) : 0
                 const active = isActive(section.path)
                 
@@ -354,6 +371,7 @@ export function AppSidebarAdmin({ activeTab, onTabChange }: AppSidebarAdminProps
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   )

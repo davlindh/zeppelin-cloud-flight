@@ -21,6 +21,7 @@ interface DashboardHeroProps {
 
 const roleGreetings: Record<DashboardRole, string> = {
   admin: 'Admin Dashboard',
+  moderator: 'Moderator Dashboard',
   provider: 'Provider Dashboard',
   participant: 'Participant Hub',
   customer: 'My Dashboard',
