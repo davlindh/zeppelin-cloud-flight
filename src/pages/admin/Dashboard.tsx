@@ -21,10 +21,13 @@ import { AdminPerformanceCard } from '@/components/admin/dashboard/AdminPerforma
 import { RecentChangesTimeline } from '@/components/admin/dashboard/RecentChangesTimeline';
 import { KeyboardShortcutsModal } from '@/components/admin/dashboard/KeyboardShortcutsModal';
 import { useKeyboardShortcuts } from '@/hooks/admin/useKeyboardShortcuts';
+import { useRolePermissions } from '@/hooks/useRolePermissions';
+import { PERMISSIONS } from '@/types/permissions';
 
 export const Dashboard = () => {
   const { data: stats, isLoading, refetch } = useUnifiedDashboardStats();
   const { logAdminAction } = useAdminAuditLog();
+  const { hasPermission } = useRolePermissions();
   const [showShortcuts, setShowShortcuts] = useState(false);
   
   useKeyboardShortcuts(true, () => setShowShortcuts(true));
@@ -101,46 +104,50 @@ export const Dashboard = () => {
 
         {/* Performance & Health Row */}
         <div className="grid gap-4 md:grid-cols-2">
-          <AdminPerformanceCard />
-          <SystemHealthMonitor />
+          {hasPermission(PERMISSIONS.VIEW_ANALYTICS) && <AdminPerformanceCard />}
+          {hasPermission(PERMISSIONS.VIEW_SECURITY) && <SystemHealthMonitor />}
         </div>
 
         {/* Analytics Section */}
-        <AdminAnalyticsSection />
+        {hasPermission(PERMISSIONS.VIEW_ANALYTICS) && <AdminAnalyticsSection />}
 
         {/* Zeppel Stats */}
-        <ZeppelStatsSection stats={stats.zeppel} />
+        {hasPermission(PERMISSIONS.VIEW_PARTICIPANTS) && <ZeppelStatsSection stats={stats.zeppel} />}
 
         {/* Funding Stats */}
-        <FundingStatsSection stats={stats.funding} />
+        {hasPermission(PERMISSIONS.MANAGE_SETTINGS) && <FundingStatsSection stats={stats.funding} />}
 
         {/* Events Stats */}
-        <EventsStatsSection stats={stats.events} />
+        {hasPermission(PERMISSIONS.VIEW_EVENTS) && <EventsStatsSection stats={stats.events} />}
 
         {/* Marketplace Stats */}
-        <MarketplaceStatsSection stats={stats.marketplace} />
+        {hasPermission(PERMISSIONS.VIEW_PRODUCTS) && <MarketplaceStatsSection stats={stats.marketplace} />}
 
         {/* Services Stats */}
-        {stats.services && <ServicesStatsSection stats={stats.services} />}
+        {stats.services && hasPermission(PERMISSIONS.VIEW_PRODUCTS) && <ServicesStatsSection stats={stats.services} />}
 
         {/* Security & Activity Row */}
         <div className="grid gap-4 md:grid-cols-2">
-          <SecurityMetricsCard 
-            onViewDetails={handleSecurityClick}
-          />
-          <LiveActivityFeed 
-            onViewAll={handleActivityViewAll}
-          />
+          {hasPermission(PERMISSIONS.VIEW_SECURITY) && (
+            <SecurityMetricsCard 
+              onViewDetails={handleSecurityClick}
+            />
+          )}
+          {hasPermission(PERMISSIONS.VIEW_ACTIVITY_FEED) && (
+            <LiveActivityFeed 
+              onViewAll={handleActivityViewAll}
+            />
+          )}
         </div>
 
         {/* Alerts & Timeline */}
         <div className="grid gap-4 md:grid-cols-2">
-          <AlertsCenter onAlertAction={handleAlertAction} />
-          <RecentChangesTimeline />
+          {hasPermission(PERMISSIONS.VIEW_SECURITY) && <AlertsCenter onAlertAction={handleAlertAction} />}
+          {hasPermission(PERMISSIONS.VIEW_ACTIVITY_FEED) && <RecentChangesTimeline />}
         </div>
 
         {/* Data Hub */}
-        <AdminDataHub />
+        {hasPermission(PERMISSIONS.MANAGE_SETTINGS) && <AdminDataHub />}
       </div>
 
       {/* Keyboard Shortcuts Modal */}

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Briefcase, Users, ShoppingBag, Shield } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+import { AppRole, ROLE_CONFIG } from '@/types/roles';
 
 interface RoleSwitcherProps {
   roles: string[];
@@ -9,34 +10,6 @@ interface RoleSwitcherProps {
   onSwitch: (role: string) => void;
   actionCounts?: Record<string, number>;
 }
-
-const roleConfig = {
-  customer: {
-    icon: User,
-    label: 'Kund',
-    color: 'default' as const
-  },
-  provider: {
-    icon: Briefcase,
-    label: 'Tjänsteleverantör',
-    color: 'default' as const
-  },
-  participant: {
-    icon: Users,
-    label: 'Deltagare',
-    color: 'default' as const
-  },
-  seller: {
-    icon: ShoppingBag,
-    label: 'Säljare',
-    color: 'default' as const
-  },
-  admin: {
-    icon: Shield,
-    label: 'Admin',
-    color: 'destructive' as const
-  }
-};
 
 export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
   roles,
@@ -47,10 +20,10 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
   return (
     <div className="flex flex-wrap gap-2">
       {roles.map((role) => {
-        const config = roleConfig[role as keyof typeof roleConfig];
+        const config = ROLE_CONFIG[role as AppRole];
         if (!config) return null;
 
-        const Icon = config.icon;
+        const IconComponent = (LucideIcons as any)[config.icon];
         const isActive = activeRole === role;
         const actionCount = actionCounts[role] || 0;
 
@@ -61,8 +34,8 @@ export const RoleSwitcher: React.FC<RoleSwitcherProps> = ({
             onClick={() => onSwitch(role)}
             className="relative"
           >
-            <Icon className="h-4 w-4 mr-2" />
-            {config.label}
+            {IconComponent && <IconComponent className="h-4 w-4 mr-2" />}
+            {config.labelSv}
             {actionCount > 0 && (
               <Badge 
                 variant="destructive" 

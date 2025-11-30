@@ -1,6 +1,7 @@
 import { LucideIcon } from 'lucide-react';
+import { AppRole } from './roles';
 
-export type DashboardRole = 'admin' | 'provider' | 'participant' | 'customer';
+export type DashboardRole = AppRole;
 
 export interface QuickStat {
   label: string;

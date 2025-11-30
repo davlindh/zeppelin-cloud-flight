@@ -3579,6 +3579,39 @@ export type Database = {
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          constraints: Json | null
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          constraints?: Json | null
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          constraints?: Json | null
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          permission_key?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       service_portfolio_items: {
         Row: {
           after_image: string | null
@@ -4523,6 +4556,10 @@ export type Database = {
       get_total_users_count: { Args: never; Returns: number }
       get_unified_admin_dashboard_stats: { Args: never; Returns: Json }
       get_zeppel_admin_stats: { Args: never; Returns: Json }
+      has_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
       has_role:
         | {
             Args: {
