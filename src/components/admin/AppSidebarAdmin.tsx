@@ -22,7 +22,8 @@ import {
   CalendarCheck,
   Heart,
   TrendingDown,
-  Link2
+  Link2,
+  Key
 } from "lucide-react"
 import {
   Sidebar,
@@ -61,6 +62,7 @@ const marketplaceSections = [
   { title: "Providers", path: "/admin/providers", icon: Building, description: "Service providers" },
   { title: "Categories", path: "/admin/categories", icon: Tags, description: "Category management" },
   { title: "Brands", path: "/admin/brands", icon: Package, description: "Brand management" },
+  { title: "Permissions", path: "/admin/settings/permissions", icon: Key, description: "Role permissions" },
   { title: "Data Cleanup", path: "/admin/data-cleanup", icon: Shield, description: "Data quality tools" },
   { title: "Security", path: "/admin/security", icon: Shield, description: "Security overview" }
 ]
