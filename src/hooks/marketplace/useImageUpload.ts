@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { replaceImage, deleteImageSafely, getImageMetadata } from '@/utils/marketplace/imageManager';
 import { BUCKET_MAP } from '@/config/storage.config';
+import { useStoragePermissions } from '@/hooks/useStoragePermissions';
 
 interface UploadProgress {
   progress: number;
@@ -22,6 +23,7 @@ export const useImageUpload = () => {
     isUploading: false,
   });
   const { toast } = useToast();
+  const { canUploadToBucket, isLoading: permissionsLoading } = useStoragePermissions();
 
   // Camera capture function
   const captureImage = useCallback(async (): Promise<File | null> => {
@@ -131,6 +133,16 @@ export const useImageUpload = () => {
     folder: string = ''
   ): Promise<ImageUploadResult | null> => {
     try {
+      // Check storage permissions
+      if (!canUploadToBucket(bucket)) {
+        toast({
+          title: "Permission Denied",
+          description: "You don't have permission to upload to this storage bucket.",
+          variant: "destructive",
+        });
+        return null;
+      }
+
       setUploadProgress({ progress: 0, isUploading: true });
 
       // Optimize image first
@@ -186,7 +198,7 @@ export const useImageUpload = () => {
       
       return null;
     }
-  }, [optimizeImage, toast]);
+  }, [optimizeImage, toast, canUploadToBucket]);
 
   // Delete from Supabase Storage
   const deleteFromSupabase = useCallback(async (
@@ -332,5 +344,7 @@ export const useImageUpload = () => {
     replaceImageWithCleanup,
     getImageMetadata,
     deleteImageSafely,
+    canUploadToBucket,
+    permissionsLoading,
   };
 };

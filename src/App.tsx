@@ -122,6 +122,7 @@ const MediaLibraryPage = lazy(() => import("./pages/admin/MediaLibraryPage"));
 const SubmissionManagementPage = lazy(() => import("./pages/admin/SubmissionManagementPage"));
 const MediaSubmissionsPage = lazy(() => import("./pages/admin/MediaSubmissionsPage").then(m => ({ default: m.MediaSubmissionsPage })));
 const DonationsManagementPage = lazy(() => import("./pages/admin/DonationsManagementPage"));
+const RolePermissionsPage = lazy(() => import("./pages/admin/RolePermissionsPage").then(m => ({ default: m.RolePermissionsPage })));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-96">
@@ -394,6 +395,11 @@ const App = () => (
                   <Route path="settings" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <SettingsPage />
+                    </Suspense>
+                  } />
+                  <Route path="settings/permissions" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <RolePermissionsPage />
                     </Suspense>
                   } />
                   <Route path="settings/commissions" element={

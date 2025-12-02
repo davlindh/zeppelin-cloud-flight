@@ -56,6 +56,15 @@ export const PERMISSIONS = {
   MANAGE_PERMISSIONS: 'system.manage_permissions',
   VIEW_SECURITY: 'system.view_security',
   MANAGE_SETTINGS: 'system.manage_settings',
+  
+  // Storage Management
+  UPLOAD_MEDIA_FILES: 'storage.upload_media',
+  UPLOAD_DOCUMENTS: 'storage.upload_documents',
+  UPLOAD_PARTICIPANT_IMAGES: 'storage.upload_participants',
+  UPLOAD_PROJECT_IMAGES: 'storage.upload_projects',
+  UPLOAD_SPONSOR_LOGOS: 'storage.upload_sponsors',
+  UPLOAD_UI_ASSETS: 'storage.upload_ui',
+  MANAGE_STORAGE: 'storage.manage',
 } as const;
 
 export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS];
@@ -81,6 +90,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     PERMISSIONS.VIEW_PARTICIPANTS,
     // Activity visibility
     PERMISSIONS.VIEW_ACTIVITY_FEED,
+    // Storage access for event/media management
+    PERMISSIONS.UPLOAD_MEDIA_FILES,
   ],
   
   provider: [
@@ -89,12 +100,17 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
     PERMISSIONS.VIEW_ORDERS,
     PERMISSIONS.VIEW_AUCTIONS,
     PERMISSIONS.MANAGE_AUCTIONS,
+    // Storage for products
+    PERMISSIONS.UPLOAD_MEDIA_FILES,
   ],
   
   participant: [
     PERMISSIONS.VIEW_PROJECTS,
     PERMISSIONS.VIEW_PROJECT_ACTIVITY,
     PERMISSIONS.VIEW_EVENTS,
+    // Storage for project collaboration
+    PERMISSIONS.UPLOAD_MEDIA_FILES,
+    PERMISSIONS.UPLOAD_PARTICIPANT_IMAGES,
   ],
   
   customer: [], // Marketplace access only, no admin
@@ -345,5 +361,49 @@ export const PERMISSION_METADATA: Record<Permission, Omit<PermissionMetadata, 'k
     description: 'Can configure system settings',
     category: PERMISSION_CATEGORIES.SYSTEM,
     uiComponents: ['Settings pages', 'Configuration'],
+  },
+  
+  // Storage permissions
+  'storage.upload_media': {
+    label: 'Upload Media Files',
+    description: 'Can upload to media-files bucket',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['Media upload', 'File uploads'],
+  },
+  'storage.upload_documents': {
+    label: 'Upload Documents',
+    description: 'Can upload to documents bucket',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['Document upload'],
+  },
+  'storage.upload_participants': {
+    label: 'Upload Participant Images',
+    description: 'Can upload participant avatars',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['Participant images'],
+  },
+  'storage.upload_projects': {
+    label: 'Upload Project Images',
+    description: 'Can upload project images',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['Project images'],
+  },
+  'storage.upload_sponsors': {
+    label: 'Upload Sponsor Logos',
+    description: 'Can upload sponsor logos',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['Sponsor logos'],
+  },
+  'storage.upload_ui': {
+    label: 'Upload UI Assets',
+    description: 'Can upload UI assets',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['UI assets'],
+  },
+  'storage.manage': {
+    label: 'Manage All Storage',
+    description: 'Full storage management access',
+    category: PERMISSION_CATEGORIES.SYSTEM,
+    uiComponents: ['Storage management', 'All buckets'],
   },
 };
