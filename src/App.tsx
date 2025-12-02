@@ -113,6 +113,7 @@ const BookingsPage = lazy(() => import("./pages/admin/BookingsPage").then(m => (
 const CommunicationsPage = lazy(() => import("./pages/admin/CommunicationsPage").then(m => ({ default: m.CommunicationsPage })));
 const SecurityPage = lazy(() => import("./pages/admin/SecurityPage").then(m => ({ default: m.SecurityPage })));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage").then(m => ({ default: m.SettingsPage })));
+const RolePermissionsPage = lazy(() => import("./pages/admin/RolePermissionsPage").then(m => ({ default: m.RolePermissionsPage })));
 const DataCleanup = lazy(() => import("./pages/admin/DataCleanup").then(m => ({ default: m.DataCleanup })));
 const ParticipantsManagementPage = lazy(() => import("./pages/admin/ParticipantsManagementPage").then(m => ({ default: m.ParticipantsManagementPage })));
 const ProjectsManagementPage = lazy(() => import("./pages/admin/ProjectsManagementPage").then(m => ({ default: m.ProjectsManagementPage })));
@@ -167,6 +168,7 @@ const App = () => (
                 <Route path="/auctions/:id" element={<Navigate to="/marketplace/auctions/:id" replace />} />
                 <Route path="/services" element={<Navigate to="/marketplace/services" replace />} />
                 <Route path="/services/:id" element={<Navigate to="/marketplace/services/:id" replace />} />
+                <Route path="/checkout" element={<Navigate to="/marketplace/checkout" replace />} />
 
                 {/* Auth & Profile Completion */}
                 <Route path="/auth" element={<AuthPage />} />
@@ -397,6 +399,11 @@ const App = () => (
                   <Route path="settings/commissions" element={
                     <Suspense fallback={<LoadingFallback />}>
                       <CommissionSettings />
+                    </Suspense>
+                  } />
+                  <Route path="settings/permissions" element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <RolePermissionsPage />
                     </Suspense>
                   } />
                   <Route path="commerce/overview" element={

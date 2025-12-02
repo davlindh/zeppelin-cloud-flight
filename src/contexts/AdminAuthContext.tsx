@@ -11,6 +11,7 @@ interface AdminAuthContextType {
   signup: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
+  ensureAdminAuth: () => Promise<boolean>; // Ensure admin auth session is active
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -185,6 +186,30 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     }
   };
 
+  const ensureAdminAuth = async (): Promise<boolean> => {
+    try {
+      if (!session?.user || !isAdmin) {
+        return false;
+      }
+
+      // Ensure the admin session is active
+      const { data, error } = await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token!
+      });
+
+      if (error || !data.session) {
+        console.error('Failed to ensure admin auth:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error ensuring admin auth:', error);
+      return false;
+    }
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
@@ -202,7 +227,8 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
       login,
       signup,
       logout,
-      loading
+      loading,
+      ensureAdminAuth
     }}>
       {children}
     </AdminAuthContext.Provider>

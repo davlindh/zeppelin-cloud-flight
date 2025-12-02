@@ -183,7 +183,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
 
   const handleCheckout = () => {
     onClose();
-    navigate('/checkout');
+    navigate('/marketplace/checkout');
   };
 
   if (state.items.length === 0) {

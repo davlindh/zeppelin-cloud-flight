@@ -22,6 +22,7 @@ interface ImageProps {
   sizes?: string;
   width?: number;
   height?: number;
+  disableResponsive?: boolean; // Disable srcset for stable positioning
 }
 
 export const Image: React.FC<ImageProps> = ({
@@ -42,7 +43,8 @@ export const Image: React.FC<ImageProps> = ({
   onError,
   sizes,
   width,
-  height
+  height,
+  disableResponsive = false
 }) => {
   const [currentSrc, setCurrentSrc] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -106,8 +108,8 @@ export const Image: React.FC<ImageProps> = ({
     setIsLoading(false);
   };
 
-  // Generate srcSet for responsive images
-  const srcSet = isInView && processedSrc.includes('supabase.co/storage')
+  // Generate srcSet for responsive images (disabled if disableResponsive is true)
+  const srcSet = !disableResponsive && isInView && processedSrc.includes('supabase.co/storage')
     ? generateSrcSet(processedSrc)
     : undefined;
 

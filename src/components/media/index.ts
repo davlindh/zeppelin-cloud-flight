@@ -43,5 +43,9 @@ export { WorkflowStageCard } from './admin/WorkflowStageCard';
 // Main media management components
 export { MediaManager } from './MediaManager';
 
+// Advanced media gallery with performance & accessibility
+export { SmartMediaGallery } from './SmartMediaGallery';
+export { SmartMediaWrapper } from './SmartMediaWrapper'; // Gradual migration wrapper
+
 // Specialized image component with lazy loading and Supabase integration
 export { Image } from './Image';

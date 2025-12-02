@@ -8,6 +8,10 @@ const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''
 );
 
+if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
+  console.error('VITE_STRIPE_PUBLISHABLE_KEY is not set. Stripe integration will not work.');
+}
+
 interface StripeProviderProps {
   children: ReactNode;
 }

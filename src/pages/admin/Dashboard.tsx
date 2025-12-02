@@ -22,6 +22,7 @@ import { RecentChangesTimeline } from '@/components/admin/dashboard/RecentChange
 import { KeyboardShortcutsModal } from '@/components/admin/dashboard/KeyboardShortcutsModal';
 import { useKeyboardShortcuts } from '@/hooks/admin/useKeyboardShortcuts';
 import { useRolePermissions } from '@/hooks/useRolePermissions';
+import { useDashboardSectionVisibility } from '@/hooks/useOptimizedDashboardStats';
 import { PERMISSIONS } from '@/types/permissions';
 
 export const Dashboard = () => {

@@ -140,6 +140,9 @@ export const SIDEBAR_PERMISSION_MAP: Record<string, Permission> = {
   // Campaigns Section
   '/admin/campaigns': PERMISSIONS.MANAGE_SETTINGS,
   '/admin/campaigns/linkage': PERMISSIONS.MANAGE_SETTINGS,
+
+  // System Settings Section
+  '/admin/settings/permissions': PERMISSIONS.MANAGE_PERMISSIONS,
 };
 
 // Map dashboard components to required permissions

@@ -166,15 +166,13 @@ const CheckoutContent = () => {
             )}
 
             {currentStep === 'payment' && shippingInfo && (
-              <StripeProvider>
-                <PaymentFormStripe
-                  clientSecret={clientSecret}
-                  amount={Math.round(state.total * 100)} // Convert to cents
-                  currency="SEK"
-                  onSuccess={() => navigate('/marketplace/order-success?view=success')}
-                  onError={(error) => console.error('Payment error:', error)}
-                />
-              </StripeProvider>
+              <PaymentFormStripe
+                clientSecret={clientSecret}
+                amount={Math.round(state.total * 100)} // Convert to cents
+                currency="SEK"
+                onSuccess={() => navigate('/marketplace/order-success?view=success')}
+                onError={(error) => console.error('Payment error:', error)}
+              />
             )}
 
             {currentStep === 'review' && shippingInfo && paymentInfo && (() => {

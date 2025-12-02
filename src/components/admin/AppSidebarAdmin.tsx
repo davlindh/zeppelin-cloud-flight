@@ -68,6 +68,7 @@ const marketplaceSections = [
 const commerceSections = [
   { title: "Commerce Overview", path: "/admin/commerce/overview", icon: TrendingUp, description: "Sales & revenue dashboard" },
   { title: "Commission Settings", path: "/admin/settings/commissions", icon: Percent, description: "Manage commission rules" },
+  { title: "Role Permissions", path: "/admin/settings/permissions", icon: Shield, description: "Manage user roles & access" },
   { title: "Seller Management", path: "/admin/commerce/sellers", icon: ShoppingBag, description: "Manage sellers & payouts" },
   { title: "Event Analytics", path: "/admin/commerce/events", icon: Calendar, description: "Sales per event" },
 ]
