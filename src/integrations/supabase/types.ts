@@ -4442,6 +4442,10 @@ export type Database = {
       }
       can_edit_project: { Args: { _project_id: string }; Returns: boolean }
       can_edit_sponsor: { Args: { _sponsor_id: string }; Returns: boolean }
+      can_upload_to_bucket: {
+        Args: { _bucket_name: string; _user_id: string }
+        Returns: boolean
+      }
       check_in_ticket_by_qr: { Args: { p_qr_code: string }; Returns: Json }
       claim_participant_profile: {
         Args: { _participant_id: string; _user_email: string; _user_id: string }
@@ -4521,6 +4525,10 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: undefined
       }
+      get_admin_action_items: { Args: never; Returns: Json }
+      get_admin_commerce_stats: { Args: never; Returns: Json }
+      get_admin_events_stats: { Args: never; Returns: Json }
+      get_admin_security_stats: { Args: never; Returns: Json }
       get_available_times: {
         Args: { selected_date: string; service_uuid: string }
         Returns: string[]
