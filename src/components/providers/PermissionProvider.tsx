@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CachePermissionDialog } from '@/components/ui/CachePermissionDialog';
-import { usePermissions } from '@/hooks/usePermissions';
+import { useBrowserPermissions } from '@/hooks/useBrowserPermissions';
 import { useCacheManager } from '@/hooks/useFileCache';
 
 interface PermissionContextValue {
@@ -32,7 +32,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
     requestNotificationPermission, 
     requestStoragePermission,
     requestGeolocationPermission 
-  } = usePermissions();
+  } = useBrowserPermissions();
   
   const { grantPermission, hasConsent } = useCacheManager();
 
