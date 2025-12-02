@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 
 interface RoleProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole: 'admin' | 'provider' | 'customer' | 'participant';
+  requiredRole: 'admin' | 'moderator' | 'provider' | 'customer' | 'participant';
   fallbackPath?: string;
   showUnauthorized?: boolean;
 }
