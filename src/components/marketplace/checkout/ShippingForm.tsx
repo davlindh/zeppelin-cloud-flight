@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ShippingInfo } from '@/pages/marketplace/CheckoutPage';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 const shippingSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -19,10 +19,11 @@ const shippingSchema = z.object({
 
 interface ShippingFormProps {
   initialData: ShippingInfo | null;
-  onSubmit: (data: ShippingInfo) => void;
+  onSubmit: (data: ShippingInfo) => void | Promise<void>;
+  isLoading?: boolean;
 }
 
-export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
+export const ShippingForm = ({ initialData, onSubmit, isLoading }: ShippingFormProps) => {
   const {
     register,
     handleSubmit,
@@ -156,9 +157,18 @@ export const ShippingForm = ({ initialData, onSubmit }: ShippingFormProps) => {
         </div>
       </div>
 
-      <Button type="submit" className="w-full" size="lg">
-        Continue to Payment
-        <ArrowRight className="ml-2 h-4 w-4" />
+      <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Setting up payment...
+          </>
+        ) : (
+          <>
+            Continue to Payment
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </>
+        )}
       </Button>
     </form>
   );
