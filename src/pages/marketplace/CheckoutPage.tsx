@@ -51,21 +51,30 @@ export interface PaymentInfo {
 }
 
 export const CheckoutPage = () => {
+  const [clientSecret, setClientSecret] = useState<string>('');
+
   return (
-    <StripeProvider>
-      <CheckoutContent />
+    <StripeProvider clientSecret={clientSecret || undefined}>
+      <CheckoutContent clientSecret={clientSecret} setClientSecret={setClientSecret} />
     </StripeProvider>
   );
 };
 
-const CheckoutContent = () => {
+const CheckoutContent = ({ 
+  clientSecret, 
+  setClientSecret 
+}: { 
+  clientSecret: string; 
+  setClientSecret: (secret: string) => void;
+}) => {
   const navigate = useNavigate();
   const { state } = useCart();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('shipping');
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
-  const [clientSecret, setClientSecret] = useState<string>('');
 
+  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
+  
   const { placeOrder, isPlacing } = useCheckout();
 
   // Redirect if cart is empty
@@ -74,23 +83,17 @@ const CheckoutContent = () => {
     return null;
   }
 
-  const handleShippingSubmit = (data: ShippingInfo) => {
+  const handleShippingSubmit = async (data: ShippingInfo) => {
     setShippingInfo(data);
-    setCurrentStep('payment');
-  };
-
-  const handlePaymentSubmit = async (data: PaymentInfo) => {
-    setPaymentInfo(data);
-
-    // Create order first
-    if (!shippingInfo) return;
-
-    const pricing = calculatePricing(state.total, shippingInfo.country);
+    setIsCreatingPayment(true);
+    
+    const pricing = calculatePricing(state.total, data.country);
 
     try {
+      // Create order first
       const orderResult = await placeOrder({
-        shippingInfo,
-        paymentInfo: data,
+        shippingInfo: data,
+        paymentInfo: { method: 'card' },
         items: state.items,
         subtotal: pricing.subtotal,
         taxAmount: pricing.taxAmount,
@@ -107,14 +110,16 @@ const CheckoutContent = () => {
       if (error) throw error;
 
       setClientSecret(paymentResult.clientSecret);
-      setCurrentStep('review');
+      setCurrentStep('payment');
     } catch (error) {
       console.error('Error setting up payment:', error);
+    } finally {
+      setIsCreatingPayment(false);
     }
   };
 
   const handlePlaceOrder = () => {
-    if (!shippingInfo || !paymentInfo || !clientSecret) return;
+    if (!shippingInfo || !clientSecret) return;
 
     const pricing = calculatePricing(state.total, shippingInfo.country);
 
@@ -162,10 +167,11 @@ const CheckoutContent = () => {
               <ShippingForm
                 initialData={shippingInfo}
                 onSubmit={handleShippingSubmit}
+                isLoading={isCreatingPayment}
               />
             )}
 
-            {currentStep === 'payment' && shippingInfo && (
+            {currentStep === 'payment' && shippingInfo && clientSecret && (
               <PaymentFormStripe
                 clientSecret={clientSecret}
                 amount={Math.round(state.total * 100)} // Convert to cents
@@ -173,6 +179,13 @@ const CheckoutContent = () => {
                 onSuccess={() => navigate('/marketplace/order-success?view=success')}
                 onError={(error) => console.error('Payment error:', error)}
               />
+            )}
+            
+            {currentStep === 'payment' && shippingInfo && !clientSecret && (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2">Setting up payment...</span>
+              </div>
             )}
 
             {currentStep === 'review' && shippingInfo && paymentInfo && (() => {
