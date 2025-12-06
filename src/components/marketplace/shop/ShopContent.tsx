@@ -5,17 +5,23 @@ import { useProductComparison } from '@/hooks/marketplace/useProductComparison';
 import { sortProductsByAnalytics } from '@/utils/marketplace/productUtils';
 import { ShopProductGrid } from './ShopProductGrid';
 import { CategoryBrowser } from './CategoryBrowser';
-import { AdvancedFilters } from './AdvancedFilters';
 import { ActiveFilterChips } from './ActiveFilterChips';
 import { ShopResultsSummary } from './ShopResultsSummary';
 import { SearchResultContext } from './SearchResultContext';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ShopContentProps {
   availableBrands: string[];
-  eventFilter?: string;
 }
 
-export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, eventFilter }) => {
+export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands }) => {
   const { state, dispatch, hasActiveFilters } = useShop();
   const {
     addToComparison,
@@ -25,7 +31,7 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, event
   // Intelligent category suggestion based on search
   const getCategorySuggestion = (searchTerm: string): string | undefined => {
     const term = searchTerm.toLowerCase();
-    const categoryMappings = {
+    const categoryMappings: Record<string, string> = {
       'phone': 'Electronics',
       'laptop': 'Electronics', 
       'computer': 'Electronics',
@@ -67,83 +73,47 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, event
 
   // Flatten all pages into single array
   const products = React.useMemo(() => {
-    const allProducts = infiniteData?.pages.flatMap(page => page.products) || [];
-    // Apply event filter if provided
-    if (!eventFilter) return allProducts;
-    return allProducts.filter(p => (p as any).eventId === eventFilter);
-  }, [infiniteData, eventFilter]);
-
-  // Debug logging for data pipeline
-  React.useEffect(() => {
-    console.log('ShopContent Debug:', {
-      selectedCategory: state.selectedCategory,
-      searchTerm: state.searchTerm,
-      filters: state.filters,
-      rawProductsCount: products.length,
-      productsLoading,
-      productsError,
-      products: products.slice(0, 3) // Log first 3 products for inspection
-    });
-  }, [state.selectedCategory, state.searchTerm, state.filters, products, productsLoading, productsError]);
+    return infiniteData?.pages.flatMap(page => page.products) || [];
+  }, [infiniteData]);
 
   // Apply additional filters and sorting
   const filteredAndSortedProducts = React.useMemo(() => {
-    console.log('Starting filteredAndSortedProducts with:', {
-      initialProductsCount: products.length,
-      filters: state.filters,
-      sortBy: state.sortBy
-    });
-
     let filtered = [...products];
 
     // Apply brand filter
     if (state.filters.brands.length > 0) {
-      const beforeBrandFilter = filtered.length;
-      filtered = filtered.filter(product => {
-        const hasValidBrand = product.brand && state.filters.brands.includes(product.brand);
-        if (!hasValidBrand && beforeBrandFilter <= 5) {
-          console.log('Product filtered out by brand:', {
-            productTitle: product.title,
-            productBrand: product.brand,
-            requiredBrands: state.filters.brands
-          });
-        }
-        return hasValidBrand;
-      });
-      console.log(`Brand filter: ${beforeBrandFilter} -> ${filtered.length} products`);
+      filtered = filtered.filter(product => 
+        product.brand && state.filters.brands.includes(product.brand)
+      );
     }
 
     // Apply rating filter
     if (state.filters.rating > 0) {
-      const beforeRatingFilter = filtered.length;
       filtered = filtered.filter(product => 
         product.rating >= state.filters.rating
       );
-      console.log(`Rating filter: ${beforeRatingFilter} -> ${filtered.length} products`);
     }
 
-    console.log('Final filtered products:', {
-      count: filtered.length,
-      products: filtered.slice(0, 3).map(p => ({ id: p.id, title: p.title, brand: p.brand, price: p.price }))
-    });
-
     // Apply sorting
-    return ['trending', 'best-deals', 'popularity', 'stock-velocity'].includes(state.sortBy) ? sortProductsByAnalytics(filtered, state.sortBy) : filtered.sort((a, b) => {
-        switch (state.sortBy) {
-          case 'price-low':
-            return a.price - b.price;
-          case 'price-high':
-            return b.price - a.price;
-          case 'rating':
-            return b.rating - a.rating;
-          default:
-            return new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime();
-        }
-      });
+    if (['trending', 'best-deals', 'popularity', 'stock-velocity'].includes(state.sortBy)) {
+      return sortProductsByAnalytics(filtered, state.sortBy);
+    }
+
+    return filtered.sort((a, b) => {
+      switch (state.sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'rating':
+          return b.rating - a.rating;
+        default:
+          return new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime();
+      }
+    });
   }, [products, state.filters, state.sortBy]);
 
   const handleQuickView = (productId: string) => {
-    // This will be handled by parent component
     console.log('Quick view:', productId);
   };
 
@@ -151,13 +121,6 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, event
     dispatch({ 
       type: 'SET_FILTERS', 
       payload: { brands: [brand] }
-    });
-  };
-
-  const handleFiltersChange = (newFilters: Partial<{ priceRange: [number, number]; brands: string[]; inStockOnly: boolean; rating: number; }>) => {
-    dispatch({ 
-      type: 'SET_FILTERS', 
-      payload: newFilters 
     });
   };
 
@@ -173,12 +136,22 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, event
   };
 
   const handleCategorySelect = (category: string) => {
-    console.log('ShopContent: handleCategorySelect with:', category);
-    dispatch({ 
-      type: 'SET_CATEGORY', 
-      payload: category 
-    });
+    dispatch({ type: 'SET_CATEGORY', payload: category });
   };
+
+  const handleSortChange = (sortBy: string) => {
+    dispatch({ type: 'SET_SORT_BY', payload: sortBy });
+  };
+
+  const sortOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'trending', label: 'Trending Now' },
+    { value: 'best-deals', label: 'Best Deals' },
+    { value: 'popularity', label: 'Most Popular' },
+    { value: 'price-low', label: 'Price: Low to High' },
+    { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'rating', label: 'Highest Rated' }
+  ];
 
   // Browse mode: show compact categories (only when not showing all products)
   if (state.view === 'browse' && state.selectedCategory !== 'all') {
@@ -197,75 +170,68 @@ export const ShopContent: React.FC<ShopContentProps> = ({ availableBrands, event
     );
   }
 
-  // Search/Filtered mode: show products with simplified filters
   return (
     <div className="animate-fade-in">
-      <div className="flex gap-6">
-        {/* Compact Filters Sidebar - Only show if we have products */}
-        {filteredAndSortedProducts.length > 0 && (
-          <aside className="hidden lg:block lg:sticky lg:top-20 lg:h-[calc(100vh-6rem)] lg:overflow-y-auto">
-            <div className="w-64">
-              <div className="p-4 rounded-lg bg-card border border-border shadow-sm">
-                <h3 className="text-sm font-semibold mb-4 text-foreground">Filters</h3>
-                <AdvancedFilters
-                  filters={state.filters}
-                  onFiltersChange={handleFiltersChange}
-                  availableBrands={availableBrands}
-                />
-              </div>
-            </div>
-          </aside>
-        )}
+      {/* Search Result Context */}
+      {state.searchTerm && (
+        <SearchResultContext
+          searchTerm={state.searchTerm}
+          productsCount={filteredAndSortedProducts.length}
+          suggestedCategory={getCategorySuggestion(state.searchTerm)}
+          onCategorySelect={handleCategorySelect}
+        />
+      )}
 
-        {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
-          {/* Search Result Context */}
-          {state.searchTerm && (
-            <SearchResultContext
-              searchTerm={state.searchTerm}
-              productsCount={filteredAndSortedProducts.length}
-              suggestedCategory={getCategorySuggestion(state.searchTerm)}
-              onCategorySelect={handleCategorySelect}
-            />
-          )}
-          
-          {/* Active Filter Chips */}
-          {hasActiveFilters && (
-            <div className="mb-3">
-              <ActiveFilterChips
-                filters={state.filters}
-                onRemoveFilter={handleRemoveFilter}
-                onClearAll={handleClearAllFilters}
-              />
-            </div>
-          )}
-          
-          {/* Results Summary */}
-          {filteredAndSortedProducts.length > 0 && (
-            <div className="mb-3">
-              <ShopResultsSummary
-                productsCount={filteredAndSortedProducts.length}
-                sortBy={state.sortBy}
-              />
-            </div>
-          )}
-          
-          <ShopProductGrid
-            products={filteredAndSortedProducts}
-            isLoading={productsLoading}
-            isError={productsError}
-            isFetchingNextPage={isFetchingNextPage}
-            hasNextPage={hasNextPage}
-            fetchNextPage={fetchNextPage}
-            scrollMode="loadmore"
-            enableVirtualization={true}
-            handleQuickView={handleQuickView}
-            handleAddToComparison={addToComparison}
-            isInComparison={isInComparison}
-            onBrandClick={handleBrandFilter}
+      {/* Header with Sort and Count */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-border">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">
+            {state.selectedCategory !== 'all' ? state.selectedCategory : 'All Products'}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {filteredAndSortedProducts.length} products found
+          </p>
+        </div>
+        
+        <Select value={state.sortBy} onValueChange={handleSortChange}>
+          <SelectTrigger className="w-[180px] bg-background">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent className="bg-background border border-border z-50">
+            {sortOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      {/* Active Filter Chips */}
+      {hasActiveFilters && (
+        <div className="mb-4">
+          <ActiveFilterChips
+            filters={state.filters}
+            onRemoveFilter={handleRemoveFilter}
+            onClearAll={handleClearAllFilters}
           />
         </div>
-      </div>
+      )}
+      
+      <ShopProductGrid
+        products={filteredAndSortedProducts}
+        isLoading={productsLoading}
+        isError={productsError}
+        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
+        scrollMode="loadmore"
+        enableVirtualization={true}
+        handleQuickView={handleQuickView}
+        handleAddToComparison={addToComparison}
+        isInComparison={isInComparison}
+        onBrandClick={handleBrandFilter}
+      />
     </div>
   );
 };
