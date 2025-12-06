@@ -90,8 +90,8 @@ const CheckoutContent = ({
     const pricing = calculatePricing(state.total, data.country);
 
     try {
-      // Create order first
-      const orderResult = await placeOrder({
+      // Create order first - returns order ID
+      const orderId = await placeOrder({
         shippingInfo: data,
         paymentInfo: { method: paymentMethod },
         items: state.items,
@@ -101,10 +101,14 @@ const CheckoutContent = ({
         totalAmount: pricing.totalAmount,
       });
 
+      if (!orderId) {
+        throw new Error('Failed to create order');
+      }
+
       // Create PaymentIntent for Stripe Elements
       const { data: paymentResult, error } = await supabase.functions.invoke(
         'create-payment-intent',
-        { body: { order_id: orderResult } }
+        { body: { order_id: orderId } }
       );
 
       if (error) throw error;
