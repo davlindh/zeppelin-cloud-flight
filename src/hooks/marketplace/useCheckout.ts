@@ -23,7 +23,7 @@ export const useCheckout = () => {
   const { createCheckout } = useMarketplaceCheckout();
   const { toast } = useToast();
 
-  const placeOrder = async (checkoutData: CheckoutData): Promise<boolean> => {
+  const placeOrder = async (checkoutData: CheckoutData): Promise<string | null> => {
     setIsPlacing(true);
     try {
       // Separate product and ticket items
@@ -86,13 +86,8 @@ export const useCheckout = () => {
         items: orderItems,
       });
 
-      // Clear cart after order creation
-      clearCart();
-
-      // Redirect to Stripe checkout
-      await createCheckout({ orderId: orderResult.id });
-
-      return true;
+      // Return the order ID instead of boolean
+      return orderResult.id;
     } catch (error) {
       console.error('Checkout error:', error);
       toast({
@@ -100,7 +95,7 @@ export const useCheckout = () => {
         description: 'Kunde inte genomföra beställningen. Försök igen.',
         variant: 'destructive',
       });
-      return false;
+      return null;
     } finally {
       setIsPlacing(false);
     }
