@@ -7,9 +7,9 @@ import { Footer } from '@/components/layout/Footer';
 import { CheckoutProgress } from '@/components/marketplace/checkout/CheckoutProgress';
 import { ShippingForm } from '@/components/marketplace/checkout/ShippingForm';
 import { PaymentFormStripe } from '@/components/stripe/PaymentFormStripe';
+import { PaymentMethodSelector, PaymentMethod } from '@/components/marketplace/checkout/PaymentMethodSelector';
 import { OrderReview } from '@/components/marketplace/checkout/OrderReview';
 import { useCheckout } from '@/hooks/marketplace/useCheckout';
-import { useCreatePaymentIntent } from '@/hooks/usePaymentIntent';
 import { StripeProvider } from '@/components/stripe/StripeProvider';
 import { checkoutConfig, getTaxRate, getShippingCost, calculateTax } from '@/config/checkout.config';
 import { Card, CardContent } from '@/components/ui/card';
@@ -43,7 +43,7 @@ export interface ShippingInfo {
 }
 
 export interface PaymentInfo {
-  method: 'card' | 'klarna' | 'swish' | 'revolut';
+  method: PaymentMethod;
   cardNumber?: string;
   cardName?: string;
   cardExpiry?: string;
@@ -71,8 +71,8 @@ const CheckoutContent = ({
   const { state } = useCart();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('shipping');
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
-
   const [isCreatingPayment, setIsCreatingPayment] = useState(false);
   
   const { placeOrder, isPlacing } = useCheckout();
@@ -93,7 +93,7 @@ const CheckoutContent = ({
       // Create order first
       const orderResult = await placeOrder({
         shippingInfo: data,
-        paymentInfo: { method: 'card' },
+        paymentInfo: { method: paymentMethod },
         items: state.items,
         subtotal: pricing.subtotal,
         taxAmount: pricing.taxAmount,
@@ -120,11 +120,7 @@ const CheckoutContent = ({
 
   const handlePlaceOrder = () => {
     if (!shippingInfo || !clientSecret) return;
-
-    const pricing = calculatePricing(state.total, shippingInfo.country);
-
-    // The actual payment will be handled by PaymentFormStripe component
-    // This just prepares the order UI
+    setPaymentInfo({ method: paymentMethod });
     setCurrentStep('review');
   };
 
@@ -153,7 +149,7 @@ const CheckoutContent = ({
             Back
           </Button>
 
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Checkout</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-foreground">Checkout</h1>
           <p className="text-muted-foreground">
             Complete your order in just a few steps
           </p>
@@ -161,7 +157,7 @@ const CheckoutContent = ({
 
         <CheckoutProgress currentStep={currentStep} />
 
-        <Card className="mt-8">
+        <Card className="mt-8 bg-card border-border">
           <CardContent className="p-6">
             {currentStep === 'shipping' && (
               <ShippingForm
@@ -171,20 +167,29 @@ const CheckoutContent = ({
               />
             )}
 
-            {currentStep === 'payment' && shippingInfo && clientSecret && (
-              <PaymentFormStripe
-                clientSecret={clientSecret}
-                amount={Math.round(state.total * 100)} // Convert to cents
-                currency="SEK"
-                onSuccess={() => navigate('/marketplace/order-success?view=success')}
-                onError={(error) => console.error('Payment error:', error)}
-              />
-            )}
-            
-            {currentStep === 'payment' && shippingInfo && !clientSecret && (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2">Setting up payment...</span>
+            {currentStep === 'payment' && shippingInfo && (
+              <div className="space-y-6">
+                {/* Payment Method Selector */}
+                <PaymentMethodSelector
+                  selectedMethod={paymentMethod}
+                  onMethodChange={setPaymentMethod}
+                />
+
+                {/* Stripe Payment Form */}
+                {clientSecret ? (
+                  <PaymentFormStripe
+                    clientSecret={clientSecret}
+                    amount={Math.round(state.total * 100)}
+                    currency="SEK"
+                    onSuccess={() => navigate('/marketplace/order-success?view=success')}
+                    onError={(error) => console.error('Payment error:', error)}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="ml-2 text-muted-foreground">Setting up payment...</span>
+                  </div>
+                )}
               </div>
             )}
 

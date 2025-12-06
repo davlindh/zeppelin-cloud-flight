@@ -12,7 +12,7 @@ import type { PaymentInfo } from '@/pages/marketplace/CheckoutPage';
 import { CreditCard, Wallet, Smartphone, ArrowRight, Loader2 } from 'lucide-react';
 
 const paymentSchema = z.object({
-  method: z.enum(['card', 'klarna', 'swish', 'revolut']),
+  method: z.enum(['card', 'klarna', 'swish']),
   cardNumber: z.string().optional(),
   cardName: z.string().optional(),
   cardExpiry: z.string().optional(),
@@ -143,20 +143,6 @@ export const PaymentForm = ({ initialData, onSubmit }: PaymentFormProps) => {
             </Label>
           </div>
 
-          <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors">
-            <RadioGroupItem value="revolut" id="revolut" />
-            <Label htmlFor="revolut" className="flex items-center flex-1 cursor-pointer">
-              <div className="flex items-center w-full">
-                <div className="h-5 w-5 mr-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded flex-shrink-0" />
-                <div className="min-w-0">
-                  <p className="font-medium text-sm sm:text-base">Revolut Pay</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Fast & secure payment
-                  </p>
-                </div>
-              </div>
-            </Label>
-          </div>
         </RadioGroup>
 
         {selectedMethod === 'card' && (
@@ -268,21 +254,6 @@ export const PaymentForm = ({ initialData, onSubmit }: PaymentFormProps) => {
           </div>
         )}
 
-        {selectedMethod === 'revolut' && (
-          <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
-            <div className="flex items-start space-x-2">
-              <div className="h-5 w-5 bg-gradient-to-br from-blue-500 to-purple-600 rounded flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-blue-900">
-                  Revolut Pay
-                </p>
-                <p className="text-xs text-blue-700 mt-1">
-                  Revolutionary payment method coming soon. Fast, secure, and global.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         <Button 
           type="submit" 
