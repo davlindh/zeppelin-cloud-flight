@@ -18,8 +18,8 @@ export const HeroShowcaseOverlay: React.FC<HeroShowcaseOverlayProps> = ({ classN
     visibility: 'public',
   });
 
-  // Fetch upcoming events
-  const { data: events } = useEvents();
+  // Fetch upcoming published events only
+  const { data: events } = useEvents({ status: 'published' });
 
   const featuredCampaign = React.useMemo(() => {
     if (!campaigns || campaigns.length === 0) return null;

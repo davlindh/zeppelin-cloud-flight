@@ -12,7 +12,8 @@ import { EventTicketOrdersTab } from "@/components/admin/events/EventTicketOrder
 import { EventCampaignsTab } from "@/components/admin/events/EventCampaignsTab";
 import { EventCheckInTab } from "@/components/admin/events/EventCheckInTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket, Target, ScanLine } from "lucide-react";
+import { ArrowLeft, Edit, QrCode, Users, CheckCircle2, Clock, AlertCircle, Ticket, Target, ScanLine, Settings } from "lucide-react";
+import { EventEditForm } from "@/components/admin/events/EventEditForm";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/events";
 
@@ -101,7 +102,14 @@ const EventOpsPage: React.FC = () => {
               <QrCode className="mr-1 h-4 w-4" />
               Check-in mode
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                const editTab = document.querySelector('[data-state="inactive"][value="edit"]') as HTMLElement;
+                editTab?.click();
+              }}
+            >
               <Edit className="mr-1 h-4 w-4" />
               Edit event
             </Button>
@@ -189,6 +197,10 @@ const EventOpsPage: React.FC = () => {
               <Clock className="mr-2 h-4 w-4" />
               Details
             </TabsTrigger>
+            <TabsTrigger value="edit">
+              <Settings className="mr-2 h-4 w-4" />
+              Edit
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="registrations" className="mt-6">
@@ -259,6 +271,10 @@ const EventOpsPage: React.FC = () => {
                 <EventTimeline event={event} />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="edit" className="mt-6">
+            <EventEditForm event={event} />
           </TabsContent>
         </Tabs>
       </div>
