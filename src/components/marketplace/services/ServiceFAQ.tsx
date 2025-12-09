@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import {
   Accordion,
   AccordionContent,
@@ -44,7 +45,9 @@ export const ServiceFAQ: React.FC<ServiceFAQProps> = ({
               <AccordionContent className="text-muted-foreground">
                 <div 
                   className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: faq.answer }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(faq.answer) 
+                  }}
                 />
               </AccordionContent>
             </AccordionItem>
