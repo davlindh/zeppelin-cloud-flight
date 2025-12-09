@@ -106,9 +106,10 @@ const CheckoutContent = ({
       }
 
       // Create PaymentIntent for Stripe Elements
+      // Pass customer_email for guest order verification
       const { data: paymentResult, error } = await supabase.functions.invoke(
         'create-payment-intent',
-        { body: { order_id: orderId } }
+        { body: { order_id: orderId, customer_email: data.email } }
       );
 
       if (error) throw error;
