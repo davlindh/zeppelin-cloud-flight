@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFaveScore } from '@/hooks/funding/useFaveScore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { FaveScoreBadge } from './FaveScoreBadge';
+import { UserReputationBadge } from './UserReputationBadge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { User, Loader2 } from 'lucide-react';
@@ -77,7 +77,7 @@ export const CampaignCreatorCard: React.FC<CampaignCreatorCardProps> = ({ creato
 
         {faveScore && (
           <div className="flex justify-center">
-            <FaveScoreBadge 
+            <UserReputationBadge 
               score={faveScore.total_score} 
               level={faveScore.level}
               size="md"

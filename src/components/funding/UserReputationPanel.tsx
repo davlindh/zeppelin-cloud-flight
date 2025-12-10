@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FaveScoreBadge } from './FaveScoreBadge';
-import { ScoreHistory } from './ScoreHistory';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Eye, EyeOff, Sparkles, TrendingUp, Trophy, History } from 'lucide-react';
+import { UserReputationBadge } from './UserReputationBadge';
+import { ReputationHistory } from './ReputationHistory';
+import { Eye, EyeOff, Sparkles, Trophy, History } from 'lucide-react';
 import { useFaveScore } from '@/hooks/funding/useFaveScore';
 
-interface EnhancedUserScoreProps {
+interface UserReputationPanelProps {
   userId: string;
   className?: string;
 }
 
-export const EnhancedUserScore: React.FC<EnhancedUserScoreProps> = ({
+export const UserReputationPanel: React.FC<UserReputationPanelProps> = ({
   userId,
   className
 }) => {
@@ -73,7 +71,7 @@ export const EnhancedUserScore: React.FC<EnhancedUserScoreProps> = ({
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <FaveScoreBadge
+              <UserReputationBadge
                 score={score?.total_score || 0}
                 level={score?.level}
                 size="lg"
@@ -171,7 +169,7 @@ export const EnhancedUserScore: React.FC<EnhancedUserScoreProps> = ({
               </TabsContent>
 
               <TabsContent value="history" className="mt-4">
-                <ScoreHistory userId={userId} />
+                <ReputationHistory userId={userId} />
               </TabsContent>
             </Tabs>
           )}

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useParticipantPerformance } from '@/hooks/marketplace/participant/useParticipantPerformance';
 import { useFaveScore } from '@/hooks/funding/useFaveScore';
-import { FaveScoreBadge } from '@/components/funding/FaveScoreBadge';
+import { UserReputationBadge } from '@/components/funding/UserReputationBadge';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -138,7 +138,7 @@ export const ParticipantHero: React.FC = () => {
                   </span>
                 )}
                 {faveScore && (
-                  <FaveScoreBadge 
+                  <UserReputationBadge 
                     score={faveScore.total_score} 
                     level={faveScore.level}
                     size="sm"

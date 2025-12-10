@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { RoleBadges } from '@/components/ui/role-badges';
-import { FaveScoreBadge } from '@/components/funding/FaveScoreBadge';
+import { UserReputationBadge } from '@/components/funding/UserReputationBadge';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useFaveScore } from '@/hooks/funding/useFaveScore';
 import { getUserInitials } from '@/utils/transforms/profile';
@@ -39,7 +39,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
               <h1 className="text-3xl font-bold">{displayName}</h1>
               <RoleBadges roles={roles as string[]} size="sm" />
               {faveScore && (
-                <FaveScoreBadge 
+                <UserReputationBadge 
                   score={faveScore.total_score} 
                   level={faveScore.level}
                   size="sm"

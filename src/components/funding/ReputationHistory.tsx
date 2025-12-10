@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-interface ScoreHistoryProps {
+interface ReputationHistoryProps {
   userId: string;
   className?: string;
 }
@@ -24,7 +24,7 @@ interface ScoreTransaction {
   metadata?: any;
 }
 
-export const ScoreHistory: React.FC<ScoreHistoryProps> = ({ userId, className }) => {
+export const ReputationHistory: React.FC<ReputationHistoryProps> = ({ userId, className }) => {
   const [timeFilter, setTimeFilter] = useState('all');
 
   const { data: transactions, isLoading } = useQuery({
