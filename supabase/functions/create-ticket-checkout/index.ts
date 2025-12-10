@@ -84,8 +84,12 @@ serve(async (req) => {
     }
 
     // Use price from ticket type (DB) not client
-    const unitAmount = Math.round((order.ticket_type?.price ?? order.unit_price) * 100);
-    const currency = (order.ticket_type?.currency || order.currency || "SEK").toLowerCase();
+    // Handle Supabase join returning array for relations
+    const ticketType = Array.isArray(order.ticket_type) ? order.ticket_type[0] : order.ticket_type;
+    const event = Array.isArray(order.event) ? order.event[0] : order.event;
+    
+    const unitAmount = Math.round((ticketType?.price ?? order.unit_price) * 100);
+    const currency = (ticketType?.currency || order.currency || "SEK").toLowerCase();
 
     console.log("[create-ticket-checkout] Creating checkout session:", {
       quantity: order.quantity,
@@ -104,7 +108,7 @@ serve(async (req) => {
             currency,
             unit_amount: unitAmount,
             product_data: {
-              name: order.ticket_type?.name || `Ticket to ${order.event?.title ?? "event"}`,
+              name: ticketType?.name || `Ticket to ${event?.title ?? "event"}`,
               metadata: {
                 event_id: order.event_id,
                 ticket_type_id: order.ticket_type_id,
@@ -120,10 +124,10 @@ serve(async (req) => {
       },
       success_url:
         success_url ||
-        `${origin}/events/${order.event?.slug ?? ""}/tickets/success?order_id=${order.id}`,
+        `${origin}/events/${event?.slug ?? ""}/tickets/success?order_id=${order.id}`,
       cancel_url:
         cancel_url ||
-        `${origin}/events/${order.event?.slug ?? ""}?checkout=canceled`,
+        `${origin}/events/${event?.slug ?? ""}?checkout=canceled`,
     });
 
     console.log("[create-ticket-checkout] Session created:", session.id);
@@ -144,8 +148,9 @@ serve(async (req) => {
     );
   } catch (err) {
     console.error("[create-ticket-checkout] Error:", err);
+    const message = err instanceof Error ? err.message : "Internal Server Error";
     return new Response(
-      JSON.stringify({ error: err.message || "Internal Server Error" }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

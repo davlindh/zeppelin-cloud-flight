@@ -181,7 +181,8 @@ Deno.serve(async (req) => {
           console.log(`✅ Migrated: ${fileName} → media_library`);
           migratedCount++;
         } catch (error) {
-          const errorMsg = `Failed to migrate file from submission ${submission.id}: ${error.message}`;
+          const errMsg = error instanceof Error ? error.message : 'Unknown error';
+          const errorMsg = `Failed to migrate file from submission ${submission.id}: ${errMsg}`;
           console.error(`❌ ${errorMsg}`);
           errors.push(errorMsg);
           errorCount++;
@@ -205,10 +206,11 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('❌ Migration failed:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: message 
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }

@@ -27,28 +27,30 @@ export const AchievementGrid: React.FC<AchievementGridProps> = ({ userId, classN
   const { data: achievements, isLoading } = useQuery({
     queryKey: ['user-achievements', userId],
     queryFn: async (): Promise<Achievement[]> => {
-      // Get user stats for calculating achievements
-      const [scoreRes, donationsRes, eventsRes] = await Promise.all([
-        supabase
-          .from('fave_scores')
-          .select('total_score')
-          .eq('user_id', userId)
-          .single(),
-        supabase
-          .from('donations')
-          .select('amount, status')
-          .eq('donor_user_id', userId)
-          .eq('status', 'succeeded'),
-        supabase
-          .from('event_ticket_instances')
-          .select('event_id')
-          .eq('holder_user_id', userId)
-          .eq('status', 'checked_in')
-      ]);
+      // Get user stats for calculating achievements - separate queries to avoid type inference issues
+      const scoreRes = await supabase
+        .from('fave_scores')
+        .select('total_score')
+        .eq('user_id', userId)
+        .single();
+      
+      const donationsRes = await supabase
+        .from('donations')
+        .select('amount, status')
+        .eq('donor_user_id', userId)
+        .eq('status', 'succeeded');
+      
+      // Query event registrations instead of ticket instances (holder_user_id doesn't exist)
+      const eventsRes = await supabase
+        .from('event_registrations')
+        .select('event_id')
+        .eq('user_id', userId)
+        .eq('status', 'confirmed');
 
-      const totalScore = scoreRes.data?.total_score || 0;
-      const totalDonated = donationsRes.data?.reduce((sum: number, d: any) => sum + d.amount, 0) || 0;
-      const eventsAttended = new Set(eventsRes.data?.map((e: any) => e.event_id) || []).size;
+      const totalScore: number = scoreRes.data?.total_score || 0;
+      const donationsData = donationsRes.data || [];
+      const totalDonated: number = donationsData.reduce((sum, d) => sum + Number(d.amount || 0), 0);
+      const eventsAttended: number = new Set(eventsRes.data?.map(e => e.event_id) || []).size;
 
       // Define all possible achievements
       const allAchievements: Achievement[] = [
