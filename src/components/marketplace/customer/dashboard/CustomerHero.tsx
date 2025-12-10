@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FaveScoreBadge } from '@/components/funding/FaveScoreBadge';
+import { EnhancedUserScore } from '@/components/funding/EnhancedUserScore';
 import { ShoppingBag, Heart, Package, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
@@ -158,17 +158,9 @@ export const CustomerHero: React.FC = () => {
           </div>
         </div>
 
-        {faveScore && (
-          <div className="bg-background/80 rounded-lg p-4 border">
-            <div className="flex flex-col items-center justify-center h-full">
-              <FaveScoreBadge 
-                score={faveScore.total_score} 
-                level={faveScore.level}
-                size="md"
-              />
-            </div>
-          </div>
-        )}
+        <div className="bg-background/80 rounded-lg p-4 border col-span-2 md:col-span-1">
+          <EnhancedUserScore userId={user?.id || ''} />
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">

@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RecurringDonationCard } from "@/components/funding/RecurringDonationCard";
-import { Heart, RefreshCcw, Calendar, DollarSign } from "lucide-react";
+import { Heart, RefreshCcw, Calendar, DollarSign, Sparkles } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
