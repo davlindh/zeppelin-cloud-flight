@@ -189,13 +189,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Order confirmation email sent:", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, emailId: emailResponse.id }), {
+    const emailId = 'data' in emailResponse && emailResponse.data ? emailResponse.data.id : 'sent';
+    return new Response(JSON.stringify({ success: true, emailId }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error sending order confirmation:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

@@ -198,8 +198,9 @@ serve(async (req) => {
 
     console.log("Email sent successfully:", emailResponse);
 
+    const emailId = 'data' in emailResponse && emailResponse.data ? emailResponse.data.id : 'sent';
     return new Response(
-      JSON.stringify({ success: true, email_id: emailResponse.id }),
+      JSON.stringify({ success: true, email_id: emailId }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -207,8 +208,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Error sending receipt:", error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,

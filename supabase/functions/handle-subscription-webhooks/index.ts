@@ -39,7 +39,8 @@ serve(async (req) => {
         webhookSecret
       );
     } catch (err) {
-      console.error("Webhook signature verification failed:", err.message);
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      console.error("Webhook signature verification failed:", errMsg);
       return new Response(
         JSON.stringify({ error: "Webhook signature verification failed" }),
         {
@@ -242,8 +243,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Subscription webhook error:", error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,

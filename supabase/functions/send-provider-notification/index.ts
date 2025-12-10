@@ -182,15 +182,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Email sent to ${provider.email}:`, emailResponse);
 
+    const messageId = 'data' in emailResponse && emailResponse.data ? emailResponse.data.id : 'sent';
     return new Response(
-      JSON.stringify({ success: true, messageId: emailResponse.id }),
+      JSON.stringify({ success: true, messageId }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error sending notification:", error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -148,7 +148,11 @@ serve(async (req) => {
     const result: AuditResult = {
       timestamp: new Date().toISOString(),
       issues: {
-        unlinked_services: unlinkedServices || [],
+        unlinked_services: (unlinkedServices || []).map(s => ({
+          id: s.id,
+          title: s.title,
+          provider_name: s.provider || 'Unknown'
+        })),
         providers_without_services: providersWithoutServices,
         duplicate_providers: duplicateProviders,
         low_quality_providers: lowQuality
@@ -167,8 +171,9 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
