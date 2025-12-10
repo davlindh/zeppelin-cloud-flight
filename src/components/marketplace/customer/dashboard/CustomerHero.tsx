@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EnhancedUserScore } from '@/components/funding/EnhancedUserScore';
+import { UserReputationPanel } from '@/components/funding/UserReputationPanel';
 import { ShoppingBag, Heart, Package, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser';
@@ -159,7 +159,7 @@ export const CustomerHero: React.FC = () => {
         </div>
 
         <div className="bg-background/80 rounded-lg p-4 border col-span-2 md:col-span-1">
-          <EnhancedUserScore userId={user?.id || ''} />
+          <UserReputationPanel userId={user?.id || ''} />
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-interface FaveScoreBadgeProps {
+interface UserReputationBadgeProps {
   score: number;
   level?: string;
   size?: 'sm' | 'md' | 'lg';
@@ -18,7 +18,7 @@ interface FaveScoreBadgeProps {
   enableTooltip?: boolean;
 }
 
-export const FaveScoreBadge: React.FC<FaveScoreBadgeProps> = ({
+export const UserReputationBadge: React.FC<UserReputationBadgeProps> = ({
   score,
   level = 'seed',
   size = 'md',
