@@ -40,7 +40,7 @@ export const AchievementGrid: React.FC<AchievementGridProps> = ({ userId, classN
         .eq('donor_user_id', userId)
         .eq('status', 'succeeded');
       
-      // Query event registrations instead of ticket instances (holder_user_id doesn't exist)
+      // Query event registrations - adjust query based on available tables
       const eventsRes = await supabase
         .from('event_registrations')
         .select('event_id')
