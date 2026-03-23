@@ -1,5 +1,5 @@
 {
-  "navid": "supabase.migrations.35f4f234.41",
+  "navid": "supabase.migrations.35f4f234.41:main@v1",
   "description": "Omniframez navigator for migrations",
   "generated": 1761446184.600524,
   "complexity_score": 6.8,
@@ -13,5 +13,13 @@
   "subdirectory_count": 0,
   "dependencies": [],
   "parent_relationships": [],
-  "learning_sequence_rank": 30
+  "learning_sequence_rank": 30,
+  "identity": {
+    "ecosystem": "supabase",
+    "domain": "migrations",
+    "entity": "35f4f234.41",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

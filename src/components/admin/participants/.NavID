@@ -1,5 +1,5 @@
 {
-  "navid": "admin.participants.914d1df3.55",
+  "navid": "admin.participants.914d1df3.55:main@v1",
   "description": "Omniframez navigator for participants",
   "generated": 1761446148.8179276,
   "complexity_score": 6.4,
@@ -24,5 +24,13 @@
     "@tanstack/react-query"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 50
+  "learning_sequence_rank": 50,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "participants",
+    "entity": "914d1df3.55",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

@@ -69,17 +69,17 @@ function getMediaType(mimeType: string): 'image' | 'video' | 'audio' | 'document
 function generateSmartTitle(filename: string): string {
   // Remove extension
   let title = filename.replace(/\.[^.]+$/, '');
-  
+
   // Remove timestamp and hash patterns (e.g., "1759747290724-ysfzo5yhp4")
   title = title.replace(/[0-9]{13,}-[a-z0-9]+/g, '');
-  
+
   // Replace underscores and hyphens with spaces
   title = title.replace(/[_-]/g, ' ');
-  
+
   // Trim and capitalize
   title = title.trim();
   title = title.charAt(0).toUpperCase() + title.slice(1);
-  
+
   return title || 'Untitled Media';
 }
 
@@ -95,7 +95,7 @@ export const generateUniqueFilename = (file: File): string => {
     .replace(/[^a-zA-Z0-9]/g, '-')
     .toLowerCase()
     .substring(0, 50);
-  
+
   return `${safeName}-${timestamp}-${random}.${extension}`;
 };
 
@@ -136,6 +136,10 @@ export const validateFile = (file: File): { valid: boolean; error?: string } => 
   return { valid: true };
 };
 
+import { apiClient } from '@/api/client';
+
+const USE_API = false; // Phase boundary toggle. False = use Supabase, True = use JakobNavid.Core API.
+
 /**
  * Upload file to media library
  * Single source of truth for all media uploads
@@ -150,6 +154,27 @@ export const uploadToMediaLibrary = async (
     throw new Error(validation.error);
   }
 
+  // Phase 2: Generic API backend handles everything (storage + db record)
+  if (USE_API) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('options', JSON.stringify(options));
+      // Extend generic apiClient temporarily here to use FormData
+      const token = localStorage.getItem('api_auth_token');
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://localhost:5001/api'}/media/upload`, {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        body: formData,
+      });
+      if (!response.ok) throw new Error('API Upload Failed');
+      return await response.json();
+    } catch (apiError: unknown) {
+      throw new Error(`Upload to generic API failed: ${apiError instanceof Error ? apiError.message : String(apiError)}`);
+    }
+  }
+
+  // Phase 1: Legacy Supabase logic
   // 2. Generate unique filename
   const filename = generateUniqueFilename(file);
   const folder = options.folder || 'general';
@@ -186,7 +211,7 @@ export const uploadToMediaLibrary = async (
   // 7. Generate smart title from filename
   const smartTitle = options.metadata?.title || generateSmartTitle(file.name);
 
-  // 8. Get current user
+  // 8. Get current user (uses abstracted checking in future)
   const { data: { user } } = await supabase.auth.getUser();
 
   // 9. Create media_library record
@@ -217,6 +242,7 @@ export const uploadToMediaLibrary = async (
       category: options.metadata?.category,
       is_public: options.metadata?.is_public ?? true,
       is_featured: options.metadata?.is_featured ?? false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
     .select()
     .single();

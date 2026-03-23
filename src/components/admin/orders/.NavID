@@ -1,5 +1,5 @@
 {
-  "navid": "admin.orders.2ef243b1.49",
+  "navid": "admin.orders.2ef243b1.49:main@v1",
   "description": "Omniframez navigator for orders",
   "generated": 1761446148.8091164,
   "complexity_score": 5.3,
@@ -22,5 +22,13 @@
     "@tanstack/react-query"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 44
+  "learning_sequence_rank": 44,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "orders",
+    "entity": "2ef243b1.49",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

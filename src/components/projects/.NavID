@@ -1,5 +1,5 @@
 {
-  "navid": "components.projects.ff965dc8.45",
+  "navid": "components.projects.ff965dc8.45:main@v1",
   "description": "Omniframez navigator for projects",
   "generated": 1761446149.0532565,
   "complexity_score": 3.8,
@@ -19,5 +19,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "components",
+    "domain": "projects",
+    "entity": "ff965dc8.45",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

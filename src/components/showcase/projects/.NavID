@@ -1,5 +1,5 @@
 {
-  "navid": "showcase.projects.ea9f922b.54",
+  "navid": "showcase.projects.ea9f922b.54:main@v1",
   "description": "Omniframez navigator for projects",
   "generated": 1761446149.0958264,
   "complexity_score": 7.6,
@@ -25,5 +25,13 @@
     "@/utils/mediaHelpers"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "showcase",
+    "domain": "projects",
+    "entity": "ea9f922b.54",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

@@ -1,5 +1,5 @@
 {
-  "navid": "pages.marketplace.b4300d8c.43",
+  "navid": "pages.marketplace.b4300d8c.43:main@v1",
   "description": "Omniframez navigator for marketplace",
   "generated": 1761446149.1185727,
   "complexity_score": 42.5,
@@ -32,5 +32,13 @@
     "@/components/marketplace/ui/back-to-top"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 49
+  "learning_sequence_rank": 49,
+  "identity": {
+    "ecosystem": "pages",
+    "domain": "marketplace",
+    "entity": "b4300d8c.43",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

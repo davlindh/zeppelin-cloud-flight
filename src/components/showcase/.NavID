@@ -1,5 +1,5 @@
 {
-  "navid": "components.showcase.10e306bc.45",
+  "navid": "components.showcase.10e306bc.45:main@v1",
   "description": "Omniframez navigator for showcase",
   "generated": 1761446149.0906713,
   "complexity_score": 11.3,
@@ -30,5 +30,13 @@
     "@/utils/mediaHelpers"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "components",
+    "domain": "showcase",
+    "entity": "10e306bc.45",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

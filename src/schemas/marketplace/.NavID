@@ -1,5 +1,5 @@
 {
-  "navid": "schemas.marketplace.465dcf31.45",
+  "navid": "schemas.marketplace.465dcf31.45:main@v1",
   "description": "Omniframez navigator for marketplace",
   "generated": 1761446149.2535136,
   "complexity_score": 1.3,
@@ -13,5 +13,13 @@
     "zod"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 49
+  "learning_sequence_rank": 49,
+  "identity": {
+    "ecosystem": "schemas",
+    "domain": "marketplace",
+    "entity": "465dcf31.45",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

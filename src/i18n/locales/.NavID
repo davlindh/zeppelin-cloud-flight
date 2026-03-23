@@ -1,5 +1,5 @@
 {
-  "navid": "i18n.locales.e3b0c442.38",
+  "navid": "i18n.locales.e3b0c442.38:main@v1",
   "description": "Omniframez navigator for locales",
   "generated": 1761446149.2090263,
   "complexity_score": 0.2,
@@ -9,5 +9,13 @@
   "subdirectory_count": 2,
   "dependencies": [],
   "parent_relationships": [],
-  "learning_sequence_rank": 45
+  "learning_sequence_rank": 45,
+  "identity": {
+    "ecosystem": "i18n",
+    "domain": "locales",
+    "entity": "e3b0c442.38",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

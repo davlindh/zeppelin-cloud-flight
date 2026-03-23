@@ -1,5 +1,5 @@
 {
-  "navid": "admin.users.2ef5923a.48",
+  "navid": "admin.users.2ef5923a.48:main@v1",
   "description": "Omniframez navigator for users",
   "generated": 1761446148.901281,
   "complexity_score": 5.3,
@@ -22,5 +22,13 @@
     "@/components/ui/table"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 43
+  "learning_sequence_rank": 43,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "users",
+    "entity": "2ef5923a.48",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

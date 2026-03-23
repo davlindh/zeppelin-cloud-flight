@@ -1,5 +1,5 @@
 {
-  "navid": "src.hooks.d8beeb66.31",
+  "navid": "src.hooks.d8beeb66.31:main@v1",
   "description": "Omniframez navigator for hooks",
   "generated": 1761446149.1799753,
   "complexity_score": 36.4,
@@ -32,5 +32,13 @@
     "@/integrations/supabase/types"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 43
+  "learning_sequence_rank": 43,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "hooks",
+    "entity": "d8beeb66.31",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

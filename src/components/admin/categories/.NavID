@@ -1,5 +1,5 @@
 {
-  "navid": "admin.categories.70774cb7.53",
+  "navid": "admin.categories.70774cb7.53:main@v1",
   "description": "Omniframez navigator for categories",
   "generated": 1761446148.7917747,
   "complexity_score": 5.3,
@@ -22,5 +22,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 48
+  "learning_sequence_rank": 48,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "categories",
+    "entity": "70774cb7.53",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

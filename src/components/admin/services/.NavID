@@ -1,5 +1,5 @@
 {
-  "navid": "admin.services.19f7890c.51",
+  "navid": "admin.services.19f7890c.51:main@v1",
   "description": "Omniframez navigator for services",
   "generated": 1761446148.772842,
   "complexity_score": 12.4,
@@ -34,5 +34,13 @@
     "@/hooks/useServices"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 12
+  "learning_sequence_rank": 12,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "services",
+    "entity": "19f7890c.51",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

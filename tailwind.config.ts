@@ -18,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Outfit', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -138,4 +141,5 @@ export default {
 				'shimmer': 'shimmer 2s infinite linear'
 			}
 		}
-}} satisfies Config
+	}
+} satisfies Config

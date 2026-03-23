@@ -1,5 +1,5 @@
 {
-  "navid": "admin.shared.ff285fa4.49",
+  "navid": "admin.shared.ff285fa4.49:main@v1",
   "description": "Omniframez navigator for shared",
   "generated": 1761446148.8569224,
   "complexity_score": 8.1,
@@ -27,5 +27,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 44
+  "learning_sequence_rank": 44,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "shared",
+    "entity": "ff285fa4.49",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

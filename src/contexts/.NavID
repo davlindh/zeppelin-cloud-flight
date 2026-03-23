@@ -1,5 +1,5 @@
 {
-  "navid": "src.contexts.e380edc1.34",
+  "navid": "src.contexts.e380edc1.34:main@v1",
   "description": "Omniframez navigator for contexts",
   "generated": 1761446149.1669397,
   "complexity_score": 8.7,
@@ -27,5 +27,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "contexts",
+    "entity": "e380edc1.34",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

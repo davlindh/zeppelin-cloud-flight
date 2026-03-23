@@ -1,5 +1,5 @@
 {
-  "navid": "marketplace.auctions.1762b99f.57",
+  "navid": "marketplace.auctions.1762b99f.57:main@v1",
   "description": "Omniframez navigator for auctions",
   "generated": 1761446148.9550486,
   "complexity_score": 14.9,
@@ -32,5 +32,13 @@
     "@/components/ui/input"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "marketplace",
+    "domain": "auctions",
+    "entity": "1762b99f.57",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

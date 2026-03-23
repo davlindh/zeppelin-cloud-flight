@@ -1,5 +1,5 @@
 {
-  "navid": "admin.bookings.02ffcba1.51",
+  "navid": "admin.bookings.02ffcba1.51:main@v1",
   "description": "Omniframez navigator for bookings",
   "generated": 1761446148.7820902,
   "complexity_score": 4.3,
@@ -20,5 +20,13 @@
     "@/hooks/useBookings"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "bookings",
+    "entity": "02ffcba1.51",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

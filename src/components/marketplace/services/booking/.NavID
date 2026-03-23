@@ -1,5 +1,5 @@
 {
-  "navid": "services.booking.49f5315d.65",
+  "navid": "services.booking.49f5315d.65:main@v1",
   "description": "Omniframez navigator for booking",
   "generated": 1761446148.9478915,
   "complexity_score": 8.5,
@@ -27,5 +27,13 @@
     "@/components/marketplace/ui/social-proof-badge"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 45
+  "learning_sequence_rank": 45,
+  "identity": {
+    "ecosystem": "services",
+    "domain": "booking",
+    "entity": "49f5315d.65",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

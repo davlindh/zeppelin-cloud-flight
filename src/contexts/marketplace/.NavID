@@ -1,8 +1,8 @@
 {
-  "navid": "contexts.marketplace.cd2465d6.46",
+  "navid": "contexts.marketplace.cd2465d6.46:main@v1",
   "description": "Omniframez navigator for marketplace",
   "generated": 1761446149.1731508,
-  "complexity_score": 5.0,
+  "complexity_score": 5,
   "language_distribution": {
     "typescript": 8
   },
@@ -20,5 +20,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 49
+  "learning_sequence_rank": 49,
+  "identity": {
+    "ecosystem": "contexts",
+    "domain": "marketplace",
+    "entity": "cd2465d6.46",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

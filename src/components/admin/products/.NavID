@@ -1,5 +1,5 @@
 {
-  "navid": "admin.products.b32ebe91.51",
+  "navid": "admin.products.b32ebe91.51:main@v1",
   "description": "Omniframez navigator for products",
   "generated": 1761446148.8232226,
   "complexity_score": 11.1,
@@ -32,5 +32,13 @@
     "react"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "products",
+    "entity": "b32ebe91.51",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

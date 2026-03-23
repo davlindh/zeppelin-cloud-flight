@@ -1,5 +1,5 @@
 {
-  "navid": "admin.security.40184b5d.51",
+  "navid": "admin.security.40184b5d.51:main@v1",
   "description": "Omniframez navigator for security",
   "generated": 1761446148.8431683,
   "complexity_score": 4.3,
@@ -20,5 +20,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "security",
+    "entity": "40184b5d.51",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

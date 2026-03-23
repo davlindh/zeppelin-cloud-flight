@@ -1,5 +1,5 @@
 {
-  "navid": "src.utils.ba9ddb78.31",
+  "navid": "src.utils.ba9ddb78.31:main@v1",
   "description": "Omniframez navigator for utils",
   "generated": 1761446149.1296647,
   "complexity_score": 18.1,
@@ -34,5 +34,13 @@
     "@/utils/media"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 13
+  "learning_sequence_rank": 13,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "utils",
+    "entity": "ba9ddb78.31",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

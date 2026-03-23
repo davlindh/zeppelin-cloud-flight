@@ -1,5 +1,5 @@
 {
-  "navid": "components.ui.5db9d22b.39",
+  "navid": "components.ui.5db9d22b.39:main@v1",
   "description": "Omniframez navigator for ui",
   "generated": 1761446149.105997,
   "complexity_score": 39.4,
@@ -33,5 +33,13 @@
     "@/components/ui/select"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 40
+  "learning_sequence_rank": 40,
+  "identity": {
+    "ecosystem": "components",
+    "domain": "ui",
+    "entity": "5db9d22b.39",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

@@ -1,12 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { User, Session } from '@supabase/supabase-js';
+import { authService, AppUser, AuthSession } from '@/api/auth';
 
 interface AdminAuthContextType {
   isAdmin: boolean;
   adminEmail: string | null;
-  user: User | null;
-  session: Session | null;
+  user: AppUser | null;
+  session: AuthSession | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -24,6 +23,18 @@ export const useAdminAuth = () => {
   return context;
 };
 
+const verifyAdmin = async (userId: string, email?: string | null): Promise<boolean> => {
+  try {
+    if (!userId) return false;
+    return await authService.hasRole(userId, 'admin');
+  } catch (error) {
+    console.error('Error verifying admin:', error);
+    return false;
+  }
+};
+
+
+
 interface AdminAuthProviderProps {
   children: ReactNode;
 }
@@ -31,38 +42,34 @@ interface AdminAuthProviderProps {
 export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    
+
     // Set loading timeout as fallback
     const setLoadingTimeout = () => {
       timeoutId = setTimeout(() => {
-        // console.log('AdminAuth: Loading timeout reached, setting loading to false');
         setLoading(false);
       }, 10000); // 10 second timeout
     };
 
-    // Set up auth state listener - CRITICAL: No async callback to prevent deadlocks
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    // Set up auth state listener
+    const { unsubscribe } = authService.onAuthStateChange(
       (event, session) => {
-        // console.log('AdminAuth: Auth state changed', event, session?.user?.email);
-        
         // Clear any existing timeout
         if (timeoutId) clearTimeout(timeoutId);
-        
+
         // Update session state immediately
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
           // Defer admin verification to avoid callback deadlock
           setTimeout(() => {
             verifyAdmin(session.user.id, session.user.email).then((isUserAdmin) => {
-              console.log('AdminAuth: Admin verification result', isUserAdmin);
               setIsAdmin(isUserAdmin);
               setAdminEmail(isUserAdmin ? session.user.email : null);
               setLoading(false);
@@ -83,11 +90,10 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
 
     // Check for existing session
     setLoadingTimeout();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      // console.log('AdminAuth: Initial session check', session?.user?.email);
-      
+    authService.getSession().then(({ session }) => {
+
       if (timeoutId) clearTimeout(timeoutId);
-      
+
       if (!session?.user) {
         // No session, stop loading immediately
         setSession(null);
@@ -104,45 +110,26 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
-      subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
-
-  const verifyAdmin = async (userId: string, email?: string | null): Promise<boolean> => {
-    try {
-      if (!userId) return false;
-      
-      const { data: isAuthorized, error } = await supabase
-        .rpc('has_role', { _user_id: userId, _role: 'admin' });
-
-      return !error && isAuthorized === true;
-    } catch (error) {
-      console.error('Error verifying admin:', error);
-      return false;
-    }
-  };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
 
-      // Sign in with Supabase Auth first
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const response = await authService.login(email, password);
 
-      if (error) {
-        return { success: false, error: error.message };
+      if (!response.success) {
+        return { success: false, error: response.error };
       }
 
       // Check if user has admin role
-      if (data.user) {
-        const { data: isAuthorized, error: authError } = await supabase
-          .rpc('has_role', { _user_id: data.user.id, _role: 'admin' });
+      if (response.user) {
+        const isAuthorized = await authService.hasRole(response.user.id, 'admin');
 
-        if (authError || !isAuthorized) {
-          await supabase.auth.signOut();
+        if (!isAuthorized) {
+          await authService.logout();
           return { success: false, error: 'User does not have admin privileges' };
         }
       }
@@ -160,22 +147,14 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     try {
       setLoading(true);
 
-      // Sign up with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/admin`
-        }
-      });
+      const response = await authService.signup(email, password);
 
-      if (error) {
-        return { success: false, error: error.message };
+      if (!response.success) {
+        return { success: false, error: response.error };
       }
 
-      // Note: Admin role must be assigned manually in the database by existing admins
-      return { 
-        success: true, 
+      return {
+        success: true,
         error: 'Account created. Please contact an administrator to grant admin privileges.'
       };
     } catch (error) {
@@ -191,18 +170,6 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
       if (!session?.user || !isAdmin) {
         return false;
       }
-
-      // Ensure the admin session is active
-      const { data, error } = await supabase.auth.setSession({
-        access_token: session.access_token,
-        refresh_token: session.refresh_token!
-      });
-
-      if (error || !data.session) {
-        console.error('Failed to ensure admin auth:', error);
-        return false;
-      }
-
       return true;
     } catch (error) {
       console.error('Error ensuring admin auth:', error);
@@ -211,7 +178,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    await authService.logout();
     setIsAdmin(false);
     setAdminEmail(null);
     setUser(null);

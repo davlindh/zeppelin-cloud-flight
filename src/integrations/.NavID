@@ -1,5 +1,5 @@
 {
-  "navid": "src.integrations.e3b0c442.38",
+  "navid": "src.integrations.e3b0c442.38:main@v1",
   "description": "Omniframez navigator for integrations",
   "generated": 1761446149.230388,
   "complexity_score": 1.2,
@@ -12,5 +12,13 @@
     "@supabase/supabase-js"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 50
+  "learning_sequence_rank": 50,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "integrations",
+    "entity": "e3b0c442.38",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

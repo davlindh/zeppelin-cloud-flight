@@ -1,5 +1,5 @@
 {
-  "navid": "src.services.ff60477f.34",
+  "navid": "src.services.ff60477f.34:main@v1",
   "description": "Omniframez navigator for services",
   "generated": 1761446149.124396,
   "complexity_score": 1.5,
@@ -16,5 +16,13 @@
     "@/integrations/supabase/client"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 12
+  "learning_sequence_rank": 12,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "services",
+    "entity": "ff60477f.34",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

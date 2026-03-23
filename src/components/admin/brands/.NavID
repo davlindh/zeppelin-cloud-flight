@@ -1,5 +1,5 @@
 {
-  "navid": "admin.brands.ff31f6c0.49",
+  "navid": "admin.brands.ff31f6c0.49:main@v1",
   "description": "Omniframez navigator for brands",
   "generated": 1761446148.7878964,
   "complexity_score": 2.8,
@@ -17,5 +17,13 @@
     "@/components/ui/button"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 44
+  "learning_sequence_rank": 44,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "brands",
+    "entity": "ff31f6c0.49",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

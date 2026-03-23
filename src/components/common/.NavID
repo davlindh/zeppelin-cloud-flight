@@ -1,5 +1,5 @@
 {
-  "navid": "components.common.a4948bc7.43",
+  "navid": "components.common.a4948bc7.43:main@v1",
   "description": "Omniframez navigator for common",
   "generated": 1761446148.915745,
   "complexity_score": 14.7,
@@ -32,5 +32,13 @@
     "react-router-dom"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 44
+  "learning_sequence_rank": 44,
+  "identity": {
+    "ecosystem": "components",
+    "domain": "common",
+    "entity": "a4948bc7.43",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

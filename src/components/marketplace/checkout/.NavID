@@ -1,5 +1,5 @@
 {
-  "navid": "marketplace.checkout.216c7ded.57",
+  "navid": "marketplace.checkout.216c7ded.57:main@v1",
   "description": "Omniframez navigator for checkout",
   "generated": 1761446148.9694395,
   "complexity_score": 6.2,
@@ -23,5 +23,13 @@
     "@hookform/resolvers/zod"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 46
+  "learning_sequence_rank": 46,
+  "identity": {
+    "ecosystem": "marketplace",
+    "domain": "checkout",
+    "entity": "216c7ded.57",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

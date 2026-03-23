@@ -1,5 +1,5 @@
 {
-  "navid": "marketplace.communication.bed3148e.62",
+  "navid": "marketplace.communication.bed3148e.62:main@v1",
   "description": "Omniframez navigator for communication",
   "generated": 1761446148.9756777,
   "complexity_score": 8.4,
@@ -27,5 +27,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 51
+  "learning_sequence_rank": 51,
+  "identity": {
+    "ecosystem": "marketplace",
+    "domain": "communication",
+    "entity": "bed3148e.62",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

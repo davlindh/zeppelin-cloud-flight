@@ -1,5 +1,5 @@
 {
-  "navid": "components.home.f1ac72be.41",
+  "navid": "components.home.f1ac72be.41:main@v1",
   "description": "Omniframez navigator for home",
   "generated": 1761446148.9220173,
   "complexity_score": 8.3,
@@ -28,5 +28,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 42
+  "learning_sequence_rank": 42,
+  "identity": {
+    "ecosystem": "components",
+    "domain": "home",
+    "entity": "f1ac72be.41",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

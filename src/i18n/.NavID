@@ -1,8 +1,8 @@
 {
-  "navid": "src.i18n.9a138d62.30",
+  "navid": "src.i18n.9a138d62.30:main@v1",
   "description": "Omniframez navigator for i18n",
   "generated": 1761446149.2041533,
-  "complexity_score": 2.0,
+  "complexity_score": 2,
   "language_distribution": {
     "typescript": 1
   },
@@ -15,5 +15,13 @@
     "react-i18next"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 42
+  "learning_sequence_rank": 42,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "i18n",
+    "entity": "9a138d62.30",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

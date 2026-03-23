@@ -1,5 +1,5 @@
 {
-  "navid": "admin.editors.60a1bead.50",
+  "navid": "admin.editors.60a1bead.50:main@v1",
   "description": "Omniframez navigator for editors",
   "generated": 1761446148.8057182,
   "complexity_score": 11.3,
@@ -32,5 +32,13 @@
     "react"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 45
+  "learning_sequence_rank": 45,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "editors",
+    "entity": "60a1bead.50",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

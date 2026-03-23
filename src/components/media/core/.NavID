@@ -1,8 +1,8 @@
 {
-  "navid": "media.core.828cdf3e.47",
+  "navid": "media.core.828cdf3e.47:main@v1",
   "description": "Omniframez navigator for core",
   "generated": 1761446149.0161083,
-  "complexity_score": 11.0,
+  "complexity_score": 11,
   "language_distribution": {
     "typescript": 8
   },
@@ -32,5 +32,13 @@
     "@/components/ui/select"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 2
+  "learning_sequence_rank": 2,
+  "identity": {
+    "ecosystem": "media",
+    "domain": "core",
+    "entity": "828cdf3e.47",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

@@ -1,5 +1,5 @@
 {
-  "navid": "src.pages.a7104f04.31",
+  "navid": "src.pages.a7104f04.31:main@v1",
   "description": "Omniframez navigator for pages",
   "generated": 1761446149.1104236,
   "complexity_score": 87.4,
@@ -33,5 +33,13 @@
     "@/components/admin/SponsorManagementList"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 8
+  "learning_sequence_rank": 8,
+  "identity": {
+    "ecosystem": "src",
+    "domain": "pages",
+    "entity": "a7104f04.31",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

@@ -1,5 +1,5 @@
 {
-  "navid": "components.participants.c53bc141.49",
+  "navid": "components.participants.c53bc141.49:main@v1",
   "description": "Omniframez navigator for participants",
   "generated": 1761446149.0446172,
   "complexity_score": 9.9,
@@ -30,5 +30,13 @@
     "@/hooks/use-toast"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 50
+  "learning_sequence_rank": 50,
+  "identity": {
+    "ecosystem": "components",
+    "domain": "participants",
+    "entity": "c53bc141.49",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }

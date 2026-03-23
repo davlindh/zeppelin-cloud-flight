@@ -1,5 +1,5 @@
 {
-  "navid": "admin.project.2b73a6e4.50",
+  "navid": "admin.project.2b73a6e4.50:main@v1",
   "description": "Omniframez navigator for project",
   "generated": 1761446148.8270094,
   "complexity_score": 4.8,
@@ -21,5 +21,13 @@
     "@tanstack/react-query"
   ],
   "parent_relationships": [],
-  "learning_sequence_rank": 45
+  "learning_sequence_rank": 45,
+  "identity": {
+    "ecosystem": "admin",
+    "domain": "project",
+    "entity": "2b73a6e4.50",
+    "variant": "main",
+    "version": "1"
+  },
+  "version": "3.0.0"
 }
