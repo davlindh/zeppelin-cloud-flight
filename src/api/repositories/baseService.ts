@@ -27,9 +27,9 @@ export class BaseService<T> {
         if (this.useApi) {
             return apiClient.get<T[]>(this.endpointPath);
         } else {
-            const { data, error } = await supabase.from(this.tableName).select('*');
+            const { data, error } = await supabase.from(this.tableName as any).select('*');
             if (error) throw new Error(error.message);
-            return data as T[];
+            return data as unknown as T[];
         }
     }
 
@@ -40,9 +40,9 @@ export class BaseService<T> {
         if (this.useApi) {
             return apiClient.get<T>(`${this.endpointPath}/${id}`);
         } else {
-            const { data, error } = await supabase.from(this.tableName).select('*').eq('id', id).maybeSingle();
+            const { data, error } = await supabase.from(this.tableName as any).select('*').eq('id', id).maybeSingle();
             if (error) throw new Error(error.message);
-            return data as T | null;
+            return data as unknown as T | null;
         }
     }
 
@@ -53,9 +53,9 @@ export class BaseService<T> {
         if (this.useApi) {
             return apiClient.post<T>(this.endpointPath, payload);
         } else {
-            const { data, error } = await supabase.from(this.tableName).insert(payload).select().single();
+            const { data, error } = await supabase.from(this.tableName as any).insert(payload as any).select().single();
             if (error) throw new Error(error.message);
-            return data as T;
+            return data as unknown as T;
         }
     }
 
@@ -66,9 +66,9 @@ export class BaseService<T> {
         if (this.useApi) {
             return apiClient.put<T>(`${this.endpointPath}/${id}`, payload);
         } else {
-            const { data, error } = await supabase.from(this.tableName).update(payload).eq('id', id).select().single();
+            const { data, error } = await supabase.from(this.tableName as any).update(payload as any).eq('id', id).select().single();
             if (error) throw new Error(error.message);
-            return data as T;
+            return data as unknown as T;
         }
     }
 
@@ -79,7 +79,7 @@ export class BaseService<T> {
         if (this.useApi) {
             await apiClient.delete(`${this.endpointPath}/${id}`);
         } else {
-            const { error } = await supabase.from(this.tableName).delete().eq('id', id);
+            const { error } = await supabase.from(this.tableName as any).delete().eq('id', id);
             if (error) throw new Error(error.message);
         }
     }
