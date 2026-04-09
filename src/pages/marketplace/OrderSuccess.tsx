@@ -3,12 +3,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Loader2, Package, Truck, Mail, Calendar } from "lucide-react";
+import { CheckCircle2, Loader2, Package, Truck, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { formatCurrency } from "@/utils/currency";
+import { useCart } from "@/contexts/marketplace/CartContext";
 
 export function OrderSuccessPage() {
   const [params] = useSearchParams();
