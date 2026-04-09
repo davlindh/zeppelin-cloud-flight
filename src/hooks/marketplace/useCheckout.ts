@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useCart } from '@/contexts/marketplace/CartContext';
 import { useCreateOrder } from './useCreateOrder';
-import { useMarketplaceCheckout } from './useMarketplaceCheckout';
 import { useToast } from '@/hooks/use-toast';
 import type { ShippingInfo, PaymentInfo } from '@/pages/marketplace/CheckoutPage';
 import type { CartItem } from '@/types/marketplace/cart';
@@ -20,7 +19,6 @@ export const useCheckout = () => {
   const [isPlacing, setIsPlacing] = useState(false);
   const { clearCart } = useCart();
   const { mutateAsync: createOrder } = useCreateOrder();
-  const { createCheckout } = useMarketplaceCheckout();
   const { toast } = useToast();
 
   const placeOrder = async (checkoutData: CheckoutData): Promise<string | null> => {
