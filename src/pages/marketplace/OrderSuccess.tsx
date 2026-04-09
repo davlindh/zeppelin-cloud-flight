@@ -81,6 +81,11 @@ export function OrderSuccessPage() {
         const result = await verifyPayment.mutateAsync(orderId);
 
         if (result.success) {
+          // Clear cart after successful payment
+          if (!cartCleared.current) {
+            clearCart();
+            cartCleared.current = true;
+          }
           // Refetch order to get updated status
           await refetch();
 
