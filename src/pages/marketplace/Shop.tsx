@@ -71,12 +71,12 @@ const ShopPage = () => {
         {/* Compact Search Header */}
         <div className="relative rounded-xl p-4 mb-6 bg-gradient-to-r from-primary/5 to-accent/5 border border-border/30">
           <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-3">
+           <div className="text-center mb-3">
               <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
-                Discover Premium Products
+                Utforska Våra Produkter
               </h1>
               <p className="text-muted-foreground text-sm">
-                Search products or browse by category
+                Sök produkter eller bläddra efter kategori
               </p>
             </div>
 
@@ -92,15 +92,15 @@ const ShopPage = () => {
             <div className="flex justify-center gap-4 sm:gap-6 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Truck className="h-3 w-3 text-primary" />
-                <span>Free Shipping $50+</span>
+                <span>Fri frakt över 1 500 kr</span>
               </div>
               <div className="flex items-center gap-1">
                 <Zap className="h-3 w-3 text-primary" />
-                <span>24h Delivery</span>
+                <span>Snabb leverans</span>
               </div>
               <div className="flex items-center gap-1">
                 <Shield className="h-3 w-3 text-primary" />
-                <span>Price Match</span>
+                <span>Prisgaranti</span>
               </div>
             </div>
           </div>
@@ -169,7 +169,7 @@ const ShopPage = () => {
             <aside className="hidden lg:block">
               <div className="sticky top-20">
                 <div className="p-4 rounded-lg bg-card border border-border">
-                  <h3 className="text-sm font-semibold mb-4 text-foreground">Filters</h3>
+                  <h3 className="text-sm font-semibold mb-4 text-foreground">Filter</h3>
                   <AdvancedFilters
                     filters={state.filters}
                     onFiltersChange={handleFiltersChange}

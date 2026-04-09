@@ -7,30 +7,23 @@ import { Footer } from '@/components/layout/Footer';
 import { CheckoutProgress } from '@/components/marketplace/checkout/CheckoutProgress';
 import { ShippingForm } from '@/components/marketplace/checkout/ShippingForm';
 import { PaymentFormStripe } from '@/components/stripe/PaymentFormStripe';
-import { PaymentMethodSelector, PaymentMethod } from '@/components/marketplace/checkout/PaymentMethodSelector';
-import { OrderReview } from '@/components/marketplace/checkout/OrderReview';
 import { useCheckout } from '@/hooks/marketplace/useCheckout';
 import { StripeProvider } from '@/components/stripe/StripeProvider';
-import { checkoutConfig, getTaxRate, getShippingCost, calculateTax } from '@/config/checkout.config';
+import { calculateTax, getShippingCost } from '@/config/checkout.config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { formatCurrency } from '@/utils/currency';
+import { Separator } from '@/components/ui/separator';
 
-// Utility function to calculate pricing based on configuration
 const calculatePricing = (subtotal: number, country: string) => {
   const taxAmount = calculateTax(subtotal, country);
   const shippingAmount = getShippingCost(subtotal);
   const totalAmount = subtotal + taxAmount + shippingAmount;
-
-  return {
-    subtotal,
-    taxAmount,
-    shippingAmount,
-    totalAmount
-  };
+  return { subtotal, taxAmount, shippingAmount, totalAmount };
 };
 
-export type CheckoutStep = 'shipping' | 'payment' | 'review';
+export type CheckoutStep = 'shipping' | 'payment';
 
 export interface ShippingInfo {
   name: string;
@@ -43,11 +36,7 @@ export interface ShippingInfo {
 }
 
 export interface PaymentInfo {
-  method: PaymentMethod;
-  cardNumber?: string;
-  cardName?: string;
-  cardExpiry?: string;
-  cardCvv?: string;
+  method: 'card';
 }
 
 export const CheckoutPage = () => {
@@ -60,22 +49,20 @@ export const CheckoutPage = () => {
   );
 };
 
-const CheckoutContent = ({ 
-  clientSecret, 
-  setClientSecret 
-}: { 
-  clientSecret: string; 
+const CheckoutContent = ({
+  clientSecret,
+  setClientSecret
+}: {
+  clientSecret: string;
   setClientSecret: (secret: string) => void;
 }) => {
   const navigate = useNavigate();
   const { state } = useCart();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>('shipping');
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
   const [isCreatingPayment, setIsCreatingPayment] = useState(false);
-  
-  const { placeOrder, isPlacing } = useCheckout();
+
+  const { placeOrder } = useCheckout();
 
   // Redirect if cart is empty
   if (state.items.length === 0) {
@@ -83,30 +70,29 @@ const CheckoutContent = ({
     return null;
   }
 
+  const pricing = shippingInfo
+    ? calculatePricing(state.total, shippingInfo.country)
+    : calculatePricing(state.total, 'SE');
+
   const handleShippingSubmit = async (data: ShippingInfo) => {
     setShippingInfo(data);
     setIsCreatingPayment(true);
-    
-    const pricing = calculatePricing(state.total, data.country);
+
+    const p = calculatePricing(state.total, data.country);
 
     try {
-      // Create order first - returns order ID
       const orderId = await placeOrder({
         shippingInfo: data,
-        paymentInfo: { method: paymentMethod },
+        paymentInfo: { method: 'card' },
         items: state.items,
-        subtotal: pricing.subtotal,
-        taxAmount: pricing.taxAmount,
-        shippingAmount: pricing.shippingAmount,
-        totalAmount: pricing.totalAmount,
+        subtotal: p.subtotal,
+        taxAmount: p.taxAmount,
+        shippingAmount: p.shippingAmount,
+        totalAmount: p.totalAmount,
       });
 
-      if (!orderId) {
-        throw new Error('Failed to create order');
-      }
+      if (!orderId) throw new Error('Failed to create order');
 
-      // Create PaymentIntent for Stripe Elements
-      // Pass customer_email for guest order verification
       const { data: paymentResult, error } = await supabase.functions.invoke(
         'create-payment-intent',
         { body: { order_id: orderId, customer_email: data.email } }
@@ -123,17 +109,9 @@ const CheckoutContent = ({
     }
   };
 
-  const handlePlaceOrder = () => {
-    if (!shippingInfo || !clientSecret) return;
-    setPaymentInfo({ method: paymentMethod });
-    setCurrentStep('review');
-  };
-
   const handleBack = () => {
     if (currentStep === 'payment') {
       setCurrentStep('shipping');
-    } else if (currentStep === 'review') {
-      setCurrentStep('payment');
     } else {
       navigate('/marketplace/cart');
     }
@@ -145,78 +123,94 @@ const CheckoutContent = ({
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-            className="mb-4"
-          >
+          <Button variant="ghost" onClick={handleBack} className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            Tillbaka
           </Button>
 
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-foreground">Checkout</h1>
-          <p className="text-muted-foreground">
-            Complete your order in just a few steps
-          </p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-foreground">Kassa</h1>
+          <p className="text-muted-foreground">Slutför din beställning</p>
         </div>
 
         <CheckoutProgress currentStep={currentStep} />
 
-        <Card className="mt-8 bg-card border-border">
-          <CardContent className="p-6">
-            {currentStep === 'shipping' && (
-              <ShippingForm
-                initialData={shippingInfo}
-                onSubmit={handleShippingSubmit}
-                isLoading={isCreatingPayment}
-              />
-            )}
-
-            {currentStep === 'payment' && shippingInfo && (
-              <div className="space-y-6">
-                {/* Payment Method Selector */}
-                <PaymentMethodSelector
-                  selectedMethod={paymentMethod}
-                  onMethodChange={setPaymentMethod}
-                />
-
-                {/* Stripe Payment Form */}
-                {clientSecret ? (
-                  <PaymentFormStripe
-                    clientSecret={clientSecret}
-                    amount={Math.round(state.total * 100)}
-                    currency="SEK"
-                    onSuccess={() => navigate('/marketplace/order-success?view=success')}
-                    onError={(error) => console.error('Payment error:', error)}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main content */}
+          <div className="lg:col-span-2">
+            <Card className="bg-card border-border">
+              <CardContent className="p-6">
+                {currentStep === 'shipping' && (
+                  <ShippingForm
+                    initialData={shippingInfo}
+                    onSubmit={handleShippingSubmit}
+                    isLoading={isCreatingPayment}
                   />
-                ) : (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <span className="ml-2 text-muted-foreground">Setting up payment...</span>
+                )}
+
+                {currentStep === 'payment' && shippingInfo && (
+                  <div className="space-y-6">
+                    <h2 className="text-lg font-semibold">Betalning</h2>
+                    {clientSecret ? (
+                      <PaymentFormStripe
+                        clientSecret={clientSecret}
+                        amount={Math.round(pricing.totalAmount * 100)}
+                        currency="SEK"
+                        onSuccess={() => navigate('/marketplace/order-success?view=success')}
+                        onError={(error) => console.error('Payment error:', error)}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Förbereder betalning...</span>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )}
+              </CardContent>
+            </Card>
+          </div>
 
-            {currentStep === 'review' && shippingInfo && paymentInfo && (() => {
-              const pricing = calculatePricing(state.total, shippingInfo.country);
-              return (
-                <OrderReview
-                  shippingInfo={shippingInfo}
-                  paymentInfo={paymentInfo}
-                  items={state.items}
-                  subtotal={pricing.subtotal}
-                  taxAmount={pricing.taxAmount}
-                  shippingAmount={pricing.shippingAmount}
-                  totalAmount={pricing.totalAmount}
-                  onPlaceOrder={handlePlaceOrder}
-                  isPlacing={isPlacing}
-                  onEdit={(step) => setCurrentStep(step)}
-                />
-              );
-            })()}
-          </CardContent>
-        </Card>
+          {/* Order summary sidebar */}
+          <div>
+            <Card className="bg-card border-border sticky top-20">
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">Ordersammanfattning</h3>
+                <div className="space-y-3 mb-4">
+                  {state.items.map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground truncate mr-2">
+                        {item.title} × {item.quantity}
+                      </span>
+                      <span className="font-medium whitespace-nowrap">
+                        {formatCurrency(item.price * item.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Delsumma</span>
+                    <span>{formatCurrency(pricing.subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Moms</span>
+                    <span>{formatCurrency(pricing.taxAmount)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Frakt</span>
+                    <span>{pricing.shippingAmount === 0 ? 'Gratis' : formatCurrency(pricing.shippingAmount)}</span>
+                  </div>
+                </div>
+                <Separator className="my-4" />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Totalt</span>
+                  <span>{formatCurrency(pricing.totalAmount)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
 
       <Footer />
