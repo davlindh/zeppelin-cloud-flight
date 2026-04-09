@@ -14,8 +14,10 @@ import { useCart } from "@/contexts/marketplace/CartContext";
 export function OrderSuccessPage() {
   const [params] = useSearchParams();
   const orderId = params.get("order_id");
-  const viewMode = params.get("view"); // 'success', 'confirm', null
+  const viewMode = params.get("view");
   const { toast } = useToast();
+  const { clearCart } = useCart();
+  const cartCleared = useRef(false);
 
   // Verify payment mutation - only for payment success flows
   const verifyPayment = useMutation({
