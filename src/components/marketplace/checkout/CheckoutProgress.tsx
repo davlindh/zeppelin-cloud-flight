@@ -6,9 +6,8 @@ interface CheckoutProgressProps {
 }
 
 const steps = [
-  { id: 'shipping', label: 'Shipping', description: 'Delivery information' },
-  { id: 'payment', label: 'Payment', description: 'Payment method' },
-  { id: 'review', label: 'Review', description: 'Confirm order' },
+  { id: 'shipping', label: 'Leverans', description: 'Leveransinformation' },
+  { id: 'payment', label: 'Betalning', description: 'Betala med kort' },
 ];
 
 export const CheckoutProgress = ({ currentStep }: CheckoutProgressProps) => {
