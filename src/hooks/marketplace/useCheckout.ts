@@ -19,7 +19,6 @@ export const useCheckout = () => {
   const [isPlacing, setIsPlacing] = useState(false);
   const { clearCart } = useCart();
   const { mutateAsync: createOrder } = useCreateOrder();
-  const { createCheckout } = useMarketplaceCheckout();
   const { toast } = useToast();
 
   const placeOrder = async (checkoutData: CheckoutData): Promise<string | null> => {
