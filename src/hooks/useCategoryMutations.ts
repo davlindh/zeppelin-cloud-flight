@@ -137,7 +137,7 @@ export const useCategoryMutations = () => {
 
       const { data, error } = await supabase
         .from('categories')
-        .update(dbUpdateData)
+        .update(dbUpdateData as any)
         .eq('id', id)
         .select()
         .single();
@@ -398,7 +398,7 @@ export const useCategoryMutations = () => {
 
           const { error } = await supabase
             .from('category_metadata')
-            .insert(defaultMetadata);
+            .insert(defaultMetadata as any);
 
           if (!error) {
             repaired.push(orphan.name);

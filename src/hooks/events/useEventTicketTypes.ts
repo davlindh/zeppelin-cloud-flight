@@ -221,7 +221,7 @@ export function useUpdateTicketType() {
       
       const { data: result, error } = await supabase
         .from('event_ticket_types')
-        .update(updateData)
+        .update(updateData as any)
         .eq('id', id)
         .select()
         .single();

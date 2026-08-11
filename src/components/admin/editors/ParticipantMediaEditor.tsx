@@ -96,7 +96,7 @@ export const ParticipantMediaEditor: React.FC<ParticipantMediaEditorProps> = ({
     mutationFn: async ({ linkId, field, value }: { linkId: string; field: string; value: string }) => {
       const { error } = await supabase
         .from('media_participant_links')
-        .update({ [field]: value })
+        .update({ [field]: value } as any)
         .eq('id', linkId);
       if (error) throw error;
     },
