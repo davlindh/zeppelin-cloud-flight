@@ -142,7 +142,7 @@ export const useGuestOrder = () => {
     mutationFn: async ({ orderId, updates }: { orderId: string; updates: Record<string, any> }) => {
       const { data, error } = await supabase
         .from('orders')
-        .update(updates)
+        .update(updates as any)
         .eq('id', orderId)
         .select()
         .single();

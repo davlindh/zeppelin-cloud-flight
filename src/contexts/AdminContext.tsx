@@ -414,7 +414,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 
       const { data: result, error } = await supabase
         .from('participants')
-        .update(dbData)
+        .update(dbData as any)
         .eq('id', id)
         .select()
         .single();

@@ -590,11 +590,11 @@ export const AdminFormFactory: React.FC<AdminFormFactoryProps> = ({
     const { error } = entityId
       ? await supabase
           .from(tableName)
-          .update(transformedData)
+          .update(transformedData as any)
           .eq('id', entityId)
       : await supabase
           .from(tableName)
-          .insert(transformedData);
+          .insert(transformedData as any);
 
     if (error) throw error;
 

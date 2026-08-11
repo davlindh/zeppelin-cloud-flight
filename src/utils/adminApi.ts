@@ -334,7 +334,7 @@ export const updateProjectWithRelationships = async (
     // Update project first
     const { data: project, error: projectError } = await supabase
       .from('projects')
-      .update(projectData)
+      .update(projectData as any)
       .eq('id', projectId)
       .select()
       .single();
@@ -412,7 +412,7 @@ export const updateParticipant = async (id: string, data: Partial<Participant>) 
     
     const { data: participant, error } = await supabase
       .from('participants')
-      .update(dbData)
+      .update(dbData as any)
       .eq('id', id)
       .select()
       .single();
@@ -435,7 +435,7 @@ export const createParticipant = async (data: Omit<Participant, 'id' | 'created_
     
     const { data: participant, error } = await supabase
       .from('participants')
-      .insert(dbData)
+      .insert(dbData as any)
       .select()
       .single();
 

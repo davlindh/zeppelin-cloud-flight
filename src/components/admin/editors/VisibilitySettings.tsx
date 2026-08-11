@@ -33,8 +33,8 @@ export const VisibilitySettings: React.FC<VisibilitySettingsProps> = ({
                        entityType === 'project' ? 'projects' : 'sponsors';
       
       const { error } = await supabase
-        .from(tableName)
-        .update({ [field]: value })
+        .from(tableName as any)
+        .update({ [field]: value } as any)
         .eq('id', entityId);
 
       if (error) throw error;

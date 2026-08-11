@@ -39,8 +39,8 @@ export const transformDatabaseNotificationPrefs = (dbPrefs: any) => {
     priceDropAlerts: dbPrefs.price_drop_alerts ?? true,
     stockAlerts: true, // Not in DB schema, use default
     backInStockAlerts: true, // Not in DB schema, use default
-    auctionEndingAlerts: dbPrefs.auction_ending_soon ?? true,
-    outbidAlerts: dbPrefs.outbid_notifications ?? true,
+    auctionEndingAlerts: dbPrefs.auction_ending_alerts ?? true,
+    outbidAlerts: dbPrefs.outbid_alerts ?? true,
     newItemsInCategories: dbPrefs.new_items_in_categories ?? false,
     dailyDigest: false, // Not in DB schema, use default
     weeklyRecommendations: true, // Not in DB schema, use default
@@ -63,8 +63,8 @@ export const transformNotificationPrefsToDatabase = (prefs: any) => {
     email_notifications: prefs.emailNotifications,
     push_notifications: prefs.pushNotifications,
     price_drop_alerts: prefs.priceDropAlerts,
-    auction_ending_soon: prefs.auctionEndingAlerts,
-    outbid_notifications: prefs.outbidAlerts,
+    auction_ending_alerts: prefs.auctionEndingAlerts,
+    outbid_alerts: prefs.outbidAlerts,
     new_items_in_categories: prefs.newItemsInCategories,
     updated_at: new Date().toISOString()
   };
