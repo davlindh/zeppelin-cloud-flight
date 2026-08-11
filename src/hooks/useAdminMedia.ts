@@ -12,7 +12,7 @@ export const useAdminMedia = () => {
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<MediaLibraryItem> }) => {
       const { error } = await supabase
         .from('media_library')
-        .update(updates)
+        .update(updates as any)
         .eq('id', id);
       
       if (error) throw error;
