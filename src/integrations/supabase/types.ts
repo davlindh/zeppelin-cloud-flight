@@ -1704,6 +1704,279 @@ export type Database = {
           },
         ]
       }
+      media_library: {
+        Row: {
+          approved_at: string | null
+          bucket: string
+          category: string | null
+          created_at: string
+          description: string | null
+          duration: number | null
+          file_size: number | null
+          filename: string
+          height: number | null
+          id: string
+          is_featured: boolean
+          is_public: boolean
+          mime_type: string
+          original_filename: string | null
+          participant_id: string | null
+          project_id: string | null
+          public_url: string
+          search_vector: unknown
+          source: string | null
+          status: string
+          storage_path: string
+          submission_id: string | null
+          tags: string[]
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string
+          uploaded_at: string
+          uploaded_by: string | null
+          width: number | null
+        }
+        Insert: {
+          approved_at?: string | null
+          bucket?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          filename: string
+          height?: number | null
+          id?: string
+          is_featured?: boolean
+          is_public?: boolean
+          mime_type?: string
+          original_filename?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          public_url: string
+          search_vector?: unknown
+          source?: string | null
+          status?: string
+          storage_path: string
+          submission_id?: string | null
+          tags?: string[]
+          thumbnail_url?: string | null
+          title: string
+          type: string
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Update: {
+          approved_at?: string | null
+          bucket?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          file_size?: number | null
+          filename?: string
+          height?: number | null
+          id?: string
+          is_featured?: boolean
+          is_public?: boolean
+          mime_type?: string
+          original_filename?: string | null
+          participant_id?: string | null
+          project_id?: string | null
+          public_url?: string
+          search_vector?: unknown
+          source?: string | null
+          status?: string
+          storage_path?: string
+          submission_id?: string | null
+          tags?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_library_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_library_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "public_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_library_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_library_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_participant_links: {
+        Row: {
+          category: string | null
+          created_at: string
+          display_order: number
+          id: string
+          media_id: string
+          participant_id: string
+          updated_at: string
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          media_id: string
+          participant_id: string
+          updated_at?: string
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          media_id?: string
+          participant_id?: string
+          updated_at?: string
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_participant_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_participant_links_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_participant_links_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "public_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_project_links: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          media_id: string
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          media_id: string
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          media_id?: string
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_project_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_project_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_sponsor_links: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_primary: boolean
+          media_id: string
+          media_type: string
+          sponsor_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_primary?: boolean
+          media_id: string
+          media_type?: string
+          sponsor_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_primary?: boolean
+          media_id?: string
+          media_type?: string
+          sponsor_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_sponsor_links_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_library"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_sponsor_links_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           auction_ending_alerts: boolean | null
@@ -2265,6 +2538,206 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      payment_analytics: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          order_id: string | null
+          payment_method: string | null
+          timestamp: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          order_id?: string | null
+          payment_method?: string | null
+          timestamp?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          order_id?: string | null
+          payment_method?: string | null
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_analytics_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_conversions: {
+        Row: {
+          conversion_type: string
+          created_at: string
+          customer_email: string | null
+          id: string
+          portfolio_item_id: string | null
+          provider_id: string | null
+          related_id: string | null
+          session_id: string | null
+        }
+        Insert: {
+          conversion_type: string
+          created_at?: string
+          customer_email?: string | null
+          id?: string
+          portfolio_item_id?: string | null
+          provider_id?: string | null
+          related_id?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          conversion_type?: string
+          created_at?: string
+          customer_email?: string | null
+          id?: string
+          portfolio_item_id?: string | null
+          provider_id?: string | null
+          related_id?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_conversions_portfolio_item_id_fkey"
+            columns: ["portfolio_item_id"]
+            isOneToOne: false
+            referencedRelation: "service_portfolio_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_conversions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "portfolio_conversions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_item_clicks: {
+        Row: {
+          click_type: string
+          created_at: string
+          id: string
+          portfolio_item_id: string | null
+          provider_id: string | null
+          session_id: string | null
+        }
+        Insert: {
+          click_type?: string
+          created_at?: string
+          id?: string
+          portfolio_item_id?: string | null
+          provider_id?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          click_type?: string
+          created_at?: string
+          id?: string
+          portfolio_item_id?: string | null
+          provider_id?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_item_clicks_portfolio_item_id_fkey"
+            columns: ["portfolio_item_id"]
+            isOneToOne: false
+            referencedRelation: "service_portfolio_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_item_clicks_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "portfolio_item_clicks_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_item_views: {
+        Row: {
+          created_at: string
+          id: string
+          portfolio_item_id: string | null
+          provider_id: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          portfolio_item_id?: string | null
+          provider_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          portfolio_item_id?: string | null
+          provider_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_item_views_portfolio_item_id_fkey"
+            columns: ["portfolio_item_id"]
+            isOneToOne: false
+            referencedRelation: "service_portfolio_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portfolio_item_views_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "portfolio_item_views_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_reviews: {
         Row: {
@@ -3091,6 +3564,38 @@ export type Database = {
           },
         ]
       }
+      review_helpful_votes: {
+        Row: {
+          created_at: string
+          id: string
+          review_id: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_id: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_helpful_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "service_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_applications: {
         Row: {
           admin_notes: string | null
@@ -3196,6 +3701,7 @@ export type Database = {
       service_portfolio_items: {
         Row: {
           after_image: string | null
+          auto_generated: boolean
           before_image: string | null
           category: string
           client_name: string | null
@@ -3210,6 +3716,8 @@ export type Database = {
           project_url: string | null
           project_value: number | null
           provider_id: string
+          source_project_id: string | null
+          source_type: string
           tags: string[] | null
           testimonial: string | null
           title: string
@@ -3217,6 +3725,7 @@ export type Database = {
         }
         Insert: {
           after_image?: string | null
+          auto_generated?: boolean
           before_image?: string | null
           category: string
           client_name?: string | null
@@ -3231,6 +3740,8 @@ export type Database = {
           project_url?: string | null
           project_value?: number | null
           provider_id: string
+          source_project_id?: string | null
+          source_type?: string
           tags?: string[] | null
           testimonial?: string | null
           title: string
@@ -3238,6 +3749,7 @@ export type Database = {
         }
         Update: {
           after_image?: string | null
+          auto_generated?: boolean
           before_image?: string | null
           category?: string
           client_name?: string | null
@@ -3252,6 +3764,8 @@ export type Database = {
           project_url?: string | null
           project_value?: number | null
           provider_id?: string
+          source_project_id?: string | null
+          source_type?: string
           tags?: string[] | null
           testimonial?: string | null
           title?: string
@@ -3267,6 +3781,77 @@ export type Database = {
           },
           {
             foreignKeyName: "service_portfolio_items_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_portfolio_items_source_project_id_fkey"
+            columns: ["source_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_provider_projects: {
+        Row: {
+          contribution_description: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          is_featured: boolean
+          project_id: string
+          provider_id: string
+          role: string
+          show_in_portfolio: boolean
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          contribution_description?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_featured?: boolean
+          project_id: string
+          provider_id: string
+          role?: string
+          show_in_portfolio?: boolean
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contribution_description?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_featured?: boolean
+          project_id?: string
+          provider_id?: string
+          role?: string
+          show_in_portfolio?: boolean
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_provider_projects_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_provider_projects_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "provider_performance_metrics"
+            referencedColumns: ["provider_id"]
+          },
+          {
+            foreignKeyName: "service_provider_projects_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "service_providers"
@@ -4070,6 +4655,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
+      }
+      auto_generate_portfolio_from_project: {
+        Args: { p_participant_id: string; p_project_id: string }
+        Returns: Json
       }
       award_event_attendance_fave: {
         Args: { p_event_id: string; p_user_id: string }
