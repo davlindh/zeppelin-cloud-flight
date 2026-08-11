@@ -1,4 +1,4 @@
-import postgres from "https://esm.sh/postgres@3.4.4";
+import { Client } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,9 +26,10 @@ Deno.serve(async (req) => {
   }
 
   const body = await req.text();
-  const sql = postgres(dbUrl, { max: 1, prepare: false, idle_timeout: 20 });
+  const client = new Client(dbUrl);
   try {
-    await sql.unsafe(body);
+    await client.connect();
+    await client.queryArray(body);
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -38,6 +39,8 @@ Deno.serve(async (req) => {
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } finally {
-    await sql.end({ timeout: 5 });
+    try {
+      await client.end();
+    } catch (_) { /* ignore */ }
   }
 });
