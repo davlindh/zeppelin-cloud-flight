@@ -25,22 +25,45 @@ Deno.serve(async (req) => {
     });
   }
 
-  const body = await req.text();
-  const client = new Client(dbUrl);
+  let payload: { files: { name: string; sql: string }[] };
   try {
-    await client.connect();
-    await client.queryArray(body);
-    return new Response(JSON.stringify({ ok: true }), {
+    payload = await req.json();
+  } catch (e) {
+    return new Response(JSON.stringify({ error: "invalid json", detail: String(e) }), {
+      status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  const client = new Client(dbUrl);
+  const failures: { name: string; error: string }[] = [];
+  let okCount = 0;
+
+  try {
+    await client.connect();
+    for (const f of payload.files ?? []) {
+      try {
+        await client.queryArray(`BEGIN; ${f.sql}\n; COMMIT;`);
+        okCount++;
+      } catch (e) {
+        try {
+          await client.queryArray("ROLLBACK;");
+        } catch (_) { /* ignore */ }
+        failures.push({ name: f.name, error: String((e as Error).message ?? e) });
+      }
+    }
   } catch (e) {
-    return new Response(
-      JSON.stringify({ ok: false, error: String((e as Error).message ?? e) }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: String((e as Error).message ?? e) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } finally {
     try {
       await client.end();
     } catch (_) { /* ignore */ }
   }
+
+  return new Response(JSON.stringify({ okCount, failedCount: failures.length, failures }, null, 2), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 });
