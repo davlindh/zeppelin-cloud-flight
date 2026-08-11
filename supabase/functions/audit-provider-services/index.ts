@@ -1,69 +1,180 @@
-import { Client } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-run-token",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const RUN_TOKEN = "zeppel-schema-replay-2026";
+interface AuditResult {
+  timestamp: string;
+  issues: {
+    unlinked_services: Array<{
+      id: string;
+      title: string;
+      provider_name: string;
+    }>;
+    providers_without_services: Array<{
+      id: string;
+      name: string;
+      created_at: string;
+    }>;
+    duplicate_providers: Array<{
+      name: string;
+      count: number;
+      ids: string[];
+    }>;
+    low_quality_providers: Array<{
+      id: string;
+      name: string;
+      issue: string;
+    }>;
+  };
+  recommendations: string[];
+  summary: {
+    total_services: number;
+    total_providers: number;
+    linkage_rate: number;
+    health_score: number;
+  };
+}
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
-  if (req.headers.get("x-run-token") !== RUN_TOKEN) {
-    return new Response(JSON.stringify({ error: "forbidden" }), {
-      status: 403,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
   }
 
-  const dbUrl = Deno.env.get("SUPABASE_DB_URL");
-  if (!dbUrl) {
-    return new Response(JSON.stringify({ error: "SUPABASE_DB_URL missing" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
-  let payload: { files: { name: string; sql: string }[] };
   try {
-    payload = await req.json();
-  } catch (e) {
-    return new Response(JSON.stringify({ error: "invalid json", detail: String(e) }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Fetch unlinked services
+    const { data: unlinkedServices } = await supabase
+      .from('services')
+      .select('id, title, provider')
+      .is('provider_id', null);
+
+    // Fetch providers without services
+    const { data: allProviders } = await supabase
+      .from('service_providers')
+      .select('id, name, created_at');
+
+    const { data: providersWithServices } = await supabase
+      .from('services')
+      .select('provider_id')
+      .not('provider_id', 'is', null);
+
+    const providerIdsWithServices = new Set(
+      providersWithServices?.map(s => s.provider_id) || []
+    );
+
+    const providersWithoutServices = allProviders?.filter(
+      p => !providerIdsWithServices.has(p.id)
+    ) || [];
+
+    // Find duplicate provider names
+    const providersByName = new Map<string, string[]>();
+    allProviders?.forEach(p => {
+      const ids = providersByName.get(p.name) || [];
+      ids.push(p.id);
+      providersByName.set(p.name, ids);
     });
-  }
 
-  const client = new Client(dbUrl);
-  const failures: { name: string; error: string }[] = [];
-  let okCount = 0;
+    const duplicateProviders = Array.from(providersByName.entries())
+      .filter(([_, ids]) => ids.length > 1)
+      .map(([name, ids]) => ({ name, count: ids.length, ids }));
 
-  try {
-    await client.connect();
-    for (const f of payload.files ?? []) {
-      try {
-        await client.queryArray(`BEGIN; ${f.sql}\n; COMMIT;`);
-        okCount++;
-      } catch (e) {
-        try {
-          await client.queryArray("ROLLBACK;");
-        } catch (_) { /* ignore */ }
-        failures.push({ name: f.name, error: String((e as Error).message ?? e) });
-      }
+    // Find low-quality providers
+    const { data: lowQualityProviders } = await supabase
+      .from('service_providers')
+      .select('id, name, rating, reviews, email')
+      .or('rating.lt.3,reviews.eq.0,email.is.null');
+
+    const lowQuality = lowQualityProviders?.map(p => ({
+      id: p.id,
+      name: p.name,
+      issue: p.email === null 
+        ? 'Missing contact info' 
+        : p.reviews === 0 
+          ? 'No reviews' 
+          : 'Low rating'
+    })) || [];
+
+    // Calculate metrics
+    const { data: allServices } = await supabase
+      .from('services')
+      .select('id, provider_id');
+
+    const totalServices = allServices?.length || 0;
+    const linkedServices = allServices?.filter(s => s.provider_id).length || 0;
+    const linkageRate = totalServices > 0 ? (linkedServices / totalServices) * 100 : 100;
+    
+    const healthScore = Math.round(
+      (linkageRate * 0.4) + 
+      ((providersWithoutServices.length === 0 ? 100 : 70) * 0.3) +
+      ((duplicateProviders.length === 0 ? 100 : 60) * 0.2) +
+      ((lowQuality.length === 0 ? 100 : 80) * 0.1)
+    );
+
+    // Generate recommendations
+    const recommendations: string[] = [];
+    
+    if (unlinkedServices && unlinkedServices.length > 0) {
+      recommendations.push(
+        `Link ${unlinkedServices.length} unlinked services to providers using name matching or manual assignment.`
+      );
     }
-  } catch (e) {
-    return new Response(JSON.stringify({ error: String((e as Error).message ?? e) }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } finally {
-    try {
-      await client.end();
-    } catch (_) { /* ignore */ }
-  }
 
-  return new Response(JSON.stringify({ okCount, failedCount: failures.length, failures }, null, 2), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+    if (duplicateProviders.length > 0) {
+      recommendations.push(
+        `Merge ${duplicateProviders.length} duplicate provider profiles to avoid confusion.`
+      );
+    }
+
+    if (providersWithoutServices.length > 0) {
+      recommendations.push(
+        `Review ${providersWithoutServices.length} providers without services - consider archiving or adding services.`
+      );
+    }
+
+    if (lowQuality.length > 0) {
+      recommendations.push(
+        `Improve ${lowQuality.length} provider profiles with missing info or low engagement.`
+      );
+    }
+
+    const result: AuditResult = {
+      timestamp: new Date().toISOString(),
+      issues: {
+        unlinked_services: (unlinkedServices || []).map(s => ({
+          id: s.id,
+          title: s.title,
+          provider_name: s.provider || 'Unknown'
+        })),
+        providers_without_services: providersWithoutServices,
+        duplicate_providers: duplicateProviders,
+        low_quality_providers: lowQuality
+      },
+      recommendations,
+      summary: {
+        total_services: totalServices,
+        total_providers: allProviders?.length || 0,
+        linkage_rate: Math.round(linkageRate * 100) / 100,
+        health_score: healthScore
+      }
+    };
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
 });
