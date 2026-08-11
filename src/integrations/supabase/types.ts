@@ -438,6 +438,7 @@ export type Database = {
           category_id: string | null
           color_scheme: Json | null
           created_at: string
+          display_settings: Json
           icon_name: string | null
           id: string
           image_url: string | null
@@ -448,6 +449,7 @@ export type Database = {
           category_id?: string | null
           color_scheme?: Json | null
           created_at?: string
+          display_settings?: Json
           icon_name?: string | null
           id?: string
           image_url?: string | null
@@ -458,6 +460,7 @@ export type Database = {
           category_id?: string | null
           color_scheme?: Json | null
           created_at?: string
+          display_settings?: Json
           icon_name?: string | null
           id?: string
           image_url?: string | null
@@ -1111,6 +1114,8 @@ export type Database = {
       evaluations: {
         Row: {
           comment: string | null
+          context_id: string | null
+          context_scope: string | null
           created_at: string
           dimensions: Json
           eckt_value: number
@@ -1124,6 +1129,8 @@ export type Database = {
         }
         Insert: {
           comment?: string | null
+          context_id?: string | null
+          context_scope?: string | null
           created_at?: string
           dimensions?: Json
           eckt_value: number
@@ -1137,6 +1144,8 @@ export type Database = {
         }
         Update: {
           comment?: string | null
+          context_id?: string | null
+          context_scope?: string | null
           created_at?: string
           dimensions?: Json
           eckt_value?: number
@@ -3103,22 +3112,28 @@ export type Database = {
       project_links: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           project_id: string
+          title: string | null
           type: string
           url: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           project_id: string
+          title?: string | null
           type: string
           url: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           project_id?: string
+          title?: string | null
           type?: string
           url?: string
         }
@@ -3367,9 +3382,13 @@ export type Database = {
           full_description: string | null
           id: string
           image_path: string | null
+          is_featured: boolean
+          is_public: boolean
+          location: string | null
           match_confidence: number | null
           match_criteria: Json | null
           purpose: string | null
+          show_contact_info: boolean
           slug: string
           title: string
           updated_at: string
@@ -3386,9 +3405,13 @@ export type Database = {
           full_description?: string | null
           id?: string
           image_path?: string | null
+          is_featured?: boolean
+          is_public?: boolean
+          location?: string | null
           match_confidence?: number | null
           match_criteria?: Json | null
           purpose?: string | null
+          show_contact_info?: boolean
           slug: string
           title: string
           updated_at?: string
@@ -3405,9 +3428,13 @@ export type Database = {
           full_description?: string | null
           id?: string
           image_path?: string | null
+          is_featured?: boolean
+          is_public?: boolean
+          location?: string | null
           match_confidence?: number | null
           match_criteria?: Json | null
           purpose?: string | null
+          show_contact_info?: boolean
           slug?: string
           title?: string
           updated_at?: string
@@ -3861,6 +3888,8 @@ export type Database = {
       }
       service_providers: {
         Row: {
+          active: boolean
+          approved_at: string | null
           auth_user_id: string | null
           availability_status: string | null
           avatar: string
@@ -3885,10 +3914,13 @@ export type Database = {
           specialties: string[] | null
           status: string | null
           updated_at: string
+          verified: boolean
           work_philosophy: string | null
           years_in_business: number | null
         }
         Insert: {
+          active?: boolean
+          approved_at?: string | null
           auth_user_id?: string | null
           availability_status?: string | null
           avatar: string
@@ -3913,10 +3945,13 @@ export type Database = {
           specialties?: string[] | null
           status?: string | null
           updated_at?: string
+          verified?: boolean
           work_philosophy?: string | null
           years_in_business?: number | null
         }
         Update: {
+          active?: boolean
+          approved_at?: string | null
           auth_user_id?: string | null
           availability_status?: string | null
           avatar?: string
@@ -3941,6 +3976,7 @@ export type Database = {
           specialties?: string[] | null
           status?: string | null
           updated_at?: string
+          verified?: boolean
           work_philosophy?: string | null
           years_in_business?: number | null
         }
