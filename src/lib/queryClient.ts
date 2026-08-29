@@ -1,5 +1,15 @@
 import { QueryClient } from '@tanstack/react-query';
 
+type HttpStatusError = Error & { status?: number; response?: Response };
+
+const isClientErrorStatus = (error: unknown): error is HttpStatusError => {
+  if (!error || typeof error !== 'object') return false;
+
+  const status = (error as HttpStatusError).status ?? (error as HttpStatusError).response?.status;
+
+  return typeof status === 'number' && status >= 400 && status < 500;
+};
+
 // Global query client configuration with 30-second fresh data window
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,15 +22,15 @@ export const queryClient = new QueryClient({
       // Retry failed requests 3 times with exponential backoff
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors (client errors)
-        if (error instanceof Error && 'status' in error) {
-          const status = (error as Error & { status: number }).status;
-          if (status >= 400 && status < 500) {
-            return false;
-          }
+        if (isClientErrorStatus(error)) {
+          return false;
         }
         // Retry up to 3 times for other errors
         return failureCount < 3;
       },
+
+      // Exponential backoff between retries, capped at 5 seconds
+      retryDelay: (attemptIndex) => Math.min(500 * 2 ** attemptIndex, 5_000),
 
       // Refetch on window focus for fresh data
       refetchOnWindowFocus: true,
@@ -46,16 +56,22 @@ export const queryClient = new QueryClient({
 
 // Global error handler for queries
 queryClient.getQueryCache().subscribe((event) => {
-  // Handle different event types
-  switch (event.type) {
-    case 'added':
-    case 'removed':
-    case 'updated':
-      // Query lifecycle events
-      break;
-    default:
-      // Log any unexpected events for debugging
-      console.debug('Query cache event:', event.type);
+  // Surface query errors so they can be correlated with API/database issues
+  if (event?.type === 'updated' && event.query.state.status === 'error') {
+    console.error('Query error:', event.query.queryKey, event.query.state.error);
+    return;
+  }
+
+  // Log unexpected events for debugging
+  if (!['added', 'removed', 'updated', 'observerResultsUpdated'].includes(event.type)) {
+    console.debug('Query cache event:', event.type);
+  }
+});
+
+// Global error handler for mutations (often writes to the database)
+queryClient.getMutationCache().subscribe((event) => {
+  if (event?.type === 'updated' && event.mutation.state.status === 'error') {
+    console.error('Mutation error:', event.mutation.options.mutationKey, event.mutation.state.error);
   }
 });
 
