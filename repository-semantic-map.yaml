@@ -1,0 +1,12 @@
+version: 1
+repository: davlindh/zeppelin-cloud-flight
+purpose: Zeppel cultural/digital experience implementation and showcase experiment.
+status: vertical-reference
+canonical_parent: davlindh/artzeppel
+capabilities: [culture, digital-experience, showcase, events]
+vertical: culture-art
+omniframez_role: vertical-predecessor-or-satellite
+evidence: {confidence: inferred, sources: [repository-name, repository-history]}
+harvest_action: compare-with-artzeppel-and-harvest
+relations:
+  - predecessor_or_sibling_of: davlindh/artzeppel
